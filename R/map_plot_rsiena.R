@@ -7,6 +7,9 @@
 #'   the RSiena package.
 #' @author Tom Snijders
 #' @references Consult also the RSiena manual, Sections 13.1 and 13.3.
+#' @inheritParams plot.diffusion
+#' @param x An object of class "selectionTable",
+#'   created using `RSiena::selectionTable()`.
 #' @param quad When TRUE (the default), a quadratic function
 #'   (average and total alter) is plotted.
 #'   Use `quad = FALSE` for similarity effects.
@@ -15,6 +18,7 @@
 #'   An advisable value then is, e.g., 0.01.
 #' @param bw Whether the plot should be rendered in black and white,
 #'   e.g. for publication, or in colour.
+#' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @examples
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mycov  <- coCovar(s50a[,1])
@@ -28,14 +32,8 @@
 #' plot(x, xd, name, vname, levls)
 #' @export
 plot.selectionTable <- function(x, 
-                                quad=TRUE,
-                                base_size=32, separation=0, bw=FALSE,
+                                quad=TRUE, separation=0, bw=FALSE,
                                 ...){
-  # vnametext and nametext: the names of the variable and of the network,
-  # as will be given as texts in the plot.
-  # vnametext.l: the names of the variable as will be given as text in the
-  # plot legend indicating the curves for ego's values.
-  # labels are for the curves, corresponding to ego's values.
   vselect <- x
   levls <- attr(x, "levls")
   multiplier <- attr(x, "multiplier")
@@ -63,15 +61,15 @@ plot.selectionTable <- function(x,
     }
   }
   if (bw) {
-    sp <- sp + ggplot2::geom_point(color='black') + gs + scale_linetype_manual(
+    sp <- sp + ggplot2::geom_point(color='black') + gs + ggplot2::scale_linetype_manual(
       values= c('solid',  'longdash','dashed',
                 'twodash', 'dotdash', 'dotted'), labels=labels) +
-      ggplot2::theme_bw(base_size=base_size, base_family="") +
+      ggplot2::theme_bw(base_size=32, base_family="") +
       ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
             panel.grid.minor = ggplot2::element_blank())
   } else {
     sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_colour_hue(labels=labels)+
-      ggplot2::theme_grey(base_size=base_size, base_family="")
+      ggplot2::theme_grey(base_size=32, base_family="")
   }
   
   nametext <- attr(x, "name")
@@ -101,6 +99,8 @@ plot.selectionTable <- function(x,
 #' @references Consult also the RSiena manual, Sections 13.2 and 13.4.
 #'   Gratitude to Steffen Triebel and Rene Veenstra for corrections.
 #' @inheritParams plot.selectionTable
+#' @param x An object of class "influenceTable",
+#'   created using `RSiena::influenceTable()`.
 #' @examples
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
@@ -122,28 +122,28 @@ plot.influenceTable <- function(x, separation=0, bw=FALSE, ...){
   zselect$select <- zselect$select + separation*zr*as.numeric(factor(zselect$alter))
   labs <- unique(zselect$alter)
   if (bw) {
-    sp <- ggplot(zselect, aes(zego, select, group=alter, linetype=alter))
+    sp <- ggplot2::ggplot(zselect, aes(zego, select, group=alter, linetype=alter))
   } else {
-    sp <- ggplot(zselect, aes(zego, select, group=alter, colour=alter))
+    sp <- ggplot2::ggplot(zselect, aes(zego, select, group=alter, colour=alter))
   }
   if (quad) {
-    gs <- geom_smooth(linewidth=1.2, span=3)
+    gs <- ggplot2::geom_smooth(linewidth=1.2, span=3)
   } else {
-    gs <- geom_line(linewidth=1.2)
+    gs <- ggplot2::geom_line(linewidth=1.2)
   }
   if (bw) {
-    sp <- sp + geom_point() + gs + scale_linetype_manual(values =
+    sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_linetype_manual(values =
                                                            c('solid',  'longdash','dashed', 'twodash', 'dotdash', 'dotted'), labels=labs)
   } else {
-    sp <- sp + geom_point() + gs + scale_colour_hue(labels=labs)
+    sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_colour_hue(labels=labs)
   }
   beh.label <- behname
   ylabel <- "Evaluation function"
   title <- paste('Influence effect',netname,'on',behname)
-  sp + theme(legend.key=element_blank())+
-    labs(x=beh.label, y=ylabel, title=title,
+  sp + ggplot2::theme(legend.key=element_blank())+
+    ggplot2::labs(x=beh.label, y=ylabel, title=title,
          colour=paste(beh.label,'\nalter')) +
-    theme_grey(base_size=26, base_family="") +
-    theme(legend.key.width=unit(1, "cm")) +
-    theme(plot.title=element_text(hjust=0.5))
+    ggplot2::theme_grey(base_size=26, base_family="") +
+    ggplot2::theme(legend.key.width=unit(1, "cm")) +
+    ggplot2::theme(plot.title=element_text(hjust=0.5))
 }
