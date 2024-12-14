@@ -90,3 +90,60 @@ plot.selectionTable <- function(x,
   ssp
 }
 
+# Influence Tables ####
+
+#' Plotting influence tables
+#' @description
+#'   These are functions for constructing and presenting influence tables
+#'   for the interpretation of results for network and behavior dynamics
+#'   obtained with the RSiena or multiSiena packages.
+#' @author Tom Snijders
+#' @references Consult also the RSiena manual, Sections 13.2 and 13.4.
+#'   Gratitude to Steffen Triebel and Rene Veenstra for corrections.
+#' @inheritParams plot.selectionTable
+#' @examples
+#' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
+#' mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
+#' mydata <- sienaDataCreate(mynet, mybeh)
+#' myeff <- getEffects(mydata)
+#' myeff <- includeEffects(myeff, avAlt, name="mybeh", interaction1="mynet")
+#' myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
+#' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
+#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, silent=TRUE, batch=TRUE)
+#' x <- influenceTable(ans, mydata, "mynet", "mybeh")
+#' plot(x)
+#' @export
+plot.influenceTable <- function(x, separation=0, bw=FALSE, ...){
+  zselect <- x
+  quad <- attr(x, "quad")
+  netname <- attr(x, "netname")
+  behname <- attr(x, "behname")
+  zr <- max(zselect$select) - min(zselect$select) # only for separation
+  zselect$select <- zselect$select + separation*zr*as.numeric(factor(zselect$alter))
+  labs <- unique(zselect$alter)
+  if (bw) {
+    sp <- ggplot(zselect, aes(zego, select, group=alter, linetype=alter))
+  } else {
+    sp <- ggplot(zselect, aes(zego, select, group=alter, colour=alter))
+  }
+  if (quad) {
+    gs <- geom_smooth(linewidth=1.2, span=3)
+  } else {
+    gs <- geom_line(linewidth=1.2)
+  }
+  if (bw) {
+    sp <- sp + geom_point() + gs + scale_linetype_manual(values =
+                                                           c('solid',  'longdash','dashed', 'twodash', 'dotdash', 'dotted'), labels=labs)
+  } else {
+    sp <- sp + geom_point() + gs + scale_colour_hue(labels=labs)
+  }
+  beh.label <- behname
+  ylabel <- "Evaluation function"
+  title <- paste('Influence effect',netname,'on',behname)
+  sp + theme(legend.key=element_blank())+
+    labs(x=beh.label, y=ylabel, title=title,
+         colour=paste(beh.label,'\nalter')) +
+    theme_grey(base_size=26, base_family="") +
+    theme(legend.key.width=unit(1, "cm")) +
+    theme(plot.title=element_text(hjust=0.5))
+}
