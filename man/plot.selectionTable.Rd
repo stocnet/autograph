@@ -4,9 +4,12 @@
 \alias{plot.selectionTable}
 \title{Plotting selection tables}
 \usage{
-\method{plot}{selectionTable}(x, quad = TRUE, base_size = 32, separation = 0, bw = FALSE, ...)
+\method{plot}{selectionTable}(x, quad = TRUE, separation = 0, bw = FALSE, ...)
 }
 \arguments{
+\item{x}{An object of class "selectionTable",
+created using \code{RSiena::selectionTable()}.}
+
 \item{quad}{When TRUE (the default), a quadratic function
 (average and total alter) is plotted.
 Use \code{quad = FALSE} for similarity effects.}
@@ -17,6 +20,8 @@ An advisable value then is, e.g., 0.01.}
 
 \item{bw}{Whether the plot should be rendered in black and white,
 e.g. for publication, or in colour.}
+
+\item{...}{Other arguments to be passed.}
 }
 \description{
 These are functions for constructing and presenting selection tables

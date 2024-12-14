@@ -2,22 +2,27 @@
 % Please edit documentation in R/map_plot_rsiena.R
 \name{plot.influenceTable}
 \alias{plot.influenceTable}
-\title{Plotting selection tables}
+\title{Plotting influence tables}
 \usage{
 \method{plot}{influenceTable}(x, separation = 0, bw = FALSE, ...)
 }
 \arguments{
+\item{x}{An object of class "influenceTable",
+created using \code{RSiena::influenceTable()}.}
+
 \item{separation}{This can be used to make the curves visually distinguishable
 if they overlap too much without it.
 An advisable value then is, e.g., 0.01.}
 
 \item{bw}{Whether the plot should be rendered in black and white,
 e.g. for publication, or in colour.}
+
+\item{...}{Other arguments to be passed.}
 }
 \description{
-These are functions for constructing and presenting selection tables
-for the interpretation of results for network dynamics obtained with
-the RSiena package.
+These are functions for constructing and presenting influence tables
+for the interpretation of results for network and behavior dynamics
+obtained with the RSiena or multiSiena packages.
 }
 \examples{
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
@@ -32,7 +37,8 @@ x <- influenceTable(ans, mydata, "mynet", "mybeh")
 plot(x)
 }
 \references{
-Consult also the RSiena manual, Sections 13.1 and 13.3.
+Consult also the RSiena manual, Sections 13.2 and 13.4.
+Gratitude to Steffen Triebel and Rene Veenstra for corrections.
 }
 \author{
 Tom Snijders
