@@ -1,3 +1,7 @@
+#' @importFrom dplyr %>%
+#' @export
+dplyr::`%>%`
+
 #' @importFrom ggplot2 ggplot
 #' @export
 ggplot2::ggplot

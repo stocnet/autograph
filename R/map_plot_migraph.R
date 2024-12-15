@@ -53,3 +53,70 @@ plot.network_test <- function(x, ...,
                         color="red", linewidth=1.2) + ggplot2::ylab("Density")
 }
 
+# MRQAP ####
+
+#' Plotting methods for MRQAP models
+#' @description
+#'   These plotting methods are for results obtained by fitting an MRQAP
+#'   model.
+#'   The S3 classes are "netlm" or "netlogit", and so are compatible with the
+#'   results from either the `{sna}` or `{migraph}` packages.
+#' @name model_mrqap
+#' @param x An object obtained by fitting an MRQAP model to some data.
+#'   For example, `migraph::net_regression()`.
+#' @param ... Further arguments to be passed on to plot.
+#' @export
+plot.netlm <- function(x, ...){
+  distrib <- x$dist
+  distrib <- as.data.frame(distrib)
+  names(distrib) <- x$names
+  distrib$obs <- seq_len(nrow(distrib))
+  distrib <- stats::reshape(data = distrib, # tidyr::pivot_longer replacement
+                            direction = "long",
+                            varying = colnames(distrib)[-ncol(distrib)],
+                            v.names = "value",
+                            times = colnames(distrib)[-ncol(distrib)],
+                            timevar = "name")
+  rownames(distrib) <- NULL
+  distrib$id <- NULL
+  distrib <- dplyr::arrange(distrib, obs)
+  distrib$coef <- rep(unname(x$coefficients), nrow(x$dist))
+  distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
+  distrib$name <- factor(distrib$name, x$names)
+  ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
+    ggplot2::geom_violin(draw_quantiles = c(0.025, 0.975)) + 
+    ggplot2::theme_minimal() +
+    ylab("") + xlab("Statistic") + 
+    ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
+                        colour = "red") +
+    scale_y_discrete(limits=rev)
+}
+
+#' @rdname model_mrqap
+#' @export
+plot.netlogit <- function(x, ...){
+  distrib <- x$dist
+  distrib <- as.data.frame(distrib)
+  names(distrib) <- x$names
+  distrib$obs <- seq_len(nrow(distrib))
+  distrib <- stats::reshape(data = distrib, # tidyr::pivot_longer replacement
+                            direction = "long",
+                            varying = colnames(distrib)[-ncol(distrib)],
+                            v.names = "value",
+                            times = colnames(distrib)[-ncol(distrib)],
+                            timevar = "name")
+  rownames(distrib) <- NULL
+  distrib$id <- NULL
+  distrib <- dplyr::arrange(distrib, obs)
+  distrib$coef <- rep(unname(x$coefficients), nrow(x$dist))
+  distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
+  distrib$name <- factor(distrib$name, x$names)
+  ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
+    ggplot2::geom_violin(draw_quantiles = c(0.025, 0.975)) + 
+    ggplot2::theme_minimal() +
+    ylab("") + xlab("Statistic") + 
+    ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
+                        colour = "red") +
+    scale_y_discrete(limits=rev)
+}
+

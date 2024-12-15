@@ -3,6 +3,7 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
+\alias{\%>\%}
 \alias{ggplot}
 \alias{ggtitle}
 \alias{guides}
@@ -19,6 +20,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
+  \item{dplyr}{\code{\link[dplyr:reexports]{\%>\%}}}
+
   \item{ggplot2}{\code{\link[ggplot2]{aes}}, \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{ggsave}}, \code{\link[ggplot2:labs]{ggtitle}}, \code{\link[ggplot2]{guides}}, \code{\link[ggplot2]{labs}}, \code{\link[ggplot2]{scale_size}}, \code{\link[ggplot2:labs]{xlab}}, \code{\link[ggplot2:labs]{ylab}}}
 }}
 
