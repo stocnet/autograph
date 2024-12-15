@@ -231,3 +231,46 @@ plot.matrix <- function(x, ..., membership = NULL) {
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
 
+# Motifs ####
+
+#' Plotting tabular motifs
+#' @description
+#'   These functions will plot graphs of the motifs used in a vector of 
+#'   results of e.g. a triad census.
+#' @name map_motifs
+#' @param x An object of "node_motif" class, e.g. resulting from a call to
+#'   `manynet::node_by_triad()`.
+#' @inheritParams map_measure
+#' @export
+plot.node_motif <- function(x, ...) {
+  motifs <- dimnames(x)[[2]]
+  if("X4" %in% motifs){
+    manynet::graphs(manynet::create_motifs(4), waves = 1:11)
+  } else if("021D" %in% motifs){
+    manynet::graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
+  } else if("102" %in% motifs){
+    manynet::graphs(manynet::create_motifs(3), waves = 1:4)
+  } else if("Asymmetric" %in% motifs){
+    manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
+  } else if("Mutual" %in% motifs){
+    manynet::graphs(manynet::create_motifs(2), waves = 1:2)
+  } else mnet_unavailable("Cannot plot these motifs yet, sorry.")
+}
+
+#' @rdname map_motifs
+#' @export
+plot.network_motif <- function(x, ...) {
+  motifs <- attr(x, "names")
+  if("X4" %in% motifs){
+    manynet::graphs(manynet::create_motifs(4), waves = 1:11)
+  } else if("021D" %in% motifs){
+    manynet::graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
+  } else if("102" %in% motifs){
+    manynet::graphs(manynet::create_motifs(3), waves = 1:4)
+  } else if("Asymmetric" %in% motifs){
+    manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
+  } else if("Mutual" %in% motifs){
+    manynet::graphs(manynet::create_motifs(2), waves = 1:2)
+  } else mnet_unavailable("Cannot plot these motifs yet, sorry.")
+}
+
