@@ -25,6 +25,7 @@ for the interpretation of results for network and behavior dynamics
 obtained with the RSiena or multiSiena packages.
 }
 \examples{
+library(RSiena)
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
 mydata <- sienaDataCreate(mynet, mybeh)

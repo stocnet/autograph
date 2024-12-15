@@ -20,6 +20,7 @@
 #'   e.g. for publication, or in colour.
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @examples
+#' library(RSiena)
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mycov  <- coCovar(s50a[,1])
 #' mydata <- sienaDataCreate(mynet, mycov)
@@ -29,7 +30,7 @@
 #' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
 #' ans <- siena07(myalgorithm, data=mydata, effects=myeff, silent=TRUE, batch=TRUE)
 #' x <- selectionTable(ans, mydata, "mynet", "mycov")
-#' plot(x, xd, name, vname, levls)
+#' plot(x)
 #' @export
 plot.selectionTable <- function(x, 
                                 quad=TRUE, separation=0, bw=FALSE,
@@ -102,6 +103,7 @@ plot.selectionTable <- function(x,
 #' @param x An object of class "influenceTable",
 #'   created using `RSiena::influenceTable()`.
 #' @examples
+#' library(RSiena)
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
 #' mydata <- sienaDataCreate(mynet, mybeh)
