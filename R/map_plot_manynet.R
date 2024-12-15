@@ -1,7 +1,15 @@
 # Measures ####
 
 #' Plotting numeric measures
-
+#' @description
+#'   These functions plot distributions for node, tie, and network measures,
+#'   as defined in the `{manynet}` package.
+#' @name map_measure
+#' @param x An object of "node_measure", "tie_measure", 
+#'   or "network_measures" class.
+#' @param ... Other arguments to be passed on.
+#' @param type For node and tie measures, whether the plot should be 
+#'   "h" a histogram or "d" a density plot. By default "h".
 #' @export
 plot.node_measure <- function(x, type = c("h", "d"), ...) {
   #type <- match.arg(type)
@@ -35,6 +43,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
+#' @rdname map_measure
 #' @export
 plot.tie_measure <- function(x, type = c("h", "d"), ...) {
   type <- match.arg(type)
@@ -56,6 +65,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
+#' @rdname map_measure
 #' @export
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
