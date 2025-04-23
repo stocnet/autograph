@@ -40,3 +40,31 @@ snet_theme <- function(theme = NULL){
   }
 }
 
+theme_opts <- c("default", "bw",
+                "iheid", "ethz", "uzh", "rug", "unibe",
+                "crisp", "neon", "rainbow")
+
+set_highlight_theme <- function(theme){
+  if(theme == "iheid"){
+    options(snet_highlight = c("#000010","#E20020"))
+  } else if(theme == "rug"){
+    options(snet_highlight = c("#000000", "#dc002d"))
+  } else if(theme == "uzh"){
+    options(snet_highlight = c("#a3adb7", "#dc6027"))
+  } else if(theme == "unibe"){
+    options(snet_highlight = c("#121212", "#E3003A"))
+  } else if(theme == "ethz"){
+    options(snet_highlight = c("#6F6F6F", "#0028a5"))
+  } else if(theme == "crisp"){
+    options(snet_highlight = c("#FFFFFA", "#101314"))
+  } else if(theme == "bw"){
+    options(snet_highlight = c("#CCCCCC", "#000000"))
+  } else if(theme == "neon"){
+    options(snet_highlight = c("#5aeafd", "#54fe4b"))
+  } else if(theme == "rainbow"){
+    options(snet_highlight = c('#1965B0', '#DC050C'))
+  } else {
+    options(snet_highlight = c("#4576B5", "#D83127"))
+  }
+}
+
