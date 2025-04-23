@@ -45,35 +45,32 @@ plot.selectionTable <- function(x,
   vselect$select <- vselect$select + separation*vr*as.numeric(factor(vselect$ego))
   levls <- multiplier*levls
   levls.alt <- multiplier*levls.alt
-  # or try  sp <- ggplot(vselect, aes(vego, valter, fill=select)) + geom_tile()
-  if (bw) {
-    sp <- ggplot2::ggplot(vselect, aes(valter, select, group=ego, linetype=ego))
-  } else {
-    sp <- ggplot2::ggplot(vselect, aes(valter, select, group=ego, colour=ego))
-  }
+  labs <- unique(vselect$ego)
+
+  sp <- ggplot2::ggplot(vselect, ggplot2::aes(valter, select, group=ego, colour=ego))
+
   if (quad) {
-    if (bw) {
-      gs <- ggplot2::geom_smooth(linewidth=1.7, span=3, color='black')  # size is line width
-    } else {
-      gs <- ggplot2::geom_smooth(linewidth=1.7, span=3)
-    }
+    gs <- ggplot2::geom_smooth(linewidth=1.7, span=3, 
+                               method = "loess", formula = 'y ~ x', se = FALSE)  # size is line width
   } else {
-    if (bw) {
-      gs <- ggplot2::geom_line(linewidth=1.7, color='black')
-    } else {
-      gs <- ggplot2::geom_line(linewidth=1.7)
-    }
+    gs <- ggplot2::geom_line(linewidth=1.7)
   }
+  
   if (bw) {
-    sp <- sp + ggplot2::geom_point(color='black') + gs + ggplot2::scale_linetype_manual(
-      values= c('solid',  'longdash','dashed',
-                'twodash', 'dotdash', 'dotted'), labels=labels) +
-      ggplot2::theme_bw(base_size=32, base_family="") +
-      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
-            panel.grid.minor = ggplot2::element_blank())
+    sp <- sp + #ggplot2::geom_point(color='black') + 
+      gs + 
+      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), labs)) + 
+      # ggplot2::scale_linetype_manual(
+      # values= c('solid',  'longdash','dashed',
+      #           'twodash', 'dotdash', 'dotted'), labels=labels) +
+      ggplot2::theme_minimal(base_size=8, base_family="") 
+    # + ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+    #         panel.grid.minor = ggplot2::element_blank())
   } else {
-    sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_colour_hue(labels=labels)+
-      ggplot2::theme_grey(base_size=32, base_family="")
+    sp <- sp + #ggplot2::geom_point() + 
+      gs +
+      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), labs)) + 
+      ggplot2::theme_minimal(base_size=8, base_family="")
   }
   
   nametext <- attr(x, "name")
@@ -84,9 +81,9 @@ plot.selectionTable <- function(x,
     ggplot2::labs(x=paste(vnametext,'alter'),
          y=paste('Selection function'),
          title=paste('Effect',vnametext,'on',nametext),
-         linetype=paste(vnametext.l,'\n ego\n', sep=''),
+         # linetype=paste(vnametext.l,'\n ego\n', sep=''),
          colour=paste(vnametext.l,'\n ego\n', sep='')) +
-    ggplot2::theme(legend.key.width=unit(2.5, "cm")) +
+    ggplot2::theme(legend.key.width = ggplot2::unit(2.5, "cm")) +
     # of course you could vary the key.width - or anything else...
     ggplot2::theme(plot.title=element_text(hjust=0.5))
   ssp
@@ -127,29 +124,33 @@ plot.influenceTable <- function(x, separation=0, ...){
   zr <- max(zselect$select) - min(zselect$select) # only for separation
   zselect$select <- zselect$select + separation*zr*as.numeric(factor(zselect$alter))
   labs <- unique(zselect$alter)
-  if (bw) {
-    sp <- ggplot2::ggplot(zselect, aes(zego, select, group=alter, linetype=alter))
-  } else {
-    sp <- ggplot2::ggplot(zselect, aes(zego, select, group=alter, colour=alter))
-  }
+  
+  sp <- ggplot2::ggplot(zselect, ggplot2::aes(zego, select, group=alter, colour=alter)) +
+    ggplot2::theme_bw()
+  
   if (quad) {
-    gs <- ggplot2::geom_smooth(linewidth=1.2, span=3)
+    gs <- ggplot2::geom_smooth(linewidth=1.2, span=3, 
+                               method = "loess", formula = 'y ~ x', se = FALSE)
   } else {
     gs <- ggplot2::geom_line(linewidth=1.2)
   }
-  if (bw) {
-    sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_linetype_manual(values =
-                                                           c('solid',  'longdash','dashed', 'twodash', 'dotdash', 'dotted'), labels=labs)
-  } else {
-    sp <- sp + ggplot2::geom_point() + gs + ggplot2::scale_colour_hue(labels=labs)
-  }
-  beh.label <- behname
+  
+  # if (bw) {
+  #   sp <- sp + ggplot2::geom_point() + gs + 
+  #     ggplot2::scale_linetype_manual(values =
+  #                                      c('solid',  'longdash','dashed', 'twodash', 'dotdash', 'dotted'), labels=labs)
+  # } else {
+    sp <- sp + ggplot2::geom_point() + gs + 
+      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), labs))
+  # }
+  beh.label <- paste0('"',behname,'"')
   ylabel <- "Evaluation function"
-  title <- paste('Influence effect',netname,'on',behname)
-  sp + ggplot2::theme(legend.key=element_blank())+
-    ggplot2::labs(x=beh.label, y=ylabel, title=title,
-         colour=paste(beh.label,'\nalter')) +
-    ggplot2::theme_grey(base_size=26, base_family="") +
-    ggplot2::theme(legend.key.width=unit(1, "cm")) +
+  title <- paste0('Influence effect "',netname,'" on "',behname,'"')
+  sp + ggplot2::theme(legend.key=element_blank()) +
+    ggplot2::labs(x=paste(beh.label,'ego value'), y=ylabel, title=title,
+                  linetype=paste(beh.label,'\nalter\nvalue'),
+         colour=paste(beh.label,'\nalter\nvalue')) +
+    # ggplot2::theme_grey(base_size=14, base_family="") +
+    ggplot2::theme(legend.key.width = ggplot2::unit(1, "cm")) +
     ggplot2::theme(plot.title=element_text(hjust=0.5))
 }
