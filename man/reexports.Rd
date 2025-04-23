@@ -12,7 +12,16 @@
 \alias{ylab}
 \alias{aes}
 \alias{ggsave}
+\alias{geom_smooth}
+\alias{geom_point}
 \alias{scale_size}
+\alias{scale_colour_hue}
+\alias{scale_x_continuous}
+\alias{theme_grey}
+\alias{theme}
+\alias{element_blank}
+\alias{element_text}
+\alias{unit}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -22,6 +31,6 @@ below to see their documentation.
 \describe{
   \item{dplyr}{\code{\link[dplyr:reexports]{\%>\%}}}
 
-  \item{ggplot2}{\code{\link[ggplot2]{aes}}, \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{ggsave}}, \code{\link[ggplot2:labs]{ggtitle}}, \code{\link[ggplot2]{guides}}, \code{\link[ggplot2]{labs}}, \code{\link[ggplot2]{scale_size}}, \code{\link[ggplot2:labs]{xlab}}, \code{\link[ggplot2:labs]{ylab}}}
+  \item{ggplot2}{\code{\link[ggplot2]{aes}}, \code{\link[ggplot2:element]{element_blank}}, \code{\link[ggplot2:element]{element_text}}, \code{\link[ggplot2]{geom_point}}, \code{\link[ggplot2]{geom_smooth}}, \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{ggsave}}, \code{\link[ggplot2:labs]{ggtitle}}, \code{\link[ggplot2]{guides}}, \code{\link[ggplot2]{labs}}, \code{\link[ggplot2:scale_hue]{scale_colour_hue}}, \code{\link[ggplot2]{scale_size}}, \code{\link[ggplot2:scale_continuous]{scale_x_continuous}}, \code{\link[ggplot2]{theme}}, \code{\link[ggplot2:ggtheme]{theme_grey}}, \code{\link[ggplot2:reexports]{unit}}, \code{\link[ggplot2:labs]{xlab}}, \code{\link[ggplot2:labs]{ylab}}}
 }}
 
