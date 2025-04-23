@@ -68,3 +68,11 @@ set_highlight_theme <- function(theme){
   }
 }
 
+set_background_theme <- function(theme){
+  if(theme == "neon"){
+    options(snet_background = "#070f23")
+  } else {
+    options(snet_background = "#FFFFFF")
+  }
+}
+
