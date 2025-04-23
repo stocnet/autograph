@@ -16,9 +16,8 @@
 #' @param separation This can be used to make the curves visually distinguishable
 #'   if they overlap too much without it.
 #'   An advisable value then is, e.g., 0.01.
-#' @param bw Whether the plot should be rendered in black and white,
-#'   e.g. for publication, or in colour.
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
+#' @importFrom stats setNames
 #' @examples
 #' library(RSiena)
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))

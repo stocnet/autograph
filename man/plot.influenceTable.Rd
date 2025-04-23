@@ -4,7 +4,7 @@
 \alias{plot.influenceTable}
 \title{Plotting influence tables}
 \usage{
-\method{plot}{influenceTable}(x, separation = 0, bw = FALSE, ...)
+\method{plot}{influenceTable}(x, separation = 0, ...)
 }
 \arguments{
 \item{x}{An object of class "influenceTable",
@@ -13,9 +13,6 @@ created using \code{RSiena::influenceTable()}.}
 \item{separation}{This can be used to make the curves visually distinguishable
 if they overlap too much without it.
 An advisable value then is, e.g., 0.01.}
-
-\item{bw}{Whether the plot should be rendered in black and white,
-e.g. for publication, or in colour.}
 
 \item{...}{Other arguments to be passed.}
 }

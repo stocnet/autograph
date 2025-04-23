@@ -4,7 +4,7 @@
 \alias{plot.selectionTable}
 \title{Plotting selection tables}
 \usage{
-\method{plot}{selectionTable}(x, quad = TRUE, separation = 0, bw = FALSE, ...)
+\method{plot}{selectionTable}(x, quad = TRUE, separation = 0, ...)
 }
 \arguments{
 \item{x}{An object of class "selectionTable",
@@ -17,9 +17,6 @@ Use \code{quad = FALSE} for similarity effects.}
 \item{separation}{This can be used to make the curves visually distinguishable
 if they overlap too much without it.
 An advisable value then is, e.g., 0.01.}
-
-\item{bw}{Whether the plot should be rendered in black and white,
-e.g. for publication, or in colour.}
 
 \item{...}{Other arguments to be passed.}
 }
