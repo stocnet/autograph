@@ -22,3 +22,9 @@ model.
 The S3 classes are "netlm" or "netlogit", and so are compatible with the
 results from either the \code{{sna}} or \code{{migraph}} packages.
 }
+\examples{
+networkers <- ison_networkers \%>\% to_subgraph(Discipline == "Sociology")
+model1 <- net_regression(weight ~ ego(Citations) + alter(Citations) + sim(Citations), 
+  networkers, times = 20)
+plot(model1)
+}

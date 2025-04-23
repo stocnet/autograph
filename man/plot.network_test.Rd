@@ -24,3 +24,12 @@ against those produced in a reference distribution of conditional uniform
 graphs or as a quadratic assignment procedure.
 The S3 class is "network_test".
 }
+\examples{
+library(migraph)
+marvel_friends <- to_unsigned(ison_marvel_relationships)
+marvel_friends <- to_giant(marvel_friends) \%>\% 
+  to_subgraph(PowerOrigin == "Human")
+(cugtest <- test_random(marvel_friends, manynet::net_heterophily, attribute = "Attractive",
+  times = 200))
+plot(cugtest)
+}

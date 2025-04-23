@@ -13,6 +13,14 @@
 #' @param threshold The empirical threshold to shade in the plot.
 #' @param tails By default "two" indicating a two-tailed test,
 #'   but "one" for a one-tailed test is also available.
+#' @examples
+#' library(migraph)
+#' marvel_friends <- to_unsigned(ison_marvel_relationships)
+#' marvel_friends <- to_giant(marvel_friends) %>% 
+#'   to_subgraph(PowerOrigin == "Human")
+#' (cugtest <- test_random(marvel_friends, manynet::net_heterophily, attribute = "Attractive",
+#'   times = 200))
+#' plot(cugtest)
 #' @export
 plot.network_test <- function(x, ...,
                               threshold = .95, 
@@ -50,7 +58,9 @@ plot.network_test <- function(x, ...,
   }
   p + ggplot2::theme_classic() + ggplot2::geom_density() +
     ggplot2::geom_vline(ggplot2::aes(xintercept = x$testval),
-                        color="red", linewidth=1.2) + ggplot2::ylab("Density")
+                        color = tail(getOption("snet_highlight", 
+                                               default = "red"), n = 1), 
+                        linewidth=1.2) + ggplot2::ylab("Density")
 }
 
 # MRQAP ####
@@ -65,6 +75,11 @@ plot.network_test <- function(x, ...,
 #' @param x An object obtained by fitting an MRQAP model to some data.
 #'   For example, `migraph::net_regression()`.
 #' @param ... Further arguments to be passed on to plot.
+#' @examples
+#' networkers <- ison_networkers %>% to_subgraph(Discipline == "Sociology")
+#' model1 <- net_regression(weight ~ ego(Citations) + alter(Citations) + sim(Citations), 
+#'   networkers, times = 20)
+#' plot(model1)
 #' @export
 plot.netlm <- function(x, ...){
   distrib <- x$dist
@@ -88,7 +103,8 @@ plot.netlm <- function(x, ...){
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
-                        colour = "red") +
+                        colour = tail(getOption("snet_highlight", 
+                                                default = "red"), n = 1)) +
     scale_y_discrete(limits=rev)
 }
 
@@ -116,7 +132,8 @@ plot.netlogit <- function(x, ...){
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
-                        colour = "red") +
+                        colour = tail(getOption("snet_highlight", 
+                                                default = "red"), n = 1)) +
     scale_y_discrete(limits=rev)
 }
 
