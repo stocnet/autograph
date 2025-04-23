@@ -36,9 +36,8 @@ plot.selectionTable <- function(x,
                                 quad=TRUE, separation=0,
                                 ...){
 
-  cli::cli_inform("Using {getOption('snet_theme','bw')} theme.")
-  
-  bw <- ifelse(getOption("snet_theme","bw")=="bw", TRUE, FALSE)
+  bw <- ifelse(getOption("snet_theme","bw") %in% c("bw","crisp"), 
+               TRUE, FALSE)
   vselect <- x
   levls <- attr(x, "levls")
   multiplier <- attr(x, "multiplier")
@@ -121,7 +120,7 @@ plot.selectionTable <- function(x,
 #' @export
 plot.influenceTable <- function(x, separation=0, ...){
   zselect <- x
-  bw <- ifelse(getOption("snet_theme","bw")=="bw", TRUE, FALSE)
+  bw <- ifelse(getOption("snet_theme","bw") %in% c("bw","crisp"), TRUE, FALSE)
   quad <- attr(x, "quad")
   netname <- attr(x, "netname")
   behname <- attr(x, "behname")
