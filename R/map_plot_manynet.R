@@ -102,7 +102,8 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 #' @export
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
-    ggplot2::geom_line() +
+    ggplot2::geom_line(colour = tail(getOption("snet_highlight", 
+                                               default = "red"), n = 1)) +
     ggplot2::theme_minimal() +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
