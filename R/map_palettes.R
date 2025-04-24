@@ -1,3 +1,4 @@
+#' @importFrom grDevices colorRampPalette
 #' @export
 ag_qualitative <- function(number){
   snet_colors <- getOption("snet_cat", default = "default")
