@@ -14,6 +14,8 @@
 #' @param ... Other arguments to be passed on.
 #' @param type For node and tie measures, whether the plot should be 
 #'   "h" a histogram or "d" a density plot. By default "h".
+#' @examples
+#' plot(manynet::node_deg(ison_karateka))
 #' @export
 plot.node_measure <- function(x, type = c("h", "d"), ...) {
   #type <- match.arg(type)
@@ -25,8 +27,12 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
       ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) > 
-                                                         .1, .1, .01))) +
-      ggplot2::geom_density(col = 2) +
+                                                         .1, .1, .01)),
+                              fill = head(getOption("snet_highlight", 
+                                                      default = "darkgrey"), n = 1)) +
+      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
+                                                    default = "red"), n = 1),
+                            linewidth = 1.5) +
       ggplot2::scale_y_continuous("Frequency", sec.axis = 
                                     ggplot2::sec_axis(~ ., breaks = c(0,1),
                                                       name = "Density"))
@@ -35,11 +41,15 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
       ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) >
-                                                         .1, .1, .01))) +
+                                                         .1, .1, .01)),
+                              fill = head(getOption("snet_highlight", 
+                                                    default = "darkgrey"), n = 1)) +
       ggplot2::labs(x = "Density", y = "Frequency")
   } else if (length(type) == 1 & type == "d") {
     p <- ggplot2::ggplot(data = data, ggplot2::aes(x = .data$Score)) +
-      ggplot2::geom_density(col = 2) +
+      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
+                                                    default = "red"), n = 1),
+                            linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
   p +
