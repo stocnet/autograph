@@ -44,6 +44,14 @@ theme_opts <- c("default", "bw",
                 "iheid", "ethz", "uzh", "rug", "unibe",
                 "crisp", "neon", "rainbow")
 
+set_background_theme <- function(theme){
+  if(theme == "neon"){
+    options(snet_background = "#070f23")
+  } else {
+    options(snet_background = "#FFFFFF")
+  }
+}
+
 set_highlight_theme <- function(theme){
   if(theme == "iheid"){
     options(snet_highlight = c("#000010","#E20020"))
@@ -110,6 +118,18 @@ set_categorical_theme <- function(theme){
                          "#F3AB00","#BD3902","#8F0A2E",
                          "#001452","#147082","#536B18",
                          "#A27200","#7E2601","#60061F"))
+    
+  } else if(theme == "unibe"){
+    options(snet_cat = c("#466553","#668271","#8aa092","#afbfb5","#d6ded9",
+                         "#007ea2","#5294b4","#85adc6","#b0c7d9","#d8e2ec",
+                         "#203a5d","#4a5575","#757792","#a1a0b4","#d0ced9",
+                         "#8a1e22","#a14540","#b86f65","#d19d93","#e8cdc6",
+                         "#5a3217","#754e31","#927157","#b49b87","#d7cac0",
+                         "#36b5b6","#75c4c5","#a0d3d4","#c4e3e3","#e2f1f2",
+                         "#ec627d","#f08797","#f4a9b1","#f8c8cc","#fce4e7",
+                         "#4767af","#6e82c0","#949fd1","#b9bee1","#dcdef1",
+                         "#c2b600","#cfc43c","#dcd274","#e8e1a4","#f4f0d3",
+                         "#ee7402","#f3923e","#f7af70","#fbcba1","#fde6d1"))
     
   } else if(theme == "rainbow"){
     options(snet_cat = c('#E8ECFB', '#D9CCE3', '#D1BBD7', 
