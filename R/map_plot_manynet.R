@@ -112,6 +112,8 @@ plot.network_measures <- function(x, ...) {
 #' @inheritParams map_measure
 #' @importFrom stats cutree
 #' @importFrom ggdendro ggdendrogram
+#' @examples
+#' plot(manynet::node_in_regular(ison_southern_women, "e"))
 #' @export
 plot.node_member <- function(x, ...) {
   hc <- attr(x, "hc")
@@ -119,12 +121,12 @@ plot.node_member <- function(x, ...) {
   memb <- x[hc$order]
   clust <- memb[!duplicated(memb)]
   colors <- ifelse(match(memb, clust) %% 2,
-                   "#000000", "#E20020")
+                   ag_positive(), ag_negative())
   ggdendro::ggdendrogram(hc, rotate = TRUE) +
     ggplot2::geom_hline(yintercept = hc$height[length(hc$order) - k],
                         linetype = 2,
-                        color = "#E20020") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(colour = "#5c666f"),
+                        color = ag_highlight()) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(colour = ag_base()),
                    axis.text.y = suppressWarnings(
                      ggplot2::element_text(colour = colors)))
 }

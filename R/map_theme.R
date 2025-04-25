@@ -31,6 +31,7 @@ snet_theme <- function(theme = NULL){
     if(theme %in% theme_opts){
       options(snet_theme = theme)
       set_highlight_theme(theme)
+      set_divergent_theme(theme)
       set_background_theme(theme)
       set_categorical_theme(theme)
       cli::cli_alert_success("Theme set to {.emph {theme}}.")
