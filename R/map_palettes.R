@@ -1,5 +1,25 @@
 #' @importFrom grDevices colorRampPalette
 #' @export
+ag_base <- function(){
+  head(getOption("snet_highlight", default = "black"), n = 1)
+}
+
+#' @export
+ag_highlight <- function(){
+  tail(getOption("snet_highlight", default = "red"), n = 1)
+}
+
+#' @export
+ag_positive <- function(){
+  tail(getOption("snet_div", default = "#4575b4"), n = 1)
+}
+
+#' @export
+ag_negative <- function(){
+  head(getOption("snet_div", default = "#d73027"), n = 1)
+}
+
+#' @export
 ag_qualitative <- function(number){
   snet_colors <- getOption("snet_cat", default = "default")
   colorRampPalette(snet_colors)(number)
