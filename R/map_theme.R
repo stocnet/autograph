@@ -52,7 +52,7 @@ set_highlight_theme <- function(theme){
   } else if(theme == "uzh"){
     options(snet_highlight = c("#a3adb7", "#dc6027"))
   } else if(theme == "unibe"){
-    options(snet_highlight = c("#121212", "#E3003A"))
+    options(snet_highlight = c("#121212", "#e4003c"))
   } else if(theme == "ethz"){
     options(snet_highlight = c("#6F6F6F", "#0028a5"))
   } else if(theme == "crisp"){
@@ -68,13 +68,24 @@ set_highlight_theme <- function(theme){
   }
 }
 
-set_background_theme <- function(theme){
-  if(theme == "neon"){
-    options(snet_background = "#070f23")
+set_divergent_theme <- function(theme){
+  if(theme == "bw"){
+    options(snet_div = c("black","grey","white"))
+  } else if(theme == "iheid"){
+    options(snet_div = c("#820C2B","#006EAA","#006564"))
+  } else if(theme == "ethz"){
+    options(snet_div = c("#B7352D","#007894","#627313"))
+  } else if(theme == "uzh"){
+    options(snet_div = c("#FC4C02","#4AC9E3","#A4D233"))
+  } else if(theme == "unibe"){
+    options(snet_div = c("#8a1e22","#007ea2","#466553"))
+  } else if(theme == "rainbow"){
+    options(snet_div = c('#DC050C','#CAE0AB','#882E72'))
   } else {
-    options(snet_background = "#FFFFFF")
+    options(snet_div = c("#d73027","white","#4575b4"))
   }
 }
+
 
 set_categorical_theme <- function(theme){
   if(theme == "bw"){
