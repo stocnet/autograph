@@ -228,6 +228,7 @@ plot.matrix <- function(x, ..., membership = NULL) {
         colour = ag_highlight()
       )
   } else {
+    group_boundaries <- diff(as.numeric(factor(membership[order(membership)])))
     g <- g +
       ggplot2::scale_y_discrete(expand = c(0, 0),
                                 limits = rev(rownames(blocked_data))
@@ -237,15 +238,13 @@ plot.matrix <- function(x, ..., membership = NULL) {
       ) +
       ggplot2::geom_vline(
         xintercept =
-          c(1 + which(diff(x[["block.membership"]][["nodes2"]]) != 0))
-        - .5,
-        colour = "blue"
+          c(1 + which(group_boundaries != 0)) - .5,
+        colour = ag_positive()
       ) +
       ggplot2::geom_hline(
-        yintercept = nrow(x[["blocked.data"]])
-        - c(1 + which(diff(x[["block.membership"]][["nodes1"]]) != 0))
-        + 1.5,
-        colour = "red"
+        yintercept = nrow(blocked_data) - 
+          c(1 + which(group_boundaries != 0)) + 1.5,
+        colour = ag_negative()
       )
   }
   g
