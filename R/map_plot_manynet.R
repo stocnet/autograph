@@ -148,7 +148,7 @@ plot.matrix <- function(x, ..., membership = NULL) {
   } else if (manynet::is_twomode(x) &&
              length(intersect(membership[!manynet::node_is_mode(x)], 
                               membership[!manynet::node_is_mode(x)])) > 0) {
-    blocked_data <- manynet::as_matrix(manynet::to_multilevel(x))
+    blocked_data <- manynet::to_multilevel(x)
     if (!is.null(membership)) blocked_data <- blocked_data[order(membership),
                                                            order(membership)]
   } else {
@@ -230,10 +230,10 @@ plot.matrix <- function(x, ..., membership = NULL) {
   } else {
     g <- g +
       ggplot2::scale_y_discrete(expand = c(0, 0),
-                                limits = rev(rownames(x[["blocked.data"]])[x[["order.vector"]][["nodes1"]]])
+                                limits = rev(rownames(blocked_data))
       ) +
       ggplot2::scale_x_discrete(expand = c(0, 0), position = "top",
-                                limits = colnames(x[["blocked.data"]])[x[["order.vector"]][["nodes2"]]]
+                                limits = colnames(blocked_data)
       ) +
       ggplot2::geom_vline(
         xintercept =
