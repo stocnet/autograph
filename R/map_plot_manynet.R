@@ -28,10 +28,8 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) > 
                                                          .1, .1, .01)),
-                              fill = head(getOption("snet_highlight", 
-                                                      default = "darkgrey"), n = 1)) +
-      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
-                                                    default = "red"), n = 1),
+                              fill = ag_base()) +
+      ggplot2::geom_density(colour = ag_highlight(),
                             linewidth = 1.5) +
       ggplot2::scale_y_continuous("Frequency", sec.axis = 
                                     ggplot2::sec_axis(~ ., breaks = c(0,1),
@@ -42,13 +40,11 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) >
                                                          .1, .1, .01)),
-                              fill = head(getOption("snet_highlight", 
-                                                    default = "darkgrey"), n = 1)) +
+                              fill = ag_base()) +
       ggplot2::labs(x = "Density", y = "Frequency")
   } else if (length(type) == 1 & type == "d") {
     p <- ggplot2::ggplot(data = data, ggplot2::aes(x = .data$Score)) +
-      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
-                                                    default = "red"), n = 1),
+      ggplot2::geom_density(colour = ag_highlight(),
                             linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
@@ -70,10 +66,8 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) > 
                                                          .1, .1, .01)),
-                              fill = head(getOption("snet_highlight", 
-                                                    default = "darkgrey"), n = 1)) +
-      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
-                                                    default = "red"), n = 1),
+                              fill = ag_base()) +
+      ggplot2::geom_density(colour = ag_highlight(),
                             linewidth = 1.5) +
       ggplot2::scale_y_continuous("Frequency", sec.axis = 
                                     ggplot2::sec_axis(~ ., breaks = c(0,1),
@@ -84,13 +78,11 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
                               binwidth = ifelse(max(data$Score) > 1, 1,
                                                 ifelse(max(data$Score) >
                                                          .1, .1, .01)),
-                              fill = head(getOption("snet_highlight", 
-                                                    default = "darkgrey"), n = 1)) +
+                              fill = ag_base()) +
       ggplot2::labs(x = "Density", y = "Frequency")
   } else if (length(type) == 1 & type == "d") {
     p <- ggplot2::ggplot(data = data, ggplot2::aes(x = .data$Score)) +
-      ggplot2::geom_density(colour = tail(getOption("snet_highlight", 
-                                                    default = "red"), n = 1),
+      ggplot2::geom_density(colour = ag_highlight(),
                             linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
@@ -102,8 +94,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 #' @export
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
-    ggplot2::geom_line(colour = tail(getOption("snet_highlight", 
-                                               default = "red"), n = 1)) +
+    ggplot2::geom_line(colour = ag_highlight()) +
     ggplot2::theme_minimal() +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
@@ -189,12 +180,12 @@ plot.matrix <- function(x, ..., membership = NULL) {
       axis.ticks = ggplot2::element_blank(),
       axis.text.y = ggplot2::element_text(
         size = 9 * 0.8,
-        colour = "grey50"
+        colour = ag_base()
       ),
       axis.text.x = ggplot2::element_text(
         size = 9 * 0.8,
         angle = 30, hjust = 0,
-        colour = "grey50"
+        colour = ag_base()
       )
     ) +
     # ggplot2::geom_tile(ggplot2::aes(fill = .data[["value"]]),
@@ -212,7 +203,7 @@ plot.matrix <- function(x, ..., membership = NULL) {
     g <- g +
       ggplot2::scale_fill_gradient(
         low = "white",
-        high = "black"
+        high = ag_base()
       )
   }
   
@@ -228,15 +219,13 @@ plot.matrix <- function(x, ..., membership = NULL) {
     if (!is.null(membership))
       if(!is.numeric(membership)) membership <- as.numeric(as.factor(membership))
     g <- g + ggplot2::geom_vline(
-      xintercept = c(1 + which(diff(membership[order(membership)]) != 0))
-      - .5,
-      colour = "red"
+      xintercept = c(1 + which(diff(membership[order(membership)]) != 0)) - .5,
+      colour = ag_highlight()
     ) +
       ggplot2::geom_hline(
         yintercept = nrow(blocked_data) -
-          c(1 + which(diff(membership[order(membership)]) != 0)) +
-          1.5,
-        colour = "red"
+          c(1 + which(diff(membership[order(membership)]) != 0)) + 1.5,
+        colour = ag_highlight()
       )
   } else {
     g <- g +
