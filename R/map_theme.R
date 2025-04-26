@@ -28,6 +28,7 @@ snet_theme <- function(theme = NULL){
   if(is.null(theme)){
     theme <- getOption("snet_theme", default = "default")
     cli::cli_alert_info("Theme is set to {.emph {theme}}.")
+    cli::cli_alert_info("The following themes are available: {.emph {theme_opts}}.")
   } else {
     theme <- tolower(theme)
     if(theme %in% theme_opts){
