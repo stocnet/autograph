@@ -52,7 +52,7 @@
 
 # defining global variables more centrally
 utils::globalVariables(c(".data", "obs", "valter","select","ego","zego","alter",
-                         "from","to","weight","unit"))
+                         "from","to","weight","unit","Step","Freq","Var1","n"))
 
 seq_nodes <- function(.data){
   seq.int(manynet::net_nodes(.data))

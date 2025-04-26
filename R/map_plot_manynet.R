@@ -382,15 +382,17 @@ plot.diffs_model <- function(x, ...){
                                   guide = "legend")
 }
 
+#' @examples
+#' plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))
 #' @export
 plot.learn_model <- function(x, ...){
-  Step <- Freq <- Var1 <- n <- NULL
   y <- t(x)
   colnames(y) <- paste0("t",0:(ncol(y)-1))
   y <- as.data.frame.table(y)
   y$Step <- as.numeric(gsub("t", "", y$Var2))
   ggplot2::ggplot(y, ggplot2::aes(x = Step, y = Freq, color = Var1)) + 
     ggplot2::geom_line(show.legend = FALSE) + ggplot2::theme_minimal() +
+    ggplot2::scale_color_manual(values = ag_qualitative(ncol(x))) +
     ggplot2::ylab("Belief")
 }
 
