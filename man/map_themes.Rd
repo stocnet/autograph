@@ -9,7 +9,8 @@ snet_theme(theme = NULL)
 }
 \arguments{
 \item{theme}{String naming a theme.
-By default "default".}
+By default "default".
+This string can be capitalised or not.}
 }
 \description{
 This function enables all plots to be

@@ -22,12 +22,14 @@ NULL
 #' @rdname map_themes
 #' @param theme String naming a theme.
 #'   By default "default".
+#'   This string can be capitalised or not.
 #' @export
 snet_theme <- function(theme = NULL){
   if(is.null(theme)){
     theme <- getOption("snet_theme", default = "default")
     cli::cli_alert_info("Theme is set to {.emph {theme}}.")
   } else {
+    theme <- tolower(theme)
     if(theme %in% theme_opts){
       options(snet_theme = theme)
       set_highlight_theme(theme)
