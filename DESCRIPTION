@@ -23,8 +23,7 @@ Imports:
     cli,
     dplyr (>= 1.1.0),
     ggdendro,
-    ggplot2,
-    lattice
+    ggplot2
 Suggests:
     testthat (>= 3.0.0),
     patchwork
