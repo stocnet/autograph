@@ -5,7 +5,7 @@
   if (!interactive()) return()
   
   # options(manynet_verbosity = getOption("manynet_verbosity", "verbose"))
-  options(snet_theme = getOption("snet_theme", "default"))
+  options(stocnet_theme = getOption("stocnet_theme", "default"))
   # options(cli.theme = manynet_console_theme())
   # options(cli.progress_clear = TRUE)
   

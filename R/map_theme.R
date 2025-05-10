@@ -11,12 +11,10 @@
 #'   `r autograph:::theme_opts`.
 #' @name map_themes
 #' @examples
-#' to_mentoring(ison_brandes) %>%
-#'   mutate(color = c(rep(c(1,2,3), 3), 3)) %>%
-#'   graphr(node_color = "color") +
-#'   labs(title = "Who leads and who follows?") +
-#'   scale_color_iheid() +
-#'   theme_iheid()
+#' stocnet_theme("default")
+#' plot(manynet::node_degree(ison_karateka))
+#' stocnet_theme("rug")
+#' plot(manynet::node_degree(ison_karateka))
 NULL
 
 #' @rdname map_themes
@@ -24,9 +22,9 @@ NULL
 #'   By default "default".
 #'   This string can be capitalised or not.
 #' @export
-snet_theme <- function(theme = NULL){
+stocnet_theme <- function(theme = NULL){
   if(is.null(theme)){
-    theme <- getOption("snet_theme", default = "default")
+    theme <- getOption("stocnet_theme", default = "default")
     cli::cli_alert_info("Theme is set to {.emph {theme}}.")
     cli::cli_alert_info("The following themes are available: {.emph {theme_opts}}.")
   } else {
