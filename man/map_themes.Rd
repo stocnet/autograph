@@ -2,10 +2,10 @@
 % Please edit documentation in R/map_theme.R
 \name{map_themes}
 \alias{map_themes}
-\alias{snet_theme}
+\alias{stocnet_theme}
 \title{Many themes}
 \usage{
-snet_theme(theme = NULL)
+stocnet_theme(theme = NULL)
 }
 \arguments{
 \item{theme}{String naming a theme.
@@ -23,10 +23,8 @@ The following themes are currently available:
 default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, rainbow.
 }
 \examples{
-to_mentoring(ison_brandes) \%>\%
-  mutate(color = c(rep(c(1,2,3), 3), 3)) \%>\%
-  graphr(node_color = "color") +
-  labs(title = "Who leads and who follows?") +
-  scale_color_iheid() +
-  theme_iheid()
+stocnet_theme("default")
+plot(manynet::node_degree(ison_karateka))
+stocnet_theme("rug")
+plot(manynet::node_degree(ison_karateka))
 }
