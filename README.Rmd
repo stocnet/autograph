@@ -20,7 +20,7 @@ list_data <- function(string){
 }
 ```
 
-# manynet 
+# autograph 
 <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
 
 <!-- badges: start -->
@@ -48,20 +48,20 @@ on an object created in one of the relevant packages.
 ## Setting a theme
 
 It is very easy to set a theme.
-Just type `snet_theme()` to see which is the theme currently set,
+Just type `stocnet_theme()` to see which is the theme currently set,
 and to get a list of available themes.
 Then enter the chosen theme name in 
 
 ```{r themeset, dpi = 300, fig.height=5}
 library(autograph)
 library(patchwork)
-snet_theme()
+stocnet_theme()
 (plot(node_degree(ison_karateka)) + 
 plot(tie_betweenness(ison_karateka)))/
 (plot(node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
      membership = node_in_regular(ison_southern_women, "e")))
-snet_theme("ethz")
+stocnet_theme("ethz")
 (plot(node_degree(ison_karateka)) + 
 plot(tie_betweenness(ison_karateka)))/
 (plot(node_in_regular(ison_southern_women, "e")) + 

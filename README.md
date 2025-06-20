@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# manynet
+# autograph
 
 <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
 
@@ -34,18 +34,14 @@ packages.
 
 ## Setting a theme
 
-It is very easy to set a theme. Just type `snet_theme()` to see which is
-the theme currently set, and to get a list of available themes. Then
+It is very easy to set a theme. Just type `stocnet_theme()` to see which
+is the theme currently set, and to get a list of available themes. Then
 enter the chosen theme name in
 
 ``` r
 library(autograph)
-#> Registered S3 methods overwritten by 'autograph':
-#>   method           from   
-#>   plot.diff_model  manynet
-#>   plot.diffs_model manynet
 library(patchwork)
-snet_theme()
+stocnet_theme()
 #> ℹ Theme is set to default.
 #> ℹ The following themes are available: default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, and rainbow.
 (plot(node_degree(ison_karateka)) + 
@@ -58,7 +54,7 @@ plot(as_matrix(ison_southern_women),
 <img src="man/figures/README-themeset-1.png" width="100%" />
 
 ``` r
-snet_theme("ethz")
+stocnet_theme("ethz")
 #> ✔ Theme set to ethz.
 (plot(node_degree(ison_karateka)) + 
 plot(tie_betweenness(ison_karateka)))/
