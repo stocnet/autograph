@@ -14,13 +14,8 @@
 #' @param tails By default "two" indicating a two-tailed test,
 #'   but "one" for a one-tailed test is also available.
 #' @examples
-#' library(migraph)
-#' marvel_friends <- to_unsigned(ison_marvel_relationships)
-#' marvel_friends <- to_giant(marvel_friends) %>% 
-#'   to_subgraph(PowerOrigin == "Human")
-#' (cugtest <- test_random(marvel_friends, manynet::net_heterophily, attribute = "Attractive",
-#'   times = 200))
-#' plot(cugtest)
+#' # Here's something I cooked up with migraph earlier:
+#' plot(nettestres)
 #' @export
 plot.network_test <- function(x, ...,
                               threshold = .95, 
@@ -58,7 +53,7 @@ plot.network_test <- function(x, ...,
   }
   p + ggplot2::theme_classic() + ggplot2::geom_density() +
     ggplot2::geom_vline(ggplot2::aes(xintercept = x$testval),
-                        color = tail(getOption("snet_highlight", 
+                        color = utils::tail(getOption("snet_highlight", 
                                                default = "red"), n = 1), 
                         linewidth=1.2) + ggplot2::ylab("Density")
 }
@@ -76,10 +71,8 @@ plot.network_test <- function(x, ...,
 #'   For example, `migraph::net_regression()`.
 #' @param ... Further arguments to be passed on to plot.
 #' @examples
-#' networkers <- ison_networkers %>% to_subgraph(Discipline == "Sociology")
-#' model1 <- net_regression(weight ~ ego(Citations) + alter(Citations) + sim(Citations), 
-#'   networkers, times = 20)
-#' plot(model1)
+#' # Here's something I cooked up with migraph earlier:
+#' plot(netregres)
 #' @export
 plot.netlm <- function(x, ...){
   distrib <- x$dist
@@ -103,7 +96,7 @@ plot.netlm <- function(x, ...){
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
-                        colour = tail(getOption("snet_highlight", 
+                        colour = utils::tail(getOption("snet_highlight", 
                                                 default = "red"), n = 1)) +
     scale_y_discrete(limits=rev)
 }
@@ -132,7 +125,7 @@ plot.netlogit <- function(x, ...){
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
-                        colour = tail(getOption("snet_highlight", 
+                        colour = utils::tail(getOption("snet_highlight", 
                                                 default = "red"), n = 1)) +
     scale_y_discrete(limits=rev)
 }

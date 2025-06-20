@@ -19,20 +19,7 @@
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @importFrom stats setNames
 #' @examples
-#' if(packageVersion("RSiena") >= "1.4.21"){
-#' library(RSiena)
-#' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
-#' mycov  <- coCovar(s50a[,1])
-#' mydata <- sienaDataCreate(mynet, mycov)
-#' myeff <- getEffects(mydata)
-#' myeff <- includeEffects(myeff, simX, interaction1="mycov")
-#' myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
-#' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
-#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, 
-#'   silent=TRUE, batch=TRUE)
-#' x <- selectionTable(ans, mydata, "mynet", "mycov")
-#' plot(x)
-#' }
+#' plot(res_siena_selection)
 #' @export
 plot.selectionTable <- function(x, 
                                 quad=TRUE, separation=0,
@@ -108,20 +95,7 @@ plot.selectionTable <- function(x,
 #' @param x An object of class "influenceTable",
 #'   created using `RSiena::influenceTable()`.
 #' @examples
-#' if(packageVersion("RSiena") >= "1.4.21"){
-#' library(RSiena)
-#' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
-#' mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
-#' mydata <- sienaDataCreate(mynet, mybeh)
-#' myeff <- getEffects(mydata)
-#' myeff <- includeEffects(myeff, avAlt, name="mybeh", interaction1="mynet")
-#' myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
-#' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
-#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, 
-#'   silent=TRUE, batch=TRUE)
-#' x <- influenceTable(ans, mydata, "mynet", "mybeh")
-#' plot(x)
-#' }
+#' plot(res_siena_influence)
 #' @export
 plot.influenceTable <- function(x, separation=0, ...){
   zselect <- x
@@ -178,19 +152,7 @@ plot.influenceTable <- function(x, separation=0, ...){
 #'   for example `main = "Title"` for a different title than the default.
 #' @importFrom tidyr pivot_longer
 #' @examples
-#' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
-#' mybeh <- sienaDependent(s50a[,1:2], type="behavior")
-#' mydata <- sienaDataCreate(mynet, mybeh)
-#' myeff <- getEffects(mydata)
-#' myeff <- includeEffects(myeff, transTrip)
-#' myeff <- setEffect(myeff, cycle3, fix=TRUE, test=TRUE)
-#' myeff <- setEffect(myeff, transTies, fix=TRUE, test=TRUE)
-#' myalgorithm <- sienaAlgorithmCreate(nsub=1, n3=10, projname=NULL)
-#' # Shorter phases 2 and 3, just for example.
-#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, batch=TRUE, returnDeps=TRUE)
-#' gofi <- sienaGOF(ans, IndegreeDistribution, verbose=TRUE, join=TRUE,
-#'                  varName="mynet")
-#' plot(gofi)
+#' plot(res_siena_gof)
 #' @export
 plot.sienaGOF <- function(x, ...){
   
