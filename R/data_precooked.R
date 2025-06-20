@@ -13,3 +13,21 @@
 #' @rdname made_earlier
 #' @usage data(res_migraph_test)
 "res_migraph_test"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_siena_gof)
+"res_siena_gof"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_siena_influence)
+"res_siena_influence"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_siena_selection)
+"res_siena_selection"
