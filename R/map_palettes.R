@@ -8,33 +8,41 @@ is_dark <- function(hex) {
   isdark
 }
 
+#' Consistent palette calls
+#' @name ag_call
+#' @param number Integer of how many category colours to return.
 #' @importFrom grDevices colorRampPalette
 #' @export
 ag_base <- function(){
-  head(getOption("snet_highlight", default = "black"), n = 1)
+  utils::head(getOption("snet_highlight", default = "black"), n = 1)
 }
 
+#' @rdname ag_call
 #' @export
 ag_highlight <- function(){
-  tail(getOption("snet_highlight", default = "red"), n = 1)
+  utils::tail(getOption("snet_highlight", default = "red"), n = 1)
 }
 
+#' @rdname ag_call
 #' @export
 ag_positive <- function(){
-  tail(getOption("snet_div", default = "#4575b4"), n = 1)
+  utils::tail(getOption("snet_div", default = "#4575b4"), n = 1)
 }
 
+#' @rdname ag_call
 #' @export
 ag_negative <- function(){
-  head(getOption("snet_div", default = "#d73027"), n = 1)
+  utils::head(getOption("snet_div", default = "#d73027"), n = 1)
 }
 
+#' @rdname ag_call
 #' @export
 ag_qualitative <- function(number){
   snet_colors <- getOption("snet_cat", default = "default")
   colorRampPalette(snet_colors)(number)
 }
 
+#' @rdname ag_call
 #' @export
 ag_sequential <- function(number){
   snet_colors <- getOption("snet_highlight", default = "default")
@@ -42,6 +50,7 @@ ag_sequential <- function(number){
   colorRampPalette(snet_colors)(number)
 }
 
+#' @rdname ag_call
 #' @export
 ag_divergent <- function(number){
   snet_colors <- getOption("snet_div", default = "default")
