@@ -19,6 +19,7 @@
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @importFrom stats setNames
 #' @examples
+#' if(packageVersion("RSiena") >= "1.4.21"){
 #' library(RSiena)
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mycov  <- coCovar(s50a[,1])
@@ -27,9 +28,11 @@
 #' myeff <- includeEffects(myeff, simX, interaction1="mycov")
 #' myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
 #' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
-#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, silent=TRUE, batch=TRUE)
+#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, 
+#'   silent=TRUE, batch=TRUE)
 #' x <- selectionTable(ans, mydata, "mynet", "mycov")
 #' plot(x)
+#' }
 #' @export
 plot.selectionTable <- function(x, 
                                 quad=TRUE, separation=0,
@@ -46,11 +49,12 @@ plot.selectionTable <- function(x,
   levls.alt <- multiplier*levls.alt
   labs <- unique(vselect$ego)
 
-  sp <- ggplot2::ggplot(vselect, ggplot2::aes(valter, select, group=ego, colour=ego))
+  sp <- ggplot2::ggplot(vselect, ggplot2::aes(valter, select, 
+                                              group=ego, colour=ego))
 
   if (quad) {
-    gs <- ggplot2::geom_smooth(linewidth=1.7, span=3, 
-                               method = "loess", formula = 'y ~ x', se = FALSE)  # size is line width
+    gs <- ggplot2::geom_smooth(linewidth=1.7, span=3, # size is line width
+                               method = "loess", formula = 'y ~ x', se = FALSE)  
   } else {
     gs <- ggplot2::geom_line(linewidth=1.7)
   }
@@ -58,7 +62,8 @@ plot.selectionTable <- function(x,
   if (bw) {
     sp <- sp + #ggplot2::geom_point(color='black') + 
       gs + 
-      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), labs)) + 
+      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), 
+                                                     labs)) + 
       # ggplot2::scale_linetype_manual(
       # values= c('solid',  'longdash','dashed',
       #           'twodash', 'dotdash', 'dotted'), labels=labels) +
@@ -68,7 +73,8 @@ plot.selectionTable <- function(x,
   } else {
     sp <- sp + #ggplot2::geom_point() + 
       gs +
-      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), labs)) + 
+      ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), 
+                                                     labs)) + 
       ggplot2::theme_minimal(base_size=8, base_family="")
   }
   
@@ -102,6 +108,7 @@ plot.selectionTable <- function(x,
 #' @param x An object of class "influenceTable",
 #'   created using `RSiena::influenceTable()`.
 #' @examples
+#' if(packageVersion("RSiena") >= "1.4.21"){
 #' library(RSiena)
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
@@ -110,9 +117,11 @@ plot.selectionTable <- function(x,
 #' myeff <- includeEffects(myeff, avAlt, name="mybeh", interaction1="mynet")
 #' myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
 #' # nsub=2, n3=100 is used here for having a brief computation, not for practice.
-#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, silent=TRUE, batch=TRUE)
+#' ans <- siena07(myalgorithm, data=mydata, effects=myeff, 
+#'   silent=TRUE, batch=TRUE)
 #' x <- influenceTable(ans, mydata, "mynet", "mybeh")
 #' plot(x)
+#' }
 #' @export
 plot.influenceTable <- function(x, separation=0, ...){
   zselect <- x
@@ -121,10 +130,12 @@ plot.influenceTable <- function(x, separation=0, ...){
   netname <- attr(x, "netname")
   behname <- attr(x, "behname")
   zr <- max(zselect$select) - min(zselect$select) # only for separation
-  zselect$select <- zselect$select + separation*zr*as.numeric(factor(zselect$alter))
+  zselect$select <- zselect$select + separation * zr * 
+    as.numeric(factor(zselect$alter))
   labs <- unique(zselect$alter)
   
-  sp <- ggplot2::ggplot(zselect, ggplot2::aes(zego, select, group=alter, colour=alter)) +
+  sp <- ggplot2::ggplot(zselect, ggplot2::aes(zego, select, 
+                                              group=alter, colour=alter)) +
     ggplot2::theme_bw()
   
   if (quad) {
@@ -162,6 +173,10 @@ plot.influenceTable <- function(x, separation=0, ...){
 #'   Unlike the plot method included in the `{RSiena}` package,
 #'   this function utilises `{ggplot2}` and not `{lattice}`,
 #'   which makes the output more compatible and themeable.
+#' @param x A sienaGOF object, as returned by `RSiena::sienaGOF()`.
+#' @param ... Other parameters to be passed to the plotting funciton,
+#'   for example `main = "Title"` for a different title than the default.
+#' @importFrom tidyr pivot_longer
 #' @examples
 #' mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 #' mybeh <- sienaDependent(s50a[,1:2], type="behavior")
@@ -200,9 +215,9 @@ plot.sienaGOF <- function(x, ...){
   sims.max <- apply(sims, 2, max)
   obs <- x$Observations
   no_vary <- sims.min == obs & sims.min == sims.max
-  if (any((diag(var(rbind(sims, obs))) == 0))) {
+  if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
     cli::cli_alert_info("Note: some statistics are not plotted because their variance is 0.")
-    statkeys <- attr(x, "key")[which(diag(var(rbind(sims, obs))) == 0)]
+    statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
     cli::cli_alert_info("This holds for the statistic{?s} {statkeys}.")
   }
   
@@ -210,12 +225,12 @@ plot.sienaGOF <- function(x, ...){
   n.obs <- nrow(obs)
   sims <- sims[,!no_vary]
   sims <- as.data.frame(sims) %>% 
-    mutate(sim = 1:nrow(sims)) %>% 
+    dplyr::mutate(sim = 1:nrow(sims)) %>% 
     tidyr::pivot_longer(!sim)
   obs <- obs[!no_vary]
   obs <- as.data.frame(obs) %>% 
-    tidyr::pivot_longer(cols = everything()) %>% 
-    mutate(name = as.character((1:length(obs))-1))
+    tidyr::pivot_longer(cols = dplyr::everything()) %>% 
+    dplyr::mutate(name = as.character((1:length(obs))-1))
   
   ggplot2::ggplot(sims, aes(x = name, y = value)) +
     ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base(),

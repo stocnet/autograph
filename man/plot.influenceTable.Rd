@@ -22,6 +22,7 @@ for the interpretation of results for network and behavior dynamics
 obtained with the RSiena or multiSiena packages.
 }
 \examples{
+if(packageVersion("RSiena") >= "1.4.21"){
 library(RSiena)
 mynet <- sienaDependent(array(c(s501, s502), dim=c(50, 50, 2)))
 mybeh  <- sienaDependent(s50a[,1:2], type="behavior")
@@ -30,9 +31,11 @@ myeff <- getEffects(mydata)
 myeff <- includeEffects(myeff, avAlt, name="mybeh", interaction1="mynet")
 myalgorithm <- sienaAlgorithmCreate(nsub=2, n3=100, seed=1291)
 # nsub=2, n3=100 is used here for having a brief computation, not for practice.
-ans <- siena07(myalgorithm, data=mydata, effects=myeff, silent=TRUE, batch=TRUE)
+ans <- siena07(myalgorithm, data=mydata, effects=myeff, 
+  silent=TRUE, batch=TRUE)
 x <- influenceTable(ans, mydata, "mynet", "mybeh")
 plot(x)
+}
 }
 \references{
 Consult also the RSiena manual, Sections 13.2 and 13.4.

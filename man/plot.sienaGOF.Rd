@@ -6,6 +6,12 @@
 \usage{
 \method{plot}{sienaGOF}(x, ...)
 }
+\arguments{
+\item{x}{A sienaGOF object, as returned by \code{RSiena::sienaGOF()}.}
+
+\item{...}{Other parameters to be passed to the plotting funciton,
+for example \code{main = "Title"} for a different title than the default.}
+}
 \description{
 This function plots goodness of fit objects created using RSiena.
 Unlike the plot method included in the \code{{RSiena}} package,
