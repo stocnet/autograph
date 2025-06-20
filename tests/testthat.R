@@ -1,5 +1,5 @@
 library(testthat)
-library(manynet)
+library(autograph)
 
-snet_theme("default")
-test_check("manynet")
+stocnet_theme("default")
+test_check("autograph")
