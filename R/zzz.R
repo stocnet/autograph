@@ -1,7 +1,7 @@
 #' @importFrom cli cli_div cli_inform cli_end
 .onAttach <- function(...) {
 
-  suppressMessages(suppressPackageStartupMessages(library("manynet", warn.conflicts = FALSE)))
+  # suppressMessages(suppressPackageStartupMessages(library("manynet", warn.conflicts = FALSE)))
   if (!interactive()) return()
   
   # options(manynet_verbosity = getOption("manynet_verbosity", "verbose"))
@@ -50,9 +50,11 @@
 
 }
 
+# Global variables ####
 # defining global variables more centrally
 utils::globalVariables(c(".data", "obs", "valter","select","ego","zego","alter",
-                         "from","to","weight","unit","Step","Freq","Var1","n"))
+                         "from","to","weight","unit","Step","Freq","Var1","n",
+                         "density","wave","period","name","value","sim"))
 
 seq_nodes <- function(.data){
   seq.int(manynet::net_nodes(.data))
