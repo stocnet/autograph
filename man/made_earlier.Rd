@@ -5,6 +5,8 @@
 \alias{made_earlier}
 \alias{res_migraph_reg}
 \alias{res_migraph_test}
+\alias{res_migraph_diff}
+\alias{res_manynet_diff}
 \alias{res_siena_gof}
 \alias{res_siena_influence}
 \alias{res_siena_selection}
@@ -13,6 +15,10 @@
 An object of class \code{netlm} of length 15.
 
 An object of class \code{network_test} of length 9.
+
+An object of class \code{diffs_model} (inherits from \code{data.frame}) with 20 rows and 11 columns.
+
+An object of class \code{diff_model} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 4 rows and 10 columns.
 
 An object of class \code{sienaGOF} of length 1.
 
@@ -24,6 +30,10 @@ An object of class \code{selectionTable} (inherits from \code{data.frame}) with 
 data(res_migraph_reg)
 
 data(res_migraph_test)
+
+data(res_migraph_diff)
+
+data(res_manynet_diff)
 
 data(res_siena_gof)
 

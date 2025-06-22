@@ -311,6 +311,8 @@ plot.network_motif <- function(x, ...) {
 #'   there is change in the distributions.
 #' @importFrom dplyr left_join
 #' @importFrom ggplot2 geom_histogram
+#' @examples
+#' plot(res_manynet_diff)
 #' @export
 plot.diff_model <- function(x, ..., all_steps = TRUE){
   # initialize variables to avoid CMD check notes
@@ -355,6 +357,8 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
 }
 
 #' @rdname plot.diffusion
+#' @examples
+#' plot(res_migraph_diff)
 #' @export
 plot.diffs_model <- function(x, ...){
   S <- E <- I <- R <- n <- NULL # initialize variables to avoid CMD check notes
