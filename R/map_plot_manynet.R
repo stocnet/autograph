@@ -131,6 +131,65 @@ plot.node_member <- function(x, ...) {
                      ggplot2::element_text(colour = colors)))
 }
 
+# #' @export
+# plot.node_members <- function(x, ...) {
+#   df <- x %>% dplyr::mutate(wave = dplyr::row_number())
+#   df_long <- df %>%
+#     tidyr::pivot_longer(-wave, names_to = "person", values_to = "group")
+  # group_counts <- df_long %>%
+  #   dplyr::group_by(wave, group) %>%
+  #   dplyr::summarise(n = dplyr::n(), .groups = "drop")
+  #
+  # # Step 1: Reshape to wide format: one row per person, one column per wave
+  # df_wide <- df_long %>%
+  #   dplyr::mutate(wave = paste0("wave", wave)) %>%
+  #   tidyr::pivot_wider(names_from = wave, values_from = group)
+  #
+  # # Step 2: Create a vector of wave columns for use as axes
+  # wave_cols <- names(df_wide)[!names(df_wide) %in% "person"]
+  #
+  # # Create a mapping list like list(axis1 = wave1, axis2 = wave2, ...)
+  # aes_mapping <- list(setNames(wave_cols, paste0("axis", seq_along(wave_cols))))
+  #
+  # # Use do.call to inject into aes
+  # ggplot2::ggplot(df_wide) +
+  #   do.call(ggalluvial::geom_alluvium, c(list(aes = do.call(ggplot2::aes, aes_mapping),
+  #                                 fill = "steelblue"))) +
+  #   do.call(ggalluvial::geom_stratum,
+  #           list(width = 1/12, fill = "grey70", color = "black")) +
+  #   ggplot2::geom_text(stat = "stratum",
+  #                      ggplot2::aes(label = ggplot2::after_stat(stratum))) +
+  #   ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
+  #   ggplot2::theme_minimal()
+
+#   # Step 1: Reshape to wide format with one row per person
+#   df_wide <- df_long |>
+#     dplyr::mutate(wave = paste0("wave", wave)) |>
+#     tidyr::pivot_wider(names_from = wave, values_from = group) |>
+#     dplyr::mutate(alluvium = dplyr::row_number())
+# 
+#   # Step 2: Identify the wave columns
+#   wave_cols <- setdiff(names(df_wide), c("person", "alluvium"))
+# 
+#   # Step 3: Build aes mapping dynamically for wide format
+#   aes_list <- rlang::set_names(rlang::syms(wave_cols), paste0("axis", seq_along(wave_cols)))
+#   aes_list$alluvium <- rlang::sym("alluvium")
+#   aes_mapping <- do.call(ggplot2::aes, aes_list)
+# 
+#   # Step 4: Construct and return the plot
+#   ggplot2::ggplot(df_wide) +
+#     ggalluvial::geom_alluvium(aes_mapping, stat = "alluvium", fill_color, alpha = 0.8) +
+#     ggalluvial::geom_stratum(stat = "alluvium", width = 1 / 12, fill = "grey70", color = "black") +
+#     ggplot2::geom_text(
+#       stat = ggalluvial::StatStratum,
+#       mapping = ggplot2::aes(label = ggplot2::after_stat(stratum)),
+#       size = 3
+#     ) +
+#     ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
+#     ggplot2::theme_minimal()
+# 
+# }
+
 #' @rdname map_member
 #' @param membership A "node_member" membership vector.
 #' @importFrom ggplot2 ggplot geom_tile aes scale_fill_gradient theme_grey labs
