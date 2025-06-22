@@ -14,7 +14,14 @@ to find matches.
 By default, the current theme's qualitative palette is used.}
 }
 \description{
-Matching colors across palettes
+Sometimes particular colours are coded in certain ways to facilitate
+interpretation.
+For example, perhaps primary colours or traffic light colours are used
+to represent some discrete options.
+Yet institutional palettes vary in terms of which colours they have
+available.
+This function uses the Euclidean distance of colours in CIELAB space to
+those of a target palette to find the closes corresponding colours.
 }
 \examples{
 match_color("#4575b4")
