@@ -339,7 +339,7 @@ plot.node_motif <- function(x, ...) {
     manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     manynet::graphs(manynet::create_motifs(2), waves = 1:2)
-  } else manynet::snet_unavailable("Cannot plot these motifs yet, sorry.")
+  } else stop("Cannot plot these motifs yet, sorry.")
 }
 
 #' @rdname map_motifs
@@ -356,7 +356,7 @@ plot.network_motif <- function(x, ...) {
     manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     manynet::graphs(manynet::create_motifs(2), waves = 1:2)
-  } else manynet::snet_unavailable("Cannot plot these motifs yet, sorry.")
+  } else stop("Cannot plot these motifs yet, sorry.")
 }
 
 # Models ####
