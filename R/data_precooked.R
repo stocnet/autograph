@@ -17,6 +17,18 @@
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
+#' @usage data(res_migraph_diff)
+"res_migraph_diff"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_manynet_diff)
+"res_manynet_diff"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
 #' @usage data(res_siena_gof)
 "res_siena_gof"
 

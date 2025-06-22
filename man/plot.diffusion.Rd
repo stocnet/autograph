@@ -26,5 +26,7 @@ there is change in the distributions.}
 Plotting diffusion models
 }
 \examples{
+plot(res_manynet_diff)
+plot(res_migraph_diff)
 plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))
 }

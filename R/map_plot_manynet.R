@@ -348,10 +348,11 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
       labs <- c(labs, "Recovered")
     }
     
+    colval <- structure(match_color(c("#4575b4","#E6AB02","#d73027","#66A61E")), 
+                         names = c("A","B","C","D"))
     p + ggplot2::scale_color_manual("Legend", 
                                     labels = labs,
-                                    values = c(A = "#4575b4", B = "#E6AB02", 
-                                               C = "#d73027", D = "#66A61E"),
+                                    values = colval,
                                     guide = "legend")
   }
 }
@@ -388,10 +389,11 @@ plot.diffs_model <- function(x, ...){
     labs <- c(labs, "Recovered")
   }
   
+  colvals <- structure(match_color(c("#4575b4","#E6AB02","#d73027","#66A61E")), 
+            names = c("A","B","C","D"))
   p + ggplot2::scale_color_manual("Legend", 
                                   labels = labs,
-                                  values = c(A = "#4575b4", B = "#E6AB02", 
-                                             C = "#d73027", D = "#66A61E"),
+                                  values = colvals,
                                   guide = "legend")
 }
 
