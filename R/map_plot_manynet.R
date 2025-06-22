@@ -113,7 +113,7 @@ plot.network_measures <- function(x, ...) {
 #' @importFrom stats cutree
 #' @importFrom ggdendro ggdendrogram
 #' @examples
-#' plot(manynet::node_in_regular(ison_southern_women, "e"))
+#' plot(manynet::node_in_walktrap(ison_southern_women, "e"))
 #' @export
 plot.node_member <- function(x, ...) {
   hc <- attr(x, "hc")
