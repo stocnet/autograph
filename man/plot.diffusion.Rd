@@ -4,11 +4,14 @@
 \alias{plot.diffusion}
 \alias{plot.diff_model}
 \alias{plot.diffs_model}
+\alias{plot.learn_model}
 \title{Plotting diffusion models}
 \usage{
 \method{plot}{diff_model}(x, ..., all_steps = TRUE)
 
 \method{plot}{diffs_model}(x, ...)
+
+\method{plot}{learn_model}(x, ...)
 }
 \arguments{
 \item{x}{A "diff_model" of "diffs_model" class of object.
@@ -21,4 +24,7 @@ there is change in the distributions.}
 }
 \description{
 Plotting diffusion models
+}
+\examples{
+plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))
 }

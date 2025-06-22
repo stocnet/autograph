@@ -133,7 +133,9 @@ plot.node_member <- function(x, ...) {
 
 #' @rdname map_member
 #' @param membership A "node_member" membership vector.
-#' @importFrom ggplot2 ggplot geom_tile aes scale_fill_gradient theme_grey labs theme scale_x_discrete scale_y_discrete geom_vline geom_hline element_blank element_text
+#' @importFrom ggplot2 ggplot geom_tile aes scale_fill_gradient theme_grey labs
+#' @importFrom ggplot2 theme scale_x_discrete scale_y_discrete geom_vline
+#' @importFrom ggplot2 geom_hline element_blank element_text
 #' @importFrom manynet is_twomode
 #' @examples
 #' plot(as_matrix(ison_adolescents),
@@ -278,7 +280,7 @@ plot.node_motif <- function(x, ...) {
     manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     manynet::graphs(manynet::create_motifs(2), waves = 1:2)
-  } else mnet_unavailable("Cannot plot these motifs yet, sorry.")
+  } else manynet::snet_unavailable("Cannot plot these motifs yet, sorry.")
 }
 
 #' @rdname map_motifs
@@ -295,7 +297,7 @@ plot.network_motif <- function(x, ...) {
     manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     manynet::graphs(manynet::create_motifs(2), waves = 1:2)
-  } else mnet_unavailable("Cannot plot these motifs yet, sorry.")
+  } else manynet::snet_unavailable("Cannot plot these motifs yet, sorry.")
 }
 
 # Models ####
@@ -382,6 +384,7 @@ plot.diffs_model <- function(x, ...){
                                   guide = "legend")
 }
 
+#' @rdname plot.diffusion
 #' @examples
 #' plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))
 #' @export
