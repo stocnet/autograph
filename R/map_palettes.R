@@ -38,7 +38,10 @@ ag_negative <- function(){
 #' @rdname ag_call
 #' @export
 ag_qualitative <- function(number){
-  snet_colors <- getOption("snet_cat", default = "default")
+  snet_colors <- getOption("snet_cat", default = c("#1B9E77","#4575b4","#d73027",
+                                                   "#66A61E","#E6AB02","#D95F02","#7570B3",
+                                                   "#A6761D","#E7298A","#666666"))
+  if(missing(number)) number <- length(snet_colors)
   colorRampPalette(snet_colors)(number)
 }
 
