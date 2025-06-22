@@ -5,8 +5,6 @@
 #' @param .data Some `{manynet}` compatible network data.
 #' @param center,circular,times Extra parameters required for `{tidygraph}`
 #'   compatibility.
-#' @examples
-#' graphr(ison_southern_women, layout = "matching")
 #' @export
 layout_tbl_graph_matching <- function(.data,
                                       center = NULL,

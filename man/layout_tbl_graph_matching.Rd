@@ -16,6 +16,3 @@ compatibility.}
 This layout works to position nodes opposite their matching nodes.
 See \code{manynet::to_matching()} for more details on the matching procedure.
 }
-\examples{
-graphr(ison_southern_women, layout = "matching")
-}
