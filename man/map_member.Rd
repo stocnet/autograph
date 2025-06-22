@@ -25,7 +25,7 @@ This plotting method operates on "node_member" class objects from the
 \examples{
 plot(manynet::node_in_walktrap(ison_southern_women, "e"))
 plot(as_matrix(ison_adolescents),
-  membership = node_in_regular(ison_adolescents, "e"))
+  membership = node_in_walktrap(ison_adolescents, "e"))
 plot(as_matrix(ison_southern_women),
-  membership = node_in_regular(ison_southern_women, "e"))
+  membership = node_in_walktrap(ison_southern_women, "e"))
 }
