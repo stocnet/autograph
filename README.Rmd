@@ -52,7 +52,7 @@ Just type `stocnet_theme()` to see which is the theme currently set,
 and to get a list of available themes.
 Then enter the chosen theme name in 
 
-```{r themeset, dpi = 300, fig.height=5}
+```{r themeset, dpi = 300, fig.height=5, fig.alt="Themed figures"}
 library(autograph)
 library(patchwork)
 stocnet_theme()

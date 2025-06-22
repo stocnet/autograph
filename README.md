@@ -51,7 +51,7 @@ plot(as_matrix(ison_southern_women),
      membership = node_in_regular(ison_southern_women, "e")))
 ```
 
-<img src="man/figures/README-themeset-1.png" width="100%" />
+<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
 
 ``` r
 stocnet_theme("ethz")
@@ -63,7 +63,7 @@ plot(as_matrix(ison_southern_women),
      membership = node_in_regular(ison_southern_women, "e")))
 ```
 
-<img src="man/figures/README-themeset-2.png" width="100%" />
+<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
 
 ## Installation
 
