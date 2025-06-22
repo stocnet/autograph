@@ -24,5 +24,5 @@ results from either the \code{{sna}} or \code{{migraph}} packages.
 }
 \examples{
 # Here's something I cooked up with migraph earlier:
-plot(netregres)
+plot(res_migraph_reg)
 }

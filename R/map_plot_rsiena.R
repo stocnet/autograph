@@ -21,9 +21,7 @@
 #' @examples
 #' plot(res_siena_selection)
 #' @export
-plot.selectionTable <- function(x, 
-                                quad=TRUE, separation=0,
-                                ...){
+plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 
   bw <- ifelse(getOption("snet_theme","bw") %in% c("bw","crisp"), 
                TRUE, FALSE)
@@ -31,9 +29,10 @@ plot.selectionTable <- function(x,
   levls <- attr(x, "levls")
   multiplier <- attr(x, "multiplier")
   vr <- max(vselect$select) - min(vselect$select) # only for separation
-  vselect$select <- vselect$select + separation*vr*as.numeric(factor(vselect$ego))
-  levls <- multiplier*levls
-  levls.alt <- multiplier*levls.alt
+  vselect$select <- vselect$select + separation * vr * 
+    as.numeric(factor(vselect$ego))
+  levls <- multiplier * levls
+  # levls.alt <- multiplier*levls.alt
   labs <- unique(vselect$ego)
 
   sp <- ggplot2::ggplot(vselect, ggplot2::aes(valter, select, 
@@ -68,7 +67,7 @@ plot.selectionTable <- function(x,
   nametext <- attr(x, "name")
   vnametext <- vnametext.l <- attr(x, "vname")
   
-  ssp <- sp + ggplot2::scale_x_continuous(breaks=levls.alt) +
+  ssp <- sp + ggplot2::scale_x_continuous(breaks = levls) +
     ggplot2::theme(legend.key=element_blank())+
     ggplot2::labs(x=paste(vnametext,'alter'),
          y=paste('Selection function'),

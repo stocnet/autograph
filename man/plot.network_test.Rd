@@ -26,5 +26,5 @@ The S3 class is "network_test".
 }
 \examples{
 # Here's something I cooked up with migraph earlier:
-plot(nettestres)
+plot(res_migraph_test)
 }

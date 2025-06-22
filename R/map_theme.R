@@ -150,3 +150,4 @@ set_categorical_theme <- function(theme){
                          "#A6761D","#E7298A","#666666"))
   }
 }
+

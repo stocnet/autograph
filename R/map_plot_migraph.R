@@ -15,7 +15,7 @@
 #'   but "one" for a one-tailed test is also available.
 #' @examples
 #' # Here's something I cooked up with migraph earlier:
-#' plot(nettestres)
+#' plot(res_migraph_test)
 #' @export
 plot.network_test <- function(x, ...,
                               threshold = .95, 
@@ -72,7 +72,7 @@ plot.network_test <- function(x, ...,
 #' @param ... Further arguments to be passed on to plot.
 #' @examples
 #' # Here's something I cooked up with migraph earlier:
-#' plot(netregres)
+#' plot(res_migraph_reg)
 #' @export
 plot.netlm <- function(x, ...){
   distrib <- x$dist
