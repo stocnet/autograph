@@ -1,0 +1,55 @@
+Package: autograph
+Title: Automatic Plotting of Many Graphs
+Version: 0.1.0
+Date: 2025-06-22
+Description: Visual exploration and presentation of networks should not be difficult.
+   This package includes functions for plotting networks and network-related metrics
+   with sensible and pretty defaults.
+   It includes ggplot2-based plot methods for many popular network package classes,
+   and three functions for drawing single, comparative, and dynamic graphs.
+   It also includes some novel layout algorithms,
+   and options for straightforward, consistent theming.
+URL: https://stocnet.github.io/autograph/
+BugReports: https://github.com/stocnet/autograph/issues
+License: MIT + file LICENSE
+Language: en-GB
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.6.0),
+    manynet
+Imports:
+    cli,
+    dplyr (>= 1.1.0),
+    ggdendro,
+    ggplot2,
+    tidyr
+Suggests:
+    testthat (>= 3.0.0),
+    patchwork
+Enhances:
+    RSiena
+Authors@R: 
+    c(person(given = "James",
+             family = "Hollway",
+             role = c("cre", "aut", "ctb"),
+             email = "james.hollway@graduateinstitute.ch",
+             comment = c("IHEID", ORCID = "0000-0002-8361-9647")),
+      person(given = "Henrique",
+             family = "Sposito",
+             role = "ctb",
+             comment = c(ORCID = "0000-0003-3420-6085"))
+    )
+Config/Needs/build: 
+    roxygen2, 
+    devtools
+Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd"))
+Config/Needs/check: 
+    covr,
+    lintr,
+    spelling
+Config/Needs/website:
+    pkgdown
+Config/testthat/parallel: true
+Config/testthat/edition: 3
