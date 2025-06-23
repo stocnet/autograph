@@ -1,3 +1,9 @@
+# autograph 0.1.1
+
+## Package
+
+- Fixed DESCRIPTION issues
+
 # autograph 0.1.0
 
 ## Package
