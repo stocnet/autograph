@@ -28,6 +28,12 @@ ag_divergent(number)
 \arguments{
 \item{number}{Integer of how many category colours to return.}
 }
+\value{
+One or more hexcodes as strings.
+}
 \description{
-Consistent palette calls
+These functions assist in calling particular parts of a theme's palette.
+For example, \code{ag_base()} will return the current theme's base or background
+color, and \code{ag_highlight()} will return the color used in that theme to
+highlight one or more nodes, lines, or such.
 }

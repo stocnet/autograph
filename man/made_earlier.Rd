@@ -10,6 +10,8 @@
 \alias{res_siena_gof}
 \alias{res_siena_influence}
 \alias{res_siena_selection}
+\alias{res_monan_traces}
+\alias{res_monan_gof}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -25,6 +27,10 @@ An object of class \code{sienaGOF} of length 1.
 An object of class \code{influenceTable} (inherits from \code{data.frame}) with 25 rows and 4 columns.
 
 An object of class \code{selectionTable} (inherits from \code{data.frame}) with 25 rows and 4 columns.
+
+An object of class \code{traces.monan} of length 3.
+
+An object of class \code{gof.stats.monan} of length 2.
 }
 \usage{
 data(res_migraph_reg)
@@ -40,6 +46,10 @@ data(res_siena_gof)
 data(res_siena_influence)
 
 data(res_siena_selection)
+
+data(res_monan_traces)
+
+data(res_monan_gof)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

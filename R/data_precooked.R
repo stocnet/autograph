@@ -49,3 +49,9 @@
 #' @rdname made_earlier
 #' @usage data(res_monan_traces)
 "res_monan_traces"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_monan_gof)
+"res_monan_gof"
