@@ -14,6 +14,8 @@
 #' @param ... Other arguments to be passed on.
 #' @param type For node and tie measures, whether the plot should be 
 #'   "h" a histogram or "d" a density plot. By default "h".
+#' @returns `plot.node_measure()` and `plot.tie_measure()` returns a histogram 
+#'   and/or density plot of the distribution of the measure.
 #' @examples
 #' plot(manynet::node_deg(ison_karateka))
 #' @export
@@ -91,6 +93,8 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 }
 
 #' @rdname map_measure
+#' @returns `plot.network_measures()` returns a plot of the measure traced over
+#'   time.
 #' @export
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
@@ -110,6 +114,9 @@ plot.network_measures <- function(x, ...) {
 #' @param x An object of "node_member" class, for example as a result of
 #'   running `manynet::node_in_community()`.
 #' @inheritParams map_measure
+#' @returns `plot.node_member()` returns a dendrogram, with labels colored to
+#'   indicate the different clusters, and with the optimal cutpoint shown by a
+#'   dashed highlight line.
 #' @importFrom stats cutree
 #' @importFrom ggdendro ggdendrogram
 #' @examples
@@ -196,6 +203,9 @@ plot.node_member <- function(x, ...) {
 #' @importFrom ggplot2 theme scale_x_discrete scale_y_discrete geom_vline
 #' @importFrom ggplot2 geom_hline element_blank element_text
 #' @importFrom manynet is_twomode
+#' @returns `plot.matrix()` returns a plot of an adjacency or incidency matrix,
+#'   potentially with the rows and columns reordered to illustrate an additional
+#'   membership vector.
 #' @examples
 #' plot(as_matrix(ison_adolescents),
 #'   membership = node_in_walktrap(ison_adolescents, "e"))
@@ -326,6 +336,8 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' @param x An object of "node_motif" class, e.g. resulting from a call to
 #'   `manynet::node_by_triad()`.
 #' @inheritParams map_measure
+#' @returns `plot.node_motif()` returns a set of graphs that illustrate the
+#'   motifs mentioned in the results from a node_motif function in `{manynet}`.
 #' @export
 plot.node_motif <- function(x, ...) {
   motifs <- dimnames(x)[[2]]
@@ -343,6 +355,8 @@ plot.node_motif <- function(x, ...) {
 }
 
 #' @rdname map_motifs
+#' @returns `plot.network_motif()` returns a set of graphs that illustrate the
+#'   motifs mentioned in the results from a net_motif function in `{manynet}`.
 #' @export
 plot.network_motif <- function(x, ...) {
   motifs <- attr(x, "names")
@@ -370,6 +384,9 @@ plot.network_motif <- function(x, ...) {
 #'   there is change in the distributions.
 #' @importFrom dplyr left_join
 #' @importFrom ggplot2 geom_histogram
+#' @returns `plot.diff_model()` returns a bar chart of the number of new 
+#'   infected nodes at each time point, as well as an overlay line plot of the
+#'   total of infected
 #' @examples
 #' plot(res_manynet_diff)
 #' @export

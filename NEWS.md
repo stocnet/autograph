@@ -1,3 +1,34 @@
+# autograph 0.1.2
+
+## Package
+
+- Fixed line break issues in DESCRIPTION
+
+## Themes
+
+- Fixed default for `ag_sequential()`
+
+## Layouts
+
+- Fixed "layout_layered" to accept typical ggraph parameters
+
+## manynet
+
+- Added return value statements
+
+## migraph
+
+- Added return value statements
+
+## RSiena
+
+- Added return value statements
+
+## MoNAn
+
+- Added `plot.traces.monan()`
+- Added `plot.gof.stats.monan()`
+
 # autograph 0.1.1
 
 ## Package

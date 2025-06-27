@@ -18,6 +18,8 @@
 #'   An advisable value then is, e.g., 0.01.
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @importFrom stats setNames
+#' @returns A plot showing how the selection evaluation function changes based 
+#'   on ego's value and alter's value of some covariate.
 #' @examples
 #' plot(res_siena_selection)
 #' @export
@@ -93,6 +95,8 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 #' @inheritParams plot.selectionTable
 #' @param x An object of class "influenceTable",
 #'   created using `RSiena::influenceTable()`.
+#' @returns A plot showing how the influence evaluation function changes based 
+#'   on ego's value and alter's value of some covariate.
 #' @examples
 #' plot(res_siena_influence)
 #' @export
@@ -150,6 +154,8 @@ plot.influenceTable <- function(x, separation=0, ...){
 #' @param ... Other parameters to be passed to the plotting funciton,
 #'   for example `main = "Title"` for a different title than the default.
 #' @importFrom tidyr pivot_longer
+#' @returns A violin plot showing the distribution of statistics from the 
+#'   simulations and a line highlighting the observed statistics.
 #' @examples
 #' plot(res_siena_gof)
 #' @export

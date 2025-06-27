@@ -13,6 +13,9 @@ match_color(colors, pal)
 to find matches.
 By default, the current theme's qualitative palette is used.}
 }
+\value{
+A vector of hexcodes the length of the first argument.
+}
 \description{
 Sometimes particular colours are coded in certain ways to facilitate
 interpretation.

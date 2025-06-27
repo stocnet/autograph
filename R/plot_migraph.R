@@ -13,6 +13,9 @@
 #' @param threshold The empirical threshold to shade in the plot.
 #' @param tails By default "two" indicating a two-tailed test,
 #'   but "one" for a one-tailed test is also available.
+#' @returns A distribution of the simulated or permuted statistics,
+#'   with 2.5% shaded at each end, and a line highlighting where the observed
+#'   statistic lies on this distribution.
 #' @examples
 #' # Here's something I cooked up with migraph earlier:
 #' plot(res_migraph_test)
@@ -70,6 +73,8 @@ plot.network_test <- function(x, ...,
 #' @param x An object obtained by fitting an MRQAP model to some data.
 #'   For example, `migraph::net_regression()`.
 #' @param ... Further arguments to be passed on to plot.
+#' @returns A plot showing the location of observed statistics compared to the
+#'   distribution of statistics from permuted networks.
 #' @examples
 #' # Here's something I cooked up with migraph earlier:
 #' plot(res_migraph_reg)

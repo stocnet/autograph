@@ -10,6 +10,8 @@
 #'   The following themes are currently available:
 #'   `r autograph:::theme_opts`.
 #' @name map_themes
+#' @returns This function sets the theme and palette(s) to be used across all
+#'   stocnet packages. The palettes are written to options and held there.
 #' @examples
 #' stocnet_theme("default")
 #' plot(manynet::node_degree(ison_karateka))
@@ -77,6 +79,14 @@ set_highlight_theme <- function(theme){
     options(snet_highlight = c("#4576B5", "#D83127"))
   }
 }
+
+# "#E20020" - IHEID red
+# "#215CAF" - ETH blue
+# "#EDEDF4" - ghost white
+# "#071013" - rich black
+# "#EDAE49" - hunyadi yellow
+# "#3C493F" - field green
+# "#679289" - viridian
 
 set_divergent_theme <- function(theme){
   if(theme == "bw"){

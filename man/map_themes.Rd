@@ -12,6 +12,10 @@ stocnet_theme(theme = NULL)
 By default "default".
 This string can be capitalised or not.}
 }
+\value{
+This function sets the theme and palette(s) to be used across all
+stocnet packages. The palettes are written to options and held there.
+}
 \description{
 This function enables all plots to be
 quickly, easily and consistently themed.
