@@ -9,8 +9,14 @@ is_dark <- function(hex) {
 }
 
 #' Consistent palette calls
+#' @description
+#'   These functions assist in calling particular parts of a theme's palette.
+#'   For example, `ag_base()` will return the current theme's base or background
+#'   color, and `ag_highlight()` will return the color used in that theme to
+#'   highlight one or more nodes, lines, or such.
 #' @name ag_call
 #' @param number Integer of how many category colours to return.
+#' @returns One or more hexcodes as strings.
 #' @importFrom grDevices colorRampPalette
 #' @export
 ag_base <- function(){
@@ -48,8 +54,8 @@ ag_qualitative <- function(number){
 #' @rdname ag_call
 #' @export
 ag_sequential <- function(number){
-  snet_colors <- getOption("snet_highlight", default = "default")
-  if(length(snet_colors)==1) snet_colors <- c("white", snet_colors[1])
+  snet_colors <- getOption("snet_highlight", default = "#d73027")
+  if(length(snet_colors)==1) snet_colors <- c(ag_base(), snet_colors[1])
   colorRampPalette(snet_colors)(number)
 }
 
@@ -76,6 +82,7 @@ ag_divergent <- function(number){
 #' @param pal Optionally, a vector of hexcodes representing a palette in which 
 #'   to find matches.
 #'   By default, the current theme's qualitative palette is used.
+#' @returns A vector of hexcodes the length of the first argument.
 #' @examples
 #' match_color("#4575b4")
 #' @export
