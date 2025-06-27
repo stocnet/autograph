@@ -6,6 +6,8 @@
 
 ## Themes
 
+- Fixed default for `ag_sequential()`
+
 ## Layouts
 
 - Fixed "layout_layered" to accept typical ggraph parameters
