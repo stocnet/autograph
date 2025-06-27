@@ -1,3 +1,9 @@
+# autograph 0.1.2
+
+## Package
+
+- Fixed line break issues in DESCRIPTION
+
 # autograph 0.1.1
 
 ## Package

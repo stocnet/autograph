@@ -9,5 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Website link should now work
-- Words in DESCRIPTION should pass spellchecks
+- Fewer linebreaks in the package description
