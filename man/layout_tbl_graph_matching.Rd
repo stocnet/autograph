@@ -4,13 +4,16 @@
 \alias{layout_tbl_graph_matching}
 \title{Matching layout}
 \usage{
-layout_tbl_graph_matching(.data, center = NULL, circular = FALSE, times = 1000)
+layout_tbl_graph_matching(.data, center = NULL, circular = FALSE, times = 1)
 }
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
 \item{center, circular, times}{Extra parameters required for \code{{tidygraph}}
 compatibility.}
+}
+\value{
+Returns a table of nodes' x and y coordinates.
 }
 \description{
 This layout works to position nodes opposite their matching nodes.
