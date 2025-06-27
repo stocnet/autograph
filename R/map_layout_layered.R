@@ -1,17 +1,24 @@
 #' Layered layout
-#' @param ties Edgelist of ties between the nodes.
-#' @param sweeps Integer of sweeps that the algorithm will pass through.
+#' @inheritParams layout_tbl_graph_matching
+#' @param center,circular Extra parameters required for `{tidygraph}`
+#'   compatibility.
+#' @param times Integer of sweeps that the algorithm will pass through.
 #'   By default 4.
+#' @returns Returns a table of coordinates.
 #' @examples
 #' ties <- data.frame(
 #'   from = c("A", "A", "B", "C", "D", "F", "F", "E"),
 #'   to   = c("B", "C", "D", "E", "E", "E", "G", "G"),
 #'   stringsAsFactors = FALSE)
 #' 
-#' coords <- layout_tbl_graph_layered(ties, sweeps = 6)
+#' coords <- layout_tbl_graph_layered(ties, times = 6)
 #' coords
 #' @export
-layout_tbl_graph_layered <- function(ties, sweeps = 4) {
+layout_tbl_graph_layered <- function(.data,
+                                     center = NULL,
+                                     circular = FALSE,
+                                     times = 4) {
+  ties <- manynet::as_edgelist(.data)
   nodes <- unique(c(ties$from, ties$to))
   node_idx <- setNames(seq_along(nodes), nodes)
   
@@ -65,7 +72,7 @@ layout_tbl_graph_layered <- function(ties, sweeps = 4) {
     setNames(seq_along(sorted), sorted)
   }
   
-  for (s in seq_len(sweeps)) {
+  for (s in seq_len(times)) {
     # Forward sweep (top-down)
     for (l in 2:length(layer_map)) {
       prev <- x_pos[[l - 1]]

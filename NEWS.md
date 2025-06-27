@@ -4,11 +4,21 @@
 
 - Fixed line break issues in DESCRIPTION
 
+## Themes
+
+## Layouts
+
+- Fixed "layout_layered" to accept typical ggraph parameters
+
 ## manynet
 
 - Added return value statements
 
 ## migraph
+
+- Added return value statements
+
+## RSiena
 
 - Added return value statements
 

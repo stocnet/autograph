@@ -4,13 +4,19 @@
 \alias{layout_tbl_graph_layered}
 \title{Layered layout}
 \usage{
-layout_tbl_graph_layered(ties, sweeps = 4)
+layout_tbl_graph_layered(.data, center = NULL, circular = FALSE, times = 4)
 }
 \arguments{
-\item{ties}{Edgelist of ties between the nodes.}
+\item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{sweeps}{Integer of sweeps that the algorithm will pass through.
+\item{center, circular}{Extra parameters required for \code{{tidygraph}}
+compatibility.}
+
+\item{times}{Integer of sweeps that the algorithm will pass through.
 By default 4.}
+}
+\value{
+Returns a table of coordinates.
 }
 \description{
 Layered layout
@@ -21,6 +27,6 @@ ties <- data.frame(
   to   = c("B", "C", "D", "E", "E", "E", "G", "G"),
   stringsAsFactors = FALSE)
 
-coords <- layout_tbl_graph_layered(ties, sweeps = 6)
+coords <- layout_tbl_graph_layered(ties, times = 6)
 coords
 }
