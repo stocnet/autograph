@@ -4,6 +4,9 @@
 
 - Fixed line break issues in DESCRIPTION
 
+## MoNAn
+
+- Added `plot.traces.monan()`
 # autograph 0.1.1
 
 ## Package
