@@ -4,6 +4,14 @@
 
 - Fixed line break issues in DESCRIPTION
 
+## manynet
+
+- Added return value statements
+
+## migraph
+
+- Added return value statements
+
 ## MoNAn
 
 - Added `plot.traces.monan()`
