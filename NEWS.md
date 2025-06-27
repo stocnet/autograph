@@ -7,6 +7,8 @@
 ## MoNAn
 
 - Added `plot.traces.monan()`
+- Added `plot.gof.stats.monan()`
+
 # autograph 0.1.1
 
 ## Package

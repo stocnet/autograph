@@ -2,6 +2,7 @@
 
 S3method(plot,diff_model)
 S3method(plot,diffs_model)
+S3method(plot,gof.stats.monan)
 S3method(plot,influenceTable)
 S3method(plot,learn_model)
 S3method(plot,matrix)
