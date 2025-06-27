@@ -9,7 +9,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plotting categorical memberships</h1>
-      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/map_plot_manynet.R" class="external-link"><code>R/map_plot_manynet.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/plot_manynet.R" class="external-link"><code>R/plot_manynet.R</code></a></small>
       <div class="d-none name"><code>map_member.Rd</code></div>
     </div>
 
@@ -67,6 +67,15 @@ running <code><a href="https://stocnet.github.io/manynet/reference/member_commun
 <dd><p>A "node_member" membership vector.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p><code>plot.node_member()</code> returns a dendrogram, with labels colored to
+indicate the different clusters, and with the optimal cutpoint shown by a
+dashed highlight line.</p>
+<p><code>plot.matrix()</code> returns a plot of an adjacency or incidency matrix,
+potentially with the rows and columns reordered to illustrate an additional
+membership vector.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
