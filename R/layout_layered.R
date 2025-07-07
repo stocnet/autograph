@@ -1,5 +1,6 @@
 #' Layered layout
-#' @inheritParams layout_tbl_graph_matching
+#' @name layout_layered
+#' @inheritParams layout_matching
 #' @param center,circular Extra parameters required for `{tidygraph}`
 #'   compatibility.
 #' @param times Integer of sweeps that the algorithm will pass through.

@@ -1,4 +1,5 @@
 #' Matching layout
+#' @name layout_matching
 #' @description
 #'   This layout works to position nodes opposite their matching nodes.
 #'   See `manynet::to_matching()` for more details on the matching procedure.
