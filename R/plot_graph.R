@@ -28,7 +28,7 @@
 #'   
 #'   To learn more about what can be done visually,
 #'   try `run_tute("Visualisation")`.
-#' @name map_graphr
+#' @name plot_graphr
 #' @family mapping
 #' @param .data A manynet-consistent object.
 #' @param layout An igraph, ggraph, or manynet layout algorithm.
@@ -724,7 +724,7 @@ hypot <- function (x, y) {
 #'   be based on the "first" or the "last" network, or "both".
 #' @param ... Additional arguments passed to `graphr()`.
 #' @return Multiple `ggplot2::ggplot()` objects displayed side-by-side.
-#' @name map_graphs
+#' @name plot_graphs
 #' @examples
 #' #graphs(to_egos(ison_adolescents))
 #' #graphs(to_egos(ison_adolescents), waves = 8)
@@ -817,7 +817,7 @@ order_alphabetically <- function(v) {
 #'   
 #'   A progress bar is shown if it takes some time to encoding all the
 #'   .png files into a .gif.
-#' @name map_grapht
+#' @name plot_grapht
 #' @family mapping
 #' @param tlist The same migraph-compatible network listed according to
 #'   a time attribute, waves, or slices.
