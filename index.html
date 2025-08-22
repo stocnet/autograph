@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,16 +64,16 @@
 <div class="section level2">
 <h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a>
 </h2>
-<p>This package aims to make exploration, analysis, and publication of results from any of the stocnet packages easier, faster, and more consistent. It does this by letting you simply set a theme, say for your institution, and then those palettes will be used whenever you use <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> or <code><a href="https://stocnet.github.io/manynet/reference/map_graphr.html" class="external-link">graphr()</a></code> on an object created in one of the relevant packages.</p>
+<p>This package aims to make exploration, analysis, and publication of results from any of the stocnet packages easier, faster, and more consistent. It does this by letting you simply set a theme, say for your institution, and then those palettes will be used whenever you use <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> or <code><a href="reference/plot_graphr.html">graphr()</a></code> on an object created in one of the relevant packages.</p>
 </div>
 <div class="section level2">
 <h2 id="setting-a-theme">Setting a theme<a class="anchor" aria-label="anchor" href="#setting-a-theme"></a>
 </h2>
-<p>It is very easy to set a theme. Just type <code><a href="reference/map_themes.html">stocnet_theme()</a></code> to see which is the theme currently set, and to get a list of available themes. Then enter the chosen theme name in</p>
+<p>It is very easy to set a theme. Just type <code><a href="reference/theme_set.html">stocnet_theme()</a></code> to see which is the theme currently set, and to get a list of available themes. Then enter the chosen theme name in the function to set it. All plots created using <a href="https://stocnet.github.io/autograph/">autograph</a> functions will then use this theme, until you change it again.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stocnet.github.io/autograph/">autograph</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/map_themes.html">stocnet_theme</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Theme is set to default.</span></span>
 <span><span class="co">#&gt; ℹ The following themes are available: default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, and rainbow.</span></span>
 <span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_central_degree.html" class="external-link">node_degree</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -83,7 +83,7 @@
 <span>     membership <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-themeset-1.png" alt="Themed figures" width="100%"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/map_themes.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"ethz"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"ethz"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ✔ Theme set to ethz.</span></span>
 <span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_central_degree.html" class="external-link">node_degree</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_central_between.html" class="external-link">tie_betweenness</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span></span>
@@ -91,6 +91,43 @@
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_as.html" class="external-link">as_matrix</a></span><span class="op">(</span><span class="va">ison_southern_women</span><span class="op">)</span>,</span>
 <span>     membership <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-themeset-2.png" alt="Themed figures" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="mapping">Mapping<a class="anchor" aria-label="anchor" href="#mapping"></a>
+</h2>
+<p><a href="https://stocnet.github.io/autograph/">autograph</a> includes three one-line graphing functions with sensible defaults based on the network’s properties.</p>
+<div class="section level3">
+<h3 id="graphr">graphr<a class="anchor" aria-label="anchor" href="#graphr"></a>
+</h3>
+<p>First, <code><a href="reference/plot_graphr.html">graphr()</a></code> is used to graph networks in any of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> formats. It includes sensible defaults so that researchers can view their network’s structure or distribution quickly with a minimum of fuss. Compare the output from <a href="https://stocnet.github.io/autograph/">autograph</a> with a similar default from <a href="https://r.igraph.org/" class="external-link">igraph</a>:</p>
+<p><img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"></p>
+<p>Here the <a href="https://stocnet.github.io/autograph/">autograph</a> function recognises that the network is a two-mode network and uses a bipartite layout by default, and recognises that the network contains names for the nodes and prints them vertically so that they are legible in this layout. Other ‘clever’ features include automatic node sizing and more. By contrast, <a href="https://r.igraph.org/" class="external-link">igraph</a> requires the bipartite layout to be specified, has cumbersome node size defaults for all but the smallest graphs, and labels also very often need resizing and adjustment to avoid overlap. All of <a href="https://stocnet.github.io/autograph/">autograph</a>’s adjustments can be overridden, however…</p>
+<div class="section level4">
+<h4 id="more-options">More options<a class="anchor" aria-label="anchor" href="#more-options"></a>
+</h4>
+<p>Changing the size and colors of nodes and ties is as easy as specifying the function’s relevant argument with a replacement, or indicating from which attribute it should inherit this information.</p>
+<p><img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"></p>
+</div>
+<div class="section level4">
+<h4 id="more-layouts">More layouts<a class="anchor" aria-label="anchor" href="#more-layouts"></a>
+</h4>
+<p><a href="https://stocnet.github.io/autograph/">autograph</a> can use all the layout algorithms offered by packages such as <a href="https://r.igraph.org/" class="external-link">igraph</a>, <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a>, and <a href="https://github.com/schochastics/graphlayouts" class="external-link">graphlayouts</a>, and offers some additional layout algorithms for snapping layouts to a grid, visualising partitions horizontally, vertically, or concentrically, or conforming to configurational coordinates.</p>
+<p><img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"></p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="graphs">graphs<a class="anchor" aria-label="anchor" href="#graphs"></a>
+</h3>
+<p>Second, <code><a href="reference/plot_graphs.html">graphs()</a></code> is used to graph multiple networks together, which can be useful for ego networks or network panels. <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> is used to help arrange individual plots together.</p>
+<p><img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"></p>
+</div>
+<div class="section level3">
+<h3 id="grapht">grapht<a class="anchor" aria-label="anchor" href="#grapht"></a>
+</h3>
+<p>Third, <code><a href="reference/plot_grapht.html">grapht()</a></code> is used to visualise dynamic networks. It uses <a href="https://gganimate.com" class="external-link">gganimate</a> and <a href="https://r-rust.r-universe.dev/gifski" class="external-link">gifski</a> to create a gif that visualises network changes over time. It really couldn’t be easier.</p>
+<p><img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"></p>
+<!-- provide a common set of tools that can be used to import, export, create, and manipulate network data in a wide variety of formats, --><!-- and obtain a good first visualisation quickly. --><!-- This can be useful for pedagogical purposes, initial description, or checking something part way through the modelling process. --><!-- Through the most comprehensive network class-coercion available, --><!-- users can access routines not available in their chosen package or even in `{manynet}`. --><!-- `{manynet}` provides a common set of tools and a standard syntax for analysing many different types of networks. --><!-- It offers a broad range of functions to make, manipulate, map, measure, and model: --><!-- - one-, two-, and sometimes three-mode networks --><!-- - undirected, directed, and sometimes complex networks --><!-- - unweighted, weighted, and sometimes signed networks -->
+</div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -138,6 +175,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=autograph" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/stocnet/autograph/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/stocnet/autograph/issues" class="external-link">Report a bug</a></li>
 </ul>

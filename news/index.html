@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,35 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.2" id="autograph-012">autograph 0.1.2<a class="anchor" aria-label="anchor" href="#autograph-012"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.2.0" id="autograph-020">autograph 0.2.0<a class="anchor" aria-label="anchor" href="#autograph-020"></a></h2>
+<div class="section level3">
+<h3 id="package-0-2-0">Package<a class="anchor" aria-label="anchor" href="#package-0-2-0"></a></h3>
+<ul><li>Added (currently) necessary dependencies</li>
+<li>Removed unnecessary manynet dependencies</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-0-2-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-2-0"></a></h3>
+<ul><li>Added <code><a href="../reference/plot_graphr.html">graphr()</a></code>, <code><a href="../reference/plot_graphs.html">graphs()</a></code>, and <code><a href="../reference/plot_grapht.html">grapht()</a></code> from manynet for quick plotting of one or more graphs</li>
+<li>Improved <code>+.ggplot()</code> to check whether second object inherits ggplot class (thanks <a href="https://github.com/teunbrand" class="external-link">@teunbrand</a> for fixing <a href="https://github.com/stocnet/autograph/issues/110" class="external-link">#110</a>)</li>
+<li>Fixed issue with edge_linetype in signed, directed networks with weights (closed <a href="https://github.com/stocnet/autograph/issues/14" class="external-link">#14</a>)</li>
+<li>Updated README with examples of <code><a href="../reference/plot_graphr.html">graphr()</a></code> and others</li>
+</ul></div>
+<div class="section level3">
+<h3 id="themes-0-2-0">Themes<a class="anchor" aria-label="anchor" href="#themes-0-2-0"></a></h3>
+<ul><li>Added themes for Oxford and UNIGE (closed <a href="https://github.com/stocnet/autograph/issues/1" class="external-link">#1</a>)</li>
+<li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to add option to “stocnet_theme” (previously “snet_theme”)</li>
+<li>Added <code>is_dark()</code> to check whether a theme is dark or light</li>
+<li>Added <code><a href="../reference/match_color.html">match_color()</a></code> to return closest matching colors from a palette</li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-0-2-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-0-2-0"></a></h3>
+<ul><li>Added layout_valence() for signed graphs (closed <a href="https://github.com/stocnet/autograph/issues/6" class="external-link">#6</a>)</li>
+<li>Added configurational layouts from manynet</li>
+<li>Added aliases for various layout_tbl_graph_*() functions</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.2" id="autograph-012">autograph 0.1.2<a class="anchor" aria-label="anchor" href="#autograph-012"></a></h2><p class="text-muted">CRAN release: 2025-07-02</p>
 <div class="section level3">
 <h3 id="package-0-1-2">Package<a class="anchor" aria-label="anchor" href="#package-0-1-2"></a></h3>
 <ul><li>Fixed line break issues in DESCRIPTION</li></ul></div>
@@ -75,7 +103,7 @@
 <ul><li>Initial setup, with all the goodies</li></ul></div>
 <div class="section level3">
 <h3 id="theming-0-1-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-1-0"></a></h3>
-<ul><li>Added <code><a href="../reference/map_themes.html">stocnet_theme()</a></code> for setting a theme that can then be reused across successive plots (closes <a href="https://github.com/stocnet/autograph/issues/3" class="external-link">#3</a>)<ul><li>For example, <code>stocnet_theme("iheid")</code> for IHEID colour theme</li></ul></li>
+<ul><li>Added <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> for setting a theme that can then be reused across successive plots (closes <a href="https://github.com/stocnet/autograph/issues/3" class="external-link">#3</a>)<ul><li>For example, <code>stocnet_theme("iheid")</code> for IHEID colour theme</li></ul></li>
 <li>Added <code>ag_*()</code> palettes, for example:<ul><li>
 <code><a href="../reference/ag_call.html">ag_highlight()</a></code> to select the highlight colours of a particular palette</li></ul></li>
 <li>Added <code><a href="../reference/match_color.html">match_color()</a></code> for matching one or more hexcodes to a palette’s offerings</li>
@@ -122,8 +150,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="layouts-0-1-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-0-1-0"></a></h3>
-<ul><li>Added <code><a href="../reference/layout_tbl_graph_matching.html">layout_tbl_graph_matching()</a></code> for positioning nodes according to their <code><a href="https://stocnet.github.io/manynet/reference/manip_paths.html" class="external-link">manynet::to_matching()</a></code> partners</li>
-<li>Added first version of <code><a href="../reference/layout_tbl_graph_layered.html">layout_tbl_graph_layered()</a></code> for layering nodes according to a Sugiyama-type layout</li>
+<ul><li>Added <code><a href="../reference/layout_matching.html">layout_tbl_graph_matching()</a></code> for positioning nodes according to their <code><a href="https://stocnet.github.io/manynet/reference/manip_paths.html" class="external-link">manynet::to_matching()</a></code> partners</li>
+<li>Added first version of <code><a href="../reference/layout_layered.html">layout_tbl_graph_layered()</a></code> for layering nodes according to a Sugiyama-type layout</li>
 </ul></div>
 <div class="section level3">
 <h3 id="data-0-1-0">Data<a class="anchor" aria-label="anchor" href="#data-0-1-0"></a></h3>

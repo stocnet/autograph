@@ -8,14 +8,17 @@
 <url><loc>https://stocnet.github.io/autograph/index.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/news/index.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/ag_call.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/depth_first_recursive_search.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/index.html</loc></url>
-<url><loc>https://stocnet.github.io/autograph/reference/layout_tbl_graph_layered.html</loc></url>
-<url><loc>https://stocnet.github.io/autograph/reference/layout_tbl_graph_matching.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/layout_configuration.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/layout_layered.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/layout_matching.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/layout_partition.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/layout_valence.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/made_earlier.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/map_measure.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/map_member.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/map_motifs.html</loc></url>
-<url><loc>https://stocnet.github.io/autograph/reference/map_themes.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/match_color.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/model_mrqap.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot.diffusion.html</loc></url>
@@ -23,8 +26,14 @@
 <url><loc>https://stocnet.github.io/autograph/reference/plot.network_test.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot.selectionTable.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot.sienaGOF.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/plot_graphr.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/plot_graphs.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/plot_grapht.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_monan_gof.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_monan_trace.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/reexports.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/theme_scales.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/theme_set.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/theme_themes.html</loc></url>
 </urlset>
 
