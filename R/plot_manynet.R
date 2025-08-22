@@ -342,15 +342,15 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 plot.node_motif <- function(x, ...) {
   motifs <- dimnames(x)[[2]]
   if("X4" %in% motifs){
-    manynet::graphs(manynet::create_motifs(4), waves = 1:11)
+    graphs(manynet::create_motifs(4), waves = 1:11)
   } else if("021D" %in% motifs){
-    manynet::graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
+    graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
   } else if("102" %in% motifs){
-    manynet::graphs(manynet::create_motifs(3), waves = 1:4)
+    graphs(manynet::create_motifs(3), waves = 1:4)
   } else if("Asymmetric" %in% motifs){
-    manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
+    graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
-    manynet::graphs(manynet::create_motifs(2), waves = 1:2)
+    graphs(manynet::create_motifs(2), waves = 1:2)
   } else stop("Cannot plot these motifs yet, sorry.")
 }
 
@@ -361,15 +361,15 @@ plot.node_motif <- function(x, ...) {
 plot.network_motif <- function(x, ...) {
   motifs <- attr(x, "names")
   if("X4" %in% motifs){
-    manynet::graphs(manynet::create_motifs(4), waves = 1:11)
+    graphs(manynet::create_motifs(4), waves = 1:11)
   } else if("021D" %in% motifs){
-    manynet::graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
+    graphs(manynet::create_motifs(3, directed = TRUE), waves = 1:16)
   } else if("102" %in% motifs){
-    manynet::graphs(manynet::create_motifs(3), waves = 1:4)
+    graphs(manynet::create_motifs(3), waves = 1:4)
   } else if("Asymmetric" %in% motifs){
-    manynet::graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
+    graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
-    manynet::graphs(manynet::create_motifs(2), waves = 1:2)
+    graphs(manynet::create_motifs(2), waves = 1:2)
   } else stop("Cannot plot these motifs yet, sorry.")
 }
 

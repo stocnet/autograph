@@ -1,4 +1,5 @@
 #' Matching layout
+#' @name layout_matching
 #' @description
 #'   This layout works to position nodes opposite their matching nodes.
 #'   See `manynet::to_matching()` for more details on the matching procedure.
@@ -11,7 +12,7 @@ layout_tbl_graph_matching <- function(.data,
                                       center = NULL,
                                       circular = FALSE,
                                       times = 1) {
-  hlay <- manynet::layout_tbl_graph_hierarchy(.data)
+  hlay <- layout_tbl_graph_hierarchy(.data)
   matchd <- manynet::as_edgelist(manynet::to_unnamed(manynet::to_matching(.data)))
   hlay[matchd$to,"x"] <- hlay[matchd$from,"x"]
   hlay

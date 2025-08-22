@@ -1,3 +1,30 @@
+# autograph 0.2.0
+
+## Package
+
+- Added (currently) necessary dependencies
+- Removed unnecessary manynet dependencies
+
+## Plotting
+
+- Added `graphr()`, `graphs()`, and `grapht()` from manynet for quick plotting of one or more graphs
+- Improved `+.ggplot()` to check whether second object inherits ggplot class (thanks @teunbrand for fixing #110)
+- Fixed issue with edge_linetype in signed, directed networks with weights (closed #14)
+- Updated README with examples of `graphr()` and others
+
+## Themes
+
+- Added themes for Oxford and UNIGE (closed #1)
+- Improved `stocnet_theme()` to add option to "stocnet_theme" (previously "snet_theme")
+- Added `is_dark()` to check whether a theme is dark or light
+- Added `match_color()` to return closest matching colors from a palette
+
+## Layouts
+
+- Added layout_valence() for signed graphs (closed #6)
+- Added configurational layouts from manynet
+- Added aliases for various layout_tbl_graph_*() functions
+
 # autograph 0.1.2
 
 ## Package

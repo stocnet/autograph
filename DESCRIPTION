@@ -20,12 +20,23 @@ Imports:
     cli,
     dplyr (>= 1.1.0),
     ggdendro,
+    ggraph,
     ggplot2,
+    igraph,
+    tidygraph,
     tidyr
 Suggests:
-    testthat (>= 3.0.0),
-    patchwork
+    BiocManager,
+    concaveman,
+    gganimate,
+    ggforce,
+    gifski,
+    graphlayouts,
+    methods,
+    patchwork,
+    testthat (>= 3.0.0)
 Enhances:
+    Rgraphviz,
     RSiena
 Authors@R: 
     c(person(given = "James",

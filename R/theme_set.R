@@ -9,7 +9,7 @@
 #'   
 #'   The following themes are currently available:
 #'   `r autograph:::theme_opts`.
-#' @name map_themes
+#' @name theme_set
 #' @returns This function sets the theme and palette(s) to be used across all
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
@@ -19,7 +19,7 @@
 #' plot(manynet::node_degree(ison_karateka))
 NULL
 
-#' @rdname map_themes
+#' @rdname theme_set
 #' @param theme String naming a theme.
 #'   By default "default".
 #'   This string can be capitalised or not.
@@ -32,7 +32,7 @@ stocnet_theme <- function(theme = NULL){
   } else {
     theme <- tolower(theme)
     if(theme %in% theme_opts){
-      options(snet_theme = theme)
+      options(stocnet_theme = theme)
       set_highlight_theme(theme)
       set_divergent_theme(theme)
       set_background_theme(theme)
@@ -59,12 +59,16 @@ set_background_theme <- function(theme){
 set_highlight_theme <- function(theme){
   if(theme == "iheid"){
     options(snet_highlight = c("#000010","#E20020"))
+  } else if(theme == "unige"){
+    options(snet_highlight = c("#A3A3A3","#CF0063"))
   } else if(theme == "rug"){
     options(snet_highlight = c("#000000", "#dc002d"))
   } else if(theme == "uzh"){
     options(snet_highlight = c("#a3adb7", "#dc6027"))
   } else if(theme == "unibe"){
     options(snet_highlight = c("#121212", "#e4003c"))
+  } else if(theme == "oxf"){
+    options(snet_highlight = c("#002147", "#c09725"))
   } else if(theme == "ethz"){
     options(snet_highlight = c("#6F6F6F", "#0028a5"))
   } else if(theme == "crisp"){
@@ -106,7 +110,6 @@ set_divergent_theme <- function(theme){
   }
 }
 
-
 set_categorical_theme <- function(theme){
   if(theme == "bw"){
     options(snet_cat = c("#CCCCCC", "#000000"))
@@ -114,6 +117,10 @@ set_categorical_theme <- function(theme){
     options(snet_cat = c("#006564","#0094D8","#622550",
                          "#268D2B","#3E2682","#820C2B",
                          "#008F92","#006EAA","#A8086E"))
+  } else if(theme == "unige"){
+    options(snet_cat = c("#F42941","#0067C5","#96004B",
+                         "#007E64","#465F7F","#F1AB00",
+                         "#00B1AE","#4B0B71","#FF5C00"))
   } else if(theme == "ethz"){
     options(snet_cat = c("#215CAF","#007894","#627313",
                          "#8E6713","#B7352D","#A7117A","#6F6F6F"))
@@ -154,6 +161,16 @@ set_categorical_theme <- function(theme){
                          '#F4A736', '#F1932D', '#EE8026', 
                          '#E8601C', '#E65518', '#DC050C', 
                          '#A5170E', '#72190E', '#42150A'))
+  } else if(theme == "oxf"){
+    options(snet_cat = c("#776885", '#E08D79', '#ED9390', 
+                         '#C4A29E', '#D1BDD5', '#994636', 
+                         '#AA1A2D', '#7F055F', '#FE615A', 
+                         '#D4CDF4', '#FB5607', '#E6007E', 
+                         '#426A5A', '#789E9E', 
+                         '#E2C044', '#E4F0EF', '#B9D6F2', 
+                         '#A0AF84', '#15616D', '#1D42A6', 
+                         '#00AAB4', '#65E5AE', '#95C11F', 
+                         '#49B6FF', '#F7EF66'))
   } else {
     options(snet_cat = c("#1B9E77","#4575b4","#d73027",
                          "#66A61E","#E6AB02","#D95F02","#7570B3",
@@ -161,3 +178,5 @@ set_categorical_theme <- function(theme){
   }
 }
 
+colorsafe_palette <- c("#d73027", "#4575b4", "#1B9E77","#D95F02","#7570B3",
+                       "#E7298A", "#66A61E","#E6AB02","#A6761D","#666666")
