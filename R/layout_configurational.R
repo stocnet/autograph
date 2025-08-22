@@ -16,19 +16,20 @@ NULL
 #' @export
 layout_configuration <- function(.data,
                                            circular = FALSE, times = 1000){
-  if (net_nodes(.data) == 2) {
+  if (manynet::net_nodes(.data) == 2) {
     layout_tbl_graph_dyad(.data, circular = circular, times = times)
-  } else if (net_nodes(.data) == 3) {
+  } else if (manynet::net_nodes(.data) == 3) {
     layout_tbl_graph_triad(.data, circular = circular, times = times)
-  } else if (net_nodes(.data) == 4) {
+  } else if (manynet::net_nodes(.data) == 4) {
     layout_tbl_graph_tetrad(.data, circular = circular, times = times)
-  } else if (net_nodes(.data) == 5) {
+  } else if (manynet::net_nodes(.data) == 5) {
     layout_tbl_graph_pentad(.data, circular = circular, times = times)
-  } else if (net_nodes(.data) == 6) {
+  } else if (manynet::net_nodes(.data) == 6) {
     layout_tbl_graph_hexad(.data, circular = circular, times = times)
   }
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_configuration <- layout_configuration
 
@@ -41,6 +42,7 @@ layout_dyad <- function(.data,
   .to_lo(res)  
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_dyad <- layout_dyad
 
@@ -54,6 +56,7 @@ layout_triad <- function(.data,
   .to_lo(res)  
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_triad <- layout_triad
 
@@ -68,6 +71,7 @@ layout_tetrad <- function(.data,
   .to_lo(res)  
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_tetrad <- layout_tetrad
 
@@ -83,6 +87,7 @@ layout_pentad <- function(.data,
   .to_lo(res)  
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_pentad <- layout_pentad
 
@@ -99,5 +104,6 @@ layout_hexad <- function(.data,
   .to_lo(res)  
 }
 
+#' @rdname layout_configuration
 #' @export
 layout_tbl_graph_hexad <- layout_hexad
