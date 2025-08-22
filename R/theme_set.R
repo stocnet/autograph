@@ -32,7 +32,7 @@ stocnet_theme <- function(theme = NULL){
   } else {
     theme <- tolower(theme)
     if(theme %in% theme_opts){
-      options(snet_theme = theme)
+      options(stocnet_theme = theme)
       set_highlight_theme(theme)
       set_divergent_theme(theme)
       set_background_theme(theme)
@@ -178,3 +178,5 @@ set_categorical_theme <- function(theme){
   }
 }
 
+colorsafe_palette <- c("#d73027", "#4575b4", "#1B9E77","#D95F02","#7570B3",
+                       "#E7298A", "#66A61E","#E6AB02","#A6761D","#666666")
