@@ -2,34 +2,111 @@
 % Please edit documentation in R/theme_scales.R
 \name{theme_scales}
 \alias{theme_scales}
-\alias{theme_iheid}
-\alias{theme_ethz}
-\alias{theme_uzh}
-\alias{theme_rug}
-\title{Many themes}
+\alias{scale_fill_iheid}
+\alias{scale_colour_iheid}
+\alias{scale_color_iheid}
+\alias{scale_edge_colour_iheid}
+\alias{scale_edge_color_iheid}
+\alias{scale_fill_centres}
+\alias{scale_colour_centres}
+\alias{scale_color_centres}
+\alias{scale_edge_colour_centres}
+\alias{scale_edge_color_centres}
+\alias{scale_fill_sdgs}
+\alias{scale_colour_sdgs}
+\alias{scale_color_sdgs}
+\alias{scale_edge_colour_sdgs}
+\alias{scale_edge_color_sdgs}
+\alias{scale_fill_ethz}
+\alias{scale_colour_ethz}
+\alias{scale_color_ethz}
+\alias{scale_edge_colour_ethz}
+\alias{scale_edge_color_ethz}
+\alias{scale_fill_uzh}
+\alias{scale_colour_uzh}
+\alias{scale_color_uzh}
+\alias{scale_edge_colour_uzh}
+\alias{scale_edge_color_uzh}
+\alias{scale_fill_rug}
+\alias{scale_colour_rug}
+\alias{scale_color_rug}
+\alias{scale_edge_colour_rug}
+\alias{scale_edge_color_rug}
+\title{Many scales}
 \usage{
-theme_iheid(base_size = 12, base_family = "serif")
+scale_fill_iheid(direction = 1, ...)
 
-theme_ethz(base_size = 12, base_family = "sans")
+scale_colour_iheid(direction = 1, ...)
 
-theme_uzh(base_size = 12, base_family = "sans")
+scale_color_iheid(direction = 1, ...)
 
-theme_rug(base_size = 12, base_family = "mono")
+scale_edge_colour_iheid(direction = 1, ...)
+
+scale_edge_color_iheid(direction = 1, ...)
+
+scale_fill_centres(direction = 1, ...)
+
+scale_colour_centres(direction = 1, ...)
+
+scale_color_centres(direction = 1, ...)
+
+scale_edge_colour_centres(direction = 1, ...)
+
+scale_edge_color_centres(direction = 1, ...)
+
+scale_fill_sdgs(direction = 1, ...)
+
+scale_colour_sdgs(direction = 1, ...)
+
+scale_color_sdgs(direction = 1, ...)
+
+scale_edge_colour_sdgs(direction = 1, ...)
+
+scale_edge_color_sdgs(direction = 1, ...)
+
+scale_fill_ethz(direction = 1, ...)
+
+scale_colour_ethz(direction = 1, ...)
+
+scale_color_ethz(direction = 1, ...)
+
+scale_edge_colour_ethz(direction = 1, ...)
+
+scale_edge_color_ethz(direction = 1, ...)
+
+scale_fill_uzh(direction = 1, ...)
+
+scale_colour_uzh(direction = 1, ...)
+
+scale_color_uzh(direction = 1, ...)
+
+scale_edge_colour_uzh(direction = 1, ...)
+
+scale_edge_color_uzh(direction = 1, ...)
+
+scale_fill_rug(direction = 1, ...)
+
+scale_colour_rug(direction = 1, ...)
+
+scale_color_rug(direction = 1, ...)
+
+scale_edge_colour_rug(direction = 1, ...)
+
+scale_edge_color_rug(direction = 1, ...)
 }
 \arguments{
-\item{base_size}{Font size, by default 12.}
+\item{direction}{Direction for using palette colors.}
 
-\item{base_family}{Font family, by default "sans".}
+\item{...}{Extra arguments passed to \code{ggplot2::discrete_scale()}.}
 }
 \description{
-These functions enable graphs to be easily and quickly themed,
-e.g. changing the default colour of the graph's vertices and edges.
+These functions enable to add color scales to be graphs.
 }
 \examples{
-to_mentoring(ison_brandes) \%>\%
-  mutate(color = c(rep(c(1,2,3), 3), 3)) \%>\%
-  graphr(node_color = "color") +
-  labs(title = "Who leads and who follows?") +
-  scale_color_iheid() +
-  theme_iheid()
+#ison_brandes \%>\%
+#mutate(core = migraph::node_is_core(ison_brandes)) \%>\%
+#graphr(node_color = "core") +
+#scale_color_iheid()
+#graphr(ison_physicians[[1]], edge_color = "type") +
+#scale_edge_color_ethz()
 }

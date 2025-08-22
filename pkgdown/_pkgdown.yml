@@ -40,12 +40,15 @@ navbar:
 reference:
   - title: "Theming"
     contents:
-      - map_themes
+      - starts_with("theme")
       - ag_call
       - match_color
   - title: "Plotting methods"
     contents:
       - starts_with("plot.")
+      - graphr
+      - graphs
+      - grapht
   - title: "Layouts"
     contents:
       - starts_with("layout")
