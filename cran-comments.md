@@ -9,5 +9,5 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Fewer linebreaks in the package description
-- There is no published methodology to cite
+- Changes to support 'ggplot2' v4.0.0
+- This version required for 'manynet' v1.6.0
