@@ -57,8 +57,8 @@ layout automatically.
 \seealso{
 Other mapping: 
 \code{\link{layout_partition}},
-\code{\link{map_graphr}},
-\code{\link{map_graphs}},
-\code{\link{map_grapht}}
+\code{\link{plot_graphr}},
+\code{\link{plot_graphs}},
+\code{\link{plot_grapht}}
 }
 \concept{mapping}

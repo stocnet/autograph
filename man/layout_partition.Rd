@@ -144,8 +144,8 @@ The "lineage" layout ranks nodes in Y axis according to values.
 \seealso{
 Other mapping: 
 \code{\link{layout_configuration}()},
-\code{\link{map_graphr}},
-\code{\link{map_graphs}},
-\code{\link{map_grapht}}
+\code{\link{plot_graphr}},
+\code{\link{plot_graphs}},
+\code{\link{plot_grapht}}
 }
 \concept{mapping}

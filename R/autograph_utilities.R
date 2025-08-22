@@ -26,6 +26,7 @@ thisRequiresBio <- function(pkgname) {
 #' This is useful for combining multiple plots into a single figure.
 #' @param e1,e2 ggplot objects
 #' @param ... Other arguments passed to `patchwork::wrap_plots()`.
+#' @noRd
 #' @export
 `+.ggplot` <- function(e1, e2, ...) {
   if (inherits(e2, c("ggplot", "ggplot2::ggplot"))) {

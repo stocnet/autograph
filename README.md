@@ -36,7 +36,9 @@ packages.
 
 It is very easy to set a theme. Just type `stocnet_theme()` to see which
 is the theme currently set, and to get a list of available themes. Then
-enter the chosen theme name in
+enter the chosen theme name in the function to set it. All plots created
+using `{autograph}` functions will then use this theme, until you change
+it again.
 
 ``` r
 library(autograph)
