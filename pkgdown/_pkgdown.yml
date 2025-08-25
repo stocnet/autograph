@@ -39,17 +39,31 @@ navbar:
       aria-label: View on CRAN
 reference:
   - title: "Theming"
+    desc: |
+      Functions for tailoring graphs with themes, scales, and palettes.
     contents:
       - starts_with("theme")
       - ag_call
       - match_color
+      - starts_with("scale")
+      - ends_with("palettes")
   - title: "Plotting methods"
+    desc: |
+      Functions for graphing networks and plotting results.
+      `graphr()` graphs any manynet-compatible class object automagically.
+      `graphs()` and `grapht()` do the same for multiple networks
+      and dynamic networks, respectively.
+      `plot()` methods exist for results and other objects for stocnet packages.
     contents:
       - starts_with("plot.")
       - graphr
       - graphs
       - grapht
   - title: "Layouts"
+    desc: |
+      Functions for laying out the nodes in a graph.
+      Included here are some improved or additional layouts to those offered
+      in `{igraph}` and `{ggraph}` by default.
     contents:
       - starts_with("layout")
   - title: "Results objects from other packages"
