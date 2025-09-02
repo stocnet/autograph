@@ -55,10 +55,10 @@ reference:
       and dynamic networks, respectively.
       `plot()` methods exist for results and other objects for stocnet packages.
     contents:
-      - starts_with("plot.")
       - graphr
       - graphs
       - grapht
+      - starts_with("plot.")
   - title: "Layouts"
     desc: |
       Functions for laying out the nodes in a graph.
