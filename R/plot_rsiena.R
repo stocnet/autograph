@@ -167,25 +167,25 @@ plot.sienaGOF <- function(x, ...){
     if (!attr(x, "joined")) {
       main = paste(main, "Period", period)
     }
-  }
-  else {
+  } else {
     main = args$main
   }
   if (attr(x, "joined")) {
     x <- x[[1]]
-  }
-  else {
+  } else {
     x <- x[[period]]
   }
   sims <- x$Simulations
   sims.min <- apply(sims, 2, min)
   sims.max <- apply(sims, 2, max)
+  if(is.null(colnames(sims)) & !is.null(attr(x, "key"))){
+    colnames(sims) <- attr(x, "key") # required for GOFs pre RSiena 1.3.20
+  }
   obs <- x$Observations
   no_vary <- sims.min == obs & sims.min == sims.max
   if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
-    cli::cli_alert_info("Note: some statistics are not plotted because their variance is 0.")
     statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    cli::cli_alert_info("This holds for the statistic{?s} {statkeys}.")
+    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
   }
   
   itns <- nrow(sims)
