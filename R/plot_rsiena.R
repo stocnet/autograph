@@ -199,15 +199,8 @@ plot.sienaGOF <- function(x, ...){
     tidyr::pivot_longer(cols = dplyr::everything()) %>% 
     dplyr::mutate(name = as.character((1:length(obs))-1))
   
-  ggplot2::ggplot(sims, aes(x = name, y = value)) +
-    ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base(),
-                         draw_quantiles = c(0.05,0.95)) +
-    ggplot2::geom_point(data = obs, aes(x = name, y = value),
-                        color = ag_highlight()) +
-    ggplot2::geom_line(data = obs, aes(x = name, y = value),
-                       group = 1,
-                       color = ag_highlight()) +
-    ggplot2::theme_minimal() +
-    ggplot2::labs(y = "Statistic", title = main, 
-                  x = paste("p:", round(x$p, 3), collapse = " "))
+  
+  out <- list(obs, sims, main, x$p)
+  class(out) <- "ag_gof"
+  plot(out)
 }
