@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Why we graph
 
-Network visualisation is important and non-trivial.
+Network visualisation is non-trivial; indeed very important.
 As Tufte (1983: 9) said:
 
 > "At their best, graphics are instruments for reasoning about quantitative information. Often the most effective way to describe, explore, and summarize a set of numbers – even a very large set – is to look at pictures of those numbers"
@@ -31,8 +31,15 @@ All of this is crucial with networks.
 As a first step, network visualisation -- or _graphing_ --
 offers us a way to vet our data for anything strange that might be going on,
 both revealing and informing our assumptions and intuitions.
+The following image relates to the famous [Anscombe's quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet),
+which shows how different datasets can have identical statistical properties
+that are only revealed to be very different when graphed.
 
 <img src="https://info5940.infosci.cornell.edu/notes/dataviz/why-visualize-data/index_files/figure-html/datasaurus-graph-1.gif" height="600px"/>
+
+Drawing network graphs is also a crucial way to explore and understand
+both the global structure of a network as well as 
+smaller-scale structures such as nodal positions or communities within it.
 
 It is also crucial to the further communication of the lessons that we have
 learned through investigation with others.
@@ -40,13 +47,7 @@ While there may be many dead-ends and time-sinks to visualisation,
 it is worth taking the time to make sure that your main points are
 easy to appreciate.
 
-Brandes et al ([1999](https://doi.org/10.1177/0951692899011001004)) argue that visualising networks demands thinking about:
-
-- _substance_: a concise and precise delivery of insights to the researcher and/or readers
-- _design_: the ergonomics of function are 98% of the purpose of good design, aesthetics only 2%
-- and _algorithm_: the features of the e.g. the layout algorithm
-
-## Different approaches
+### Different approaches
 
 There are several main packages for plotting in R, 
 as well as several for plotting networks in R.
@@ -71,31 +72,10 @@ shiny apps or markdown documents;
 (https://www.r-bloggers.com/2016/10/network-visualization-part-6-d3-and-r-networkd3/).
 ]
 
-While the coercion routines available in `{manynet}` make it easy to use 
-any of these packages' graphing capabilities,
-`{manynet}` itself builds upon the ggplot2/ggraph engine 
-to help quickly and informatively graph networks.
-
-### Dimensions of visualisation
-
-On [her excellent and helpful website](https://kateto.net/network-visualization), 
-Katya Ognyanova outlines some key dimensions of control
-that network researchers have to play with:
-
-- vertex position (layout)
-- vertex shape (e.g. circles, squares)
-- vertex color
-- vertex size
-- vertex labels
-- edge shape (e.g. straight, bends)
-- edge type (e.g. solid, dashed)
-- edge color
-- edge size
-- edge arrows
-
-In the following sections, 
-we will learn how `{manynet}` provides sensible defaults on many of these elements,
-and offers ways to extend or customise them.
+`{autograph}` builds upon `{ggraph}` for quickly and informatively graphing networks,
+and uses `{ggplot2}` for plotting related statistics and other information.
+It also depends on the coercion routines available in `{manynet}` to make it easy to use 
+the functions included in this package with many related network analysis packages.
 
 ## Graphing
 
