@@ -32,28 +32,28 @@ plot.traces.monan <- function(x, ...) {
 plot.gof.stats.monan <- function(x, lvls, ...) {
   if (missing(lvls)) {
     lvls <- 1:length(x$observed)
+
+  args <- list(...)
+  if (is.null(args$main)) {
+    main = "Goodness of fit"
+  } else {
+    main = args$main
   }
-  simStats <- Reduce(rbind, x$simulated)
-  sim <- simStats[, lvls] %>% dplyr::as_tibble() %>% 
-    dplyr::mutate(sim = 1:dplyr::n()) %>% 
-    tidyr::pivot_longer(-sim) %>% 
-    dplyr::mutate(name = formatC(gsub("V","",name), width = 2))
   
-  obs <- data.frame(name = sim$name[1:length(x$observed)], value = x$observed)
+  obs <- dplyr::tibble(name = as.factor(1:length(x$observed)), 
+                       value = x$observed)
+
+  simsMat <- Reduce(rbind, x$simulated)
+  colnames(simsMat) <- obs$name
+  rownames(simsMat) <- 1:nrow(simsMat)
+  sims <- dplyr::tibble(as.data.frame(as.table(simsMat)))
+  names(sims) <- c("sim", "name", "value")
   
-  ggplot2::ggplot(sim, aes(x = name, y = value)) +
-    ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base(),
-                         draw_quantiles = c(0.05,0.95)) +
-    ggplot2::geom_point(data = obs, 
-                        aes(x = name, y = value),
-                        color = ag_highlight()) +
-    ggplot2::geom_line(data = obs, aes(x = name, y = value),
-                       group = 1,
-                       color = ag_highlight()) +
-    ggplot2::theme_minimal() +
-    ggplot2::labs(y = "Statistic", x = "")
+  p_value <- NULL
+  
+  
+  out <- list(obs, sims, main, p_value)
+  class(out) <- "ag_gof"
+  plot.ag_gof(out)
   
 }
-
-
-
