@@ -105,6 +105,23 @@ the `graphr()` function using the following parameters:
 graphr(fict_lotr, node_color = "Race")
 ```
 
+### Dimensions of visualisation
+
+On [her excellent and helpful website](https://kateto.net/network-visualization), 
+Katya Ognyanova outlines some key dimensions of control
+that network researchers have to play with:
+
+- vertex position (layout)
+- vertex shape (e.g. circles, squares)
+- vertex color
+- vertex size
+- vertex labels
+- edge shape (e.g. straight, bends)
+- edge type (e.g. solid, dashed)
+- edge color
+- edge size
+- edge arrows
+
 In the following sections, 
 we will learn how `{autograph}` provides sensible defaults on many of these elements,
 and offers ways to extend or customise them.
@@ -132,11 +149,18 @@ fict_lotr %>%
   grapht()
 ```
 
-## Titles and subtitles
+## Titles and legends
+
+### Titles
 
 `{autograph}` works well with both `{ggplot2}` and `{ggraph}` functions 
 that can be appended to create more tailored visualisations 
 of the network.
+Let's try this by adding a title to a plot.
+Append (with a `+`) `ggtitle()` to add a title to a plot,
+say "My graph",
+and then add also a subtitle (an argument to that function),
+say "I did this".
 
 ```{r manynetexample2, exercise=TRUE, purl = FALSE}
 
@@ -144,25 +168,10 @@ of the network.
   
 ```{r manynetexample2-solution}
 graphr(ison_adolescents) + 
-  ggtitle("Visualisation")
+  ggtitle("My visualisation", subtitle = "I did this")
 ```
 
-## Arrangements
-
-`{manynet}` also uses the `{patchwork}` package for arranging
-graphs together, e.g. side-by-side or above one another.
-The syntax is quite straight forward and is used throughout these vignettes.
-
-```{r patchwork, exercise=TRUE, purl = FALSE}
-
-```
-
-```{r patchwork-solution}
-graphr(ison_adolescents) + graphr(ison_algebra)
-graphr(ison_adolescents) / graphr(ison_algebra)
-```
-
-## Legends
+### Legends
 
 While `{autograph}` attempts to provide legends where necessary,
 in some cases the legends offer insufficient detail,
@@ -197,7 +206,28 @@ This works best for quite clustered distributions of attributes.
 graphr(fict_lotr, node_group = "Race")
 ```
 
+## Arrangements
+
+`{autograph}` also uses the `{patchwork}` package for arranging
+graphs together, e.g. side-by-side or above one another.
+The syntax is quite straight forward and is used throughout these vignettes.
+
+```{r patchwork, exercise=TRUE, purl = FALSE}
+
+```
+
+```{r patchwork-solution}
+graphr(ison_adolescents) + graphr(ison_algebra)
+graphr(ison_adolescents) / graphr(ison_algebra)
+```
+
 ## Layouts
+
+Brandes et al ([1999](https://doi.org/10.1177/0951692899011001004)) argue that thinking about how to layout a graph is one of three key aspects of visualisation:
+
+- _substance_: a concise and precise delivery of insights to the researcher and/or readers
+- _design_: the ergonomics of function are 98% of the purpose of good design, aesthetics only 2%
+- and _algorithm_: the features of the e.g. the layout algorithm
 
 The aim of graph layouts is to position nodes in a (usually) two-dimensional space 
 to maximise some analytic and aesthetically pleasing function.
