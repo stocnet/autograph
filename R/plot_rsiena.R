@@ -159,7 +159,7 @@ plot.influenceTable <- function(x, separation=0, ...){
 #' @examples
 #' plot(res_siena_gof)
 #' @export
-plot.sienaGOF <- function(x, ...){
+plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   
   args <- list(...)
   if (is.null(args$main)) {
@@ -199,6 +199,13 @@ plot.sienaGOF <- function(x, ...){
     tidyr::pivot_longer(cols = dplyr::everything()) %>% 
     dplyr::mutate(name = as.character((1:length(obs))-1))
   
+  if(!cumulative){
+    sims <- sims %>% dplyr::group_by(sim) %>%
+      dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
+      dplyr::ungroup()
+    obs <- obs %>% 
+      mutate(value = c(.data$value[1], diff(.data$value)))
+  }
   
   out <- list(obs, sims, main, x$p)
   class(out) <- "ag_gof"

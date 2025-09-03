@@ -4,7 +4,7 @@
 \alias{plot.sienaGOF}
 \title{SIENA Goodness of Fit}
 \usage{
-\method{plot}{sienaGOF}(x, ...)
+\method{plot}{sienaGOF}(x, cumulative = FALSE, ...)
 }
 \arguments{
 \item{x}{A sienaGOF object, as returned by \code{RSiena::sienaGOF()}.}
