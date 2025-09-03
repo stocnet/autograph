@@ -5,12 +5,10 @@
 \alias{plot.gof.stats.monan}
 \title{plot.gof.stats.monan}
 \usage{
-\method{plot}{gof.stats.monan}(x, lvls, ...)
+\method{plot}{gof.stats.monan}(x, cumulative = FALSE, ...)
 }
 \arguments{
 \item{x}{An object of class "gof.stats.monan".}
-
-\item{lvls}{The values for which the gofFunction should be calculated/plotted.}
 
 \item{...}{Additional plotting parameters, use discouraged.}
 }

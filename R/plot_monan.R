@@ -57,6 +57,13 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
   
   p_value <- NULL
   
+  if(cumulative){
+    sims <- sims %>% dplyr::group_by(sim) %>%
+      dplyr::mutate(value = cumsum(.data$value)) %>%
+      dplyr::ungroup()
+    obs <- obs %>% 
+      mutate(value = cumsum(.data$value))
+  }
   
   out <- list(obs, sims, main, p_value)
   class(out) <- "ag_gof"
