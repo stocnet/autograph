@@ -1,4 +1,7 @@
-#' Plotting function for goodness-of-fit results
+#' Plotting functions for goodness-of-fit results
+#' @param x A goodness of fit object using `RSiena::sienaGOF()` or 
+#'   `MoNAn::monanGOF()`.
+#' @param ... Additional arguments to be passed to the plotting function.
 #' @examples
 #' plot(res_siena_gof)
 #' @export

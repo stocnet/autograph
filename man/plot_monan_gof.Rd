@@ -10,6 +10,9 @@
 \arguments{
 \item{x}{An object of class "gof.stats.monan".}
 
+\item{cumulative}{Logical, indicating whether the statistics should be
+plotted cumulatively (default FALSE).}
+
 \item{...}{Additional plotting parameters, use discouraged.}
 }
 \value{

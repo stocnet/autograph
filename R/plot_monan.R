@@ -22,6 +22,8 @@ plot.traces.monan <- function(x, ...) {
 #' plot.gof.stats.monan
 #' @name plot_monan_gof
 #' @param x An object of class "gof.stats.monan".
+#' @param cumulative Logical, indicating whether the statistics should be
+#'  plotted cumulatively (default FALSE).
 #' @param ... Additional plotting parameters, use discouraged.
 #' @return The function `plot.gof.stats.monan` returns violin plots of the 
 #' gof tests with observed values superimposed in red.

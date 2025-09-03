@@ -9,6 +9,9 @@
 \arguments{
 \item{x}{A sienaGOF object, as returned by \code{RSiena::sienaGOF()}.}
 
+\item{cumulative}{Logical, indicating whether the statistics should be
+plotted cumulatively (default FALSE).}
+
 \item{...}{Other parameters to be passed to the plotting funciton,
 for example \code{main = "Title"} for a different title than the default.}
 }

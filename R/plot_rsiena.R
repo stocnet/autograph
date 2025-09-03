@@ -151,6 +151,8 @@ plot.influenceTable <- function(x, separation=0, ...){
 #'   this function utilises `{ggplot2}` and not `{lattice}`,
 #'   which makes the output more compatible and themeable.
 #' @param x A sienaGOF object, as returned by `RSiena::sienaGOF()`.
+#' @param cumulative Logical, indicating whether the statistics should be
+#'  plotted cumulatively (default FALSE).
 #' @param ... Other parameters to be passed to the plotting funciton,
 #'   for example `main = "Title"` for a different title than the default.
 #' @importFrom tidyr pivot_longer
