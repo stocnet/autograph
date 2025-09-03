@@ -22,16 +22,13 @@ plot.traces.monan <- function(x, ...) {
 #' plot.gof.stats.monan
 #' @name plot_monan_gof
 #' @param x An object of class "gof.stats.monan".
-#' @param lvls The values for which the gofFunction should be calculated/plotted.
 #' @param ... Additional plotting parameters, use discouraged.
 #' @return The function `plot.gof.stats.monan` returns violin plots of the 
 #' gof tests with observed values superimposed in red.
 #' @examples
 #' plot(res_monan_gof, lvls = 1:15)
 #' @export
-plot.gof.stats.monan <- function(x, lvls, ...) {
-  if (missing(lvls)) {
-    lvls <- 1:length(x$observed)
+plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
 
   args <- list(...)
   if (is.null(args$main)) {
@@ -44,6 +41,15 @@ plot.gof.stats.monan <- function(x, lvls, ...) {
                        value = x$observed)
 
   simsMat <- Reduce(rbind, x$simulated)
+  sims.min <- apply(simsMat, 2, min)
+  sims.max <- apply(simsMat, 2, max)
+  no_vary <- sims.min == x$observed & sims.min == sims.max
+  if (any(no_vary)) {
+    statkeys <- as.character(which(no_vary))
+    simsMat <- simsMat[,!no_vary]
+    obs <- obs[!no_vary, ]
+    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+  }
   colnames(simsMat) <- obs$name
   rownames(simsMat) <- 1:nrow(simsMat)
   sims <- dplyr::tibble(as.data.frame(as.table(simsMat)))
