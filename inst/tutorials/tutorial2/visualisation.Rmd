@@ -225,40 +225,43 @@ there are some racial assignments that are debatable.]
 Unfortunately, this is a few too many different categories to be effectively
 distinguished by shape.
 
+### Colouring nodes
+
+Let's try instead colouring the nodes by this "Race" variable.
+It is very similar to the shape example above.
+Can you try and complete the code yourself?
+
+```{r speceg, exercise=TRUE, fig.width=9}
+
+```
+
+```{r speceg-solution}
 graphr(fict_lotr, node_color = "Race")
 ```
 
-### Dimensions of visualisation
+That's much easier to read.
+Since the same colours seem to be clustered together,
+with the humans and hobbits each clustered together in the centre of the graph,
+and the elves clustered towards the left,
+we might infer that there is some 'homophily' going on here --
+a topic for another tutorial.
 
-On [her excellent and helpful website](https://kateto.net/network-visualization), 
-Katya Ognyanova outlines some key dimensions of control
-that network researchers have to play with:
+An alternative to coloring the nodes is to use the 'node_group' argument 
+to highlight groups in a network.
+This puts a shaded area around nodes of the same group.
+For rather spatially clustered distributions, this can be a very effective way 
+to show groupings, but can be sensitive to the layout used.
+If nodes of the same group are not close together,
+the shaded areas can overlap and make the graph harder to read.
 
-- vertex position (layout)
-- vertex shape (e.g. circles, squares)
-- vertex color
-- vertex size
-- vertex labels
-- edge shape (e.g. straight, bends)
-- edge type (e.g. solid, dashed)
-- edge color
-- edge size
-- edge arrows
+```{r group, exercise = TRUE}
+graphr(fict_lotr, node_group = "Race")
+```
 
-In the following sections, 
-we will learn how `{autograph}` provides sensible defaults on many of these elements,
-and offers ways to extend or customise them.
+Note that `node_color` and `node_group` can be used together,
+either to highlight different groups or to emphasise group assignment where
+there is the kind of interpenetration or overlap described above as a challenge.
 
-### graphs
-
-`graphr()` is not the only graphing function included in `{autograph}`.
-To graph _sets_ of networks together, `graphs()` makes sure that two
-or more networks are plotted together.
-This might be a set of ego networks, subgraphs, or waves of a longitudinal network.
-
-```{r graphs, exercise=TRUE}
-graphs(to_subgraphs(fict_lotr, "Race"),
-       waves = c(1,2,3,4))
 ```
 
 ### grapht
