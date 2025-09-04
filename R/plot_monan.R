@@ -12,7 +12,15 @@ plot.traces.monan <- function(x, ...) {
   nParams <- length(x[[1]])
   nSims <- length(x[[2]][, 1])
   dat <- x[[2]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
-    tidyr::pivot_longer(-sim)
+    as.data.frame() %>% dplyr::select(sim, dplyr::everything())
+  dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
+                 direction = "long",
+                 varying = list(colnames(dat)[-1]),
+                 v.names = "value",
+                 timevar = "name",
+                 times = colnames(dat)[-1],
+                 idvar = "sim") %>% 
+    dplyr::tibble() %>% dplyr::arrange(sim)
   dat <- dat %>% dplyr::mutate(name = gsub("_","\n",name, fixed = TRUE))
   dat <- dat %>% dplyr::mutate(name = gsub(" ","\n",name, fixed = TRUE))
   ggplot2::ggplot(dat, aes(x = sim, y = value), shape = 1, color = ag_base()) + 

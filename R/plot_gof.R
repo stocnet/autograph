@@ -93,13 +93,13 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   itns <- nrow(sims)
   n.obs <- nrow(obs)
   sims <- sims[,!no_vary]
-  sims <- as.data.frame(sims) %>% 
-    dplyr::mutate(sim = 1:nrow(sims)) %>% 
-    tidyr::pivot_longer(!sim)
+  sims <- as.data.frame(sims) %>% dplyr::mutate(sim = 1:nrow(sims))
+  sims <- stats::reshape(sims, varying = list(colnames(sims)[-ncol(sims)]), 
+          v.names = "value", timevar = "name", times = colnames(sims)[-ncol(sims)],
+          idvar = "sim", direction = "long") %>% 
+    dplyr::tibble() %>% dplyr::arrange(sim)
   obs <- obs[!no_vary]
-  obs <- as.data.frame(obs) %>% 
-    tidyr::pivot_longer(cols = dplyr::everything()) %>% 
-    dplyr::mutate(name = as.character((1:length(obs))-1))
+  obs <- data.frame(name = as.character((1:length(obs))-1), value = obs)
   
   if(!cumulative){
     sims <- sims %>% dplyr::group_by(sim) %>%
