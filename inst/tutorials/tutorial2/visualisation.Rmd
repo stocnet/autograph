@@ -338,29 +338,51 @@ graphr(fict_lotr,
   labs(color = "Color")
 ```
 
+
+## Titles, labels, and legends
+
+When it comes to communicating insights from network graphs to others,
+it is important to add in the contextual information that will help them
+understand what they are looking at.
+In this section, we will learn how to add titles, labels, and legends to graphs.
+
+### Labels
+
+With our `fict_lotr` example above, because the network is itself labelled,
+`graphr()` automatically adds in the node labels because they are available.
+If you do not want these labels, you can remove them from the network before
+passing it on to `graphr()`, or you can use the argument `labels = FALSE`.
+
+```{r nodelab, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, labels = FALSE)
 ```
 
-## Titles and legends
+Without the labels, the structure of the network is clearer and easier to
+interpret, though we lose the information about which node is which character.
 
 ### Titles
 
 `{autograph}` works well with both `{ggplot2}` and `{ggraph}` functions 
-that can be appended to create more tailored visualisations 
-of the network.
+that can be appended to create more tailored visualisations.
 Let's try this by adding a title to a plot.
-Append (with a `+`) `ggtitle()` to add a title to a plot,
+Append (with a `+`) `labs(title = )` to add a title to a plot,
 say "My graph",
 and then add also a subtitle (an argument to that function),
 say "I did this".
 
-```{r manynetexample2, exercise=TRUE, purl = FALSE}
+```{r manynetexample2, exercise=TRUE, purl = FALSE, fig.width=9}
 
 ```
   
 ```{r manynetexample2-solution}
-graphr(ison_adolescents) + 
-  ggtitle("My visualisation", subtitle = "I did this")
+graphr(fict_lotr) + 
+  labs(title = "My visualisation", 
+       subtitle = "I did this")
 ```
+
+Note that you can also use `ggtitle()` to do the same thing,
+but if you just remember `labs()` you can also use it to add labels
+for _x_ and _y_ axes, and legends (see below).
 
 ### Legends
 
@@ -368,7 +390,7 @@ While `{autograph}` attempts to provide legends where necessary,
 in some cases the legends offer insufficient detail,
 such as in the following figure, or are absent.
 
-```{r maxbet, exercise = TRUE}
+```{r maxbet, exercise = TRUE, fig.width=9}
 fict_lotr %>% 
   mutate(maxbet = node_is_max(node_betweenness(fict_lotr))) %>% 
   graphr(node_color = "maxbet")
@@ -381,35 +403,12 @@ and `labs()` for giving those legends particular titles.
 Note that we can use `"\n"` within the legend title to make the title
 span multiple lines.
 
-```{r legend, exercise=TRUE}
+```{r legend, exercise=TRUE, fig.width=9}
 fict_lotr %>% 
   mutate(maxbet = node_is_max(node_betweenness(fict_lotr))) %>% 
   graphr(node_color = "maxbet") +
   guides(color = "legend") + 
   labs(color = "Maximum\nBetweenness")
-```
-
-An alternative to colors and legends is to use the 'node_group' argument 
-to highlight groups in a network.
-This works best for quite clustered distributions of attributes.
-
-```{r group, exercise = TRUE}
-graphr(fict_lotr, node_group = "Race")
-```
-
-## Arrangements
-
-`{autograph}` also uses the `{patchwork}` package for arranging
-graphs together, e.g. side-by-side or above one another.
-The syntax is quite straight forward and is used throughout these vignettes.
-
-```{r patchwork, exercise=TRUE, purl = FALSE}
-
-```
-
-```{r patchwork-solution}
-graphr(ison_adolescents) + graphr(ison_algebra)
-graphr(ison_adolescents) / graphr(ison_algebra)
 ```
 
 ## Layouts
