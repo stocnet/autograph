@@ -24,7 +24,7 @@ the appropriate palette to be used for all autograph-consistent
 plotting methods.
 
 The following themes are currently available:
-default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, rainbow.
+default, bw, iheid, ethz, uzh, rug, unibe, oxf, unige, crisp, neon, rainbow.
 }
 \examples{
 stocnet_theme("default")

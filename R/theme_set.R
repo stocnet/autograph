@@ -45,7 +45,8 @@ stocnet_theme <- function(theme = NULL){
 }
 
 theme_opts <- c("default", "bw",
-                "iheid", "ethz", "uzh", "rug", "unibe",
+                "iheid", "ethz", "uzh", "rug", "unibe", 
+                "oxf", "unige",
                 "crisp", "neon", "rainbow")
 
 set_background_theme <- function(theme){
