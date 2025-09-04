@@ -205,19 +205,26 @@ Tie arrows and shapes are used to indicate directionality and reciprocity,
 where present in the data.
 Let's go through some of these options in more detail.
 
-```
-  
-We can also specify the colours, groups, shapes, and sizes of nodes and edges in 
-the `graphr()` function using the following parameters:
-  
-* `node_colour`
-* `node_shape`
-* `node_size`
-* `node_group`
-* `edge_color`
-* `edge_size`
+### Shaping nodes
 
-```{r speceg, exercise=TRUE}
+One of the first things we might be interested in doing is understanding better
+the distribution of some categorical variable.
+Our `fict_lotr` dataset contains a variable called `Race`,
+so let's try and change the shape of the nodes by this variable.
+Following the syntax shown in the table above,
+we just need to reference the variable name in the `node_shape` argument.
+
+```{r shapeeg, exercise=TRUE, fig.width=9}
+fict_lotr
+graphr(fict_lotr, node_shape = "Race")
+```
+
+We can see here that there are six different races present here.^[
+Though the keen-eyed and well-read among you will have noticed that
+there are some racial assignments that are debatable.]
+Unfortunately, this is a few too many different categories to be effectively
+distinguished by shape.
+
 graphr(fict_lotr, node_color = "Race")
 ```
 
