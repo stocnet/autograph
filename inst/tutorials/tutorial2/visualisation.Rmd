@@ -277,15 +277,67 @@ fict_lotr %>%
   graphr(node_size = "Degree")
 ```
 
-### grapht
+## Theming
 
-`grapht()` is another option, rendering network changes as a gif.
-  
-```{r grapht, exercise=TRUE}
-fict_lotr %>%
-  mutate_ties(year = sample(1:12, 66, replace = TRUE)) %>%
-  to_waves(attribute = "year", cumulative = TRUE) %>%
-  grapht()
+### Who's hue?
+
+By default, `graphr()` will use a color palette that offers fairly good contrast
+and better accessibility.
+However, a different hue might offer a better aesthetic or 
+identifiability for some nodes.
+Because the `graphr()` function is based on
+the grammar of graphics,
+it's easy to extend or alter aesthetic aspects.
+Here let's try and change the colors
+assigned to the different races in the `fict_lotr` dataset.
+
+```{r colorch, exercise=TRUE}
+graphr(fict_lotr,
+           node_color = "Race")
+
+graphr(fict_lotr,
+           node_color = "Race") +
+  ggplot2::scale_colour_hue()
+```
+
+
+### Grayscale
+
+Other times color may not be desired.
+Some publications require grayscale images.
+To use a grayscale color palette,
+replace `_hue` from above with `_grey` (note the 'e' spelling):
+
+```{r greyscale, exercise=TRUE}
+graphr(fict_lotr,
+           node_color = "Race") +
+  ggplot2::scale_colour_grey()
+```
+
+As you can see, grayscale is more effective for continuous variables
+or very few discrete variables than the number used here.
+
+### Manual override
+
+Or we may want to choose particular colors for each category.
+This is pretty straightforward to do with `ggplot2::scale_colour_manual()`.
+Some common color names are available,
+but otherwise hex color codes can be used for more specific colors.
+Unspecified categories are coloured (dark) grey.
+
+```{r mancolor, exercise=TRUE}
+graphr(fict_lotr,
+           node_color = "Race") +
+  ggplot2::scale_colour_manual(
+    values = c("Dwarf" = "red",
+               "Hobbit" = "orange",
+               "Maiar" = "#DEC20B",
+               "Human" = "lightblue",
+               "Elf" = "lightgreen",
+               "Ent" = "darkgreen")) +
+  labs(color = "Color")
+```
+
 ```
 
 ## Titles and legends
