@@ -100,13 +100,14 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
        y = "Miles per Gallon")
 ```
 
+### Different graphing approaches in R
 
 Approaches to plotting _graphs_ or _networks_ in R can be similarly divided:
 
 - two classic packages, `{igraph}` and `{sna}`, 
-both build upon the base R graphics engine,
+both build upon the 'base' R graphics engine,
 - newer packages [`{ggnetwork}`](https://www.r-bloggers.com/2016/03/ggnetwork-network-geometries-for-ggplot2/) and 
-[`{ggraph}`](https://ggraph.data-imaginist.com/index.html) build upon a grid approach.^[
+[`{ggraph}`](https://ggraph.data-imaginist.com/index.html) build upon a 'grid' approach.^[
 Others include: 'Networkly' for creating 2-D and 3-D interactive networks
 that can be rendered with plotly and can be easily integrated into
 shiny apps or markdown documents;
@@ -115,6 +116,38 @@ shiny apps or markdown documents;
 'networkD3' interacts with javascript (D3) to make interactive networks
 (https://www.r-bloggers.com/2016/10/network-visualization-part-6-d3-and-r-networkd3/).
 ]
+
+In this tutorial, we're going to use the `fict_lotr` dataset from the `{manynet}` package.
+Let's see how this would be plotted using `{igraph}` and `{ggraph}`,
+adding a title to each to facilitate comparison,
+but otherwise relying on default behaviour.
+
+```{r igraph-vs-ggraph, exercise = TRUE, fig.show='hold', fig.width=9, fig.height=4, message=FALSE}
+plot(as_igraph(fict_lotr),
+     main = "igraph: fict_lotr")
+ggraph::ggraph(as_tidygraph(fict_lotr)) +
+  ggraph::geom_edge_link() +
+  ggraph::geom_node_point() +
+  ggtitle("ggraph: fict_lotr")
+```
+
+We can see here that `{igraph}` plots the network in a fairly basic way,
+straight to the plotting device (window).
+By default, it uses a force-directed layout (see Layouts below),^[Which incidentally returns a different layout each time it is run.]
+colors the nodes orange, and prints node labels if they have them.
+However, the layout is not optimised for the size of the plotting window,
+the node labels are regularly overlapping, 
+and the orange color with black borders is not particularly appealing
+or helpful for label legibility.
+It only works with 'igraph' objects.
+
+In contrast, `{ggraph}` offers the trademark flexibility of the grammar of graphics approach.
+However, it requires the user to build up a plot from the ground up,
+which can be daunting for new users and fiddly even for experienced ones.
+Four lines are required to get even a basic plot,
+with an additional line required if a grey background is not desired.
+No labels or other information are added by default, and would also require additional lines.
+It works with 'tidygraph' objects, which are an additional layer on top of 'igraph' objects.
 
 `{autograph}` builds upon `{ggraph}` for quickly and informatively graphing networks,
 and uses `{ggplot2}` for plotting related statistics and other information.
