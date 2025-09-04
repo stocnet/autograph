@@ -14,14 +14,14 @@ description: >
 ```{r setup, include=FALSE}
 library(learnr)
 library(autograph)
-stocnet_theme("iheid")
+stocnet_theme("default")
 library(migraph)
 library(patchwork)
 clear_glossary()
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## Why we graph
+## Why graph
 
 Network visualisation is non-trivial; indeed it is very important for at least
 two reasons.
@@ -41,9 +41,9 @@ As Tufte (1983: 9) said:
 > "At their best, graphics are instruments for reasoning about quantitative information. Often the most effective way to describe, explore, and summarize a set of numbers – even a very large set – is to look at pictures of those numbers"
 
 All of this is crucial with networks.
-Drawing network graphs is also a crucial way to explore and understand
-both the global structure of a network as well as 
-smaller-scale structures such as nodal positions or communities within it.
+Drawing network graphs is key to exploring and understanding both the 
+global structure of a network as well as smaller-scale structures 
+such as nodal positions or communities within it.
 
 Second, visualisation is a crucial part of the communication of the lessons 
 that we have learned through investigation with others.
@@ -149,22 +149,39 @@ with an additional line required if a grey background is not desired.
 No labels or other information are added by default, and would also require additional lines.
 It works with 'tidygraph' objects, which are an additional layer on top of 'igraph' objects.
 
-`{autograph}` builds upon `{ggraph}` for quickly and informatively graphing networks,
-and uses `{ggplot2}` for plotting related statistics and other information.
-It also depends on the coercion routines available in `{manynet}` to make it easy to use 
-the functions included in this package with many related network analysis packages.
+### Who draws first
 
-## Graphing
+`{autograph}` builds upon these packages,
+but takes a somewhat different approach.
+Because it builds upon the 'grid' approach of `{ggplot2}` and `{ggraph}`,
+lending itself to the additional layering and flexibility of those packages.
+Because it depends on the coercion routines available in `{manynet}`,
+it can be used with network-related objects from most common network analysis packages.
+However, unlike those packages it offers concise and easy-to-use functions
+for drawing graphs that offer sensible defaults for most common use cases,
+using the information that is available in the network object.
 
-### graphr
-  
-To get a basic visualisation of the network before adding various specifications,
-the `graphr()` function in `{autograph}` is a quick and easy way to obtain a 
-clear first look of the network for preliminary investigations and understanding of the network. 
-Let's quickly visualise one of the `ison_` datasets included in the `{manynet}` package.
+The first thing you will want to do when you import or 
+create a new network dataset is draw it.
+Let's say that we're still interested in the `fict_lotr` dataset from the `{manynet}` package.
+Compared to the `{igraph}` and `{ggraph}` examples before,
+we can see that `autograph::graphr()` offers a much more concise way to draw the network.
 
-```{r manyneteg, exercise=TRUE}
+```{r agsimple, exercise=TRUE, fig.width=9}
 graphr(fict_lotr)
+```
+
+The package also offers methods for plotting statistics related to networks
+(e.g. degree distributions) and models of them (e.g. goodness-of-fit plots).
+But we'll get to that later, and most of these are demonstrated in other
+vignettes, tutorials, or packages.
+`{autograph}` also offers consistent theming across graphs and plots,
+so that you do not need to keep specifying the same options over and over again.
+
+In the following pages, we're going to go through a number of different ways
+of taking control of the graphing process.
+Click 'Next Topic' to continue.
+
 ```
   
 We can also specify the colours, groups, shapes, and sizes of nodes and edges in 
