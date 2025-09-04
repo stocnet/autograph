@@ -621,22 +621,27 @@ Other grid layouts include:
 - orthogonal layouts for e.g. printed circuit boards
 - grid snapping for other layouts
 
-## Arrangements
+## Multiple graphs
 
-`{autograph}` also uses the `{patchwork}` package for arranging
-graphs together, e.g. side-by-side or above one another.
-The syntax is quite straight forward and is used throughout these vignettes.
+### Arrangements
+
+`{autograph}` uses the `{patchwork}` package for arranging graphs together, 
+e.g. side-by-side or above one another.
+The syntax is quite straight forward and is used throughout these vignettes/tutorials.
+Basically, you just use `+` to put graphs side-by-side,
+and `/` to put them above one another.
+Parentheses can be used to group graphs together.
 
 ```{r patchwork, exercise=TRUE, purl = FALSE}
 
 ```
 
 ```{r patchwork-solution}
-graphr(ison_adolescents) + graphr(ison_algebra)
-graphr(ison_adolescents) / graphr(ison_algebra)
+graphr(fict_lotr) + graphr(ison_algebra)
+graphr(fict_lotr) / graphr(ison_algebra)
 ```
 
-### graphs
+### Sets
 
 `graphr()` is not the only graphing function included in `{autograph}`.
 To graph _sets_ of networks together, `graphs()` makes sure that two
@@ -648,9 +653,16 @@ graphs(to_subgraphs(fict_lotr, "Race"),
        waves = c(1,2,3,4))
 ```
 
-### grapht
+What is happening here is that `to_subgraphs()` is creating a list of subgraphs
+and then `graphs()` is plotting them together at once with the same set of
+aesthetic parameters.
 
-`grapht()` is another option, rendering network changes as a gif.
+### Dynamics
+
+`grapht()` is another alternative to `graphr()`, 
+this time rendering network changes as a gif.
+While the `grapht()` function is not as flexible as `graphr()`,
+it is very useful for visualising changes in networks over time.
   
 ```{r grapht, exercise=TRUE}
 fict_lotr %>%
@@ -658,6 +670,8 @@ fict_lotr %>%
   to_waves(attribute = "year", cumulative = TRUE) %>%
   grapht()
 ```
+
+More functionality will be added to this function in future releases.
 
 ## Further flexibility
 
