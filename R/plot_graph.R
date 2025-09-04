@@ -146,7 +146,7 @@ graphr <- function(.data, layout, labels = TRUE,
   p <- .graph_layout(g, layout, labels, node_group, snap, ...)
   # Add background ----
   if(getOption("snet_background", default = "#FFFFFF")!="#FFFFFF")
-    p <- p + ggplot2::theme(panel.background = ggplot2::element_rect(fill = getOption("mnet_background", default = "#FFFFFF")))
+    p <- p + ggplot2::theme(panel.background = ggplot2::element_rect(fill = getOption("snet_background", default = "#FFFFFF")))
   # Add edges ----
   p <- .graph_edges(p, g, edge_color, edge_size, node_size)
   # Add nodes ----
@@ -217,12 +217,12 @@ graphr <- function(.data, layout, labels = TRUE,
   if (length(unique(out[["ecolor"]])) == 1) {
     p <- p + ggplot2::guides(edge_colour = "none")
   } else if (length(unique(out[["ecolor"]])) == 2){
-    p <- p + ggraph::scale_edge_colour_manual(values = getOption("mnet_highlight", default = c("grey","black")),
+    p <- p + ggraph::scale_edge_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
                                                             "Edge Sign", "Edge Color")))
-    } else p <- p + ggraph::scale_edge_colour_manual(values = getOption("mnet_cat", default = colorsafe_palette),
+    } else p <- p + ggraph::scale_edge_colour_manual(values = getOption("snet_cat", default = colorsafe_palette),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
@@ -246,10 +246,10 @@ graphr <- function(.data, layout, labels = TRUE,
         title = ifelse(manynet::is_twomode(g) & is.null(node_shape), "Node Mode", "Node Shape")))
     if (length(unique(out[["ncolor"]])) > 1){
       if(length(unique(out[["ncolor"]])) == 2){
-        p <- p + ggplot2::scale_colour_manual(values = getOption("mnet_highlight", default = c("grey","black")),
+        p <- p + ggplot2::scale_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
                                               guide = ggplot2::guide_legend("Node Color"))
       } else {
-        p <- p + ggplot2::scale_colour_manual(values = getOption("mnet_cat", default = colorsafe_palette),
+        p <- p + ggplot2::scale_colour_manual(values = getOption("snet_cat", default = colorsafe_palette),
                                               guide = ggplot2::guide_legend("Node Color"))
       }
     }
