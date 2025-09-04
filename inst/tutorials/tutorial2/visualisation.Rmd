@@ -254,7 +254,7 @@ to show groupings, but can be sensitive to the layout used.
 If nodes of the same group are not close together,
 the shaded areas can overlap and make the graph harder to read.
 
-```{r group, exercise = TRUE}
+```{r group, exercise = TRUE, fig.width=9}
 graphr(fict_lotr, node_group = "Race")
 ```
 
@@ -271,10 +271,29 @@ we can create one rather easily from the network itself.
 Let's use each node's degree, which is the number of ties incident/connecting
 to the node.
 
-```{r degsize, exercise = TRUE}
+```{r degsize, exercise = TRUE, fig.width=9}
 fict_lotr %>% 
   mutate(Degree = node_deg(fict_lotr)) %>% 
   graphr(node_size = "Degree")
+```
+
+### Tying up loose ends
+
+All this works similarly with ties/edges.
+Just replace `node_` with `edge_` in the arguments above,
+and you can control edges' size and color.
+Have a try yourself by adding some additional variables to the data.
+Try adding in a binary variable to each tie called 'is_tri'
+that indicates whether the tie is a part of a triangle or not.
+If you add a continuous variable to each tie called 'weight',
+and a categorical variable to the ties called 'type',
+then `graphr()` will even try to use this information automatically.
+
+```{r tiesize, exercise = TRUE, fig.width=9}
+fict_lotr %>% 
+  mutate_ties(weight = tie_closeness(fict_lotr),
+              is_tri = tie_is_triangular(fict_lotr)) %>% 
+  graphr(edge_color = "is_tri")
 ```
 
 ## Theming
@@ -312,7 +331,7 @@ it's easy to extend or alter aesthetic aspects.
 Here let's try and change the colors
 assigned to the different races in the `fict_lotr` dataset.
 
-```{r colorch, exercise=TRUE}
+```{r colorch, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
            node_color = "Race")
 
@@ -328,7 +347,7 @@ Some publications require grayscale images.
 To use a grayscale color palette,
 replace `_hue` from above with `_grey` (note the 'e' spelling):
 
-```{r greyscale, exercise=TRUE}
+```{r greyscale, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
            node_color = "Race") +
   ggplot2::scale_colour_grey()
@@ -345,7 +364,7 @@ Some common color names are available,
 but otherwise hex color codes can be used for more specific colors.
 Unspecified categories are coloured (dark) grey.
 
-```{r mancolor, exercise=TRUE}
+```{r mancolor, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
            node_color = "Race") +
   ggplot2::scale_colour_manual(
@@ -429,6 +448,10 @@ fict_lotr %>%
   guides(color = "legend") + 
   labs(color = "Maximum\nBetweenness")
 ```
+
+To change the position of the legend, add the `theme()` function from `{ggplot2}`.
+The legend can be positioned at the top, bottom, left, or right, 
+or removed using "none".
 
 ## Layouts
 
@@ -704,10 +727,6 @@ and the `arrow()` function from `{ggplot2}`.
 The angle, length, arrowhead type, 
 and padding between the arrowhead and the node can also be specified.
   
-To change the position of the legend, add the `theme()` function from `{ggplot2}`.
-The legend can be positioned at the top, bottom, left, or right, 
-or removed using "none".
-
 For more see David Schoch's [excellent resources on this](http://mr.schochastics.net/netVizR.html).
   
 ## Exporting plots to PDF
