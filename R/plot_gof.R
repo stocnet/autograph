@@ -31,8 +31,8 @@ plot.ag_gof <- function(x, ...){
   bounds <- sims %>%
     dplyr::group_by(name) %>%
     dplyr::summarise(
-      q05 = quantile(value, 0.05),
-      q95 = quantile(value, 0.95),
+      q05 = stats::quantile(value, 0.05),
+      q95 = stats::quantile(value, 0.95),
       .groups = "drop")
   
   ggplot2::ggplot(sims, aes(x = name, y = value)) +

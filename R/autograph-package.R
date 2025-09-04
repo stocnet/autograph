@@ -5,3 +5,5 @@
 #'   The tutorial can be run locally using `run_tute("visualisation")`.
 #' @author James Hollway
 "_PACKAGE"
+
+globalVariables(c("q05","q95"))
