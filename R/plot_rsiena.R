@@ -6,6 +6,7 @@
 #'   for the interpretation of results for network dynamics obtained with 
 #'   the RSiena package.
 #' @author Tom Snijders
+#' @family RSiena
 #' @references Consult also the RSiena manual, Sections 13.1 and 13.3.
 #' @inheritParams plot.diffusion
 #' @param x An object of class "selectionTable",
@@ -90,6 +91,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 #'   for the interpretation of results for network and behavior dynamics
 #'   obtained with the RSiena or multiSiena packages.
 #' @author Tom Snijders
+#' @family RSiena
 #' @references Consult also the RSiena manual, Sections 13.2 and 13.4.
 #'   Gratitude to Steffen Triebel and Rene Veenstra for corrections.
 #' @inheritParams plot.selectionTable
@@ -140,76 +142,4 @@ plot.influenceTable <- function(x, separation=0, ...){
     # ggplot2::theme_grey(base_size=14, base_family="") +
     ggplot2::theme(legend.key.width = ggplot2::unit(1, "cm")) +
     ggplot2::theme(plot.title=element_text(hjust=0.5))
-}
-
-# Goodness of Fit ####
-
-#' SIENA Goodness of Fit
-#' @description
-#'   This function plots goodness of fit objects created using RSiena.
-#'   Unlike the plot method included in the `{RSiena}` package,
-#'   this function utilises `{ggplot2}` and not `{lattice}`,
-#'   which makes the output more compatible and themeable.
-#' @param x A sienaGOF object, as returned by `RSiena::sienaGOF()`.
-#' @param cumulative Logical, indicating whether the statistics should be
-#'  plotted cumulatively (default FALSE).
-#' @param ... Other parameters to be passed to the plotting funciton,
-#'   for example `main = "Title"` for a different title than the default.
-#' @importFrom tidyr pivot_longer
-#' @returns A violin plot showing the distribution of statistics from the 
-#'   simulations and a line highlighting the observed statistics.
-#' @examples
-#' plot(res_siena_gof)
-#' @export
-plot.sienaGOF <- function(x, cumulative = FALSE, ...){
-  
-  args <- list(...)
-  if (is.null(args$main)) {
-    main = paste("Goodness of Fit of", attr(x, "auxiliaryStatisticName"))
-    if (!attr(x, "joined")) {
-      main = paste(main, "Period", period)
-    }
-  } else {
-    main = args$main
-  }
-  if (attr(x, "joined")) {
-    x <- x[[1]]
-  } else {
-    x <- x[[period]]
-  }
-  sims <- x$Simulations
-  sims.min <- apply(sims, 2, min)
-  sims.max <- apply(sims, 2, max)
-  if(is.null(colnames(sims)) & !is.null(attr(x, "key"))){
-    colnames(sims) <- attr(x, "key") # required for GOFs pre RSiena 1.3.20
-  }
-  obs <- x$Observations
-  no_vary <- sims.min == obs & sims.min == sims.max
-  if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
-    statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
-  }
-  
-  itns <- nrow(sims)
-  n.obs <- nrow(obs)
-  sims <- sims[,!no_vary]
-  sims <- as.data.frame(sims) %>% 
-    dplyr::mutate(sim = 1:nrow(sims)) %>% 
-    tidyr::pivot_longer(!sim)
-  obs <- obs[!no_vary]
-  obs <- as.data.frame(obs) %>% 
-    tidyr::pivot_longer(cols = dplyr::everything()) %>% 
-    dplyr::mutate(name = as.character((1:length(obs))-1))
-  
-  if(!cumulative){
-    sims <- sims %>% dplyr::group_by(sim) %>%
-      dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
-      dplyr::ungroup()
-    obs <- obs %>% 
-      mutate(value = c(.data$value[1], diff(.data$value)))
-  }
-  
-  out <- list(obs, sims, main, x$p)
-  class(out) <- "ag_gof"
-  plot(out)
 }
