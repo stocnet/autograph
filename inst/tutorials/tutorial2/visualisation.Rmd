@@ -58,15 +58,48 @@ but it is worth taking the time to explore your data and experiment with ways
 to make what you have learned over a longer period of time evident to others
 in a shorter period of time.
 
-### Different approaches
+### Different graphics approaches in R
 
+To understand graph and network metric visualisation with `{autograph}`,
+it is useful to review the different approaches taken already in R.
 There are several main packages for plotting in R, 
 as well as several for plotting networks in R.
 Plotting in R is typically based around two main approaches:
 
-- the 'base' approach in R by default,
-and 
-- the 'grid' approach made popular by the famous and very flexible `{ggplot2}` package.^['gg' stands for the [Grammar of Graphics](https://doi.org/10.1007/0-387-28695-0).]
+- the 'base' approach in R by default, and 
+- the 'grid' approach made popular by the famous and very flexible `{ggplot2}` package.^[
+Perhaps of interest, `gg` stands for the Grammar of Graphics (https://doi.org/10.1007/0-387-28695-0).]
+
+In the case of base R graphics, plots are essentially written straight to the
+plotting device. 
+This means that they are not easily modified after the fact.
+You would need to replot the whole thing to change something.
+Moreover, while there is an admirably clean aestethic to base R graphics,
+it can be difficult to modify or extend them to your needs.
+
+In the case of grid graphics, plots are built up in layers,
+and thus can be modified after the fact.
+That is, you can initialise a plot using `ggplot2::ggplot()`,
+specifying the data and mapping variables to various aesthetic features,
+and then add layers to it using `+` to add further points and lines, 
+but also titles, legends, etc.
+
+The following figure illustrates the difference between these two approaches.
+
+```{r base-vs-gg, exercise = TRUE, fig.show='hold', fig.width=9, fig.height=4}
+plot(mtcars$hp, mtcars$mpg,
+     main = "Base R: MPG vs Horsepower",
+     xlab = "Horsepower",
+     ylab = "Miles per Gallon",
+     pch = 19,
+     col = "blue")
+ggplot(mtcars, aes(x = hp, y = mpg)) +
+  geom_point(color = "blue") +
+  labs(title = "ggplot2: MPG vs Horsepower",
+       x = "Horsepower",
+       y = "Miles per Gallon")
+```
+
 
 Approaches to plotting _graphs_ or _networks_ in R can be similarly divided:
 
