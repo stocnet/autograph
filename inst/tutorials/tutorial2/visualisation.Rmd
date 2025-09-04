@@ -413,14 +413,9 @@ fict_lotr %>%
 
 ## Layouts
 
-Brandes et al ([1999](https://doi.org/10.1177/0951692899011001004)) argue that thinking about how to layout a graph is one of three key aspects of visualisation:
-
-- _substance_: a concise and precise delivery of insights to the researcher and/or readers
-- _design_: the ergonomics of function are 98% of the purpose of good design, aesthetics only 2%
-- and _algorithm_: the features of the e.g. the layout algorithm
-
 The aim of graph layouts is to position nodes in a (usually) two-dimensional space 
 to maximise some analytic and aesthetically pleasing function.
+There is a lot to which one could potentially pay attention.
 Quality measures might include:
 
 - minimising the _crossing number_ of edges/ties in the graph 
@@ -437,8 +432,10 @@ Quality measures might include:
 - evening the _aspect ratio_ of the plot
 - displaying _symmetry groups_ (subgraph automorphisms)
 
-A range of graph layouts are available across the `{igraph}`, `{graphlayouts}`, and `{manynet}` packages 
-that can be used together with `graphr()`.
+Graph layouts available in the `{igraph}`, `{ggraph}`, `{graphlayouts}`, 
+and `{autograph}` packages can be used in `graphr()`.
+These can be specified using the `layout` argument.
+In the following sections, we review some of the most common types of layouts.
 
 ### Force-directed layouts
 
@@ -582,83 +579,43 @@ Other grid layouts include:
 - orthogonal layouts for e.g. printed circuit boards
 - grid snapping for other layouts
 
-## Colors
+## Arrangements
 
-### Who's hue?
+`{autograph}` also uses the `{patchwork}` package for arranging
+graphs together, e.g. side-by-side or above one another.
+The syntax is quite straight forward and is used throughout these vignettes.
 
-By default, `graphr()` will use a color palette that offers fairly good contrast
-and better accessibility.
-However, a different hue might offer a better aesthetic or 
-identifiability for some nodes.
-Because the `graphr()` function is based on
-the grammar of graphics,
-it's easy to extend or alter aesthetic aspects.
-Here let's try and change the colors
-assigned to the different races in the `fict_lotr` dataset.
+```{r patchwork, exercise=TRUE, purl = FALSE}
 
-```{r colorch, exercise=TRUE}
-graphr(fict_lotr,
-           node_color = "Race")
-
-graphr(fict_lotr,
-           node_color = "Race") +
-  ggplot2::scale_colour_hue()
 ```
 
-
-### Grayscale
-
-Other times color may not be desired.
-Some publications require grayscale images.
-To use a grayscale color palette,
-replace `_hue` from above with `_grey` (note the 'e' spelling):
-
-```{r greyscale, exercise=TRUE}
-graphr(fict_lotr,
-           node_color = "Race") +
-  ggplot2::scale_colour_grey()
+```{r patchwork-solution}
+graphr(ison_adolescents) + graphr(ison_algebra)
+graphr(ison_adolescents) / graphr(ison_algebra)
 ```
 
-As you can see, grayscale is more effective for continuous variables
-or very few discrete variables than the number used here.
+### graphs
 
-### Manual override
+`graphr()` is not the only graphing function included in `{autograph}`.
+To graph _sets_ of networks together, `graphs()` makes sure that two
+or more networks are plotted together.
+This might be a set of ego networks, subgraphs, or waves of a longitudinal network.
 
-Or we may want to choose particular colors for each category.
-This is pretty straightforward to do with `ggplot2::scale_colour_manual()`.
-Some common color names are available,
-but otherwise hex color codes can be used for more specific colors.
-Unspecified categories are coloured (dark) grey.
-
-```{r mancolor, exercise=TRUE}
-graphr(fict_lotr,
-           node_color = "Race") +
-  ggplot2::scale_colour_manual(
-    values = c("Dwarf" = "red",
-               "Hobbit" = "orange",
-               "Maiar" = "#DEC20B",
-               "Human" = "lightblue",
-               "Elf" = "lightgreen",
-               "Ent" = "darkgreen")) +
-  labs(color = "Color")
+```{r graphs, exercise=TRUE}
+graphs(to_subgraphs(fict_lotr, "Race"),
+       waves = c(1,2,3,4))
 ```
 
-### Theming
+### grapht
 
-Perhaps you are preparing a presentation,
-representing your institution, department, or research centre at home or abroad.
-In this case, you may wish to theme the whole network with institutional colors
-and fonts.
-Here we demonstrate one of the color scales available in `{autograph}`,
-the colors of the Sustainable Development Goals:
-
-```{r theming, exercise=TRUE}
-graphr(fict_lotr, node_color = "Race") + 
-  scale_color_sdgs()
+`grapht()` is another option, rendering network changes as a gif.
+  
+```{r grapht, exercise=TRUE}
+fict_lotr %>%
+  mutate_ties(year = sample(1:12, 66, replace = TRUE)) %>%
+  to_waves(attribute = "year", cumulative = TRUE) %>%
+  grapht()
 ```
-
-More institutional scales and themes are available,
-and more can be implemented upon pull request.
 
 ## Further flexibility
 
