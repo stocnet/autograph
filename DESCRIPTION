@@ -23,8 +23,7 @@ Imports:
     ggraph,
     ggplot2,
     igraph,
-    tidygraph,
-    tidyr
+    tidygraph
 Suggests:
     BiocManager,
     concaveman,
