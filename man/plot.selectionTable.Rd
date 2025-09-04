@@ -35,6 +35,12 @@ plot(res_siena_selection)
 \references{
 Consult also the RSiena manual, Sections 13.1 and 13.3.
 }
+\seealso{
+Other RSiena: 
+\code{\link{plot.influenceTable}()},
+\code{\link{plot_gof}}
+}
 \author{
 Tom Snijders
 }
+\concept{RSiena}

@@ -27,9 +27,22 @@ plot.ag_gof <- function(x, ...){
   main <- x[[3]]
   p_value <- x[[4]]
   
+  # Compute quantiles for each x
+  bounds <- sims %>%
+    dplyr::group_by(name) %>%
+    dplyr::summarise(
+      q05 = quantile(value, 0.05),
+      q95 = quantile(value, 0.95),
+      .groups = "drop")
+  
   ggplot2::ggplot(sims, aes(x = name, y = value)) +
-    ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base(),
-                         draw_quantiles = c(0.05,0.95)) +
+    ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base()) +
+    ggplot2::geom_boxplot(width = 0.1, outlier.shape = 4, 
+                          fill = ag_base()) +
+    ggplot2::geom_line(data = bounds, aes(x = name, y = q05, group = 1), 
+                       linetype = "dashed") +
+    ggplot2::geom_line(data = bounds, aes(x = name, y = q95, group = 1), 
+                       linetype = "dashed") +
     ggplot2::geom_point(data = obs, aes(x = name, y = value),
                         color = ag_highlight()) +
     ggplot2::geom_text(data = obs, aes(label = value), 
