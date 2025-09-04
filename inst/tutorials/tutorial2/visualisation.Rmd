@@ -23,14 +23,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Why we graph
 
-Network visualisation is non-trivial; indeed very important.
-As Tufte (1983: 9) said:
+Network visualisation is non-trivial; indeed it is very important for at least
+two reasons.
 
-> "At their best, graphics are instruments for reasoning about quantitative information. Often the most effective way to describe, explore, and summarize a set of numbers – even a very large set – is to look at pictures of those numbers"
-
-All of this is crucial with networks.
+First, visualisation is a crucial part of the process of data analysis.
 As a first step, network visualisation -- or _graphing_ --
-offers us a way to vet our data for anything strange that might be going on,
+offers us a way to vett our data for anything strange that might be going on,
 both revealing and informing our assumptions and intuitions.
 The following image relates to the famous [Anscombe's quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet),
 which shows how different datasets can have identical statistical properties
@@ -38,15 +36,27 @@ that are only revealed to be very different when graphed.
 
 <img src="https://info5940.infosci.cornell.edu/notes/dataviz/why-visualize-data/index_files/figure-html/datasaurus-graph-1.gif" height="600px"/>
 
+As Tufte (1983: 9) said:
+
+> "At their best, graphics are instruments for reasoning about quantitative information. Often the most effective way to describe, explore, and summarize a set of numbers – even a very large set – is to look at pictures of those numbers"
+
+All of this is crucial with networks.
 Drawing network graphs is also a crucial way to explore and understand
 both the global structure of a network as well as 
 smaller-scale structures such as nodal positions or communities within it.
 
-It is also crucial to the further communication of the lessons that we have
-learned through investigation with others.
-While there may be many dead-ends and time-sinks to visualisation,
-it is worth taking the time to make sure that your main points are
-easy to appreciate.
+Second, visualisation is a crucial part of the communication of the lessons 
+that we have learned through investigation with others.
+As Brandes et al ([1999](https://doi.org/10.1177/0951692899011001004)) argue,
+visualisation involves thinking about the _substance_ of what you are trying to
+communicate, how to _design_ it so that it is ergonomic and (ideally) aesthetic,
+and which _algotihm_ is most appropriate to lay out the graph informatively.
+The aim is to offer a concise and precise delivery of insights.
+
+There may be some dead-ends and time-sinks involved in visualising your data,
+but it is worth taking the time to explore your data and experiment with ways
+to make what you have learned over a longer period of time evident to others
+in a shorter period of time.
 
 ### Different approaches
 
