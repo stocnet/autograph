@@ -279,6 +279,27 @@ fict_lotr %>%
 
 ## Theming
 
+### Setting a theme
+
+Perhaps you are preparing a presentation,
+representing your institution, department, or research centre at home or abroad.
+In this case, you may wish to theme the whole network with institutional colors
+and fonts.
+Indeed, you may even want to set a theme that is then reused across
+all your graphs and plots.
+`{autograph}` offers a number of themes that can be set using the `stocnet_theme()`
+function.
+
+```{r theming, exercise=TRUE, fig.width=9}
+stocnet_theme("default")
+graphr(fict_lotr, node_color = "Race")
+stocnet_theme("iheid")
+graphr(fict_lotr, node_color = "Race")
+```
+
+More institutional scales and themes are available,
+and more can be implemented upon pull request.
+
 ### Who's hue?
 
 By default, `graphr()` will use a color palette that offers fairly good contrast
@@ -299,7 +320,6 @@ graphr(fict_lotr,
            node_color = "Race") +
   ggplot2::scale_colour_hue()
 ```
-
 
 ### Grayscale
 
@@ -337,7 +357,6 @@ graphr(fict_lotr,
                "Ent" = "darkgreen")) +
   labs(color = "Color")
 ```
-
 
 ## Titles, labels, and legends
 
