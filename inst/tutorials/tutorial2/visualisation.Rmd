@@ -182,6 +182,29 @@ In the following pages, we're going to go through a number of different ways
 of taking control of the graphing process.
 Click 'Next Topic' to continue.
 
+## Illustrating graphs
+
+Once we have an initial graph of our network, we can start to explore features
+of the network and its structure in more detail.
+There are a number of different dimensions network researchers can play with 
+to illustrate different aspects of the network.
+On [her excellent and helpful website](https://kateto.net/network-visualization), 
+Katya Ognyanova outlines some of these dimensions:
+
+| Nodes    |     | Ties  |     |
+| :--------|:-------------|:-------------|:-------------|
+| Position | `layout=`   | Arrows |  (e.g. capped, head shape)  |
+| Labels   | `labels=`, `node_group=`   | Type      |  (e.g. solid, dashed)  |
+| Shape    | `node_shape=`   | Shape      | (e.g. straight, bent)   |
+| Size     | `node_size=`   | Size      | `edge_size=`   |
+| Color    | `node_color=`, `node_colour=`   | Color      | `edge_color=`, `edge_colour=`   |
+
+Currently only those options with named parameters in the table above 
+are available to be customised in `{autograph}` at the moment.
+Tie arrows and shapes are used to indicate directionality and reciprocity,
+where present in the data.
+Let's go through some of these options in more detail.
+
 ```
   
 We can also specify the colours, groups, shapes, and sizes of nodes and edges in 
