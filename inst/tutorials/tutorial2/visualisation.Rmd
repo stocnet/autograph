@@ -262,6 +262,19 @@ Note that `node_color` and `node_group` can be used together,
 either to highlight different groups or to emphasise group assignment where
 there is the kind of interpenetration or overlap described above as a challenge.
 
+### Sizing nodes
+
+What about if we're interested in a continuous variable instead of a categorical
+variable?
+While the `fict_lotr` dataset does not contain any continuous nodal variables,
+we can create one rather easily from the network itself.
+Let's use each node's degree, which is the number of ties incident/connecting
+to the node.
+
+```{r degsize, exercise = TRUE}
+fict_lotr %>% 
+  mutate(Degree = node_deg(fict_lotr)) %>% 
+  graphr(node_size = "Degree")
 ```
 
 ### grapht
