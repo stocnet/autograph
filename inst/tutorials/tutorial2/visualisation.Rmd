@@ -743,6 +743,39 @@ and padding between the arrowhead and the node can also be specified.
   
 For more see David Schoch's [excellent resources on this](http://mr.schochastics.net/netVizR.html).
   
+## Plotting
+
+While researchers will probably want to start with using `graphr()`
+to visualise the network,
+`{autograph}` also offers `plot()` methods for a number of different
+network-related objects.
+These include of measures of centrality, cohesion, and clustering,
+as well as goodness-of-fit plots for network models from packages
+such as `{RSiena}` and `{MoNAn}`.
+Usefully, all these plots use the same theming system as `graphr()`,
+so that you can set a theme once and have it apply to all your graphs and plots.
+Let's try this now with a few examples.
+
+```{r plotexamples, exercise=TRUE, fig.width=9}
+stocnet_theme("default")
+plot(node_degree(fict_lotr)) + 
+plot(node_closeness(fict_lotr))
+stocnet_theme("oxf")
+plot(node_degree(fict_lotr)) + 
+plot(node_closeness(fict_lotr))
+```
+
+This is a very simple example, but the same principle applies to
+all plots in `{autograph}`.
+One can set a theme once and have it apply to all plots.
+You can also always add additional `{ggplot2}` layers
+to any plot to further customise it.
+For example, it is straightforward to add titles and labels
+to these plots,
+but it is also possible to add trend lines,
+confidence intervals, and so on.
+The user is encouraged to explore the `{ggplot2}` package for more details.
+
 ## Exporting plots to PDF
 
 We can print the plots we have made to PDF by point-and-click
