@@ -1,7 +1,7 @@
 #' Plotting goodness-of-fit results
 #' @description
 #'   These plot methods plot goodness of fit objects created using 
-#'   `RSiena::sienaGOF()`, `MoNAn::monanGOF()`, or `ergm::gof()`.
+#'   `RSiena::sienaGOF()`, `MoNAn::monanGOF()`, or `{ergm}`'s gof() function.
 #'   Internally, the GOF object is translated into a common class (`ag_gof`),
 #'   which has its own plot method to ensure a consistent look and feel.
 #'   It is not expected that users will create `ag_gof` class objects themselves.

@@ -40,7 +40,7 @@ simulations and a line joining points showing the observed statistics.
 }
 \description{
 These plot methods plot goodness of fit objects created using
-\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or \code{ergm::gof()}.
+\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or \code{{ergm}}'s gof() function.
 Internally, the GOF object is translated into a common class (\code{ag_gof}),
 which has its own plot method to ensure a consistent look and feel.
 It is not expected that users will create \code{ag_gof} class objects themselves.
