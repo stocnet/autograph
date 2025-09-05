@@ -40,7 +40,7 @@ simulations and a line joining points showing the observed statistics.
 }
 \description{
 These plot methods plot goodness of fit objects created using
-\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or \code{{ergm}}'s gof() function.
+\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or the ergm package's gof() function.
 Internally, the GOF object is translated into a common class (\code{ag_gof}),
 which has its own plot method to ensure a consistent look and feel.
 It is not expected that users will create \code{ag_gof} class objects themselves.
@@ -70,8 +70,8 @@ or added after the fact using \code{{ggplot2}} functions such as
 \code{ggtitle()} or \code{labs()}.
 
 The user can choose whether to plot the statistics cumulatively or not.
-This is typically handled in \code{RSiena::sienaGOF()},
-but for \code{MoNAn::monanGOF()} and \code{ergm::gof()},
+This is typically handled within \code{RSiena::sienaGOF()},
+but for \code{MoNAn::monanGOF()} and the ergm package's gof() function
 the cumulative option is handled here.
 The default is to plot the non-cumulative statistics.
 This is because the non-cumulative statistics are often more interpretable,

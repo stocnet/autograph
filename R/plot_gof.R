@@ -1,7 +1,7 @@
 #' Plotting goodness-of-fit results
 #' @description
 #'   These plot methods plot goodness of fit objects created using 
-#'   `RSiena::sienaGOF()`, `MoNAn::monanGOF()`, or `{ergm}`'s gof() function.
+#'   `RSiena::sienaGOF()`, `MoNAn::monanGOF()`, or the ergm package's gof() function.
 #'   Internally, the GOF object is translated into a common class (`ag_gof`),
 #'   which has its own plot method to ensure a consistent look and feel.
 #'   It is not expected that users will create `ag_gof` class objects themselves.
@@ -30,8 +30,8 @@
 #'   `ggtitle()` or `labs()`.
 #'   
 #'   The user can choose whether to plot the statistics cumulatively or not.
-#'   This is typically handled in `RSiena::sienaGOF()`, 
-#'   but for `MoNAn::monanGOF()` and `ergm::gof()`,
+#'   This is typically handled within `RSiena::sienaGOF()`, 
+#'   but for `MoNAn::monanGOF()` and the ergm package's gof() function
 #'   the cumulative option is handled here.
 #'   The default is to plot the non-cumulative statistics.
 #'   This is because the non-cumulative statistics are often more interpretable,
