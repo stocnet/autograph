@@ -3,41 +3,88 @@
 \name{plot_gof}
 \alias{plot_gof}
 \alias{plot.ag_gof}
-\alias{plot.sienaGOF}
 \alias{plot.gof.stats.monan}
+\alias{plot.sienaGOF}
+\alias{plot.gof.ergm}
 \title{Plotting goodness-of-fit results}
 \usage{
 \method{plot}{ag_gof}(x, ...)
 
+\method{plot}{gof.stats.monan}(x, cumulative = FALSE, ...)
+
 \method{plot}{sienaGOF}(x, cumulative = FALSE, ...)
 
-\method{plot}{gof.stats.monan}(x, cumulative = FALSE, ...)
+\method{plot}{gof.ergm}(x, cumulative = FALSE, statistic = c("deg", "espart", "dist"), ...)
 }
 \arguments{
-\item{x}{An object of class "sienaGOF" or "gof.stats.monan".}
+\item{x}{An object of class "sienaGOF", "gof.stats.monan", or "gof.ergm".}
 
 \item{...}{Other parameters to be passed to the plotting function,
 for example \code{main = "Title"} for a different title than the default.}
 
 \item{cumulative}{Logical, indicating whether the statistics should be
-plotted cumulatively (default FALSE).}
+plotted cumulatively (default FALSE).
+This is typically treated in \code{sienaGOF()} for \code{{RSiena}},
+but treated within the plotting function for \code{{MoNAn}} and \code{{ergm}}.}
+
+\item{statistic}{Character, indicating which statistic to plot.
+Since \code{{ergm}} package GOFs include goodness of fit on multiple statistics,
+the user must specify which statistic to plot.
+Options are \code{"deg"} (degree distribution), \code{"espart"} (edgewise shared partners),
+and \code{"dist"} (geodesic distance).
+The default is \code{"deg"}.}
 }
 \value{
 A violin plot showing the distribution of statistics from the
-simulations and a line highlighting the observed statistics.
+simulations and a line joining points showing the observed statistics.
 }
 \description{
-These plot methods plot goodness of fit objects created using \code{RSiena::sienaGOF()} or
-\code{MoNAn::monanGOF()}.
-Internally, the data is translated into a common format
-and then plotted using \code{{ggplot2}} so that there is a consistent look and feel.
-Unlike the plot method included in the \code{{RSiena}} package,
-this function utilises \code{{ggplot2}} and not \code{{lattice}},
-which makes the output more compatible and themeable.
+These plot methods plot goodness of fit objects created using
+\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or \code{ergm::gof()}.
+Internally, the GOF object is translated into a common class (\code{ag_gof}),
+which has its own plot method to ensure a consistent look and feel.
+It is not expected that users will create \code{ag_gof} class objects themselves.
+
+The plot shows a violin plot of the distribution of statistics from the
+simulations, with a boxplot inside the violin to show the interquartile range,
+and dashed lines connecting the 5th and 95th percentiles.
+The boxplot also shows outliers as crosses.
+The observed statistics are shown as points and connected by a line.
+The observed statistics are also labelled with their value.
+If a p-value is available (as in the case of \code{RSiena::sienaGOF()}),
+it is shown beneath the x-axis.
+}
+\details{
+Since these plots methods are in \code{{autograph}},
+the plots are automatically themed according to the current theme
+set using \code{stocnet_theme()}.
+The function uses the highlight colour defined in the current theme
+to highlight the observed statistics.
+The function also uses the base colour defined in the current theme
+to draw the violin and box plots.
+
+It is however completely customisable.
+While a title is automatically generated so that the graph is informative,
+this can be customised by specifying the \code{main} argument in the plotting function,
+or added after the fact using \code{{ggplot2}} functions such as
+\code{ggtitle()} or \code{labs()}.
+
+The user can choose whether to plot the statistics cumulatively or not.
+This is typically handled in \code{RSiena::sienaGOF()},
+but for \code{MoNAn::monanGOF()} and \code{ergm::gof()},
+the cumulative option is handled here.
+The default is to plot the non-cumulative statistics.
+This is because the non-cumulative statistics are often more interpretable,
+and the cumulative statistics can be obtained by setting \code{cumulative = TRUE}.
+
+The function also checks whether any of the statistics have zero variance
+across the simulations, and if so, these statistics are not plotted,
+with a message to the user indicating which statistics were omitted.
 }
 \examples{
-plot(res_siena_gof)
-plot(res_monan_gof, lvls = 1:15)
+plot(res_monan_gof)
+plot(res_siena_gof, cumulative = TRUE)
+plot(res_ergm_gof, statistic = "espart")
 }
 \references{
 Hintze, J. L. and Nelson, R. D. 1998.
@@ -46,12 +93,13 @@ Hintze, J. L. and Nelson, R. D. 1998.
 \doi{10.1080/00031305.1998.10480559}
 }
 \seealso{
+Other MoNAn: 
+\code{\link{plot_monan_trace}}
+
 Other RSiena: 
 \code{\link{plot.influenceTable}()},
 \code{\link{plot.selectionTable}()}
-
-Other MoNAn: 
-\code{\link{plot_monan_trace}}
 }
 \concept{MoNAn}
 \concept{RSiena}
+\concept{ergm}
