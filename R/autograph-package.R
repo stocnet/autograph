@@ -6,4 +6,4 @@
 #' @author James Hollway
 "_PACKAGE"
 
-globalVariables(c("q05","q95"))
+utils::globalVariables(c("q05","q95"))
