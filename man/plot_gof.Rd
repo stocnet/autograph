@@ -25,10 +25,10 @@ for example \code{main = "Title"} for a different title than the default.}
 \item{cumulative}{Logical, indicating whether the statistics should be
 plotted cumulatively (default FALSE).
 This is typically treated in \code{sienaGOF()} for \code{{RSiena}},
-but treated within the plotting function for \code{{MoNAn}} and \code{{ergm}}.}
+but treated within the plotting function for \code{{MoNAn}} and 'ergm'.}
 
 \item{statistic}{Character, indicating which statistic to plot.
-Since \code{{ergm}} package GOFs include goodness of fit on multiple statistics,
+Since 'ergm' package GOFs include goodness of fit on multiple statistics,
 the user must specify which statistic to plot.
 Options are \code{"deg"} (degree distribution), \code{"espart"} (edgewise shared partners),
 and \code{"dist"} (geodesic distance).
@@ -40,7 +40,7 @@ simulations and a line joining points showing the observed statistics.
 }
 \description{
 These plot methods plot goodness of fit objects created using
-\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or the ergm package's gof() function.
+\code{RSiena::sienaGOF()}, \code{MoNAn::monanGOF()}, or the 'ergm' package's gof() function.
 Internally, the GOF object is translated into a common class (\code{ag_gof}),
 which has its own plot method to ensure a consistent look and feel.
 It is not expected that users will create \code{ag_gof} class objects themselves.
@@ -71,7 +71,7 @@ or added after the fact using \code{{ggplot2}} functions such as
 
 The user can choose whether to plot the statistics cumulatively or not.
 This is typically handled within \code{RSiena::sienaGOF()},
-but for \code{MoNAn::monanGOF()} and the ergm package's gof() function
+but for \code{MoNAn::monanGOF()} and the 'ergm' package's gof() function
 the cumulative option is handled here.
 The default is to plot the non-cumulative statistics.
 This is because the non-cumulative statistics are often more interpretable,
