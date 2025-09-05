@@ -60,7 +60,7 @@ jobs:
           path: build/
 
       - name: Calculate code coverage
-        run: Rscript -e "covr::codecov()"
+        run: Rscript -e "covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))"
 
       - name: Lint
         run: lintr::lint_package()
