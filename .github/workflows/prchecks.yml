@@ -60,12 +60,17 @@ jobs:
           path: build/
 
       - name: Calculate code coverage
+        if: runner.os == 'macOS'
         run: Rscript -e "covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))"
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Lint
+        if: runner.os == 'macOS'
         run: lintr::lint_package()
         shell: Rscript {0}
 
       - name: Spell check
+        if: runner.os == 'macOS'
         run: spelling::spell_check_package()
         shell: Rscript {0}
