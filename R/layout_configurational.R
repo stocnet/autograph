@@ -94,7 +94,7 @@ layout_tbl_graph_pentad <- layout_pentad
 #' @rdname layout_configuration
 #' @export
 layout_hexad <- function(.data,
-                                   circular = FALSE, times = 1000){
+                         circular = FALSE, times = 1000){
   res <- matrix(c(1,0,
                   1/2,sqrt(3)/2,
                   -1/2,sqrt(3)/2,
