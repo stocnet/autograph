@@ -1,0 +1,8 @@
+test_that("valence layout works", {
+  edges <- data.frame(from = c("A", "B", "C", "D"),
+                      to   = c("B", "C", "D", "A"),
+                      weight = c(2, 3, 1, 4),
+                      sign = c(1, -1, 1, -1))  # 1 = positive, -1 = negative
+  lo <- layout_valence(edges, times = 500)
+  expect_true(sqrt(sum((lo[1,] - lo[2,])^2)) < sqrt(sum((lo[1,] - lo[3,])^2)))
+})
