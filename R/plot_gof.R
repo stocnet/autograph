@@ -156,7 +156,8 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   
   args <- list(...)
   if (is.null(args$main)) {
-    main = paste("Goodness of Fit of", attr(x, "auxiliaryStatisticName"))
+    statName <- add_spaces(attr(x, "auxiliaryStatisticName"))
+    main = paste("Goodness of Fit of", statName)
     if (!attr(x, "joined")) {
       main = paste(main, "Period", period)
     }

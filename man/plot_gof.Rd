@@ -80,6 +80,14 @@ and the cumulative statistics can be obtained by setting \code{cumulative = TRUE
 The function also checks whether any of the statistics have zero variance
 across the simulations, and if so, these statistics are not plotted,
 with a message to the user indicating which statistics were omitted.
+
+Note that these methods overwrite any plot methods for these classes
+that may be provided by the original packages.
+You may receive such a warning in the console when loading the package.
+Please load \code{{autograph}} after these other packages to ensure the plotting
+methods included in this package are used,
+or specify the package when calling the plotting method directly,
+e.g., \code{autograph:::plot.sienaGOF(res_siena_gof)}.
 }
 \examples{
 plot(res_monan_gof)
