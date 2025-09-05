@@ -61,9 +61,9 @@ jobs:
 
       - name: Calculate code coverage
         if: runner.os == 'macOS'
-        run: Rscript -e "covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))"
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: Rscript -e "covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))"
 
       - name: Lint
         if: runner.os == 'macOS'
