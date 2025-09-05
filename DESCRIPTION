@@ -25,9 +25,8 @@ Imports:
     tidygraph
 Suggests:
     BiocManager,
-    concaveman,
     gganimate,
-    ggforce,
+    ggforce (>= 0.5.0),
     gifski,
     graphlayouts,
     methods,

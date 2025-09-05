@@ -4,7 +4,7 @@
 
 - Added package documentation
 - Added citation
-- Dropped `{tidyr}` and `{cli}` dependencies
+- Dropped dependencies `{tidyr}`, `{cli}`, and `{concaveman}`
 - Added more description to the function overview sections on the website
 - Added CODECOV_TOKEN to Github secrets for test coverage reporting
 
