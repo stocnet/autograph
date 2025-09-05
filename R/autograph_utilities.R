@@ -36,3 +36,8 @@ thisRequiresBio <- function(pkgname) {
     NextMethod()
   }
 }
+
+seq_nodes <- function(.data){
+  seq.int(manynet::net_nodes(.data))
+}
+

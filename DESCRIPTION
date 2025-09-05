@@ -17,7 +17,6 @@ Depends:
     R (>= 3.6.0),
     manynet
 Imports:
-    cli,
     dplyr (>= 1.1.0),
     ggdendro,
     ggraph,
@@ -35,6 +34,7 @@ Suggests:
     patchwork,
     testthat (>= 3.0.0)
 Enhances:
+    ergm,
     Rgraphviz,
     RSiena
 Authors@R: 

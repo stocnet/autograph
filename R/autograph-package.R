@@ -6,4 +6,9 @@
 #' @author James Hollway
 "_PACKAGE"
 
-utils::globalVariables(c("q05","q95"))
+# Global variables ####
+# defining global variables more centrally
+utils::globalVariables(c(".data", "obs", "valter","select","ego","zego","alter",
+                         "from","to","weight","unit","Step","Freq","Var1","n",
+                         "density","wave","period","name","value","sim","time",
+                         "q05","q95"))

@@ -116,7 +116,7 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
     statkeys <- as.character(which(no_vary))
     simsMat <- simsMat[,!no_vary]
     obs <- obs[!no_vary, ]
-    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
   }
   colnames(simsMat) <- obs$name
   rownames(simsMat) <- 1:nrow(simsMat)
@@ -170,7 +170,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   no_vary <- sims.min == obs & sims.min == sims.max
   if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
     statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
   }
   
   itns <- nrow(sims)
@@ -233,7 +233,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     statkeys <- names(no_vary)[which(no_vary)]
     simsMat <- simsMat[,!no_vary]
     obs <- obs[!no_vary, ]
-    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
   }
   sims <- as.data.frame(simsMat)
   sims$sim <- 1:nrow(sims)
