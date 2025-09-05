@@ -57,67 +57,9 @@ plot.ag_gof <- function(x, ...){
 }
 
 #' @rdname plot_gof
-#' @family RSiena
-#' @examples
-#' plot(res_siena_gof)
-#' @export
-plot.sienaGOF <- function(x, cumulative = FALSE, ...){
-  
-  args <- list(...)
-  if (is.null(args$main)) {
-    main = paste("Goodness of Fit of", attr(x, "auxiliaryStatisticName"))
-    if (!attr(x, "joined")) {
-      main = paste(main, "Period", period)
-    }
-  } else {
-    main = args$main
-  }
-  if (attr(x, "joined")) {
-    x <- x[[1]]
-  } else {
-    x <- x[[period]]
-  }
-  sims <- x$Simulations
-  sims.min <- apply(sims, 2, min)
-  sims.max <- apply(sims, 2, max)
-  if(is.null(colnames(sims)) & !is.null(attr(x, "key"))){
-    colnames(sims) <- attr(x, "key") # required for GOFs pre RSiena 1.3.20
-  }
-  obs <- x$Observations
-  no_vary <- sims.min == obs & sims.min == sims.max
-  if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
-    statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
-  }
-  
-  itns <- nrow(sims)
-  n.obs <- nrow(obs)
-  sims <- sims[,!no_vary]
-  sims <- as.data.frame(sims) %>% dplyr::mutate(sim = 1:nrow(sims))
-  sims <- stats::reshape(sims, varying = list(colnames(sims)[-ncol(sims)]), 
-          v.names = "value", timevar = "name", times = colnames(sims)[-ncol(sims)],
-          idvar = "sim", direction = "long") %>% 
-    dplyr::tibble() %>% dplyr::arrange(sim)
-  obs <- obs[!no_vary]
-  obs <- data.frame(name = as.character((1:length(obs))-1), value = obs)
-  
-  if(!cumulative){
-    sims <- sims %>% dplyr::group_by(sim) %>%
-      dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
-      dplyr::ungroup()
-    obs <- obs %>% 
-      mutate(value = c(.data$value[1], diff(.data$value)))
-  }
-  
-  out <- list(obs, sims, main, x$p)
-  class(out) <- "ag_gof"
-  plot(out)
-}
-
-#' @rdname plot_gof
 #' @family MoNAn
 #' @examples
-#' plot(res_monan_gof, lvls = 1:15)
+#' plot(res_monan_gof)
 #' @export
 plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
   
@@ -156,6 +98,131 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
       mutate(value = cumsum(.data$value))
   }
   
+  out <- list(obs, sims, main, p_value)
+  class(out) <- "ag_gof"
+  plot.ag_gof(out)
+  
+}
+
+#' @rdname plot_gof
+#' @family RSiena
+#' @examples
+#' plot(res_siena_gof, cumulative = TRUE)
+#' @export
+plot.sienaGOF <- function(x, cumulative = FALSE, ...){
+  
+  args <- list(...)
+  if (is.null(args$main)) {
+    main = paste("Goodness of Fit of", attr(x, "auxiliaryStatisticName"))
+    if (!attr(x, "joined")) {
+      main = paste(main, "Period", period)
+    }
+  } else {
+    main = args$main
+  }
+  if (attr(x, "joined")) {
+    x <- x[[1]]
+  } else {
+    x <- x[[period]]
+  }
+  sims <- x$Simulations
+  sims.min <- apply(sims, 2, min)
+  sims.max <- apply(sims, 2, max)
+  if(is.null(colnames(sims)) & !is.null(attr(x, "key"))){
+    colnames(sims) <- attr(x, "key") # required for GOFs pre RSiena 1.3.20
+  }
+  obs <- x$Observations
+  no_vary <- sims.min == obs & sims.min == sims.max
+  if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
+    statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
+    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+  }
+  
+  itns <- nrow(sims)
+  n.obs <- nrow(obs)
+  sims <- sims[,!no_vary]
+  sims <- as.data.frame(sims) %>% dplyr::mutate(sim = 1:nrow(sims))
+  sims <- stats::reshape(sims, varying = list(colnames(sims)[-ncol(sims)]), 
+                         v.names = "value", timevar = "name", times = colnames(sims)[-ncol(sims)],
+                         idvar = "sim", direction = "long") %>% 
+    dplyr::tibble() %>% dplyr::arrange(sim)
+  obs <- obs[!no_vary]
+  obs <- data.frame(name = as.character((1:length(obs))-1), value = obs)
+  
+  if(!cumulative){
+    sims <- sims %>% dplyr::group_by(sim) %>%
+      dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
+      dplyr::ungroup()
+    obs <- obs %>% 
+      mutate(value = c(.data$value[1], diff(.data$value)))
+  }
+  
+  out <- list(obs, sims, main, x$p)
+  class(out) <- "ag_gof"
+  plot(out)
+}
+
+#' @rdname plot_gof
+#' @family ergm
+#' @param statistic Character, indicating which statistic to plot.
+#'   Since `{ergm}` package GOFs include goodness of fit on multiple statistics,
+#'   the user must specify which statistic to plot.
+#'   Options are `"deg"` (degree distribution), `"espart"` (edgewise shared partners),
+#'   and `"dist"` (geodesic distance).
+#'   The default is `"deg"`.
+#' @examples
+#' plot(res_ergm_gof, statistic = "espart")
+#' @export
+plot.gof.ergm <- function(x, cumulative = FALSE, 
+                          statistic = c("deg","espart","dist"), ...){
+  statistic <- match.arg(statistic)
+  args <- list(...)
+  if (is.null(args$main)) {
+    statdescription <- switch(statistic,
+                              deg = "degree distribution",
+                              espart = "edgewise shared partners",
+                              dist = "geodesic distance")
+    main = paste("Goodness of fit of", statdescription)
+  } else {
+    main = args$main
+  }
+  
+  obs <- data.frame(name = as.factor(as.numeric(names(x[[paste0("obs.",statistic)]]))),
+                    value = x[[paste0("obs.",statistic)]]) %>% 
+    dplyr::tibble()
+  simsMat <- x[[paste0("sim.",statistic)]]
+  sims.min <- apply(simsMat, 2, min)
+  sims.max <- apply(simsMat, 2, max)
+  no_vary <- sims.min == obs$value & sims.min == sims.max
+  if (any(no_vary)) {
+    statkeys <- names(no_vary)[which(no_vary)]
+    simsMat <- simsMat[,!no_vary]
+    obs <- obs[!no_vary, ]
+    cli::cli_alert_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+  }
+  sims <- as.data.frame(simsMat)
+  sims$sim <- 1:nrow(sims)
+  sims <- stats::reshape(sims,
+                 direction = "long",
+                 varying = list(colnames(sims)[-ncol(sims)]),
+                 v.names = "value",
+                 timevar = "name",
+                 times = colnames(sims)[-ncol(sims)],
+                 idvar = "sim") %>% 
+    dplyr::tibble() %>% 
+    dplyr::mutate(name = as.factor(as.numeric(name))) %>% 
+    dplyr::arrange(sim)
+  
+  p_value <- NULL
+  
+  if(cumulative){
+    sims <- sims %>% dplyr::group_by(sim) %>%
+      dplyr::mutate(value = cumsum(.data$value)) %>%
+      dplyr::ungroup()
+    obs <- obs %>% 
+      mutate(value = cumsum(.data$value))
+  }
+
   out <- list(obs, sims, main, p_value)
   class(out) <- "ag_gof"
   plot.ag_gof(out)
