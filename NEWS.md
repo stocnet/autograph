@@ -24,6 +24,7 @@
   - Improved GOF plotting by using `cumulative = FALSE` by default
 - Fixed issue with pre-v1.3.20 RSiena::gof() objects, thanks @TomSnijders
 - Added testing of GOF plotting
+- Added testing of measures plotting
 
 ## Theming
 
