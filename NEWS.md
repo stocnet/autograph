@@ -28,6 +28,7 @@
 
 ## Theming
 
+- Added `set_stocnet_theme()` alias for `stocnet_theme()`
 - Fixed issue with 'oxf' and 'unige' themes not being recognised
 
 ## Data
