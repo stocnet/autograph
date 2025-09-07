@@ -42,10 +42,11 @@ reference:
     desc: |
       Functions for tailoring graphs with themes, scales, and palettes.
     contents:
-      - starts_with("theme")
+      - theme_set
       - ag_call
       - match_color
-      - starts_with("scale")
+      - ends_with("themes")
+      - ends_with("scales")
       - ends_with("palettes")
   - title: "Plotting methods"
     desc: |
