@@ -45,6 +45,10 @@ stocnet_theme <- function(theme = NULL){
   }
 }
 
+#' @rdname theme_set
+#' @export
+set_stocnet_theme <- stocnet_theme
+
 theme_opts <- c("default", "bw",
                 "iheid", "ethz", "uzh", "rug", "unibe", 
                 "oxf", "unige",

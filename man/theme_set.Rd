@@ -3,9 +3,12 @@
 \name{theme_set}
 \alias{theme_set}
 \alias{stocnet_theme}
+\alias{set_stocnet_theme}
 \title{Many themes}
 \usage{
 stocnet_theme(theme = NULL)
+
+set_stocnet_theme(theme = NULL)
 }
 \arguments{
 \item{theme}{String naming a theme.
