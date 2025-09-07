@@ -23,12 +23,13 @@ NULL
 #' @param theme String naming a theme.
 #'   By default "default".
 #'   This string can be capitalised or not.
+#' @importFrom manynet snet_info snet_success snet_warn
 #' @export
 stocnet_theme <- function(theme = NULL){
   if(is.null(theme)){
     theme <- getOption("stocnet_theme", default = "default")
-    cli::cli_alert_info("Theme is set to {.emph {theme}}.")
-    cli::cli_alert_info("The following themes are available: {.emph {theme_opts}}.")
+    snet_info("Theme is set to {.emph {theme}}.")
+    snet_info("The following themes are available: {.emph {theme_opts}}.")
   } else {
     theme <- tolower(theme)
     if(theme %in% theme_opts){
@@ -37,15 +38,20 @@ stocnet_theme <- function(theme = NULL){
       set_divergent_theme(theme)
       set_background_theme(theme)
       set_categorical_theme(theme)
-      cli::cli_alert_success("Theme set to {.emph {theme}}.")
+      snet_success("Theme set to {.emph {theme}}.")
     } else {
-      cli::cli_alert_warning("Please choose one of the available themes: {.emph {theme_opts}}.")
+      snet_warn("Please choose one of the available themes: {.emph {theme_opts}}.")
     }
   }
 }
 
+#' @rdname theme_set
+#' @export
+set_stocnet_theme <- stocnet_theme
+
 theme_opts <- c("default", "bw",
-                "iheid", "ethz", "uzh", "rug", "unibe",
+                "iheid", "ethz", "uzh", "rug", "unibe", 
+                "oxf", "unige",
                 "crisp", "neon", "rainbow")
 
 set_background_theme <- function(theme){

@@ -36,3 +36,12 @@ thisRequiresBio <- function(pkgname) {
     NextMethod()
   }
 }
+
+seq_nodes <- function(.data){
+  seq.int(manynet::net_nodes(.data))
+}
+
+add_spaces <- function(CamelString) {
+  gsub("([a-z])([A-Z])", "\\1 \\2", CamelString)
+}
+

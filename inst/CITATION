@@ -1,0 +1,11 @@
+citHeader("To cite autograph in publications use:")
+
+citEntry(
+  entry    = "Manual",
+  title    = "autograph: Automatic Plotting of Many Graphs",
+  author   = "James Hollway",
+  year     = "2025",
+  url      = "https://github.com/stocnet/autograph",
+  textVersion = paste("James Hollway (2025) ‘autograph: Automatic Plotting of Many Graphs’."
+  )
+)

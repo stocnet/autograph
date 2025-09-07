@@ -22,3 +22,8 @@ plot.traces.monan
 \examples{
 plot(res_monan_traces)
 }
+\seealso{
+Other MoNAn: 
+\code{\link{plot_gof}}
+}
+\concept{MoNAn}

@@ -15,42 +15,42 @@
 \alias{layout_tbl_graph_hexad}
 \title{Layout algorithms based on configurational positions}
 \usage{
-layout_configuration(.data, circular = FALSE, times = 1000)
+layout_configuration(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_configuration(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_configuration(.data, circular = TRUE, times = 1)
 
-layout_dyad(.data, circular = FALSE, times = 1000)
+layout_dyad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_dyad(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_dyad(.data, circular = TRUE, times = 1)
 
-layout_triad(.data, circular = FALSE, times = 1000)
+layout_triad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_triad(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_triad(.data, circular = TRUE, times = 1)
 
-layout_tetrad(.data, circular = FALSE, times = 1000)
+layout_tetrad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_tetrad(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_tetrad(.data, circular = TRUE, times = 1)
 
-layout_pentad(.data, circular = FALSE, times = 1000)
+layout_pentad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_pentad(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_pentad(.data, circular = TRUE, times = 1)
 
-layout_hexad(.data, circular = FALSE, times = 1000)
+layout_hexad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_hexad(.data, circular = FALSE, times = 1000)
+layout_tbl_graph_hexad(.data, circular = TRUE, times = 1)
 }
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{circular}{Should the layout be transformed into a radial representation.
-Only possible for some layouts. Defaults to FALSE.}
+\item{circular}{Logical, required for \code{{ggraph}} compatibility, default TRUE.}
 
-\item{times}{Maximum number of iterations, where appropriate}
+\item{times}{Integer, how many times to run the algorithm.
+Required by for \code{{ggraph}} compatibility, but not used here, so default = 1.}
 }
 \description{
 Configurational layouts locate nodes at symmetric coordinates
 to help illustrate particular configurations.
-Currently "triad" and "quad" layouts are available.
+Currently configurational layouts are available for 2-6 nodes.
 The "configuration" layout will choose the appropriate configurational
 layout automatically.
 }

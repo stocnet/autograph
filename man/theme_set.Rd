@@ -3,9 +3,12 @@
 \name{theme_set}
 \alias{theme_set}
 \alias{stocnet_theme}
+\alias{set_stocnet_theme}
 \title{Many themes}
 \usage{
 stocnet_theme(theme = NULL)
+
+set_stocnet_theme(theme = NULL)
 }
 \arguments{
 \item{theme}{String naming a theme.
@@ -24,7 +27,7 @@ the appropriate palette to be used for all autograph-consistent
 plotting methods.
 
 The following themes are currently available:
-default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, rainbow.
+default, bw, iheid, ethz, uzh, rug, unibe, oxf, unige, crisp, neon, rainbow.
 }
 \examples{
 stocnet_theme("default")

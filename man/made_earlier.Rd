@@ -12,6 +12,7 @@
 \alias{res_siena_selection}
 \alias{res_monan_traces}
 \alias{res_monan_gof}
+\alias{res_ergm_gof}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -31,6 +32,8 @@ An object of class \code{selectionTable} (inherits from \code{data.frame}) with 
 An object of class \code{traces.monan} of length 3.
 
 An object of class \code{gof.stats.monan} of length 2.
+
+An object of class \code{gof.ergm} (inherits from \code{gof}) of length 30.
 }
 \usage{
 data(res_migraph_reg)
@@ -50,6 +53,8 @@ data(res_siena_selection)
 data(res_monan_traces)
 
 data(res_monan_gof)
+
+data(res_ergm_gof)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

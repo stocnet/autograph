@@ -1,4 +1,3 @@
-#' @importFrom cli cli_div cli_inform cli_end
 .onAttach <- function(...) {
 
   # suppressMessages(suppressPackageStartupMessages(library("manynet", warn.conflicts = FALSE)))
@@ -14,7 +13,7 @@
   # cran_version <- pkgs[pkgs$Package == "manynet","Version"]
 
   local_version <- utils::packageVersion("autograph")
-  cli::cli_inform("You are using {.pkg autograph} version {.version {local_version}}.", 
+  snet_info("You are using {.pkg autograph} version {.version {local_version}}.", 
                   class = "packageStartupMessage")
   old.list <- as.data.frame(utils::old.packages())
   behind_cran <- "autograph" %in% old.list$Package
@@ -24,15 +23,15 @@
       "i" = "There are lots of ways to contribute to {.pkg autograph} at {.url https://github.com/stocnet/autograph/}.",
       "i" = "Please let us know any bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}. It's really helpful!",
       # "i" = "To eliminate package startup messages, use: `suppressPackageStartupMessages(library({.pkg autograph}))`.",
-      # "i" = "Changing the theme of all your graphs is straightforward with `set_manynet_theme()`",
+      "i" = "Changing the theme of all your graphs and plots is straightforward with `stocnet_theme()`",
       # "i" = "If there are too many messages in the console, run `options(manynet_verbosity = 'quiet')`",
       "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}.",
       "i" = "We recommend the 'Function Overview' page online to discover new analytic opportunities: {.url https://stocnet.github.io/autograph/reference/index.html}.",
       # "i" = "Star me at {.url https://github.com/users/follow?target=jhollway}.",
-      # "i" = "You can list all the tutorials available in {.pkg manynet} using {.fn run_tute}, and run them too!",
+      # "i" = "You can list all the tutorials available in {.pkg autograph} using {.fn run_tute}, and run them too!",
       "i" = "Discover all the {.emph stocnet} R packages at {.url https://github.com/stocnet/}."
     )
-    cli::cli_inform(sample(tips, 1), class = "packageStartupMessage")
+    snet_info(sample(tips, 1), class = "packageStartupMessage")
   }
 
   if (interactive()) {
@@ -44,21 +43,9 @@
       }
     } else {
       greet_startup_cli()
-      # packageStartupMessage(paste(strwrap(tip), collapse = "\n"))
     }
   }
 
 }
-
-# Global variables ####
-# defining global variables more centrally
-utils::globalVariables(c(".data", "obs", "valter","select","ego","zego","alter",
-                         "from","to","weight","unit","Step","Freq","Var1","n",
-                         "density","wave","period","name","value","sim","time"))
-
-seq_nodes <- function(.data){
-  seq.int(manynet::net_nodes(.data))
-}
-
 
 

@@ -3,19 +3,22 @@
 #' @description
 #'   Configurational layouts locate nodes at symmetric coordinates
 #'   to help illustrate particular configurations.
-#'   Currently "triad" and "quad" layouts are available.
+#'   Currently configurational layouts are available for 2-6 nodes.
 #'   The "configuration" layout will choose the appropriate configurational
 #'   layout automatically.
 #' 
 #' @name layout_configuration
 #' @family mapping
 #' @inheritParams layout_partition
+#' @param circular Logical, required for `{ggraph}` compatibility, default TRUE.
+#' @param times Integer, how many times to run the algorithm.
+#'   Required by for `{ggraph}` compatibility, but not used here, so default = 1.
 NULL
 
 #' @rdname layout_configuration
 #' @export
 layout_configuration <- function(.data,
-                                           circular = FALSE, times = 1000){
+                                 circular = TRUE, times = 1){
   if (manynet::net_nodes(.data) == 2) {
     layout_tbl_graph_dyad(.data, circular = circular, times = times)
   } else if (manynet::net_nodes(.data) == 3) {
@@ -36,7 +39,7 @@ layout_tbl_graph_configuration <- layout_configuration
 #' @rdname layout_configuration
 #' @export
 layout_dyad <- function(.data,
-                                  circular = FALSE, times = 1000){
+                        circular = TRUE, times = 1){
   res <- matrix(c(0,0,
                   1,0), 2, 2, byrow = TRUE)
   .to_lo(res)  
@@ -49,7 +52,7 @@ layout_tbl_graph_dyad <- layout_dyad
 #' @rdname layout_configuration
 #' @export
 layout_triad <- function(.data,
-                                   circular = FALSE, times = 1000){
+                         circular = TRUE, times = 1){
   res <- matrix(c(0,0,
                   2,3.5,
                   4,0), 3, 2, byrow = TRUE)
@@ -63,7 +66,7 @@ layout_tbl_graph_triad <- layout_triad
 #' @rdname layout_configuration
 #' @export
 layout_tetrad <- function(.data,
-                                    circular = FALSE, times = 1000){
+                          circular = TRUE, times = 1){
   res <- matrix(c(0,0,
                   0,1,
                   1,0,
@@ -78,7 +81,7 @@ layout_tbl_graph_tetrad <- layout_tetrad
 #' @rdname layout_configuration
 #' @export
 layout_pentad <- function(.data,
-                                    circular = FALSE, times = 1000){
+                          circular = TRUE, times = 1){
   res <- matrix(c(0,1,
                   -0.9511,0.3090,
                   -0.5878,-0.8090,
@@ -94,7 +97,7 @@ layout_tbl_graph_pentad <- layout_pentad
 #' @rdname layout_configuration
 #' @export
 layout_hexad <- function(.data,
-                                   circular = FALSE, times = 1000){
+                         circular = TRUE, times = 1){
   res <- matrix(c(1,0,
                   1/2,sqrt(3)/2,
                   -1/2,sqrt(3)/2,

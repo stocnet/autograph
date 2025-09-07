@@ -1,7 +1,7 @@
 Package: autograph
 Title: Automatic Plotting of Many Graphs
-Version: 0.2.0
-Date: 2025-08-22
+Version: 0.3.0
+Date: 2025-09-07
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
    It includes 'ggplot2'-based plot methods for many popular network package classes.
@@ -17,25 +17,23 @@ Depends:
     R (>= 3.6.0),
     manynet
 Imports:
-    cli,
     dplyr (>= 1.1.0),
     ggdendro,
     ggraph,
     ggplot2,
     igraph,
-    tidygraph,
-    tidyr
+    tidygraph
 Suggests:
     BiocManager,
-    concaveman,
     gganimate,
-    ggforce,
+    ggforce (>= 0.5.0),
     gifski,
     graphlayouts,
     methods,
     patchwork,
     testthat (>= 3.0.0)
 Enhances:
+    ergm,
     Rgraphviz,
     RSiena
 Authors@R: 

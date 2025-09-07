@@ -1,3 +1,56 @@
+# autograph 0.3.0
+
+## Package
+
+- Added package documentation
+- Added citation
+- Dropped dependencies `{tidyr}`, `{cli}`, and `{concaveman}`
+- Added more description to the function overview sections on the website
+- Added CODECOV_TOKEN to Github secrets for test coverage reporting
+
+## Graphing
+
+- Fixed `graphr()` not using theme colours for node and edge aesthetics
+
+## Plotting
+
+- Added new plot class and method for centralising GOF plotting
+  - Improved `plot.sienaGOF()` and `plot.gof.stats.monan()` to use new plotting method
+  - Added `plot.gof.ergm()` for plotting ERGM GOF objects
+  - Improved GOF plotting by adding boxplot within the violins
+  - Improved GOF plotting by adding crosses for outliers
+  - Improved GOF plotting by adding dashed line for 0.05 and 0.95 quantile bounds
+  - Improved GOF plotting by dropping statistics without variance
+  - Improved GOF plotting by using `cumulative = FALSE` by default
+- Fixed issue with pre-v1.3.20 RSiena::gof() objects, thanks @TomSnijders
+- Added testing of GOF plotting
+- Added testing of measures plotting
+
+## Theming
+
+- Added `set_stocnet_theme()` alias for `stocnet_theme()`
+- Fixed issue with 'oxf' and 'unige' themes not being recognised
+
+## Data
+
+- Added `res_ergm_gof` for testing and illustration of `plot.gof.ergm()`
+
+## Tutorial
+
+- Added visualisation tutorial from manynet
+  - Improved introduction
+  - Improved section on titles, labels, and legends
+  - Improved section explaining base and grid graphics
+  - Added section demonstrating difference between `igraph::plot()`, `ggraph::ggraph()`, and `graphr()`
+  - Added table describing the main arguments of `graphr()` and the visualisation dimensions to which they relate
+  - Added section showing how to use "node_shape" (poorly)
+  - Improved section showing how to use "node_colour" and "node_group"
+  - Added section showing how to use "node_size"
+  - Added section showing how to set a theme
+  - Added section showing how to use "edge_colour" and "edge_size"
+  - Improved section introducing `{patchwork}`, `graphs()`, and `grapht()`
+  - Added plotting section to viz tutorial
+
 # autograph 0.2.0
 
 ## Package
