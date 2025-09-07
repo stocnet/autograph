@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,62 @@
       <small>Source: <a href="https://github.com/stocnet/autograph/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.3.0" id="autograph-030">autograph 0.3.0<a class="anchor" aria-label="anchor" href="#autograph-030"></a></h2>
+<div class="section level3">
+<h3 id="package-0-3-0">Package<a class="anchor" aria-label="anchor" href="#package-0-3-0"></a></h3>
+<ul><li>Added package documentation</li>
+<li>Added citation</li>
+<li>Dropped dependencies <a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a>, <a href="https://cli.r-lib.org" class="external-link">cli</a>, and <a href="https://joelgombin.github.io/concaveman/" class="external-link">concaveman</a>
+</li>
+<li>Added more description to the function overview sections on the website</li>
+<li>Added CODECOV_TOKEN to Github secrets for test coverage reporting</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-0-3-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-0-3-0"></a></h3>
+<ul><li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> not using theme colours for node and edge aesthetics</li></ul></div>
+<div class="section level3">
+<h3 id="plotting-0-3-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-3-0"></a></h3>
+<ul><li>Added new plot class and method for centralising GOF plotting<ul><li>Improved <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code> and <code><a href="../reference/plot_gof.html">plot.gof.stats.monan()</a></code> to use new plotting method</li>
+<li>Added <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code> for plotting ERGM GOF objects</li>
+<li>Improved GOF plotting by adding boxplot within the violins</li>
+<li>Improved GOF plotting by adding crosses for outliers</li>
+<li>Improved GOF plotting by adding dashed line for 0.05 and 0.95 quantile bounds</li>
+<li>Improved GOF plotting by dropping statistics without variance</li>
+<li>Improved GOF plotting by using <code>cumulative = FALSE</code> by default</li>
+</ul></li>
+<li>Fixed issue with pre-v1.3.20 RSiena::gof() objects, thanks <a href="https://github.com/TomSnijders" class="external-link">@TomSnijders</a></li>
+<li>Added testing of GOF plotting</li>
+<li>Added testing of measures plotting</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-0-3-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-3-0"></a></h3>
+<ul><li>Added <code><a href="../reference/theme_set.html">set_stocnet_theme()</a></code> alias for <code><a href="../reference/theme_set.html">stocnet_theme()</a></code>
+</li>
+<li>Fixed issue with ‘oxf’ and ‘unige’ themes not being recognised</li>
+</ul></div>
+<div class="section level3">
+<h3 id="data-0-3-0">Data<a class="anchor" aria-label="anchor" href="#data-0-3-0"></a></h3>
+<ul><li>Added <code>res_ergm_gof</code> for testing and illustration of <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code>
+</li></ul></div>
+<div class="section level3">
+<h3 id="tutorial-0-3-0">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial-0-3-0"></a></h3>
+<ul><li>Added visualisation tutorial from manynet<ul><li>Improved introduction</li>
+<li>Improved section on titles, labels, and legends</li>
+<li>Improved section explaining base and grid graphics</li>
+<li>Added section demonstrating difference between <code>igraph::plot()</code>, <code><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">ggraph::ggraph()</a></code>, and <code><a href="../reference/plot_graphr.html">graphr()</a></code>
+</li>
+<li>Added table describing the main arguments of <code><a href="../reference/plot_graphr.html">graphr()</a></code> and the visualisation dimensions to which they relate</li>
+<li>Added section showing how to use “node_shape” (poorly)</li>
+<li>Improved section showing how to use “node_colour” and “node_group”</li>
+<li>Added section showing how to use “node_size”</li>
+<li>Added section showing how to set a theme</li>
+<li>Added section showing how to use “edge_colour” and “edge_size”</li>
+<li>Improved section introducing <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a>, <code><a href="../reference/plot_graphs.html">graphs()</a></code>, and <code><a href="../reference/plot_grapht.html">grapht()</a></code>
+</li>
+<li>Added plotting section to viz tutorial</li>
+</ul></li></ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="autograph-020">autograph 0.2.0<a class="anchor" aria-label="anchor" href="#autograph-020"></a></h2><p class="text-muted">CRAN release: 2025-08-22</p>
 <div class="section level3">
@@ -86,7 +142,7 @@
 <h3 id="monan-0-1-2">MoNAn<a class="anchor" aria-label="anchor" href="#monan-0-1-2"></a></h3>
 <ul><li>Added <code><a href="../reference/plot_monan_trace.html">plot.traces.monan()</a></code>
 </li>
-<li>Added <code><a href="../reference/plot_monan_gof.html">plot.gof.stats.monan()</a></code>
+<li>Added <code><a href="../reference/plot_gof.html">plot.gof.stats.monan()</a></code>
 </li>
 </ul></div>
 </div>
@@ -140,7 +196,7 @@
 <li>Added <code><a href="../reference/plot.diffusion.html">plot.diffs_model()</a></code>
 </li>
 </ul></li>
-<li>Added RSiena plot methods<ul><li>Added <code><a href="../reference/plot.sienaGOF.html">plot.sienaGOF()</a></code>
+<li>Added RSiena plot methods<ul><li>Added <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code>
 </li>
 <li>Added <code><a href="../reference/plot.influenceTable.html">plot.influenceTable()</a></code>
 </li>

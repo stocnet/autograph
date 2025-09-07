@@ -8,6 +8,7 @@
 <url><loc>https://stocnet.github.io/autograph/index.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/news/index.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/ag_call.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/autograph-package.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/depth_first_recursive_search.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/index.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/layout_configuration.html</loc></url>
@@ -25,11 +26,10 @@
 <url><loc>https://stocnet.github.io/autograph/reference/plot.influenceTable.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot.network_test.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot.selectionTable.html</loc></url>
-<url><loc>https://stocnet.github.io/autograph/reference/plot.sienaGOF.html</loc></url>
+<url><loc>https://stocnet.github.io/autograph/reference/plot_gof.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_graphr.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_graphs.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_grapht.html</loc></url>
-<url><loc>https://stocnet.github.io/autograph/reference/plot_monan_gof.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/plot_monan_trace.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/reexports.html</loc></url>
 <url><loc>https://stocnet.github.io/autograph/reference/theme_scales.html</loc></url>
