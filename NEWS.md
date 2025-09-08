@@ -10,6 +10,8 @@
   - Plots MCMC traces as a line plot with loess smoothing highlighting the trend
   - Plots overall density plot of the samples on the right margin
 - Improved plotting of `{MoNAn}` trace objects by using `plot.ag_conv()`
+- Added `plot.mcmc.list()` for plotting MCMC samples from `ergm::ergm` results objects,
+using `plot.ag_conv()`
 
 ## Data
 

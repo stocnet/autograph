@@ -60,3 +60,23 @@ plot.traces.monan <- function(x, ...) {
   plot(dat)
 }
 
+#' @rdname plot_convergence
+#' @family ergm
+#' @examples
+#' plot(ergm_res$sample)
+#' @export
+plot.mcmc.list <- function(x, ...) {
+  dat <- x[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
+    as.data.frame()
+  dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
+                        direction = "long",
+                        varying = list(colnames(dat)[-ncol(dat)]),
+                        v.names = "value",
+                        timevar = "name",
+                        times = colnames(dat)[-ncol(dat)],
+                        idvar = "sim") %>% 
+    dplyr::tibble() %>% dplyr::arrange(sim)
+  class(dat) <- c("ag_conv", class(dat))
+  plot(dat)
+}
+

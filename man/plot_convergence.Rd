@@ -11,6 +11,12 @@
 
 \method{plot}{traces.monan}(x, ...)
 
+\method{plot}{mcmc.list}(x, ...)
+}
+\arguments{
+\item{x}{An object of class "traces.monan".}
+
+\item{...}{Additional plotting parameters, currently unused.}
 }
 \value{
 The function shows a line plot tracing the statistics obtained at
@@ -27,10 +33,14 @@ distribution.
 }
 \examples{
 plot(res_monan_traces)
+plot(ergm_res$sample)
 }
 \seealso{
 Other MoNAn: 
 \code{\link{plot_gof}}
 
+Other ergm: 
+\code{\link{plot_gof}}
 }
 \concept{MoNAn}
+\concept{ergm}

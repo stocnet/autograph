@@ -102,11 +102,14 @@ Hintze, J. L. and Nelson, R. D. 1998.
 }
 \seealso{
 Other MoNAn: 
-\code{\link{plot_monan_trace}}
+\code{\link{plot_convergence}}
 
 Other RSiena: 
 \code{\link{plot.influenceTable}()},
 \code{\link{plot.selectionTable}()}
+
+Other ergm: 
+\code{\link{plot_convergence}}
 }
 \concept{MoNAn}
 \concept{RSiena}
