@@ -6,6 +6,7 @@ bibentry(
   author   = "James Hollway",
   year     = "2025",
   url      = "https://github.com/stocnet/autograph",
+  doi      = "https://doi.org/10.5281/zenodo.17072231",
   textVersion = paste("James Hollway (2025) ‘autograph: Automatic Plotting of Many Graphs’."
   )
 )
