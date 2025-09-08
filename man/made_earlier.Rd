@@ -12,6 +12,7 @@
 \alias{res_siena_selection}
 \alias{res_monan_traces}
 \alias{res_monan_gof}
+\alias{ergm_res}
 \alias{res_ergm_gof}
 \title{Precooked results for demonstrating plotting}
 \format{
@@ -33,6 +34,8 @@ An object of class \code{traces.monan} of length 3.
 
 An object of class \code{gof.stats.monan} of length 2.
 
+An object of class \code{ergm} of length 35.
+
 An object of class \code{gof.ergm} (inherits from \code{gof}) of length 30.
 }
 \usage{
@@ -53,6 +56,8 @@ data(res_siena_selection)
 data(res_monan_traces)
 
 data(res_monan_gof)
+
+data(ergm_res)
 
 data(res_ergm_gof)
 }
