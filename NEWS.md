@@ -4,6 +4,12 @@
 
 - Fixed old citation style issue for CRAN
 
+
+## Data
+
+- Added `ergm_res` for testing and illustration of `plot.mcmc.list()`,
+use `ergm_res$sample` to access the MCMC sample
+
 # autograph 0.3.0
 
 ## Package
