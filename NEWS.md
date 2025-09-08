@@ -4,6 +4,12 @@
 
 - Fixed old citation style issue for CRAN
 
+## Plotting
+
+- Added `plot.ag_conv()` as a new plotting method for convergence diagnostics
+  - Plots MCMC traces as a line plot with loess smoothing highlighting the trend
+  - Plots overall density plot of the samples on the right margin
+- Improved plotting of `{MoNAn}` trace objects by using `plot.ag_conv()`
 
 ## Data
 

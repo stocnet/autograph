@@ -15,6 +15,26 @@
 #'   of the statistics over the entire simulation.
 NULL
 
+#' @rdname plot_convergence
+#' @export
+plot.ag_conv <- function(x, ...){
+  dat <- x
+  trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value), shape = 1, color = ag_base()) + 
+    ggplot2::geom_line() + 
+    ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
+    ggplot2::geom_smooth(method = "loess", se = FALSE, color = ag_highlight(), linewidth = 0.5) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(axis.text.y = element_blank(),
+                   strip.text.y.left = element_text(angle = 0)) +
+    ggplot2::labs(x = "Simulation step", y = "")
+  density_plot <- ggplot2::ggplot(dat, aes(x = value)) +
+    ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
+    ggplot2::coord_flip() +
+    ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
+    ggplot2::theme_void() +
+    ggplot2::theme(strip.text.y = element_blank())
+  trace_plot + density_plot + patchwork::plot_layout(ncol = 2, widths = c(5, 1))
+}
 
 #' @rdname plot_convergence
 #' @family MoNAn
