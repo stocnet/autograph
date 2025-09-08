@@ -1,3 +1,23 @@
+# autograph 0.3.1
+
+## Package
+
+- Fixed old citation style issue for CRAN
+
+## Plotting
+
+- Added `plot.ag_conv()` as a new plotting method for convergence diagnostics
+  - Plots MCMC traces as a line plot with loess smoothing highlighting the trend
+  - Plots overall density plot of the samples on the right margin
+- Improved plotting of `{MoNAn}` trace objects by using `plot.ag_conv()`
+- Added `plot.mcmc.list()` for plotting MCMC samples from `ergm::ergm` results objects,
+using `plot.ag_conv()`
+
+## Data
+
+- Added `ergm_res` for testing and illustration of `plot.mcmc.list()`,
+use `ergm_res$sample` to access the MCMC sample
+
 # autograph 0.3.0
 
 ## Package

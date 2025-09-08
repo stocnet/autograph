@@ -9,5 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Changes to support 'ggplot2' v4.0.0
-- This version required for 'manynet' v1.6.0
+- Fixed CITATION issue in last submission

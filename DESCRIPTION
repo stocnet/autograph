@@ -1,7 +1,7 @@
 Package: autograph
 Title: Automatic Plotting of Many Graphs
-Version: 0.3.0
-Date: 2025-09-07
+Version: 0.3.1
+Date: 2025-09-08
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
    It includes 'ggplot2'-based plot methods for many popular network package classes.
@@ -22,6 +22,7 @@ Imports:
     ggraph,
     ggplot2,
     igraph,
+    patchwork,
     tidygraph
 Suggests:
     BiocManager,
@@ -30,7 +31,6 @@ Suggests:
     gifski,
     graphlayouts,
     methods,
-    patchwork,
     testthat (>= 3.0.0)
 Enhances:
     ergm,
