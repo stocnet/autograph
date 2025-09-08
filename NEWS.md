@@ -1,3 +1,9 @@
+# autograph 0.3.1
+
+## Package
+
+- Fixed old citation style issue for CRAN
+
 # autograph 0.3.0
 
 ## Package

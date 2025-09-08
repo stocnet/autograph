@@ -1,7 +1,7 @@
 citHeader("To cite autograph in publications use:")
 
-citEntry(
-  entry    = "Manual",
+bibentry(
+  bibtype    = "Manual",
   title    = "autograph: Automatic Plotting of Many Graphs",
   author   = "James Hollway",
   year     = "2025",
