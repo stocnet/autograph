@@ -129,8 +129,7 @@ graphr <- function(.data, layout, labels = TRUE,
   }
   if (missing(node_group)) node_group <- NULL else {
     node_group <- as.character(substitute(node_group))
-    g <- tidygraph::activate(g, "nodes") %>%
-      tidygraph::mutate(node_group = reduce_categories(g, node_group))
+    g <- manynet::mutate_nodes(g, node_group = reduce_categories(g, node_group))
   }
   if (missing(edge_color) && missing(edge_colour)) {
     edge_color <- NULL
@@ -276,24 +275,29 @@ graphr <- function(.data, layout, labels = TRUE,
       hj <- ifelse(p[["data"]][,1] >= 0, -0.2, 1.2)
     }
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name), repel = TRUE,
+                                    family = ag_font(),
                                     size = 3, hjust = hj, angle = angles) +
       ggplot2::coord_cartesian(xlim=c(-1.2,1.2), ylim=c(-1.2,1.2))
   } else if (layout %in% c("bipartite", "railway") | layout == "hierarchy" &
              length(unique(p[["data"]][["y"]])) <= 2) {
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name), angle = 90,
+                                    family = ag_font(),
                                     size = 3, hjust = "outward", repel = TRUE,
                                     nudge_y = ifelse(p[["data"]][,2] == 1,
                                                      0.05, -0.05)) +
       ggplot2::coord_cartesian(ylim=c(-0.2, 1.2))
   } else if (layout == "hierarchy" & length(unique(p[["data"]][["y"]])) > 2) {
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name),
+                                    family = ag_font(),
                                     size = 3, hjust = "inward", repel = TRUE)
   } else if (layout %in% c("alluvial", "lineage")) {
     p <- p + ggraph::geom_node_label(ggplot2::aes(label = name), size = 3,
+                                     family = ag_font(),
                                      repel = TRUE, nudge_x = ifelse(p[["data"]][,1] == 1, 
                                                                     0.02, -0.02))
   } else {
     p <- p + ggraph::geom_node_label(ggplot2::aes(label = name),
+                                     family = ag_font(),
                                      repel = TRUE, seed = 1234, size = 3)
   }
 }
