@@ -26,6 +26,14 @@
 #'   
 #' @name theme_set
 #' @family themes
+#' @section Fonts: 
+#'   Some themes also set a preferred font for use in plots, 
+#'   if available on the system (a check is performed).
+#'   In some cases, this includes a vector of options to try in sequence.
+#'   If none of the preferred fonts are available, a sans-serif font is used.
+#'   If you receive a warning about a missing font when setting a theme, 
+#'   try installing one of the preferred fonts or make sure that the font is
+#'   available to R using `extrafont::font_import()` and `extrafont::loadfont()`
 #' @returns This function sets the theme and palette(s) to be used across all
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
@@ -34,6 +42,11 @@
 #' stocnet_theme("rug")
 #' plot(manynet::node_degree(ison_karateka))
 NULL
+
+theme_opts <- c("default", "bw", "crisp", "neon", 
+                "iheid", "ethz", "uzh", "rug", "unibe", 
+                "oxf", "unige",
+                "rainbow")
 
 #' @rdname theme_set
 #' @param theme String naming a theme.
@@ -56,6 +69,7 @@ stocnet_theme <- function(theme = NULL){
       set_divergent_theme(theme)
       set_background_theme(theme)
       set_categorical_theme(theme)
+      set_font_theme(theme)
       snet_success("Theme set to {.emph {theme}}.")
     } else {
       snet_warn("Please choose one of the available themes: {.emph {theme_opts}}.")
@@ -66,11 +80,6 @@ stocnet_theme <- function(theme = NULL){
 #' @rdname theme_set
 #' @export
 set_stocnet_theme <- stocnet_theme
-
-theme_opts <- c("default", "bw",
-                "iheid", "ethz", "uzh", "rug", "unibe", 
-                "oxf", "unige",
-                "crisp", "neon", "rainbow")
 
 set_background_theme <- function(theme){
   if(theme == "neon"){
@@ -202,5 +211,35 @@ set_categorical_theme <- function(theme){
   }
 }
 
-colorsafe_palette <- c("#d73027", "#4575b4", "#1B9E77","#D95F02","#7570B3",
-                       "#E7298A", "#66A61E","#E6AB02","#A6761D","#666666")
+set_font_theme <- function(theme){
+  
+  # Get available fonts depending on OS
+  if (.Platform$OS.type == "windows") {
+    available_fonts <- c(names(windowsFonts()),
+                         names(postscriptFonts()))
+  } else {
+    available_fonts <- c(names(X11Fonts()),
+                         names(postscriptFonts()))
+  }
+  
+  candidates <- switch(theme,
+                       "iheid" = c("Helvetica", "Arial", "Verdana"),
+                       "ethz" = "Arial",
+                       "uzh" = c("Source Sans", "TheSans", "Palatino"),
+                       "rug" = "Georgia",
+                       "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
+                       "neon" = "Comic Sans"
+  )
+  
+  # Find first match
+  if(any(candidates %in% available_fonts)){
+    font_match <- candidates[candidates %in% available_fonts]
+  } else {
+    snet_info("None of the preferred fonts for theme {.emph {theme}},",
+              "{candidates}, are available.",
+              "Try using {.pkg extrafont} to import and load fonts.",
+              "Using default sans-serif font instead.")
+    font_match <- "sans"
+  }
+  options(snet_font = font_match[1])
+}

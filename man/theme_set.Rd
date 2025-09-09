@@ -14,7 +14,7 @@ set_stocnet_theme(theme = NULL)
 \item{theme}{String naming a theme.
 By default "default".
 The following themes are currently available:
-default, bw, iheid, ethz, uzh, rug, unibe, oxf, unige, crisp, neon, rainbow.
+default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, rainbow.
 This string can be capitalised or not.}
 }
 \value{
@@ -46,6 +46,17 @@ high-contrast black and white theme, "neon" for a dark theme
 with neon highlights, and "rainbow" for a colourful theme.
 Most themes are designed to be colour-blind safe.
 }
+\section{Fonts}{
+
+Some themes also set a preferred font for use in plots,
+if available on the system (a check is performed).
+In some cases, this includes a vector of options to try in sequence.
+If none of the preferred fonts are available, a sans-serif font is used.
+If you receive a warning about a missing font when setting a theme,
+try installing one of the preferred fonts or make sure that the font is
+available to R using \code{extrafont::font_import()} and \code{extrafont::loadfont()}
+}
+
 \examples{
 stocnet_theme("default")
 plot(manynet::node_degree(ison_karateka))
