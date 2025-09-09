@@ -9,6 +9,7 @@
 \alias{ag_qualitative}
 \alias{ag_sequential}
 \alias{ag_divergent}
+\alias{ag_font}
 \title{Consistent palette calls}
 \usage{
 ag_base()
@@ -24,6 +25,8 @@ ag_qualitative(number)
 ag_sequential(number)
 
 ag_divergent(number)
+
+ag_font()
 }
 \arguments{
 \item{number}{Integer of how many category colours to return.}

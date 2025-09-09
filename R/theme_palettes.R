@@ -58,5 +58,9 @@ ag_divergent <- function(number){
   colorRampPalette(snet_colors)(number)
 }
 
-colorsafe_palette <- c("#d73027", "#4575b4", "#1B9E77","#D95F02","#7570B3",
-                       "#E7298A", "#66A61E","#E6AB02","#A6761D","#666666")
+#' @rdname ag_call
+#' @export
+ag_font <- function(){
+  getOption("snet_font", default = "sans")
+}
+
