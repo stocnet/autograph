@@ -32,7 +32,7 @@ has adequately explored the state space and converged to a stable
 distribution.
 }
 \examples{
-plot(res_monan_traces)
+plot(monan_conv)
 plot(ergm_res$sample)
 }
 \seealso{

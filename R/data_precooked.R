@@ -44,17 +44,20 @@
 #' @usage data(res_siena_selection)
 "res_siena_selection"
 
-#' @docType data
-#' @keywords datasets
-#' @rdname made_earlier
-#' @usage data(res_monan_traces)
-"res_monan_traces"
+# MoNAn objects ####
 
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_monan_gof)
-"res_monan_gof"
+#' @usage data(monan_conv)
+"monan_conv"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(monan_gof)
+"monan_gof"
+
 
 #' @docType data
 #' @keywords datasets

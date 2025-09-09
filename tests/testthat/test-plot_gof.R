@@ -5,7 +5,7 @@ test_that("gof plotting siena gof objects works", {
 })
 
 test_that("gof plotting monan gof objects works", {
-  p <- plot(res_monan_gof)
+  p <- plot(monan_gof)
   expect_s3_class(p, "ggplot")  
 })
 
