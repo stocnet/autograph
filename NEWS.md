@@ -24,6 +24,7 @@
 - Dropped `theme_*()` functions in favour of `stocnet_theme()`
 - Dropped `theme_*()` tests
 - Added `stocnet_theme()` tests
+- Added "cmu" theme for Carnegie Mellon University
 
 ## Graphing
 
