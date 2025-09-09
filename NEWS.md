@@ -4,6 +4,8 @@
 
 - Fixed DOI in CITATION
 - Improved README introduction
+- Improved README graphing illustration, including igraph comparison figure
+- Improved README plotting illustration, added SAOM/ERGM GOF comparison figure
 
 ## Theming
 

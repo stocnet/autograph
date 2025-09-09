@@ -152,6 +152,64 @@ that visualises network changes over time. It really couldn’t be easier.
 
 <!-- - unweighted, weighted, and sometimes signed networks -->
 
+## Generating plots
+
+Since network analysis involves not just drawing graphs, `{autograph}`
+also provides a function for plotting results from the analysis or
+modelling of those networks. To keep things simple, all users need to
+remember is a single, generic function: `plot()`. Method dispatching
+takes care of the rest, so you can concentrate on exploring and
+interpreting your results. Here are some examples, using goodness-of-fit
+results from fitting a SAOM in `{RSiena}` and an ERGM in `{ergm}`. (Note
+that neither the data nor the model are similar; this is just for
+illustrative purposes.)
+
+<img src="man/figures/README-siena-ergm-gof-1.png" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" width="100%" />
+
+### Setting a theme
+
+Note that in the above plots, the same colour scheme and fonts were
+used. They can be easily changed though. `{autograph}` includes a number
+of themes that can be used to style all graphs and plots consistently.
+And it is very easy to set a theme. Just type `stocnet_theme()` to see
+which is the theme currently set, and to get a list of available themes.
+Then enter the chosen theme name in the function to set it. All plots
+created using `{autograph}` functions will then use this theme, until
+you change it again.
+
+``` r
+stocnet_theme()
+(plot(node_degree(ison_karateka)) + 
+plot(tie_betweenness(ison_karateka)))/
+(plot(node_in_regular(ison_southern_women, "e")) + 
+plot(as_matrix(ison_southern_women),
+     membership = node_in_regular(ison_southern_women, "e")))
+```
+
+<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
+
+``` r
+stocnet_theme("ethz")
+(plot(node_degree(ison_karateka)) + 
+plot(tie_betweenness(ison_karateka)))/
+(plot(node_in_regular(ison_southern_women, "e")) + 
+plot(as_matrix(ison_southern_women),
+     membership = node_in_regular(ison_southern_women, "e")))
+```
+
+<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
+
+There are a range of institutional and topical themes available,
+including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf,
+unige, rainbow, with more on the way. If your institution or
+organisation is not included and you would like it to be, please just
+raise an issue on Github, along with a link to your corporate branding
+or style guide if available, and we will attempt to add it at the next
+opportunity.
+
+In sum, while there is a lot of clever defaults and customisation
+available, all it takes is three simple functions for your
+
 ## Installation
 
 ### Stable
