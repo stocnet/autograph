@@ -2,6 +2,7 @@
 
 ## Theming
 
+- Improved `stocnet_theme()` documentation
 - Improved `match_colors()` documentation
 - Exported `is_dark()` and made it vectorised
 

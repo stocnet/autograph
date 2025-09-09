@@ -1,15 +1,31 @@
-#' Many themes
-#' 
+#' Setting a consistent theme for all plots
 #' @description
-#'   This function enables all plots to be 
-#'   quickly, easily and consistently themed.
-#'   This is achieved by setting a theme option that enables
-#'   the appropriate palette to be used for all autograph-consistent
-#'   plotting methods.
+#'   This function enables plots to be quickly, easily and consistently themed.
+#'   This is achieved by setting a theme option, usually at the start of an R
+#'   session, that enables the palette to be used for 
+#'   all autograph-consistent plotting methods.
+#'   This includes thematic colours for backgrounds, highlights, 
+#'   sequential, divergent and categorical colour schemes.
+#'   The function sets these palettes to options that are then
+#'   used by the various plotting functions.
 #'   
-#'   The following themes are currently available:
-#'   `r autograph:::theme_opts`.
+#'   If no theme is specified (i.e. the function is called without argument), 
+#'   the current theme is reported.
+#'   The default theme is "default".
+#'   This theme uses a white background, blue and red for
+#'   highlighting, and a blue-white-red divergent palette.
+#'   The themes can be changed at any time by calling `stocnet_theme()`
+#'   or its alias `set_stocnet_theme()` with a different theme name.
+#'   
+#'   Other themes include those based on the colour schemes of various 
+#'   universities, including ETH Zurich, UZH, UNIBE, RUG, and Oxford.
+#'   Other themes include "bw" for black and white, "crisp" for a
+#'   high-contrast black and white theme, "neon" for a dark theme
+#'   with neon highlights, and "rainbow" for a colourful theme.
+#'   Most themes are designed to be colour-blind safe.
+#'   
 #' @name theme_set
+#' @family themes
 #' @returns This function sets the theme and palette(s) to be used across all
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
@@ -22,6 +38,8 @@ NULL
 #' @rdname theme_set
 #' @param theme String naming a theme.
 #'   By default "default".
+#'   The following themes are currently available:
+#'   `r autograph:::theme_opts`.
 #'   This string can be capitalised or not.
 #' @importFrom manynet snet_info snet_success snet_warn
 #' @export
