@@ -7,6 +7,13 @@
 ## Theming
 
 - Improved `stocnet_theme()` documentation
+- Improved `stocnet_theme()` to register a font family for plots
+  - A vector of potential fonts is included for some themes
+  - The first font found on the system will be used
+  - If no fonts are found, the default R font ("sans") will be used
+  - A message is printed to inform the user if the default is used,
+  and how to install missing fonts via `{extrafont}`
+- Added `ag_font()` for retrieving the registered font family
 - Improved `match_colors()` documentation
 - Exported `is_dark()` and made it vectorised
 - Added tests for `match_colors()` and `is_dark()`
@@ -15,6 +22,8 @@
 
 - Improved `plot.selectionTable()` and `plot.influenceTable()` documentation
 by consolidating them together into one help file
+- Improved `plot.ag_conv()`, `plot.ag_gof()`, and plot_interp by using 
+registered fonts where available
 
 ## Data
 

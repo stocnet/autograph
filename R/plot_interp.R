@@ -70,7 +70,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       # ggplot2::scale_linetype_manual(
       # values= c('solid',  'longdash','dashed',
       #           'twodash', 'dotdash', 'dotted'), labels=labels) +
-      ggplot2::theme_minimal(base_size=8, base_family="") 
+      ggplot2::theme_minimal(base_size=8, base_family=ag_font()) 
     # + ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
     #         panel.grid.minor = ggplot2::element_blank())
   } else {
@@ -78,7 +78,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       gs +
       ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), 
                                                      labs)) + 
-      ggplot2::theme_minimal(base_size=8, base_family="")
+      ggplot2::theme_minimal(base_size=8, base_family=ag_font())
   }
   
   nametext <- attr(x, "name")
@@ -93,7 +93,8 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
          colour=paste(vnametext.l,'\n ego\n', sep='')) +
     ggplot2::theme(legend.key.width = ggplot2::unit(2.5, "cm")) +
     # of course you could vary the key.width - or anything else...
-    ggplot2::theme(plot.title=element_text(hjust=0.5))
+    ggplot2::theme(plot.title=element_text(hjust=0.5),
+                   base_family=ag_font())
   ssp
 }
 
@@ -145,5 +146,6 @@ plot.influenceTable <- function(x, separation=0, ...){
          colour=paste(beh.label,'\nalter\nvalue')) +
     # ggplot2::theme_grey(base_size=14, base_family="") +
     ggplot2::theme(legend.key.width = ggplot2::unit(1, "cm")) +
-    ggplot2::theme(plot.title=element_text(hjust=0.5))
+    ggplot2::theme(plot.title=element_text(hjust=0.5),
+                   base_family=ag_font())
 }

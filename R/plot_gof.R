@@ -94,7 +94,7 @@ plot.ag_gof <- function(x, ...){
     ggplot2::geom_line(data = obs, aes(x = name, y = value),
                        group = 1,
                        color = ag_highlight()) +
-    ggplot2::theme_minimal() +
+    ggplot2::theme_minimal(base_family = ag_font()) +
     ggplot2::labs(y = "Statistic", title = main, 
                   x = if(is.null(p_value)) "" else paste("p:", round(p_value, 3), collapse = " "))
 }

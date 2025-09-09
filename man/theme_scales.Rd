@@ -32,7 +32,7 @@
 \alias{scale_color_rug}
 \alias{scale_edge_colour_rug}
 \alias{scale_edge_color_rug}
-\title{Many scales}
+\title{Themed scales for further customization}
 \usage{
 scale_fill_iheid(direction = 1, ...)
 

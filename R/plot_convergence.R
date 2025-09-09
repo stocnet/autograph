@@ -22,8 +22,9 @@ plot.ag_conv <- function(x, ...){
   trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value), shape = 1, color = ag_base()) + 
     ggplot2::geom_line() + 
     ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
-    ggplot2::geom_smooth(method = "loess", se = FALSE, color = ag_highlight(), linewidth = 0.5) +
-    ggplot2::theme_minimal() +
+    ggplot2::geom_smooth(formula = y ~ x, method = "loess", se = FALSE, 
+                         color = ag_highlight(), linewidth = 0.5) +
+    ggplot2::theme_minimal(base_family = ag_font()) +
     ggplot2::theme(axis.text.y = element_blank(),
                    strip.text.y.left = element_text(angle = 0)) +
     ggplot2::labs(x = "Simulation step", y = "")
