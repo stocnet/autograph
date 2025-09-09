@@ -1,5 +1,9 @@
 # autograph 0.3.2
 
+## Theming
+
+- Improved `match_colors()` documentation
+- Exported `is_dark()` and made it vectorised
 
 ## Plotting
 
