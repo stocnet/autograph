@@ -215,11 +215,11 @@ set_font_theme <- function(theme){
   
   # Get available fonts depending on OS
   if (.Platform$OS.type == "windows") {
-    available_fonts <- c(names(windowsFonts()),
-                         names(postscriptFonts()))
+    available_fonts <- c(names(grDevices::windowsFonts()),
+                         names(grDevices::postscriptFonts()))
   } else {
-    available_fonts <- c(names(X11Fonts()),
-                         names(postscriptFonts()))
+    available_fonts <- c(names(grDevices::X11Fonts()),
+                         names(grDevices::postscriptFonts()))
   }
   
   candidates <- switch(theme,
