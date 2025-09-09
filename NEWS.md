@@ -33,6 +33,7 @@
 by consolidating them together into one help file
 - Improved `plot.ag_conv()`, `plot.ag_gof()`, and plot_interp by using 
 registered fonts where available
+- Improved `plot.sienaGOF()` to use lower case auxiliary statistic description
 
 ## Data
 
