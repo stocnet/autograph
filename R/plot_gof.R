@@ -102,7 +102,7 @@ plot.ag_gof <- function(x, ...){
 #' @rdname plot_gof
 #' @family MoNAn
 #' @examples
-#' plot(res_monan_gof)
+#' plot(monan_gof)
 #' @export
 plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
   
@@ -150,7 +150,7 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
 #' @rdname plot_gof
 #' @family RSiena
 #' @examples
-#' plot(res_siena_gof, cumulative = TRUE)
+#' plot(siena_gof, cumulative = TRUE)
 #' @export
 plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   

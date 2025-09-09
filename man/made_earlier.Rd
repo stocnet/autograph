@@ -7,11 +7,11 @@
 \alias{res_migraph_test}
 \alias{res_migraph_diff}
 \alias{res_manynet_diff}
-\alias{res_siena_gof}
-\alias{res_siena_influence}
-\alias{res_siena_selection}
-\alias{res_monan_traces}
-\alias{res_monan_gof}
+\alias{siena_gof}
+\alias{siena_influence}
+\alias{siena_selection}
+\alias{monan_conv}
+\alias{monan_gof}
 \alias{ergm_res}
 \alias{res_ergm_gof}
 \title{Precooked results for demonstrating plotting}
@@ -47,15 +47,15 @@ data(res_migraph_diff)
 
 data(res_manynet_diff)
 
-data(res_siena_gof)
+data(siena_gof)
 
-data(res_siena_influence)
+data(siena_influence)
 
-data(res_siena_selection)
+data(siena_selection)
 
-data(res_monan_traces)
+data(monan_conv)
 
-data(res_monan_gof)
+data(monan_gof)
 
 data(ergm_res)
 

@@ -1,3 +1,13 @@
+# autograph 0.3.2
+
+## Data
+
+- Renamed `res_monan_traces` to `monan_conv`
+- Renamed `res_monan_gof` to `monan_gof`
+- Renamed `res_siena_gof` to `siena_gof`
+- Renamed `res_siena_influence` to `siena_influence`
+- Renamed `res_siena_selection` to `siena_selection`
+
 # autograph 0.3.1
 
 ## Package
