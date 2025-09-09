@@ -3,6 +3,7 @@
 ## Package
 
 - Fixed DOI in CITATION
+- Improved README introduction
 
 ## Theming
 

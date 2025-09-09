@@ -25,49 +25,42 @@ coverage](https://codecov.io/gh/stocnet/autograph/branch/main/graph/badge.svg)](
 
 ## About the package
 
-This package aims to make exploration, analysis, and publication of
-results from any of the stocnet packages easier, faster, and more
-consistent. It does this by letting you simply set a theme, say for your
-institution, and then those palettes will be used whenever you use
-`plot()` or `graphr()` on an object created in one of the relevant
-packages.
+This package aims to make network visualisation *easier*, *succinct*,
+and *consistent*. Visualisation is a key part of the research process,
+from the initial exploration of data to the analysis of results and the
+presentation of findings in publications. However, it is often a tedious
+and time-consuming task. Trying to wrangle these into a consistent style
+for publication or presentation can be frustrating and requires a lot of
+code. While there are a number of excellent packages for network
+analysis in R, they each face several of the following challenges when
+it comes to visualisation:
 
-## Setting a theme
+- defaults are often not sensible for different types of networks
+- customisation can sometimes be difficult
+- some require multiple lines of code to even produce a graph or plot
+- most require multiple lines of code to produce a graph or plot that is
+  styled suitable for publication or presentation
+- such style code needs to be repeated every time a graph or plot is
+  produced if a consistent style is to be maintained
+- defaults and syntax are different for different packages, so a
+  workflow using multiple packages must adapt to multiple syntaxes
+- different visual defaults can frustrate interpretation, and
+  potentially invites errors when comparing plots from different
+  packages
+- some plotting methods are available for some networks or
+  network-related results and not others
 
-It is very easy to set a theme. Just type `stocnet_theme()` to see which
-is the theme currently set, and to get a list of available themes. Then
-enter the chosen theme name in the function to set it. All plots created
-using `{autograph}` functions will then use this theme, until you change
-it again.
+`{autograph}` aims to solve these problems by providing automatic graph
+drawing for networks in any of the `{manynet}` formats, and automatic
+plotting for results from `{stocnet}` packages, including `{migraph}`,
+`{RSiena}`, and `{MoNAn}`, and more.
 
-``` r
-library(autograph)
-#> Registered S3 method overwritten by 'autograph':
-#>   method         from
-#>   plot.mcmc.list coda
-library(patchwork)
-stocnet_theme()
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
-plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
-```
+All you need to do is install the package (loading it last will make
+sure its plotting methods are the default), use `set_stocnet_theme()`
+(once) to set your preferred theme, and then use `graphr()` to graph
+your networks, or `plot()` to plot your results. That’s it!
 
-<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
-
-``` r
-stocnet_theme("ethz")
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
-plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
-```
-
-<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
-
-## Mapping
+## Drawing graphs
 
 `{autograph}` includes three one-line graphing functions with sensible
 defaults based on the network’s properties.
