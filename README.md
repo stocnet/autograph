@@ -42,10 +42,11 @@ it again.
 
 ``` r
 library(autograph)
+#> Registered S3 method overwritten by 'autograph':
+#>   method         from
+#>   plot.mcmc.list coda
 library(patchwork)
 stocnet_theme()
-#> ℹ Theme is set to default.
-#> ℹ The following themes are available: default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, and rainbow.
 (plot(node_degree(ison_karateka)) + 
 plot(tie_betweenness(ison_karateka)))/
 (plot(node_in_regular(ison_southern_women, "e")) + 
@@ -57,7 +58,6 @@ plot(as_matrix(ison_southern_women),
 
 ``` r
 stocnet_theme("ethz")
-#> ✔ Theme set to ethz.
 (plot(node_degree(ison_karateka)) + 
 plot(tie_betweenness(ison_karateka)))/
 (plot(node_in_regular(ison_southern_women, "e")) + 

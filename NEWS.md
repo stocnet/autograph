@@ -9,14 +9,20 @@
 - Improved `stocnet_theme()` documentation
 - Improved `stocnet_theme()` to register a font family for plots
   - A vector of potential fonts is included for some themes
-  - The first font found on the system will be used
+  - The first font found on the system will be used, and user notified
   - If no fonts are found, the default R font ("sans") will be used
   - A message is printed to inform the user if the default is used,
   and how to install missing fonts via `{extrafont}`
+- Added font options for "iheid", "oxf", "ethz", "uzh", and "rug" themes
 - Added `ag_font()` for retrieving the registered font family
 - Improved `match_colors()` documentation
 - Exported `is_dark()` and made it vectorised
 - Added tests for `match_colors()` and `is_dark()`
+- Dropped `theme_*()` functions in favour of `stocnet_theme()`
+
+## Graphing
+
+- Improved `graphr()` by using registered fonts where available
 
 ## Plotting
 
