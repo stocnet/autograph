@@ -4,6 +4,7 @@
 
 - Renamed `res_monan_traces` to `monan_conv`
 - Renamed `res_monan_gof` to `monan_gof`
+- Renamed `res_ergm_gof` to `ergm_gof`
 - Renamed `res_siena_gof` to `siena_gof`
 - Renamed `res_siena_influence` to `siena_influence`
 - Renamed `res_siena_selection` to `siena_selection`

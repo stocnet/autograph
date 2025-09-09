@@ -13,7 +13,7 @@
 \alias{monan_conv}
 \alias{monan_gof}
 \alias{ergm_res}
-\alias{res_ergm_gof}
+\alias{ergm_gof}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -59,7 +59,7 @@ data(monan_gof)
 
 data(ergm_res)
 
-data(res_ergm_gof)
+data(ergm_gof)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

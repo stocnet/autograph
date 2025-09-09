@@ -215,7 +215,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
 #'   and `"dist"` (geodesic distance).
 #'   The default is `"deg"`.
 #' @examples
-#' plot(res_ergm_gof, statistic = "espart")
+#' plot(ergm_gof, statistic = "espart")
 #' @export
 plot.gof.ergm <- function(x, cumulative = FALSE, 
                           statistic = c("deg","espart","dist"), ...){

@@ -39,7 +39,7 @@ plot.ag_conv <- function(x, ...){
 #' @rdname plot_convergence
 #' @family MoNAn
 #' @examples
-#' plot(res_monan_traces)
+#' plot(monan_conv)
 #' @export
 plot.traces.monan <- function(x, ...) {
   nParams <- length(x[[1]])
