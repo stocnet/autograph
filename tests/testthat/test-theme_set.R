@@ -21,6 +21,7 @@ test_that("setting fonts works", {
   stocnet_theme("iheid")
   p <- plot(monan_gof)
   expect_equal(p$theme$text$family, "Helvetica")
+  skip_on_os("windows") # Arial not available on Windows by default
   stocnet_theme("ethz")
   p <- plot(monan_gof)
   expect_equal(p$theme$text$family, "Arial")
