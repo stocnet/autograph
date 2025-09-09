@@ -1,5 +1,9 @@
 # autograph 0.3.2
 
+## Package
+
+- Fixed DOI in CITATION
+
 ## Theming
 
 - Improved `stocnet_theme()` documentation
