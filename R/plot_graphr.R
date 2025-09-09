@@ -1,5 +1,3 @@
-# Single graphs ####
-
 #' Easily graph networks with sensible defaults
 #' 
 #' @description 
@@ -175,12 +173,11 @@ graphr <- function(.data, layout, labels = TRUE,
   p <- ggraph::ggraph(lo) + ggplot2::theme_void()
   if (!is.null(node_group)) {
     x <- y <- NULL
-    thisRequires("ggforce")
-    thisRequires("concaveman")
+    # thisRequires("ggforce")
     p <- p + 
       ggforce::geom_mark_hull(ggplot2::aes(x, y, fill = node_group,
                                            label = node_group), data = lo) +
-      ggplot2::scale_fill_manual(values = colorsafe_palette,
+      ggplot2::scale_fill_manual(values = ag_qualitative(length(unique(p$data[[node_group]]))),
                                  guide = ggplot2::guide_legend("Group"))
   }
   if(snap){
@@ -221,7 +218,7 @@ graphr <- function(.data, layout, labels = TRUE,
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
                                                             "Edge Sign", "Edge Color")))
-    } else p <- p + ggraph::scale_edge_colour_manual(values = getOption("snet_cat", default = colorsafe_palette),
+    } else p <- p + ggraph::scale_edge_colour_manual(values = ag_qualitative(length(unique(out[["ecolor"]]))),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
@@ -248,7 +245,7 @@ graphr <- function(.data, layout, labels = TRUE,
         p <- p + ggplot2::scale_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
                                               guide = ggplot2::guide_legend("Node Color"))
       } else {
-        p <- p + ggplot2::scale_colour_manual(values = getOption("snet_cat", default = colorsafe_palette),
+        p <- p + ggplot2::scale_colour_manual(values = ag_qualitative(length(unique(out[["ncolor"]]))),
                                               guide = ggplot2::guide_legend("Node Color"))
       }
     }
