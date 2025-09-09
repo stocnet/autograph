@@ -224,11 +224,11 @@ set_font_theme <- function(theme){
   
   candidates <- switch(theme,
                        "iheid" = c("Helvetica", "Arial", "Verdana"),
-                       "ethz" = "Arial",
+                       "ethz" = c("DIN Next","Arial"),
                        "uzh" = c("Source Sans", "TheSans", "Palatino"),
-                       "rug" = "Georgia",
+                       "rug" = c("Arial","Parry","Georgia","Open Sans"),
                        "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
-                       "neon" = "Comic Sans"
+                       "neon" = "Comic Sans MS"
   )
   
   # Find first match
