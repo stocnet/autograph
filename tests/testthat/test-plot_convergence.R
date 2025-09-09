@@ -1,5 +1,5 @@
 test_that("monan diagnostics works", {
-  p <- plot(res_monan_traces)
+  p <- plot(monan_conv)
   expect_s3_class(p, "ggplot")  
 })
 

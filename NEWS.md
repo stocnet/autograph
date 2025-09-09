@@ -1,3 +1,53 @@
+# autograph 0.4.0
+
+## Package
+
+- Fixed DOI in CITATION
+- Improved README introduction
+- Improved README graphing illustration, including igraph comparison figure
+- Improved README plotting illustration, added SAOM/ERGM GOF comparison figure
+
+## Theming
+
+- Improved `stocnet_theme()` documentation
+- Improved `stocnet_theme()` to register a font family for plots
+  - A vector of potential fonts is included for some themes
+  - The first font found on the system will be used, and user notified
+  - If no fonts are found, the default R font ("sans") will be used
+  - A message is printed to inform the user if the default is used,
+  and how to install missing fonts via `{extrafont}`
+- Added font options for "iheid", "oxf", "ethz", "uzh", and "rug" themes
+- Added `ag_font()` for retrieving the registered font family
+- Improved `match_colors()` documentation
+- Exported `is_dark()` and made it vectorised
+- Added `match_colors()` and `is_dark()` tests
+- Dropped `theme_*()` functions in favour of `stocnet_theme()`
+- Dropped `theme_*()` tests
+- Added `stocnet_theme()` tests
+- Added "cmu" theme for Carnegie Mellon University
+
+## Graphing
+
+- Improved `graphr()` by using registered fonts where available
+- Improved `graphr()` by using `ag_qualitative()` for discrete colour scales
+
+## Plotting
+
+- Improved `plot.selectionTable()` and `plot.influenceTable()` documentation
+by consolidating them together into one help file
+- Improved `plot.ag_conv()`, `plot.ag_gof()`, and plot_interp by using 
+registered fonts where available
+- Improved `plot.sienaGOF()` to use lower case auxiliary statistic description
+
+## Data
+
+- Renamed `res_monan_traces` to `monan_conv`
+- Renamed `res_monan_gof` to `monan_gof`
+- Renamed `res_ergm_gof` to `ergm_gof`
+- Renamed `res_siena_gof` to `siena_gof`
+- Renamed `res_siena_influence` to `siena_influence`
+- Renamed `res_siena_selection` to `siena_selection`
+
 # autograph 0.3.1
 
 ## Package

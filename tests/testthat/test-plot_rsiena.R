@@ -9,11 +9,11 @@
 # })
 
 test_that("siena selection table plotting works",{
-  p <- plot(res_siena_selection)
+  p <- plot(siena_selection)
   expect_s3_class(p, "ggplot")
 })
 
 test_that("siena influence table plotting works",{
-  p <- plot(res_siena_influence)
+  p <- plot(siena_influence)
   expect_s3_class(p, "ggplot")
 })

@@ -25,104 +25,110 @@ coverage](https://codecov.io/gh/stocnet/autograph/branch/main/graph/badge.svg)](
 
 ## About the package
 
-This package aims to make exploration, analysis, and publication of
-results from any of the stocnet packages easier, faster, and more
-consistent. It does this by letting you simply set a theme, say for your
-institution, and then those palettes will be used whenever you use
-`plot()` or `graphr()` on an object created in one of the relevant
-packages.
+This package aims to make network visualisation *easier*, *succinct*,
+and *consistent*. Visualisation is a key part of the research process,
+from the initial exploration of data to the analysis of results and the
+presentation of findings in publications. However, it is often a tedious
+and time-consuming task. Trying to wrangle these into a consistent style
+for publication or presentation can be frustrating and requires a lot of
+code. While there are a number of excellent packages for network
+analysis in R, they each face several of the following challenges when
+it comes to visualisation:
 
-## Setting a theme
+- defaults are often not sensible for different types of networks
+- customisation can sometimes be difficult
+- some require multiple lines of code to even produce a graph or plot
+- most require multiple lines of code to produce a graph or plot that is
+  styled suitable for publication or presentation
+- such style code needs to be repeated every time a graph or plot is
+  produced if a consistent style is to be maintained
+- defaults and syntax are different for different packages, so a
+  workflow using multiple packages must adapt to multiple syntaxes
+- different visual defaults can frustrate interpretation, and
+  potentially invites errors when comparing plots from different
+  packages
+- some plotting methods are available for some networks or
+  network-related results and not others
 
-It is very easy to set a theme. Just type `stocnet_theme()` to see which
-is the theme currently set, and to get a list of available themes. Then
-enter the chosen theme name in the function to set it. All plots created
-using `{autograph}` functions will then use this theme, until you change
-it again.
+`{autograph}` aims to solve these problems by providing automatic graph
+drawing for networks in any of the `{manynet}` formats, and automatic
+plotting for results from `{stocnet}` packages, including `{migraph}`,
+`{RSiena}`, and `{MoNAn}`, and more.
 
-``` r
-library(autograph)
-library(patchwork)
-stocnet_theme()
-#> ℹ Theme is set to default.
-#> ℹ The following themes are available: default, bw, iheid, ethz, uzh, rug, unibe, crisp, neon, and rainbow.
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
-plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
-```
+All you need to do is install the package (loading it last will make
+sure its plotting methods are the default), use `set_stocnet_theme()`
+(once) to set your preferred theme, and then use `graphr()` to graph
+your networks, or `plot()` to plot your results. That’s it!
 
-<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
-
-``` r
-stocnet_theme("ethz")
-#> ✔ Theme set to ethz.
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
-plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
-```
-
-<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
-
-## Mapping
+## Drawing graphs
 
 `{autograph}` includes three one-line graphing functions with sensible
 defaults based on the network’s properties.
 
-### graphr
-
 First, `graphr()` is used to graph networks in any of the `{manynet}`
-formats. It includes sensible defaults so that researchers can view
-their network’s structure or distribution quickly with a minimum of
-fuss. Compare the output from `{autograph}` with a similar default from
+formats. Because it builds upon `{manynet}`, it can graph networks in
+any of the `{manynet}` formats, including `network`, `igraph`, `sna`,
+`tidygraph`, and more.
+
+Second, it includes sensible defaults so that researchers can view their
+network’s structure or distribution quickly with a minimum of fuss.
+Compare the output from `{autograph}` with a similar default from
 `{igraph}`:
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-Here the `{autograph}` function recognises that the network is a
-two-mode network and uses a bipartite layout by default, and recognises
-that the network contains names for the nodes and prints them vertically
-so that they are legible in this layout. Other ‘clever’ features include
-automatic node sizing and more. By contrast, `{igraph}` requires the
-bipartite layout to be specified, has cumbersome node size defaults for
-all but the smallest graphs, and labels also very often need resizing
-and adjustment to avoid overlap. All of `{autograph}`’s adjustments can
-be overridden, however…
+`{igraph}` requires the bipartite layout to be specified, has cumbersome
+node size defaults for all but the smallest graphs, and labels also very
+often need resizing and adjustment to avoid overlap. Getting this
+default plot to look good can take a lot of trial and error, and time.
+By contrast, `graphr()` recognises the network as two-mode and uses a
+bipartite layout by default. It also recognises that the network
+contains names for the nodes and prints them vertically so that they are
+legible in this layout. Other ‘clever’ features include automatic node
+sizing and more.
 
-#### More options
+### More options
 
-Changing the size and colors of nodes and ties is as easy as specifying
-the function’s relevant argument with a replacement, or indicating from
-which attribute it should inherit this information.
+All of `graphr()`’s adjustments can be overridden, however… Changing the
+size and colors of nodes and ties is as easy as specifying the
+function’s relevant argument with a replacement,
+e.g. `node_color = "darkblue"` or `node_size = 6`, or indicating from
+which attribute it should inherit this information,
+e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
-#### More layouts
+Legends are added by default when node or tie aesthetics are mapped to
+attributes, but can be removed with `show_legend = FALSE`. Since the
+`{autograph}` builds upon `{ggplot2}`, titles, subtitles and, for
+plotting, axis labels can all be added on easily, or other elements
+(e.g. font size) can be tweaked for a particular output.
 
-`{autograph}` can use all the layout algorithms offered by packages such
-as `{igraph}`, `{ggraph}`, and `{graphlayouts}`, and offers some
-additional layout algorithms for snapping layouts to a grid, visualising
-partitions horizontally, vertically, or concentrically, or conforming to
-configurational coordinates.
+### More layouts
+
+`graphr()` can use all the layout algorithms offered by packages such as
+`{igraph}`, `{ggraph}`, and `{graphlayouts}`. `{autograph}` also offers
+some additional layout algorithms for visualising partitions
+horizontally, vertically, or concentrically, conforming to
+configurational coordinates, or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
-### graphs
+### More networks
 
-Second, `graphs()` is used to graph multiple networks together, which
-can be useful for ego networks or network panels. `{patchwork}` is used
-to help arrange individual plots together.
+The second graph drawing function included, `graphs()`, is used to graph
+multiple networks together. This can be useful for ego networks or
+network panels. `{patchwork}` is used to help arrange individual plots
+together, and is used throughout the package to help arrange plots
+together informatively.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
-### grapht
+### More time
 
-Third, `grapht()` is used to visualise dynamic networks. It uses
-`{gganimate}` and `{gifski}` to create a gif that visualises network
-changes over time. It really couldn’t be easier.
+The third graph drawing function, `grapht()`, is used to visualise
+dynamic networks. It uses `{gganimate}` and `{gifski}` to create a gif
+that visualises network changes over time. It really couldn’t be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
@@ -145,6 +151,64 @@ changes over time. It really couldn’t be easier.
 <!-- - undirected, directed, and sometimes complex networks -->
 
 <!-- - unweighted, weighted, and sometimes signed networks -->
+
+## Generating plots
+
+Since network analysis involves not just drawing graphs, `{autograph}`
+also provides a function for plotting results from the analysis or
+modelling of those networks. To keep things simple, all users need to
+remember is a single, generic function: `plot()`. Method dispatching
+takes care of the rest, so you can concentrate on exploring and
+interpreting your results. Here are some examples, using goodness-of-fit
+results from fitting a SAOM in `{RSiena}` and an ERGM in `{ergm}`. (Note
+that neither the data nor the model are similar; this is just for
+illustrative purposes.)
+
+<img src="man/figures/README-siena-ergm-gof-1.png" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" width="100%" />
+
+### Setting a theme
+
+Note that in the above plots, the same colour scheme and fonts were
+used. They can be easily changed though. `{autograph}` includes a number
+of themes that can be used to style all graphs and plots consistently.
+And it is very easy to set a theme. Just type `stocnet_theme()` to see
+which is the theme currently set, and to get a list of available themes.
+Then enter the chosen theme name in the function to set it. All plots
+created using `{autograph}` functions will then use this theme, until
+you change it again.
+
+``` r
+stocnet_theme()
+(plot(node_degree(ison_karateka)) + 
+plot(tie_betweenness(ison_karateka)))/
+(plot(node_in_regular(ison_southern_women, "e")) + 
+plot(as_matrix(ison_southern_women),
+     membership = node_in_regular(ison_southern_women, "e")))
+```
+
+<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
+
+``` r
+stocnet_theme("ethz")
+(plot(node_degree(ison_karateka)) + 
+plot(tie_betweenness(ison_karateka)))/
+(plot(node_in_regular(ison_southern_women, "e")) + 
+plot(as_matrix(ison_southern_women),
+     membership = node_in_regular(ison_southern_women, "e")))
+```
+
+<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
+
+There are a range of institutional and topical themes available,
+including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf,
+unige, cmu, rainbow, with more on the way. If your institution or
+organisation is not included and you would like it to be, please just
+raise an issue on Github, along with a link to your corporate branding
+or style guide if available, and we will attempt to add it at the next
+opportunity.
+
+In sum, while there is a lot of clever defaults and customisation
+available, all it takes is three simple functions for your
 
 ## Installation
 

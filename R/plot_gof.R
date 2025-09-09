@@ -94,7 +94,7 @@ plot.ag_gof <- function(x, ...){
     ggplot2::geom_line(data = obs, aes(x = name, y = value),
                        group = 1,
                        color = ag_highlight()) +
-    ggplot2::theme_minimal() +
+    ggplot2::theme_minimal(base_family = ag_font()) +
     ggplot2::labs(y = "Statistic", title = main, 
                   x = if(is.null(p_value)) "" else paste("p:", round(p_value, 3), collapse = " "))
 }
@@ -102,7 +102,7 @@ plot.ag_gof <- function(x, ...){
 #' @rdname plot_gof
 #' @family MoNAn
 #' @examples
-#' plot(res_monan_gof)
+#' plot(monan_gof)
 #' @export
 plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
   
@@ -150,14 +150,14 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
 #' @rdname plot_gof
 #' @family RSiena
 #' @examples
-#' plot(res_siena_gof, cumulative = TRUE)
+#' plot(siena_gof, cumulative = TRUE)
 #' @export
 plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   
   args <- list(...)
   if (is.null(args$main)) {
-    statName <- add_spaces(attr(x, "auxiliaryStatisticName"))
-    main = paste("Goodness of Fit of", statName)
+    statName <- tolower(add_spaces(attr(x, "auxiliaryStatisticName")))
+    main = paste("Goodness of fit of", statName)
     if (!attr(x, "joined")) {
       main = paste(main, "Period", period)
     }
@@ -215,7 +215,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
 #'   and `"dist"` (geodesic distance).
 #'   The default is `"deg"`.
 #' @examples
-#' plot(res_ergm_gof, statistic = "espart")
+#' plot(ergm_gof, statistic = "espart")
 #' @export
 plot.gof.ergm <- function(x, cumulative = FALSE, 
                           statistic = c("deg","espart","dist"), ...){

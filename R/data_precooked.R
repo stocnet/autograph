@@ -26,35 +26,41 @@
 #' @usage data(res_manynet_diff)
 "res_manynet_diff"
 
-#' @docType data
-#' @keywords datasets
-#' @rdname made_earlier
-#' @usage data(res_siena_gof)
-"res_siena_gof"
+# RSiena objects ####
 
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_siena_influence)
-"res_siena_influence"
+#' @usage data(siena_gof)
+"siena_gof"
 
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_siena_selection)
-"res_siena_selection"
+#' @usage data(siena_influence)
+"siena_influence"
 
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_monan_traces)
-"res_monan_traces"
+#' @usage data(siena_selection)
+"siena_selection"
+
+# MoNAn objects ####
 
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_monan_gof)
-"res_monan_gof"
+#' @usage data(monan_conv)
+"monan_conv"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(monan_gof)
+"monan_gof"
+
+# ERGM objects ####
 
 #' @docType data
 #' @keywords datasets
@@ -65,5 +71,5 @@
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(res_ergm_gof)
-"res_ergm_gof"
+#' @usage data(ergm_gof)
+"ergm_gof"

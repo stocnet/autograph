@@ -90,9 +90,9 @@ or specify the package when calling the plotting method directly,
 e.g., \code{autograph:::plot.sienaGOF(res_siena_gof)}.
 }
 \examples{
-plot(res_monan_gof)
-plot(res_siena_gof, cumulative = TRUE)
-plot(res_ergm_gof, statistic = "espart")
+plot(monan_gof)
+plot(siena_gof, cumulative = TRUE)
+plot(ergm_gof, statistic = "espart")
 }
 \references{
 Hintze, J. L. and Nelson, R. D. 1998.
@@ -105,8 +105,7 @@ Other MoNAn:
 \code{\link{plot_convergence}}
 
 Other RSiena: 
-\code{\link{plot.influenceTable}()},
-\code{\link{plot.selectionTable}()}
+\code{\link{plot_interp}}
 
 Other ergm: 
 \code{\link{plot_convergence}}
