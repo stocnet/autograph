@@ -234,6 +234,7 @@ set_font_theme <- function(theme){
   # Find first match
   if(any(candidates %in% available_fonts)){
     font_match <- candidates[candidates %in% available_fonts]
+    snet_info("Setting font to {font_match[1]}.")
   } else {
     snet_info("None of the preferred fonts for theme {.emph {theme}},",
               "{candidates}, are available.",
