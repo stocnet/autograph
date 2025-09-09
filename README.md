@@ -201,7 +201,7 @@ plot(as_matrix(ison_southern_women),
 
 There are a range of institutional and topical themes available,
 including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf,
-unige, rainbow, with more on the way. If your institution or
+unige, cmu, rainbow, with more on the way. If your institution or
 organisation is not included and you would like it to be, please just
 raise an issue on Github, along with a link to your corporate branding
 or style guide if available, and we will attempt to add it at the next

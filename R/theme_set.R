@@ -45,7 +45,7 @@ NULL
 
 theme_opts <- c("default", "bw", "crisp", "neon", 
                 "iheid", "ethz", "uzh", "rug", "unibe", 
-                "oxf", "unige",
+                "oxf", "unige", "cmu",
                 "rainbow")
 
 #' @rdname theme_set
@@ -84,6 +84,8 @@ set_stocnet_theme <- stocnet_theme
 set_background_theme <- function(theme){
   if(theme == "neon"){
     options(snet_background = "#070f23")
+  } else if(theme == "cmu"){
+    options(snet_background = "#E4DAC4")
   } else {
     options(snet_background = "#FFFFFF")
   }
@@ -104,6 +106,8 @@ set_highlight_theme <- function(theme){
     options(snet_highlight = c("#002147", "#c09725"))
   } else if(theme == "ethz"){
     options(snet_highlight = c("#6F6F6F", "#0028a5"))
+  } else if(theme == "cmu"){
+    options(snet_highlight = c("#6D6E71", "#C41230"))
   } else if(theme == "crisp"){
     options(snet_highlight = c("#FFFFFA", "#101314"))
   } else if(theme == "bw"){
@@ -136,6 +140,8 @@ set_divergent_theme <- function(theme){
     options(snet_div = c("#FC4C02","#4AC9E3","#A4D233"))
   } else if(theme == "unibe"){
     options(snet_div = c("#8a1e22","#007ea2","#466553"))
+  } else if(theme == "cmu"){
+    options(snet_div = c("#941120","#BCB49E","#182C4B"))
   } else if(theme == "rainbow"){
     options(snet_div = c('#DC050C','#CAE0AB','#882E72'))
   } else {
@@ -157,6 +163,10 @@ set_categorical_theme <- function(theme){
   } else if(theme == "ethz"){
     options(snet_cat = c("#215CAF","#007894","#627313",
                          "#8E6713","#B7352D","#A7117A","#6F6F6F"))
+  } else if(theme == "cmu"){
+    options(snet_cat = c("#EF3A47","#FDB515","#009647",
+                         "#008F91","#043673","#007BC0",
+                         "#1F4C4C","#719F94"))
   } else if(theme == "uzh"){
     options(snet_cat = c("#0028A5","#4AC9E3","#A4D233",
                          "#FFC845","#FC4C02","#BF0D3E",
@@ -228,6 +238,7 @@ set_font_theme <- function(theme){
                        "uzh" = c("Source Sans", "TheSans", "Palatino"),
                        "rug" = c("Arial","Parry","Georgia","Open Sans"),
                        "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
+                       "cmu" = c("Open Sans","Source Serif Pro","Helvetica","Times"),
                        "neon" = "Comic Sans MS"
   )
   
