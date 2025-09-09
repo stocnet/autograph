@@ -1,5 +1,11 @@
 # autograph 0.3.2
 
+
+## Plotting
+
+- Improved `plot.selectionTable()` and `plot.influenceTable()` documentation
+by consolidating them together into one help file
+
 ## Data
 
 - Renamed `res_monan_traces` to `monan_conv`

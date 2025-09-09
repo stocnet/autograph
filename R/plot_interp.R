@@ -1,28 +1,42 @@
-# Selection Tables ####
-
-#' Plotting selection tables
+#' Plotting effects interpretation
+#' @name plot_interp
 #' @description
-#'   These are functions for constructing and presenting selection tables
-#'   for the interpretation of results for network dynamics obtained with 
-#'   the RSiena package.
-#' @author Tom Snijders
-#' @family RSiena
-#' @references Consult also the RSiena manual, Sections 13.1 and 13.3.
+#'   These functions support the interpretation of network and behavior effects
+#'   found in stochastic actor-oriented models.
+#'   They are S3 plotting methods for objects of class "selectionTable"
+#'   or "influenceTable", created using `RSiena::selectionTable()`
+#'   or `RSiena::influenceTable()`, respectively.
+#'   They plot how the evaluation function for selection or influence
+#'   changes based on ego's value and alter's value of some covariate.
+#'   This helps to interpret the effect of that covariate on the network dynamics
+#'   or behavior dynamics, respectively.
+#' @details
+#'   These functions were originally written by Tom Snijders, and adapted
+#'   for use in the `{autograph}` package.
 #' @inheritParams plot.diffusion
-#' @param x An object of class "selectionTable",
-#'   created using `RSiena::selectionTable()`.
-#' @param quad When TRUE (the default), a quadratic function
-#'   (average and total alter) is plotted.
-#'   Use `quad = FALSE` for similarity effects.
+#' @param x An object of class "selectionTable" or "influenceTable",
+#'   created using `RSiena::selectionTable()` or `RSiena::influenceTable()`,
+#'   respectively.
 #' @param separation This can be used to make the curves visually distinguishable
 #'   if they overlap too much without it.
 #'   An advisable value then is, e.g., 0.01.
 #' @importFrom ggplot2 ggplot geom_smooth geom_line geom_point theme_bw
 #' @importFrom stats setNames
-#' @returns A plot showing how the selection evaluation function changes based 
-#'   on ego's value and alter's value of some covariate.
+#' @returns A plot showing how the selection/influence evaluation function 
+#'   changes based on ego's value and alter's value of some covariate.
+NULL
+
+#' @rdname plot_interp
+#' @family RSiena
+#' @author Tom Snijders
+#' @references 
+#'   For plotting selection tables, 
+#'   please consult the RSiena manual, Sections 13.1 and 13.3.
+#' @param quad When TRUE (the default), a quadratic function
+#'   (average and total alter) is plotted.
+#'   Use `quad = FALSE` for similarity effects.
 #' @examples
-#' plot(res_siena_selection)
+#' plot(siena_selection)
 #' @export
 plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 
@@ -83,24 +97,14 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
   ssp
 }
 
-# Influence Tables ####
-
-#' Plotting influence tables
-#' @description
-#'   These are functions for constructing and presenting influence tables
-#'   for the interpretation of results for network and behavior dynamics
-#'   obtained with the RSiena or multiSiena packages.
-#' @author Tom Snijders
+#' @rdname plot_interp
+#' @author Thanks to Steffen Triebel and Rene Veenstra for corrections.
 #' @family RSiena
-#' @references Consult also the RSiena manual, Sections 13.2 and 13.4.
-#'   Gratitude to Steffen Triebel and Rene Veenstra for corrections.
-#' @inheritParams plot.selectionTable
-#' @param x An object of class "influenceTable",
-#'   created using `RSiena::influenceTable()`.
-#' @returns A plot showing how the influence evaluation function changes based 
-#'   on ego's value and alter's value of some covariate.
+#' @references
+#'   For plotting selection tables, 
+#'   please consult the RSiena manual, Sections 13.2 and 13.4.
 #' @examples
-#' plot(res_siena_influence)
+#' plot(siena_influence)
 #' @export
 plot.influenceTable <- function(x, separation=0, ...){
   zselect <- x
