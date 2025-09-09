@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,31 +48,25 @@
           <code><a href="theme_set.html">stocnet_theme()</a></code> <code><a href="theme_set.html">set_stocnet_theme()</a></code>
 
         </dt>
-        <dd>Many themes</dd>
+        <dd>Setting a consistent theme for all plots</dd>
       </dl><dl><dt>
 
-          <code><a href="ag_call.html">ag_base()</a></code> <code><a href="ag_call.html">ag_highlight()</a></code> <code><a href="ag_call.html">ag_positive()</a></code> <code><a href="ag_call.html">ag_negative()</a></code> <code><a href="ag_call.html">ag_qualitative()</a></code> <code><a href="ag_call.html">ag_sequential()</a></code> <code><a href="ag_call.html">ag_divergent()</a></code>
+          <code><a href="ag_call.html">ag_base()</a></code> <code><a href="ag_call.html">ag_highlight()</a></code> <code><a href="ag_call.html">ag_positive()</a></code> <code><a href="ag_call.html">ag_negative()</a></code> <code><a href="ag_call.html">ag_qualitative()</a></code> <code><a href="ag_call.html">ag_sequential()</a></code> <code><a href="ag_call.html">ag_divergent()</a></code> <code><a href="ag_call.html">ag_font()</a></code>
 
         </dt>
         <dd>Consistent palette calls</dd>
       </dl><dl><dt>
 
-          <code><a href="match_color.html">match_color()</a></code>
+          <code><a href="theme_match.html">match_color()</a></code> <code><a href="theme_match.html">is_dark()</a></code>
 
         </dt>
         <dd>Matching colors across palettes</dd>
       </dl><dl><dt>
 
-          <code><a href="theme_themes.html">theme_iheid()</a></code> <code><a href="theme_themes.html">theme_ethz()</a></code> <code><a href="theme_themes.html">theme_uzh()</a></code> <code><a href="theme_themes.html">theme_rug()</a></code>
-
-        </dt>
-        <dd>Many themes</dd>
-      </dl><dl><dt>
-
           <code><a href="theme_scales.html">scale_fill_iheid()</a></code> <code><a href="theme_scales.html">scale_colour_iheid()</a></code> <code><a href="theme_scales.html">scale_color_iheid()</a></code> <code><a href="theme_scales.html">scale_edge_colour_iheid()</a></code> <code><a href="theme_scales.html">scale_edge_color_iheid()</a></code> <code><a href="theme_scales.html">scale_fill_centres()</a></code> <code><a href="theme_scales.html">scale_colour_centres()</a></code> <code><a href="theme_scales.html">scale_color_centres()</a></code> <code><a href="theme_scales.html">scale_edge_colour_centres()</a></code> <code><a href="theme_scales.html">scale_edge_color_centres()</a></code> <code><a href="theme_scales.html">scale_fill_sdgs()</a></code> <code><a href="theme_scales.html">scale_colour_sdgs()</a></code> <code><a href="theme_scales.html">scale_color_sdgs()</a></code> <code><a href="theme_scales.html">scale_edge_colour_sdgs()</a></code> <code><a href="theme_scales.html">scale_edge_color_sdgs()</a></code> <code><a href="theme_scales.html">scale_fill_ethz()</a></code> <code><a href="theme_scales.html">scale_colour_ethz()</a></code> <code><a href="theme_scales.html">scale_color_ethz()</a></code> <code><a href="theme_scales.html">scale_edge_colour_ethz()</a></code> <code><a href="theme_scales.html">scale_edge_color_ethz()</a></code> <code><a href="theme_scales.html">scale_fill_uzh()</a></code> <code><a href="theme_scales.html">scale_colour_uzh()</a></code> <code><a href="theme_scales.html">scale_color_uzh()</a></code> <code><a href="theme_scales.html">scale_edge_colour_uzh()</a></code> <code><a href="theme_scales.html">scale_edge_color_uzh()</a></code> <code><a href="theme_scales.html">scale_fill_rug()</a></code> <code><a href="theme_scales.html">scale_colour_rug()</a></code> <code><a href="theme_scales.html">scale_color_rug()</a></code> <code><a href="theme_scales.html">scale_edge_colour_rug()</a></code> <code><a href="theme_scales.html">scale_edge_color_rug()</a></code>
 
         </dt>
-        <dd>Many scales</dd>
+        <dd>Themed scales for further customization</dd>
       </dl></div><div class="section level2">
       <h2 id="plotting-methods">Plotting methods<a class="anchor" aria-label="anchor" href="#plotting-methods"></a></h2>
 
@@ -134,22 +128,10 @@
         <dd>Plotting diffusion models</dd>
       </dl><dl><dt>
 
-          <code><a href="plot.influenceTable.html">plot(<i>&lt;influenceTable&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plotting influence tables</dd>
-      </dl><dl><dt>
-
           <code><a href="plot.network_test.html">plot(<i>&lt;network_test&gt;</i>)</a></code>
 
         </dt>
         <dd>Plotting methods for CUG and QAP tests</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot.selectionTable.html">plot(<i>&lt;selectionTable&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plotting selection tables</dd>
       </dl><dl><dt>
 
           <code><a href="plot_convergence.html">plot(<i>&lt;ag_conv&gt;</i>)</a></code> <code><a href="plot_convergence.html">plot(<i>&lt;traces.monan&gt;</i>)</a></code> <code><a href="plot_convergence.html">plot(<i>&lt;mcmc.list&gt;</i>)</a></code>
@@ -162,6 +144,12 @@
 
         </dt>
         <dd>Plotting goodness-of-fit results</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_interp.html">plot(<i>&lt;selectionTable&gt;</i>)</a></code> <code><a href="plot_interp.html">plot(<i>&lt;influenceTable&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plotting effects interpretation</dd>
       </dl></div><div class="section level2">
       <h2 id="layouts">Layouts<a class="anchor" aria-label="anchor" href="#layouts"></a></h2>
 
@@ -216,7 +204,7 @@
 
       <dl><dt>
 
-          <code><a href="made_earlier.html">res_migraph_reg</a></code> <code><a href="made_earlier.html">res_migraph_test</a></code> <code><a href="made_earlier.html">res_migraph_diff</a></code> <code><a href="made_earlier.html">res_manynet_diff</a></code> <code><a href="made_earlier.html">res_siena_gof</a></code> <code><a href="made_earlier.html">res_siena_influence</a></code> <code><a href="made_earlier.html">res_siena_selection</a></code> <code><a href="made_earlier.html">res_monan_traces</a></code> <code><a href="made_earlier.html">res_monan_gof</a></code> <code><a href="made_earlier.html">ergm_res</a></code> <code><a href="made_earlier.html">res_ergm_gof</a></code>
+          <code><a href="made_earlier.html">res_migraph_reg</a></code> <code><a href="made_earlier.html">res_migraph_test</a></code> <code><a href="made_earlier.html">res_migraph_diff</a></code> <code><a href="made_earlier.html">res_manynet_diff</a></code> <code><a href="made_earlier.html">siena_gof</a></code> <code><a href="made_earlier.html">siena_influence</a></code> <code><a href="made_earlier.html">siena_selection</a></code> <code><a href="made_earlier.html">monan_conv</a></code> <code><a href="made_earlier.html">monan_gof</a></code> <code><a href="made_earlier.html">ergm_res</a></code> <code><a href="made_earlier.html">ergm_gof</a></code>
 
         </dt>
         <dd>Precooked results for demonstrating plotting</dd>

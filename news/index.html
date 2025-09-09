@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,62 @@
       <small>Source: <a href="https://github.com/stocnet/autograph/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="autograph-040">autograph 0.4.0<a class="anchor" aria-label="anchor" href="#autograph-040"></a></h2>
+<div class="section level3">
+<h3 id="package-0-4-0">Package<a class="anchor" aria-label="anchor" href="#package-0-4-0"></a></h3>
+<ul><li>Fixed DOI in CITATION</li>
+<li>Improved README introduction</li>
+<li>Improved README graphing illustration, including igraph comparison figure</li>
+<li>Improved README plotting illustration, added SAOM/ERGM GOF comparison figure</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-0-4-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-4-0"></a></h3>
+<ul><li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> documentation</li>
+<li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to register a font family for plots<ul><li>A vector of potential fonts is included for some themes</li>
+<li>The first font found on the system will be used, and user notified</li>
+<li>If no fonts are found, the default R font (“sans”) will be used</li>
+<li>A message is printed to inform the user if the default is used, and how to install missing fonts via <code>{extrafont}</code>
+</li>
+</ul></li>
+<li>Added font options for “iheid”, “oxf”, “ethz”, “uzh”, and “rug” themes</li>
+<li>Added <code><a href="../reference/ag_call.html">ag_font()</a></code> for retrieving the registered font family</li>
+<li>Improved <code>match_colors()</code> documentation</li>
+<li>Exported <code><a href="../reference/theme_match.html">is_dark()</a></code> and made it vectorised</li>
+<li>Added <code>match_colors()</code> and <code><a href="../reference/theme_match.html">is_dark()</a></code> tests</li>
+<li>Dropped <code>theme_*()</code> functions in favour of <code><a href="../reference/theme_set.html">stocnet_theme()</a></code>
+</li>
+<li>Dropped <code>theme_*()</code> tests</li>
+<li>Added <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> tests</li>
+<li>Added “cmu” theme for Carnegie Mellon University</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-0-4-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-0-4-0"></a></h3>
+<ul><li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> by using registered fonts where available</li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> by using <code><a href="../reference/ag_call.html">ag_qualitative()</a></code> for discrete colour scales</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-0-4-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-4-0"></a></h3>
+<ul><li>Improved <code><a href="../reference/plot_interp.html">plot.selectionTable()</a></code> and <code><a href="../reference/plot_interp.html">plot.influenceTable()</a></code> documentation by consolidating them together into one help file</li>
+<li>Improved <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>, <code><a href="../reference/plot_gof.html">plot.ag_gof()</a></code>, and plot_interp by using registered fonts where available</li>
+<li>Improved <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code> to use lower case auxiliary statistic description</li>
+</ul></div>
+<div class="section level3">
+<h3 id="data-0-4-0">Data<a class="anchor" aria-label="anchor" href="#data-0-4-0"></a></h3>
+<ul><li>Renamed <code>res_monan_traces</code> to <code>monan_conv</code>
+</li>
+<li>Renamed <code>res_monan_gof</code> to <code>monan_gof</code>
+</li>
+<li>Renamed <code>res_ergm_gof</code> to <code>ergm_gof</code>
+</li>
+<li>Renamed <code>res_siena_gof</code> to <code>siena_gof</code>
+</li>
+<li>Renamed <code>res_siena_influence</code> to <code>siena_influence</code>
+</li>
+<li>Renamed <code>res_siena_selection</code> to <code>siena_selection</code>
+</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.1" id="autograph-031">autograph 0.3.1<a class="anchor" aria-label="anchor" href="#autograph-031"></a></h2>
 <div class="section level3">
@@ -126,8 +182,8 @@
 <h3 id="themes-0-2-0">Themes<a class="anchor" aria-label="anchor" href="#themes-0-2-0"></a></h3>
 <ul><li>Added themes for Oxford and UNIGE (closed <a href="https://github.com/stocnet/autograph/issues/1" class="external-link">#1</a>)</li>
 <li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to add option to “stocnet_theme” (previously “snet_theme”)</li>
-<li>Added <code>is_dark()</code> to check whether a theme is dark or light</li>
-<li>Added <code><a href="../reference/match_color.html">match_color()</a></code> to return closest matching colors from a palette</li>
+<li>Added <code><a href="../reference/theme_match.html">is_dark()</a></code> to check whether a theme is dark or light</li>
+<li>Added <code><a href="../reference/theme_match.html">match_color()</a></code> to return closest matching colors from a palette</li>
 </ul></div>
 <div class="section level3">
 <h3 id="layouts-0-2-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-0-2-0"></a></h3>
@@ -181,7 +237,7 @@
 <ul><li>Added <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> for setting a theme that can then be reused across successive plots (closes <a href="https://github.com/stocnet/autograph/issues/3" class="external-link">#3</a>)<ul><li>For example, <code>stocnet_theme("iheid")</code> for IHEID colour theme</li></ul></li>
 <li>Added <code>ag_*()</code> palettes, for example:<ul><li>
 <code><a href="../reference/ag_call.html">ag_highlight()</a></code> to select the highlight colours of a particular palette</li></ul></li>
-<li>Added <code><a href="../reference/match_color.html">match_color()</a></code> for matching one or more hexcodes to a palette’s offerings</li>
+<li>Added <code><a href="../reference/theme_match.html">match_color()</a></code> for matching one or more hexcodes to a palette’s offerings</li>
 </ul></div>
 <div class="section level3">
 <h3 id="plotting-0-1-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-1-0"></a></h3>
@@ -217,9 +273,9 @@
 </ul></li>
 <li>Added RSiena plot methods<ul><li>Added <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code>
 </li>
-<li>Added <code><a href="../reference/plot.influenceTable.html">plot.influenceTable()</a></code>
+<li>Added <code><a href="../reference/plot_interp.html">plot.influenceTable()</a></code>
 </li>
-<li>Added <code><a href="../reference/plot.selectionTable.html">plot.selectionTable()</a></code>
+<li>Added <code><a href="../reference/plot_interp.html">plot.selectionTable()</a></code>
 </li>
 </ul></li>
 </ul></div>

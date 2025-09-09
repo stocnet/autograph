@@ -31,7 +31,7 @@ it is shown beneath the x-axis."><meta property="og:image" content="https://stoc
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -167,19 +167,18 @@ e.g., <code>autograph:::plot.sienaGOF(res_siena_gof)</code>.</p>
     <div class="dont-index"><p>Other MoNAn:
 <code><a href="plot_convergence.html">plot_convergence</a></code></p>
 <p>Other RSiena:
-<code><a href="plot.influenceTable.html">plot.influenceTable</a>()</code>,
-<code><a href="plot.selectionTable.html">plot.selectionTable</a>()</code></p>
+<code><a href="plot_interp.html">plot_interp</a></code></p>
 <p>Other ergm:
 <code><a href="plot_convergence.html">plot_convergence</a></code></p></div>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_monan_gof</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">monan_gof</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_gof-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_siena_gof</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">siena_gof</span>, cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_gof-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_ergm_gof</span>, statistic <span class="op">=</span> <span class="st">"espart"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ergm_gof</span>, statistic <span class="op">=</span> <span class="st">"espart"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_gof-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
