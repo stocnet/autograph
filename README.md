@@ -65,57 +65,70 @@ your networks, or `plot()` to plot your results. That’s it!
 `{autograph}` includes three one-line graphing functions with sensible
 defaults based on the network’s properties.
 
-### graphr
-
 First, `graphr()` is used to graph networks in any of the `{manynet}`
-formats. It includes sensible defaults so that researchers can view
-their network’s structure or distribution quickly with a minimum of
-fuss. Compare the output from `{autograph}` with a similar default from
+formats. Because it builds upon `{manynet}`, it can graph networks in
+any of the `{manynet}` formats, including `network`, `igraph`, `sna`,
+`tidygraph`, and more.
+
+Second, it includes sensible defaults so that researchers can view their
+network’s structure or distribution quickly with a minimum of fuss.
+Compare the output from `{autograph}` with a similar default from
 `{igraph}`:
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-Here the `{autograph}` function recognises that the network is a
-two-mode network and uses a bipartite layout by default, and recognises
-that the network contains names for the nodes and prints them vertically
-so that they are legible in this layout. Other ‘clever’ features include
-automatic node sizing and more. By contrast, `{igraph}` requires the
-bipartite layout to be specified, has cumbersome node size defaults for
-all but the smallest graphs, and labels also very often need resizing
-and adjustment to avoid overlap. All of `{autograph}`’s adjustments can
-be overridden, however…
+`{igraph}` requires the bipartite layout to be specified, has cumbersome
+node size defaults for all but the smallest graphs, and labels also very
+often need resizing and adjustment to avoid overlap. Getting this
+default plot to look good can take a lot of trial and error, and time.
+By contrast, `graphr()` recognises the network as two-mode and uses a
+bipartite layout by default. It also recognises that the network
+contains names for the nodes and prints them vertically so that they are
+legible in this layout. Other ‘clever’ features include automatic node
+sizing and more.
 
-#### More options
+### More options
 
-Changing the size and colors of nodes and ties is as easy as specifying
-the function’s relevant argument with a replacement, or indicating from
-which attribute it should inherit this information.
+All of `graphr()`’s adjustments can be overridden, however… Changing the
+size and colors of nodes and ties is as easy as specifying the
+function’s relevant argument with a replacement,
+e.g. `node_color = "darkblue"` or `node_size = 6`, or indicating from
+which attribute it should inherit this information,
+e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
-#### More layouts
+Legends are added by default when node or tie aesthetics are mapped to
+attributes, but can be removed with `show_legend = FALSE`. Since the
+`{autograph}` builds upon `{ggplot2}`, titles, subtitles and, for
+plotting, axis labels can all be added on easily, or other elements
+(e.g. font size) can be tweaked for a particular output.
 
-`{autograph}` can use all the layout algorithms offered by packages such
-as `{igraph}`, `{ggraph}`, and `{graphlayouts}`, and offers some
-additional layout algorithms for snapping layouts to a grid, visualising
-partitions horizontally, vertically, or concentrically, or conforming to
-configurational coordinates.
+### More layouts
+
+`graphr()` can use all the layout algorithms offered by packages such as
+`{igraph}`, `{ggraph}`, and `{graphlayouts}`. `{autograph}` also offers
+some additional layout algorithms for visualising partitions
+horizontally, vertically, or concentrically, conforming to
+configurational coordinates, or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
-### graphs
+### More networks
 
-Second, `graphs()` is used to graph multiple networks together, which
-can be useful for ego networks or network panels. `{patchwork}` is used
-to help arrange individual plots together.
+The second graph drawing function included, `graphs()`, is used to graph
+multiple networks together. This can be useful for ego networks or
+network panels. `{patchwork}` is used to help arrange individual plots
+together, and is used throughout the package to help arrange plots
+together informatively.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
-### grapht
+### More time
 
-Third, `grapht()` is used to visualise dynamic networks. It uses
-`{gganimate}` and `{gifski}` to create a gif that visualises network
-changes over time. It really couldn’t be easier.
+The third graph drawing function, `grapht()`, is used to visualise
+dynamic networks. It uses `{gganimate}` and `{gifski}` to create a gif
+that visualises network changes over time. It really couldn’t be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 

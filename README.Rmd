@@ -89,7 +89,7 @@ Compare the output from `{autograph}` with a similar default from `{igraph}`:
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-```{r layout-comparison, echo = FALSE, message=FALSE, dpi = 250, fig.height=4, eval = FALSE}
+```{r layout-comparison, echo = FALSE, message=FALSE, dpi = 250, fig.height=4, fig.width=12, eval=FALSE}
 library(autograph)
 library(igraph)
 library(gridBase)
@@ -102,23 +102,28 @@ plot.new()              ## suggested by @Josh
 vps <- baseViewports()
 pushViewport(vps$figure) ##   I am in the space of the autocorrelation plot
 vp1 <-plotViewport(c(1.8,1,0,1)) ## create new vp with margins, you play with this values 
-p <- graphr(ison_southern_women) + ggtitle("{autograph} twomode")
+p <- graphr(ison_southern_women) + ggtitle("{autograph} twomode") + guides(shape = "none")
 print(p,vp = vp1) 
 ```
 
-Here the `{autograph}` function recognises that the network is a two-mode network
-and uses a bipartite layout by default,
-and recognises that the network contains names for the nodes and
+`{igraph}` requires the bipartite layout to be specified, 
+has cumbersome node size defaults for all but the smallest graphs, 
+and labels also very often need resizing and adjustment to avoid overlap.
+Getting this default plot to look good can take a lot of trial and error, and time.
+By contrast, `graphr()` recognises the network as two-mode 
+and uses a bipartite layout by default.
+It also recognises that the network contains names for the nodes and
 prints them vertically so that they are legible in this layout.
 Other 'clever' features include automatic node sizing and more.
-By contrast, `{igraph}` requires the bipartite layout to be specified, has cumbersome node size defaults for all but the smallest graphs, and labels also very often need resizing and adjustment to avoid overlap.
-All of `{autograph}`'s adjustments can be overridden, however...
 
-#### More options
+### More options
 
+All of `graphr()`'s adjustments can be overridden, however...
 Changing the size and colors of nodes and ties is as easy as 
 specifying the function's relevant argument with a replacement,
-or indicating from which attribute it should inherit this information.
+e.g. `node_color = "darkblue"` or `node_size = 6`,
+or indicating from which attribute it should inherit this information,
+e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
@@ -132,13 +137,18 @@ graphr(mutate(ison_lawfirm, Seniority = Seniority/3), node_color = "Office", nod
   theme(plot.subtitle = element_text(size = 8))
 ```
 
-#### More layouts
+Legends are added by default when node or tie aesthetics are mapped to attributes,
+but can be removed with `show_legend = FALSE`.
+Since the `{autograph}` builds upon `{ggplot2}`, titles, subtitles and, for plotting, axis labels can all be added on easily,
+or other elements (e.g. font size) can be tweaked for a particular output.
 
-`{autograph}` can use all the layout algorithms offered by packages such as `{igraph}`, `{ggraph}`, and `{graphlayouts}`,
-and offers some additional layout algorithms for
-snapping layouts to a grid, 
+### More layouts
+
+`graphr()` can use all the layout algorithms offered by packages such as `{igraph}`, `{ggraph}`, and `{graphlayouts}`.
+`{autograph}` also offers some additional layout algorithms for
 visualising partitions horizontally, vertically, or concentrically,
-or conforming to configurational coordinates.
+conforming to configurational coordinates,
+or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
@@ -148,11 +158,13 @@ or conforming to configurational coordinates.
   (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Quad layout")))
 ```
 
-### graphs
+### More networks
 
-Second, `graphs()` is used to graph multiple networks together,
-which can be useful for ego networks or network panels.
-`{patchwork}` is used to help arrange individual plots together.
+The second graph drawing function included, `graphs()`, 
+is used to graph multiple networks together.
+This can be useful for ego networks or network panels.
+`{patchwork}` is used to help arrange individual plots together,
+and is used throughout the package to help arrange plots together informatively.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
@@ -163,9 +175,10 @@ ison_adolescents %>%
   graphs()
 ```
 
-### grapht
+### More time
 
-Third, `grapht()` is used to visualise dynamic networks.
+The third graph drawing function, `grapht()`, 
+is used to visualise dynamic networks.
 It uses `{gganimate}` and `{gifski}` to create a gif that
 visualises network changes over time.
 It really couldn't be easier.
