@@ -17,12 +17,15 @@
 - Added `ag_font()` for retrieving the registered font family
 - Improved `match_colors()` documentation
 - Exported `is_dark()` and made it vectorised
-- Added tests for `match_colors()` and `is_dark()`
+- Added `match_colors()` and `is_dark()` tests
 - Dropped `theme_*()` functions in favour of `stocnet_theme()`
+- Dropped `theme_*()` tests
+- Added `stocnet_theme()` tests
 
 ## Graphing
 
 - Improved `graphr()` by using registered fonts where available
+- Improved `graphr()` by using `ag_qualitative()` for discrete colour scales
 
 ## Plotting
 

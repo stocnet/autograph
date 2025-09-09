@@ -59,8 +59,8 @@ theme_opts <- c("default", "bw", "crisp", "neon",
 stocnet_theme <- function(theme = NULL){
   if(is.null(theme)){
     theme <- getOption("stocnet_theme", default = "default")
-    snet_info("Theme is set to {.emph {theme}}.")
-    snet_info("The following themes are available: {.emph {theme_opts}}.")
+    snet_info("Theme is currently set to {.emph {theme}}.",
+              "The following themes are available: {.emph {theme_opts}}.")
   } else {
     theme <- tolower(theme)
     if(theme %in% theme_opts){
