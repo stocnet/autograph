@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.4.0" id="autograph-040">autograph 0.4.0<a class="anchor" aria-label="anchor" href="#autograph-040"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.4.1" id="autograph-041">autograph 0.4.1<a class="anchor" aria-label="anchor" href="#autograph-041"></a></h2>
+<div class="section level3">
+<h3 id="package-0-4-1">Package<a class="anchor" aria-label="anchor" href="#package-0-4-1"></a></h3>
+<ul><li>Improved startup message to ignore class</li></ul></div>
+<div class="section level3">
+<h3 id="theming-0-4-1">Theming<a class="anchor" aria-label="anchor" href="#theming-0-4-1"></a></h3>
+<ul><li>Added “iast” theme for the Institute of Advanced Studies, Toulouse</li></ul></div>
+<div class="section level3">
+<h3 id="plotting-0-4-1">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-4-1"></a></h3>
+<ul><li>Improved ergm convergence diagnostic plotting by working on the results object, mostly avoiding startup conflict warning</li>
+<li>Dropped marginal density plot in <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code> to fix <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> v4.0.0-related node overflow issue</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="autograph-040">autograph 0.4.0<a class="anchor" aria-label="anchor" href="#autograph-040"></a></h2><p class="text-muted">CRAN release: 2025-09-10</p>
 <div class="section level3">
 <h3 id="package-0-4-0">Package<a class="anchor" aria-label="anchor" href="#package-0-4-0"></a></h3>
 <ul><li>Fixed DOI in CITATION</li>
@@ -101,12 +115,12 @@
 </ul></li>
 <li>Improved plotting of <code>{MoNAn}</code> trace objects by using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
 </li>
-<li>Added <code><a href="../reference/plot_convergence.html">plot.mcmc.list()</a></code> for plotting MCMC samples from <code><a href="https://rdrr.io/pkg/ergm/man/ergm.html" class="external-link">ergm::ergm</a></code> results objects, using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
+<li>Added <code>plot.mcmc.list()</code> for plotting MCMC samples from <code><a href="https://rdrr.io/pkg/ergm/man/ergm.html" class="external-link">ergm::ergm</a></code> results objects, using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
 </li>
 </ul></div>
 <div class="section level3">
 <h3 id="data-0-3-1">Data<a class="anchor" aria-label="anchor" href="#data-0-3-1"></a></h3>
-<ul><li>Added <code>ergm_res</code> for testing and illustration of <code><a href="../reference/plot_convergence.html">plot.mcmc.list()</a></code>, use <code>ergm_res$sample</code> to access the MCMC sample</li></ul></div>
+<ul><li>Added <code>ergm_res</code> for testing and illustration of <code>plot.mcmc.list()</code>, use <code>ergm_res$sample</code> to access the MCMC sample</li></ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="autograph-030">autograph 0.3.0<a class="anchor" aria-label="anchor" href="#autograph-030"></a></h2>
