@@ -18,9 +18,9 @@ NULL
 #' @rdname plot_convergence
 #' @export
 plot.ag_conv <- function(x, ...){
-  dat <- x
-  trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value), shape = 1, color = ag_base()) + 
-    ggplot2::geom_line() + 
+  dat <- as.data.frame(x)
+  trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value)) + 
+    ggplot2::geom_line(color = ag_base()) + 
     ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
     ggplot2::geom_smooth(formula = y ~ x, method = "loess", se = FALSE, 
                          color = ag_highlight(), linewidth = 0.5) +
@@ -28,13 +28,14 @@ plot.ag_conv <- function(x, ...){
     ggplot2::theme(axis.text.y = element_blank(),
                    strip.text.y.left = element_text(angle = 0)) +
     ggplot2::labs(x = "Simulation step", y = "")
-  density_plot <- ggplot2::ggplot(dat, aes(x = value)) +
-    ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
-    ggplot2::coord_flip() +
-    ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
-    ggplot2::theme_void() +
-    ggplot2::theme(strip.text.y = element_blank())
-  trace_plot + density_plot + patchwork::plot_layout(ncol = 2, widths = c(5, 1))
+  # density_plot <- ggplot2::ggplot(dat, aes(y = value)) +
+  #   ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
+  #   ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") +
+  #   ggplot2::theme_void() +
+  #   ggplot2::theme(strip.text.y = element_blank())
+  # patchwork::wrap_plots(trace_plot, density_plot,
+  #                       ncol = 2, widths = c(5, 1))
+  trace_plot
 }
 
 #' @rdname plot_convergence
@@ -58,16 +59,16 @@ plot.traces.monan <- function(x, ...) {
   # dat <- dat %>% dplyr::mutate(name = gsub("_","\n",name, fixed = TRUE))
   # dat <- dat %>% dplyr::mutate(name = gsub(" ","\n",name, fixed = TRUE))
   class(dat) <- c("ag_conv", class(dat))
-  plot(dat)
+  plot.ag_conv(dat)
 }
 
 #' @rdname plot_convergence
 #' @family ergm
 #' @examples
-#' plot(ergm_res$sample)
+#' plot(ergm_res)
 #' @export
-plot.mcmc.list <- function(x, ...) {
-  dat <- x[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
+plot.ergm <- function(x, ...) {
+  dat <- x$sample[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
     as.data.frame()
   dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
                         direction = "long",
@@ -78,6 +79,6 @@ plot.mcmc.list <- function(x, ...) {
                         idvar = "sim") %>% 
     dplyr::tibble() %>% dplyr::arrange(sim)
   class(dat) <- c("ag_conv", class(dat))
-  plot(dat)
+  plot.ag_conv(dat)
 }
 

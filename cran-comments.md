@@ -9,4 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Fixed CITATION issue in last submission
+- Fixed node overflow issues as reported by CRAN

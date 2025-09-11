@@ -14,7 +14,7 @@ set_stocnet_theme(theme = NULL)
 \item{theme}{String naming a theme.
 By default "default".
 The following themes are currently available:
-default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, rainbow.
+default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, iast, rainbow.
 This string can be capitalised or not.}
 }
 \value{

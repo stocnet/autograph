@@ -13,8 +13,7 @@
   # cran_version <- pkgs[pkgs$Package == "manynet","Version"]
 
   local_version <- utils::packageVersion("autograph")
-  snet_info("You are using {.pkg autograph} version {.version {local_version}}.", 
-                  class = "packageStartupMessage")
+  snet_info("You are using {.pkg autograph} version {.version {local_version}}.")
   old.list <- as.data.frame(utils::old.packages())
   behind_cran <- "autograph" %in% old.list$Package
   
@@ -31,7 +30,7 @@
       # "i" = "You can list all the tutorials available in {.pkg autograph} using {.fn run_tute}, and run them too!",
       "i" = "Discover all the {.emph stocnet} R packages at {.url https://github.com/stocnet/}."
     )
-    snet_info(sample(tips, 1), class = "packageStartupMessage")
+    snet_info(sample(tips, 1))
   }
 
   if (interactive()) {

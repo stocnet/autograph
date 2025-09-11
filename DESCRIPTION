@@ -1,7 +1,7 @@
 Package: autograph
 Title: Automatic Plotting of Many Graphs
-Version: 0.4.0
-Date: 2025-09-09
+Version: 0.4.1
+Date: 2025-09-11
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
    It includes 'ggplot2'-based plot methods for many popular network package classes.
@@ -12,7 +12,7 @@ License: MIT + file LICENSE
 Language: en-GB
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.6.0),
     manynet
