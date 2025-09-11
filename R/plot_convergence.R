@@ -32,14 +32,14 @@ plot.ag_conv <- function(x, ...){
   density_plot <- ggplot2::ggplot(dat, aes(x = value)) +
     ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
     ggplot2::coord_flip() +
-    ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
+    ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "y") +
     ggplot2::theme_void() +
     ggplot2::theme(strip.text.y = element_blank())
-  do.call(patchwork::wrap_plots, c(list(trace_plot, density_plot), 
-                                   list(ncol = 2),
-                                   list(widths = c(5, 1))))
-  # patchwork::wrap_plots(trace_plot, density_plot,
-                        # ncol = 2, widths = c(5, 1))
+  patchwork::wrap_plots(trace_plot, density_plot,
+                        ncol = 2, widths = c(5, 1))
+  # do.call(patchwork::wrap_plots, c(list(trace_plot, density_plot), 
+  #                                  list(ncol = 2),
+  #                                  list(widths = c(5, 1))))
   # trace_plot
 }
 
