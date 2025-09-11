@@ -28,14 +28,15 @@ plot.ag_conv <- function(x, ...){
     ggplot2::theme(axis.text.y = element_blank(),
                    strip.text.y.left = element_text(angle = 0)) +
     ggplot2::labs(x = "Simulation step", y = "")
-  density_plot <- ggplot2::ggplot(dat, aes(x = value)) +
-    ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
-    ggplot2::coord_flip() +
-    ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
-    ggplot2::theme_void() +
-    ggplot2::theme(strip.text.y = element_blank())
-  patchwork::wrap_plots(trace_plot, density_plot,
-                        ncol = 2, widths = c(5, 1))
+  # density_plot <- ggplot2::ggplot(dat, aes(x = value)) +
+  #   ggplot2::geom_density(fill = ag_base(), alpha = 0.6) +
+  #   ggplot2::coord_flip() +
+  #   ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
+  #   ggplot2::theme_void() +
+  #   ggplot2::theme(strip.text.y = element_blank())
+  # patchwork::wrap_plots(trace_plot, density_plot,
+  #                       ncol = 2, widths = c(5, 1))
+  trace_plot
 }
 
 #' @rdname plot_convergence
