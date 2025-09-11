@@ -57,7 +57,7 @@ plot.traces.monan <- function(x, ...) {
     dplyr::tibble() %>% dplyr::arrange(sim)
   # dat <- dat %>% dplyr::mutate(name = gsub("_","\n",name, fixed = TRUE))
   # dat <- dat %>% dplyr::mutate(name = gsub(" ","\n",name, fixed = TRUE))
-  class(dat) <- c("ag_conv", class(dat))
+  class(dat) <- "ag_conv"
   plot(dat)
 }
 
@@ -77,7 +77,7 @@ plot.ergm <- function(x, ...) {
                         times = colnames(dat)[-ncol(dat)],
                         idvar = "sim") %>% 
     dplyr::tibble() %>% dplyr::arrange(sim)
-  class(dat) <- c("ag_conv", class(dat))
+  class(dat) <- "ag_conv"
   plot(dat)
 }
 
