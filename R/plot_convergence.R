@@ -34,8 +34,8 @@ plot.ag_conv <- function(x, ...){
     ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
     ggplot2::theme_void() +
     ggplot2::theme(strip.text.y = element_blank())
-  trace_plot + density_plot + 
-    patchwork::plot_layout(ncol = 2, widths = c(5, 1))
+  patchwork::wrap_plots(trace_plot, density_plot,
+                        ncol = 2, widths = c(5, 1))
 }
 
 #' @rdname plot_convergence
