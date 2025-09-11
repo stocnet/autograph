@@ -45,7 +45,7 @@ NULL
 
 theme_opts <- c("default", "bw", "crisp", "neon", 
                 "iheid", "ethz", "uzh", "rug", "unibe", 
-                "oxf", "unige", "cmu",
+                "oxf", "unige", "cmu", "iast",
                 "rainbow")
 
 #' @rdname theme_set
@@ -108,6 +108,8 @@ set_highlight_theme <- function(theme){
     options(snet_highlight = c("#6F6F6F", "#0028a5"))
   } else if(theme == "cmu"){
     options(snet_highlight = c("#6D6E71", "#C41230"))
+  } else if(theme == "iast"){
+    options(snet_highlight = c("#555", "#e54a37"))
   } else if(theme == "crisp"){
     options(snet_highlight = c("#FFFFFA", "#101314"))
   } else if(theme == "bw"){
@@ -142,6 +144,8 @@ set_divergent_theme <- function(theme){
     options(snet_div = c("#8a1e22","#007ea2","#466553"))
   } else if(theme == "cmu"){
     options(snet_div = c("#941120","#BCB49E","#182C4B"))
+  } else if(theme == "iast"){
+    options(snet_div = c("#e62117","#999","#3b5998"))
   } else if(theme == "rainbow"){
     options(snet_div = c('#DC050C','#CAE0AB','#882E72'))
   } else {
@@ -167,6 +171,13 @@ set_categorical_theme <- function(theme){
     options(snet_cat = c("#EF3A47","#FDB515","#009647",
                          "#008F91","#043673","#007BC0",
                          "#1F4C4C","#719F94"))
+  } else if(theme == "iast"){
+    options(snet_cat = c("#fbda26","#0a0","#9c1a1a",
+                         "#1b870b","#3d86d8","#50e3c2",
+                         "#7ad03d","#fe0087","#e62117",
+                         "#1db6d6","#3b5998","#f58b4c",
+                         "#e9711c","#ff2b46","#d9372f",
+                         "#2fa7d5","#f0c020","#47c965"))
   } else if(theme == "uzh"){
     options(snet_cat = c("#0028A5","#4AC9E3","#A4D233",
                          "#FFC845","#FC4C02","#BF0D3E",
@@ -239,6 +250,7 @@ set_font_theme <- function(theme){
                        "rug" = c("Arial","Parry","Georgia","Open Sans"),
                        "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
                        "cmu" = c("Open Sans","Source Serif Pro","Helvetica","Times"),
+                       "iast" = c("Gogh","Monserrat","Playfair","Roboto","tse"),
                        "neon" = "Comic Sans MS"
   )
   
