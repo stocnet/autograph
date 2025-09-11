@@ -12,7 +12,7 @@
 
 - Improved ergm convergence diagnostic plotting by working on the results object, 
 mostly avoiding startup conflict warning
-- Fixed probable reason for node overflow in `plot.ag_conv()` on Windows and Linux
+- Dropped marginal density plot in `plot.ag_conv()` to fix `{ggplot2}` v4.0.0-related node overflow issue
 
 # autograph 0.4.0
 

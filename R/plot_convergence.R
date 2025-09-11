@@ -19,7 +19,6 @@ NULL
 #' @export
 plot.ag_conv <- function(x, ...){
   dat <- as.data.frame(x)
-  x <- NULL
   trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value)) + 
     ggplot2::geom_line(color = ag_base()) + 
     ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
