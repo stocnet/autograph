@@ -1,3 +1,19 @@
+# autograph 0.4.1
+
+## Package
+
+- Improved startup message to ignore class
+
+## Theming
+
+- Added "iast" theme for the Institute of Advanced Studies, Toulouse
+
+## Plotting
+
+- Improved ergm convergence diagnostic plotting by working on the results object, 
+mostly avoiding startup conflict warning
+- Fixed probable reason for node overflow in `plot.ag_conv()` on Windows and Linux
+
 # autograph 0.4.0
 
 ## Package
