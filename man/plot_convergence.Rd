@@ -4,14 +4,14 @@
 \alias{plot_convergence}
 \alias{plot.ag_conv}
 \alias{plot.traces.monan}
-\alias{plot.mcmc.list}
+\alias{plot.ergm}
 \title{Plotting convergence diagnostics}
 \usage{
 \method{plot}{ag_conv}(x, ...)
 
 \method{plot}{traces.monan}(x, ...)
 
-\method{plot}{mcmc.list}(x, ...)
+\method{plot}{ergm}(x, ...)
 }
 \arguments{
 \item{x}{An object of class "traces.monan".}
@@ -33,7 +33,7 @@ distribution.
 }
 \examples{
 plot(monan_conv)
-plot(ergm_res$sample)
+plot(ergm_res)
 }
 \seealso{
 Other MoNAn: 

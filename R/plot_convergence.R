@@ -64,10 +64,10 @@ plot.traces.monan <- function(x, ...) {
 #' @rdname plot_convergence
 #' @family ergm
 #' @examples
-#' plot(ergm_res$sample)
+#' plot(ergm_res)
 #' @export
-plot.mcmc.list <- function(x, ...) {
-  dat <- x[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
+plot.ergm <- function(x, ...) {
+  dat <- x$sample[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
     as.data.frame()
   dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
                         direction = "long",

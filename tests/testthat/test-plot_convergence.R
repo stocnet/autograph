@@ -4,6 +4,6 @@ test_that("monan diagnostics works", {
 })
 
 test_that("ergm diagnostics works", {
-  p <- plot(ergm_res$sample)
+  p <- plot(ergm_res)
   expect_s3_class(p, "ggplot")  
 })
