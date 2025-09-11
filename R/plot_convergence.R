@@ -35,8 +35,11 @@ plot.ag_conv <- function(x, ...){
     ggplot2::facet_grid(name ~ ., scales = "free_y", switch = "x") +
     ggplot2::theme_void() +
     ggplot2::theme(strip.text.y = element_blank())
-  patchwork::wrap_plots(trace_plot, density_plot,
-                        ncol = 2, widths = c(5, 1))
+  do.call(patchwork::wrap_plots, c(list(trace_plot, density_plot), 
+                                   list(ncol = 2),
+                                   list(widths = c(5, 1))))
+  # patchwork::wrap_plots(trace_plot, density_plot,
+                        # ncol = 2, widths = c(5, 1))
   # trace_plot
 }
 
