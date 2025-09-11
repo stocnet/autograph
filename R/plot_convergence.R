@@ -19,8 +19,8 @@ NULL
 #' @export
 plot.ag_conv <- function(x, ...){
   dat <- x
-  trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value), shape = 1, color = ag_base()) + 
-    ggplot2::geom_line() + 
+  trace_plot <- ggplot2::ggplot(dat, aes(x = sim, y = value)) + 
+    ggplot2::geom_line(color = ag_base()) + 
     ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
     ggplot2::geom_smooth(formula = y ~ x, method = "loess", se = FALSE, 
                          color = ag_highlight(), linewidth = 0.5) +
