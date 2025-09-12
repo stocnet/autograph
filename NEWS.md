@@ -1,3 +1,14 @@
+# autograph 0.4.2
+
+## Plotting
+
+- Fixed node overflow issue and restored marginal density plot in `plot.ag_conv()` by dropping `+.ggplot()`
+
+## Theming
+
+- Added "hwu" theme for Heriot-Watt University
+- Improved highlight and divergent theme setting to use switch
+
 # autograph 0.4.1
 
 ## Package
