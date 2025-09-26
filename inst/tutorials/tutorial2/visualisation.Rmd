@@ -84,7 +84,7 @@ specifying the data and mapping variables to various aesthetic features,
 and then add layers to it using `+` to add further points and lines, 
 but also titles, legends, etc.
 
-The following figure illustrates the difference between these two approaches.
+The following figure illustrates the difference between these two approaches.^[For more on the differences between base and grid graphics, see https://flowingdata.com/2016/03/22/comparing-ggplot2-and-r-base-graphics/.]
 
 ```{r base-vs-gg, exercise = TRUE, fig.show='hold', fig.width=9, fig.height=4}
 plot(mtcars$hp, mtcars$mpg,
@@ -339,6 +339,15 @@ graphr(fict_lotr,
            node_color = "Race") +
   ggplot2::scale_colour_hue()
 ```
+
+At this stage, it is worth noting that not everyone experiences colours in the
+same way.
+Some people are colour-blind, and so it is worth checking that your
+visualisations are accessible to them.^[The [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) and [colorspace](http://colorspace.r-forge.r-project.org/articles/endrainbow.html) packages have excellent vignettes on this.]
+Others are less sensitive to colour distinctions.
+The old trope is that males are less sensitive to colour distinctions:^[Though see https://blog.xkcd.com/2010/05/03/color-survey-results/ for a more nuanced take.]
+
+<img src="http://thedoghousediaries.com/dhdcomics/2010-03-01-12bf011.png" height="500px"/>
 
 ### Grayscale
 
