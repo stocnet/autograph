@@ -236,17 +236,17 @@ graphr <- function(.data, layout, labels = TRUE,
     p <- map_nodes(p, out)
     # Check legends
     if (length(unique(out[["nsize"]])) > 1)
-      p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = "Node Size"))
+      p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = node_size))
     if (length(unique(out[["nshape"]])) > 1) 
       p <- p + ggplot2::guides(shape = ggplot2::guide_legend(
         title = ifelse(manynet::is_twomode(g) & is.null(node_shape), "Node Mode", "Node Shape")))
     if (length(unique(out[["ncolor"]])) > 1){
       if(length(unique(out[["ncolor"]])) == 2){
         p <- p + ggplot2::scale_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
-                                              guide = ggplot2::guide_legend("Node Color"))
+                                              guide = ggplot2::guide_legend(node_color))
       } else {
         p <- p + ggplot2::scale_colour_manual(values = ag_qualitative(length(unique(out[["ncolor"]]))),
-                                              guide = ggplot2::guide_legend("Node Color"))
+                                              guide = ggplot2::guide_legend(node_color))
       }
     }
   }
