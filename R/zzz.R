@@ -19,16 +19,12 @@
   
   greet_startup_cli <- function() {
     tips <- c(
-      "i" = "There are lots of ways to contribute to {.pkg autograph} at {.url https://github.com/stocnet/autograph/}.",
-      "i" = "Please let us know any bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}. It's really helpful!",
+      "i" = "Theming all your graphs and plots is straightforward with `stocnet_theme()`",
+      "i" = "Share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}. It's really helpful!",
       # "i" = "To eliminate package startup messages, use: `suppressPackageStartupMessages(library({.pkg autograph}))`.",
-      "i" = "Changing the theme of all your graphs and plots is straightforward with `stocnet_theme()`",
       # "i" = "If there are too many messages in the console, run `options(manynet_verbosity = 'quiet')`",
-      "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}.",
-      "i" = "We recommend the 'Function Overview' page online to discover new analytic opportunities: {.url https://stocnet.github.io/autograph/reference/index.html}.",
-      # "i" = "Star me at {.url https://github.com/users/follow?target=jhollway}.",
-      # "i" = "You can list all the tutorials available in {.pkg autograph} using {.fn run_tute}, and run them too!",
-      "i" = "Discover all the {.emph stocnet} R packages at {.url https://github.com/stocnet/}."
+      "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}."
+      # "i" = "We recommend the 'Function Overview' page online to discover new analytic opportunities: {.url https://stocnet.github.io/autograph/reference/index.html}.",
     )
     snet_info(sample(tips, 1))
   }
