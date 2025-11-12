@@ -217,12 +217,12 @@ graphr <- function(.data, layout, labels = TRUE,
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
-                                                            "Edge Sign", "Edge Color")))
+                                                            "Edge Sign", edge_color)))
     } else p <- p + ggraph::scale_edge_colour_manual(values = ag_qualitative(length(unique(out[["ecolor"]]))),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
-                                                            "Edge Sign", "Edge Color")))
+                                                            "Edge Sign", edge_color)))
   p
 }
 
