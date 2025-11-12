@@ -1,0 +1,55 @@
+# Consistent palette calls
+
+These functions assist in calling particular parts of a theme's palette.
+For example, `ag_base()` will return the current theme's base or
+background color, and `ag_highlight()` will return the color used in
+that theme to highlight one or more nodes, lines, or such.
+
+Using palettes that are high contrast, aesthetically pleasing, and
+institutionally or thematically consistent is not without its
+challenges.
+
+## Usage
+
+``` r
+ag_base()
+
+ag_highlight()
+
+ag_positive()
+
+ag_negative()
+
+ag_qualitative(number)
+
+ag_sequential(number)
+
+ag_divergent(number)
+
+ag_font()
+```
+
+## Arguments
+
+  - number:
+    
+    Integer of how many category colours to return.
+
+## Value
+
+One or more hexcodes as strings.
+
+## Colour blindness
+
+The default palettes are designed to be colour-blind friendly. There are
+different types of colour-blindness. The most common type, red-green
+colour-blindness, finds it difficult to distinguish between the red and
+green hues used in the [rainbow
+palette](https://colorspace.r-forge.r-project.org/articles/endrainbow.html),
+for instance. Fortunately there are a range of palettes that function
+fairly well for those who . These include the
+[viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+palette (included in the package of the same name), and the ColorBrewer
+palettes (included in the RColorBrewer package). The default palettes in
+`{autograph}` are designed to be colour-blind friendly, but users should
+always check that their visualisations serve their intended audience.
