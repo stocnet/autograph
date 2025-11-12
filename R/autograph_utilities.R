@@ -27,3 +27,10 @@ add_spaces <- function(CamelString) {
   gsub("([a-z])([A-Z])", "\\1 \\2", CamelString)
 }
 
+# Note that we use patchwork and not gridExtra, cowplot, or ggpubr
+# because patchwork is the only one that doesn't mess with ggplot2 themes
+# and aesthetics. It just arranges plots as they are.
+# See https://patchwork.data-imaginists.com/
+# and
+# https://cran.r-project.org/web/packages/patchwork/vignettes/patchwork.html
+
