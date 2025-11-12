@@ -82,3 +82,39 @@ ag_font <- function(){
   getOption("snet_font", default = "sans")
 }
 
+ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
+  n <- length(colors)
+  angles <- seq(0, 2*pi, length.out = n + 1) + init.angle * pi/180
+  
+  # Data for slices
+  slices <- lapply(seq_len(n), function(i) {
+    theta <- seq(angles[i], angles[i+1], length.out = 100)
+    data.frame(
+      x = c(0, cos(theta)),
+      y = c(0, sin(theta)),
+      color = colors[i],
+      group = i
+    )
+  }) %>% dplyr::bind_rows()
+  
+  # Label positions
+  mids <- (angles[-1] + angles[-(n+1)]) / 2
+  labels <- data.frame(
+    x = 1.1 * cos(mids),
+    y = 1.1 * sin(mids),
+    label = colors
+  )
+  
+  # Label color choice
+  labels$labcol <- ag_base()
+  
+  ggplot2::ggplot() +
+    ggplot2::geom_polygon(data = slices, aes(x, y, group = group, fill = color), 
+                          color = "white") +
+    ggplot2::geom_text(data = labels, aes(x, y, label = label, color = labcol), 
+                       size = cex) +
+    ggplot2::scale_fill_identity() +
+    ggplot2::scale_color_identity() +
+    ggplot2::coord_equal() +
+    ggplot2::theme_void()
+}
