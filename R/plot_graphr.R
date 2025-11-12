@@ -91,7 +91,7 @@
 #' @importFrom ggraph geom_edge_link geom_node_text geom_conn_bundle
 #'   get_con geom_node_point scale_edge_width_continuous geom_node_label
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
-#' @importFrom tidygraph mutate activate
+#' @importFrom tidygraph activate
 #' @examples
 #' graphr(ison_adolescents)
 #' ison_adolescents %>%
@@ -217,12 +217,12 @@ graphr <- function(.data, layout, labels = TRUE,
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
-                                                            "Edge Sign", "Edge Color")))
+                                                            "Edge Sign", edge_color)))
     } else p <- p + ggraph::scale_edge_colour_manual(values = ag_qualitative(length(unique(out[["ecolor"]]))),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
-                                                            "Edge Sign", "Edge Color")))
+                                                            "Edge Sign", edge_color)))
   p
 }
 
@@ -236,17 +236,17 @@ graphr <- function(.data, layout, labels = TRUE,
     p <- map_nodes(p, out)
     # Check legends
     if (length(unique(out[["nsize"]])) > 1)
-      p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = "Node Size"))
+      p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = node_size))
     if (length(unique(out[["nshape"]])) > 1) 
       p <- p + ggplot2::guides(shape = ggplot2::guide_legend(
         title = ifelse(manynet::is_twomode(g) & is.null(node_shape), "Node Mode", "Node Shape")))
     if (length(unique(out[["ncolor"]])) > 1){
       if(length(unique(out[["ncolor"]])) == 2){
         p <- p + ggplot2::scale_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
-                                              guide = ggplot2::guide_legend("Node Color"))
+                                              guide = ggplot2::guide_legend(node_color))
       } else {
         p <- p + ggplot2::scale_colour_manual(values = ag_qualitative(length(unique(out[["ncolor"]]))),
-                                              guide = ggplot2::guide_legend("Node Color"))
+                                              guide = ggplot2::guide_legend(node_color))
       }
     }
   }

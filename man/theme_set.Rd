@@ -14,7 +14,7 @@ set_stocnet_theme(theme = NULL)
 \item{theme}{String naming a theme.
 By default "default".
 The following themes are currently available:
-default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, iast, rainbow.
+default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, iast, hwu, rainbow.
 This string can be capitalised or not.}
 }
 \value{
@@ -55,6 +55,17 @@ If none of the preferred fonts are available, a sans-serif font is used.
 If you receive a warning about a missing font when setting a theme,
 try installing one of the preferred fonts or make sure that the font is
 available to R using \code{extrafont::font_import()} and \code{extrafont::loadfont()}
+}
+
+\section{Custom}{
+
+If you have specific needs or preferences, you can
+set your own palettes or overwrite part of an existing one using \code{options()}.
+For example, to set a custom base color, you can use:
+\code{options(snet_highlight = c("#1b9e77", "#d95f02", "#7570b3"))}.
+This will set a custom highlight color palette.
+Similarly, you can set \code{snet_div} for divergent palettes
+and \code{snet_cat} for categorical palettes.
 }
 
 \examples{

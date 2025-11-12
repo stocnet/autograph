@@ -34,6 +34,14 @@
 #'   If you receive a warning about a missing font when setting a theme, 
 #'   try installing one of the preferred fonts or make sure that the font is
 #'   available to R using `extrafont::font_import()` and `extrafont::loadfont()`
+#' @section Custom: 
+#'   If you have specific needs or preferences, you can
+#'   set your own palettes or overwrite part of an existing one using `options()`.
+#'   For example, to set a custom base color, you can use:
+#'   `options(snet_highlight = c("#1b9e77", "#d95f02", "#7570b3"))`.
+#'   This will set a custom highlight color palette.
+#'   Similarly, you can set `snet_div` for divergent palettes
+#'   and `snet_cat` for categorical palettes.
 #' @returns This function sets the theme and palette(s) to be used across all
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
@@ -45,7 +53,7 @@ NULL
 
 theme_opts <- c("default", "bw", "crisp", "neon", 
                 "iheid", "ethz", "uzh", "rug", "unibe", 
-                "oxf", "unige", "cmu", "iast",
+                "oxf", "unige", "cmu", "iast", "hwu",
                 "rainbow")
 
 #' @rdname theme_set
@@ -92,35 +100,23 @@ set_background_theme <- function(theme){
 }
 
 set_highlight_theme <- function(theme){
-  if(theme == "iheid"){
-    options(snet_highlight = c("#000010","#E20020"))
-  } else if(theme == "unige"){
-    options(snet_highlight = c("#A3A3A3","#CF0063"))
-  } else if(theme == "rug"){
-    options(snet_highlight = c("#000000", "#dc002d"))
-  } else if(theme == "uzh"){
-    options(snet_highlight = c("#a3adb7", "#dc6027"))
-  } else if(theme == "unibe"){
-    options(snet_highlight = c("#121212", "#e4003c"))
-  } else if(theme == "oxf"){
-    options(snet_highlight = c("#002147", "#c09725"))
-  } else if(theme == "ethz"){
-    options(snet_highlight = c("#6F6F6F", "#0028a5"))
-  } else if(theme == "cmu"){
-    options(snet_highlight = c("#6D6E71", "#C41230"))
-  } else if(theme == "iast"){
-    options(snet_highlight = c("#555", "#e54a37"))
-  } else if(theme == "crisp"){
-    options(snet_highlight = c("#FFFFFA", "#101314"))
-  } else if(theme == "bw"){
-    options(snet_highlight = c("#CCCCCC", "#000000"))
-  } else if(theme == "neon"){
-    options(snet_highlight = c("#5aeafd", "#54fe4b"))
-  } else if(theme == "rainbow"){
-    options(snet_highlight = c('#1965B0', '#DC050C'))
-  } else {
-    options(snet_highlight = c("#4576B5", "#D83127"))
-  }
+  hl <- switch(theme,
+               "iheid" = c("#000010","#E20020"),
+               "unige" = c("#A3A3A3","#CF0063"),
+               "rug" = c("#000000", "#dc002d"),
+               "uzh" = c("#a3adb7", "#dc6027"),
+               "unibe" = c("#121212", "#e4003c"),
+               "oxf" = c("#002147", "#c09725"),
+               "ethz" = c("#6F6F6F", "#0028a5"),
+               "cmu" = c("#6D6E71", "#C41230"),
+               "iast" = c("#555", "#e54a37"),
+               "hwu" = c("#0A3E65", "#0095DB"),
+               "crisp" = c("#bfbfbf", "#101314"),
+               "bw" = c("#CCCCCC", "#000000"),
+               "neon" = c("#5aeafd", "#54fe4b"),
+               "rainbow" = c('#1965B0', '#DC050C'),
+               c("#4576B5", "#D83127"))
+  options(snet_highlight = hl)
 }
 
 # "#E20020" - IHEID red
@@ -132,25 +128,20 @@ set_highlight_theme <- function(theme){
 # "#679289" - viridian
 
 set_divergent_theme <- function(theme){
-  if(theme == "bw"){
-    options(snet_div = c("black","grey","white"))
-  } else if(theme == "iheid"){
-    options(snet_div = c("#820C2B","#006EAA","#006564"))
-  } else if(theme == "ethz"){
-    options(snet_div = c("#B7352D","#007894","#627313"))
-  } else if(theme == "uzh"){
-    options(snet_div = c("#FC4C02","#4AC9E3","#A4D233"))
-  } else if(theme == "unibe"){
-    options(snet_div = c("#8a1e22","#007ea2","#466553"))
-  } else if(theme == "cmu"){
-    options(snet_div = c("#941120","#BCB49E","#182C4B"))
-  } else if(theme == "iast"){
-    options(snet_div = c("#e62117","#999","#3b5998"))
-  } else if(theme == "rainbow"){
-    options(snet_div = c('#DC050C','#CAE0AB','#882E72'))
-  } else {
-    options(snet_div = c("#d73027","white","#4575b4"))
-  }
+  dv <- switch(theme,
+               "iheid" = c("#820C2B","#006EAA","#006564"),
+               "unige" = c("#0067C5","white","#F42941"),
+               "ethz" = c("#B7352D","#007894","#627313"),
+               "uzh" = c("#FC4C02","#4AC9E3","#A4D233"),
+               "unibe" = c("#8a1e22","#007ea2","#466553"),
+               "oxf" = c('#426A5A', 'white', '#ED9390'),
+               "cmu" = c("#941120","#BCB49E","#182C4B"),
+               "iast" = c("#e62117","#999","#3b5998"),
+               "hwu" = c("#D32D5C","#6A5B49","#0A3E65"),
+               "bw" = c("black","grey","white"),
+               "rainbow" = c('#DC050C','#CAE0AB','#882E72'),
+               c("#d73027","white","#4575b4"))
+    options(snet_div = dv)
 }
 
 set_categorical_theme <- function(theme){
@@ -178,6 +169,13 @@ set_categorical_theme <- function(theme){
                          "#1db6d6","#3b5998","#f58b4c",
                          "#e9711c","#ff2b46","#d9372f",
                          "#2fa7d5","#f0c020","#47c965"))
+  } else if(theme == "hwu"){
+    options(snet_cat = c("#342B20","#6A5B49","#947F68","#F7D6A8",
+                         "#1A4323","#2C642C","#BBC33E","#D3E3BE",
+                         "#5C1F0A","#B25A22","#E38C33","#F5D1A7",
+                         "#921E3F","#D32D5C","#DD7488","#E59CBB",
+                         "#490C3B","#782066","#B84E8F","#D9AACA",
+                         "#031B39","#0A3E65","#0095DB","#C4CEDE"))
   } else if(theme == "uzh"){
     options(snet_cat = c("#0028A5","#4AC9E3","#A4D233",
                          "#FFC845","#FC4C02","#BF0D3E",
@@ -251,6 +249,7 @@ set_font_theme <- function(theme){
                        "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
                        "cmu" = c("Open Sans","Source Serif Pro","Helvetica","Times"),
                        "iast" = c("Gogh","Monserrat","Playfair","Roboto","tse"),
+                       "hwu" = c("Univers LT Pro","Baskerville BT","Arial"),
                        "neon" = "Comic Sans MS"
   )
   

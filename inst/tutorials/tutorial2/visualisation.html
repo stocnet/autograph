@@ -175,7 +175,8 @@ variables to various aesthetic features, and then add layers to it using
 <code>+</code> to add further points and lines, but also titles,
 legends, etc.</p>
 <p>The following figure illustrates the difference between these two
-approaches.</p>
+approaches.<a href="#section-fn2" class="footnote-ref"
+id="section-fnref2"><sup>2</sup></a></p>
 <div class="tutorial-exercise" data-label="base-vs-gg"
 data-completion="1" data-diagnostics="1" data-startover="1"
 data-lines="0" data-pipe="|&gt;">
@@ -199,6 +200,11 @@ ggplot(mtcars, aes(x = hp, y = mpg)) +
 the Grammar of Graphics (<a href="https://doi.org/10.1007/0-387-28695-0"
 class="uri">https://doi.org/10.1007/0-387-28695-0</a>).<a
 href="#section-fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="section-fn2"><p>For more on the differences between base and
+grid graphics, see <a
+href="https://flowingdata.com/2016/03/22/comparing-ggplot2-and-r-base-graphics/"
+class="uri">https://flowingdata.com/2016/03/22/comparing-ggplot2-and-r-base-graphics/</a>.<a
+href="#section-fnref2" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 </div>
@@ -214,8 +220,8 @@ both build upon the ‘base’ R graphics engine,</li>
 href="https://www.r-bloggers.com/2016/03/ggnetwork-network-geometries-for-ggplot2/"><code>{ggnetwork}</code></a>
 and <a
 href="https://ggraph.data-imaginist.com/index.html"><code>{ggraph}</code></a>
-build upon a ‘grid’ approach.<a href="#section-fn2" class="footnote-ref"
-id="section-fnref2"><sup>2</sup></a></li>
+build upon a ‘grid’ approach.<a href="#section-fn3" class="footnote-ref"
+id="section-fnref3"><sup>3</sup></a></li>
 </ul>
 <p>In this tutorial, we’re going to use the <code>fict_lotr</code>
 dataset from the <code>{manynet}</code> package. Let’s see how this
@@ -236,8 +242,8 @@ ggraph::ggraph(as_tidygraph(fict_lotr)) +
 <p>We can see here that <code>{igraph}</code> plots the network in a
 fairly basic way, straight to the plotting device (window). By default,
 it uses a force-directed layout (see Layouts below),<a
-href="#section-fn3" class="footnote-ref"
-id="section-fnref3"><sup>3</sup></a> colors the nodes orange, and prints
+href="#section-fn4" class="footnote-ref"
+id="section-fnref4"><sup>4</sup></a> colors the nodes orange, and prints
 node labels if they have them. However, the layout is not optimised for
 the size of the plotting window, the node labels are regularly
 overlapping, and the orange color with black borders is not particularly
@@ -253,8 +259,8 @@ would also require additional lines. It works with ‘tidygraph’ objects,
 which are an additional layer on top of ‘igraph’ objects.</p>
 <div class="footnotes footnotes-end-of-section">
 <hr />
-<ol start="2">
-<li id="section-fn2"><p> Others include: ‘Networkly’ for creating 2-D
+<ol start="3">
+<li id="section-fn3"><p> Others include: ‘Networkly’ for creating 2-D
 and 3-D interactive networks that can be rendered with plotly and can be
 easily integrated into shiny apps or markdown documents; ‘visNetwork’
 interacts with javascript (vis.js) to make interactive networks (<a
@@ -264,9 +270,9 @@ class="uri">http://datastorm-open.github.io/visNetwork/</a>); and
 (<a
 href="https://www.r-bloggers.com/2016/10/network-visualization-part-6-d3-and-r-networkd3/"
 class="uri">https://www.r-bloggers.com/2016/10/network-visualization-part-6-d3-and-r-networkd3/</a>).<a
-href="#section-fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="section-fn3"><p>Which incidentally returns a different layout
-each time it is run.<a href="#section-fnref3"
+href="#section-fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="section-fn4"><p>Which incidentally returns a different layout
+each time it is run.<a href="#section-fnref4"
 class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
@@ -388,15 +394,15 @@ graphr(fict_lotr, node_shape = &quot;Race&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>We can see here that there are six different races present here.<a
-href="#section-fn4" class="footnote-ref"
-id="section-fnref4"><sup>4</sup></a> Unfortunately, this is a few too
+href="#section-fn5" class="footnote-ref"
+id="section-fnref5"><sup>5</sup></a> Unfortunately, this is a few too
 many different categories to be effectively distinguished by shape.</p>
 <div class="footnotes footnotes-end-of-section">
 <hr />
-<ol start="4">
-<li id="section-fn4"><p> Though the keen-eyed and well-read among you
+<ol start="5">
+<li id="section-fn5"><p> Though the keen-eyed and well-read among you
 will have noticed that there are some racial assignments that are
-debatable.<a href="#section-fnref4" class="footnote-back">↩︎</a></p></li>
+debatable.<a href="#section-fnref5" class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 </div>
@@ -518,6 +524,31 @@ graphr(fict_lotr,
            node_color = &quot;Race&quot;) +
   ggplot2::scale_colour_hue()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<p>At this stage, it is worth noting that not everyone experiences
+colours in the same way. Some people are colour-blind, and so it is
+worth checking that your visualisations are accessible to them.<a
+href="#section-fn6" class="footnote-ref"
+id="section-fnref6"><sup>6</sup></a> Others are less sensitive to colour
+distinctions. The old trope is that males are less sensitive to colour
+distinctions:<a href="#section-fn7" class="footnote-ref"
+id="section-fnref7"><sup>7</sup></a></p>
+<p><img src="http://thedoghousediaries.com/dhdcomics/2010-03-01-12bf011.png" height="500px"/></p>
+<div class="footnotes footnotes-end-of-section">
+<hr />
+<ol start="6">
+<li id="section-fn6"><p>The <a
+href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">viridis</a>
+and <a
+href="http://colorspace.r-forge.r-project.org/articles/endrainbow.html">colorspace</a>
+packages have excellent vignettes on this.<a href="#section-fnref6"
+class="footnote-back">↩︎</a></p></li>
+<li id="section-fn7"><p>Though see <a
+href="https://blog.xkcd.com/2010/05/03/color-survey-results/"
+class="uri">https://blog.xkcd.com/2010/05/03/color-survey-results/</a>
+for a more nuanced take.<a href="#section-fnref7"
+class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 </div>
 <div id="section-grayscale" class="section level3">
@@ -1757,11 +1788,11 @@ learnr:::store_exercise_cache(structure(list(label = "forcedir", global_setup = 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "layoutinterp-Q", 
     question = structure("Can we interpret the distance between nodes in force-directed layouts conclusively?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_8b5bcda", 
+    "character")), answers = list(structure(list(id = "lnr_ans_33a08e6", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right, they are illustrative and not to be used for hard conclusions.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_19e6f74", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_862c5d3", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
     "tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
@@ -1772,7 +1803,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "layoutinterp-Q-answer", question = "layoutinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 1083174617.49561, options = list()), class = c("learnr_radio", 
+    seed = 1884256885.12257, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
@@ -1983,10 +2014,10 @@ learnr:::store_exercise_cache(structure(list(label = "mds", global_setup = struc
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "spectralinterp-Q", 
     question = structure("Can we interpret the distance between nodes in spectral layouts?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_7d014f3", 
+    "character")), answers = list(structure(list(id = "lnr_ans_95a7fad", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = NULL, type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_78e32d", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_bdeffa0", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right, though it is not always easy to do so…", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -1998,7 +2029,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "spectralinterp-Q-answer", question = "spectralinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 1951527411.59125, options = list()), class = c("learnr_radio", 
+    seed = 425189515.802006, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
  
@@ -2261,7 +2292,7 @@ learnr:::store_exercise_cache(structure(list(label = "plotexamples", global_setu
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91]}},"value":[{"type":"character","attributes":{},"value":["autograph","backports","base","bslib","cachem","checkmate","cli","coda","codetools","commonmark","compiler","datasets","digest","dplyr","ellipsis","evaluate","farver","fastmap","fontawesome","furrr","future","generics","ggdendro","ggforce","ggplot2","ggraph","ggrepel","globals","glue","graphics","graphlayouts","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","igraph","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","listenv","litedown","magrittr","manynet","markdown","MASS","memoise","methods","migraph","mime","network","parallel","parallelly","patchwork","pillar","pkgconfig","polyclip","promises","purrr","R6","RColorBrewer","Rcpp","rlang","rmarkdown","rprojroot","rstudioapi","sass","scales","shiny","statnet.common","stats","tibble","tidygraph","tidyr","tidyselect","tools","tweenr","utils","vctrs","viridis","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.3.0","1.5.0","4.5.1","0.9.0","1.1.0","2.3.2","3.6.5","0.19-4.1","0.2-20","2.0.0","4.5.1","4.5.1","0.6.37","1.1.4","0.3.2","1.0.4","2.1.2","1.2.0","0.5.3","0.3.1","1.67.0","0.1.4","0.2.0","0.5.0","3.5.2","2.2.1","0.9.6","0.18.0","1.8.0","4.5.1","1.2.2","4.5.1","4.5.1","2.3","0.3.6","0.5.8.1","1.6.4","1.6.16","2.1.4","0.1.4","2.0.0","1.50","1.4.2","0.22-7","0.11.5","1.0.4","0.9.1","0.7","2.0.3","1.6.0","2.0","7.3-65","2.0.1","4.5.1","1.5.1","0.13","1.19.0","4.5.1","1.45.1","1.3.1","1.11.0","2.0.3","1.10-7","1.3.3","1.1.0","2.6.1","1.1-3","1.1.0","1.1.6","2.29","2.1.0","0.17.1","0.4.10","1.4.0","1.11.1","4.12.0","4.5.1","3.3.0","1.3.1","1.3.1","1.2.1","4.5.1","2.0.3","4.5.1","0.6.5","0.6.5","0.4.2","3.0.2","0.52","1.8-4","2.3.10"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92]}},"value":[{"type":"character","attributes":{},"value":["autograph","backports","base","bslib","cachem","checkmate","cli","coda","codetools","commonmark","compiler","datasets","digest","dplyr","ellipsis","evaluate","farver","fastmap","fontawesome","furrr","future","generics","ggdendro","ggforce","ggplot2","ggraph","ggrepel","globals","glue","graphics","graphlayouts","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","igraph","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","listenv","litedown","magrittr","manynet","markdown","MASS","memoise","methods","migraph","mime","network","parallel","parallelly","patchwork","pillar","pkgconfig","polyclip","promises","purrr","R6","RColorBrewer","Rcpp","rlang","rmarkdown","rprojroot","rstudioapi","S7","sass","scales","shiny","statnet.common","stats","tibble","tidygraph","tidyr","tidyselect","tools","tweenr","utils","vctrs","viridis","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.4.1","1.5.0","4.5.1","0.9.0","1.1.0","2.3.3","3.6.5","0.19-4.1","0.2-20","2.0.0","4.5.1","4.5.1","0.6.37","1.1.4","0.3.2","1.0.5","2.1.2","1.2.0","0.5.3","0.3.1","1.67.0","0.1.4","0.2.0","0.5.0","4.0.0","2.2.2","0.9.6","0.18.0","1.8.0","4.5.1","1.2.2","4.5.1","4.5.1","2.3","0.3.6","0.5.8.1","1.6.4","1.6.16","2.1.4","0.1.4","2.0.0","1.50","1.4.4","0.22-7","0.11.5","1.0.4","0.9.1","0.7","2.0.4","1.6.1","2.0","7.3-65","2.0.1","4.5.1","1.5.1","0.13","1.19.0","4.5.1","1.45.1","1.3.2","1.11.1","2.0.3","1.10-7","1.3.3","1.1.0","2.6.1","1.1-3","1.1.0","1.1.6","2.29","2.1.1","0.17.1","0.2.0","0.4.10","1.4.0","1.11.1","4.12.0","4.5.1","3.3.0","1.3.1","1.3.1","1.2.1","4.5.1","2.0.3","4.5.1","0.6.5","0.6.5","0.4.2","3.0.2","0.53","1.8-4","2.3.10"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

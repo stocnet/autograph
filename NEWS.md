@@ -1,3 +1,21 @@
+# autograph 0.4.2
+
+## Package
+
+- Added ggpizzas to README
+
+## Plotting
+
+- Fixed node overflow issue and restored marginal density plot in `plot.ag_conv()` by dropping `+.ggplot()`
+- Added automatic legend labelling where node_size or node_color or edge_color is given
+
+## Theming
+
+- Added "hwu" theme for Heriot-Watt University
+- Improved highlight and divergent theme setting to use switch
+- Added some discussion about colour-blindedness to palettes documentation and viz tute
+- Added some instruction on how to customise themes more specifically
+
 # autograph 0.4.1
 
 ## Package

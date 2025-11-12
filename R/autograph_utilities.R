@@ -19,24 +19,6 @@ thisRequiresBio <- function(pkgname) {
     }}
 }
 
-#' Add ggplot objects together
-#' @description
-#' This function allows you to add ggplot objects together using the `+` operator.
-#' This is made possible by the `{patchwork}` package.
-#' This is useful for combining multiple plots into a single figure.
-#' @param e1,e2 ggplot objects
-#' @param ... Other arguments passed to `patchwork::wrap_plots()`.
-#' @noRd
-#' @export
-`+.ggplot` <- function(e1, e2, ...) {
-  if (inherits(e2, c("ggplot", "ggplot2::ggplot"))) {
-    thisRequires("patchwork")
-    patchwork::wrap_plots(e1, e2, ...)
-  } else {
-    NextMethod()
-  }
-}
-
 seq_nodes <- function(.data){
   seq.int(manynet::net_nodes(.data))
 }
@@ -44,4 +26,11 @@ seq_nodes <- function(.data){
 add_spaces <- function(CamelString) {
   gsub("([a-z])([A-Z])", "\\1 \\2", CamelString)
 }
+
+# Note that we use patchwork and not gridExtra, cowplot, or ggpubr
+# because patchwork is the only one that doesn't mess with ggplot2 themes
+# and aesthetics. It just arranges plots as they are.
+# See https://patchwork.data-imaginists.com/
+# and
+# https://cran.r-project.org/web/packages/patchwork/vignettes/patchwork.html
 
