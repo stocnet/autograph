@@ -57,6 +57,17 @@ try installing one of the preferred fonts or make sure that the font is
 available to R using \code{extrafont::font_import()} and \code{extrafont::loadfont()}
 }
 
+\section{Custom}{
+
+If you have specific needs or preferences, you can
+set your own palettes or overwrite part of an existing one using \code{options()}.
+For example, to set a custom base color, you can use:
+\code{options(snet_highlight = c("#1b9e77", "#d95f02", "#7570b3"))}.
+This will set a custom highlight color palette.
+Similarly, you can set \code{snet_div} for divergent palettes
+and \code{snet_cat} for categorical palettes.
+}
+
 \examples{
 stocnet_theme("default")
 plot(manynet::node_degree(ison_karateka))

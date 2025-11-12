@@ -34,6 +34,14 @@
 #'   If you receive a warning about a missing font when setting a theme, 
 #'   try installing one of the preferred fonts or make sure that the font is
 #'   available to R using `extrafont::font_import()` and `extrafont::loadfont()`
+#' @section Custom: 
+#'   If you have specific needs or preferences, you can
+#'   set your own palettes or overwrite part of an existing one using `options()`.
+#'   For example, to set a custom base color, you can use:
+#'   `options(snet_highlight = c("#1b9e77", "#d95f02", "#7570b3"))`.
+#'   This will set a custom highlight color palette.
+#'   Similarly, you can set `snet_div` for divergent palettes
+#'   and `snet_cat` for categorical palettes.
 #' @returns This function sets the theme and palette(s) to be used across all
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
