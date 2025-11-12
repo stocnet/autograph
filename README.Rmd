@@ -254,6 +254,30 @@ plot(as_matrix(ison_southern_women),
 There are a range of institutional and topical themes available,
 including `r autograph:::theme_opts`,
 with more on the way.
+
+```{r theme-opts, echo=FALSE, dpi = 300, fig.height=3, fig.width=8, fig.alt="Institutional themes"}
+set_stocnet_theme("iheid")
+ai <- autograph:::ggpizza(ag_qualitative()) + ggtitle("IHEID") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+set_stocnet_theme("uzh")
+au <- autograph:::ggpizza(ag_qualitative(18)) + ggtitle("UZH") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+set_stocnet_theme("ethz")
+ae <- autograph:::ggpizza(ag_qualitative()) + ggtitle("ETHZ") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+set_stocnet_theme("rug")
+ar <- autograph:::ggpizza(ag_qualitative()) + ggtitle("RUG") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+set_stocnet_theme("iast")
+as <- autograph:::ggpizza(ag_qualitative()) + ggtitle("IAST") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+set_stocnet_theme("cmu")
+ac <- autograph:::ggpizza(ag_qualitative()) + ggtitle("CMU") + 
+  theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
+ai | au | ae
+ar | as | ac
+```
+
 If your institution or organisation is not included and you would like it to be,
 please just raise an issue on Github, 
 along with a link to your corporate branding or style guide if available,
