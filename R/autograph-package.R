@@ -11,4 +11,4 @@
 utils::globalVariables(c(".data", "obs", "valter","select","ego","zego","alter",
                          "from","to","weight","unit","Step","Freq","Var1","n",
                          "density","wave","period","name","value","sim","time",
-                         "q05","q95"))
+                         "q05","q95","color","group","label","x","y"))
