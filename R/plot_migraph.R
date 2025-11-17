@@ -97,7 +97,9 @@ plot.netlm <- function(x, ...){
   distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
   distrib$name <- factor(distrib$name, x$names)
   ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
-    ggplot2::geom_violin(draw_quantiles = c(0.025, 0.975)) + 
+    ggplot2::geom_violin(quantile.color = ag_base(),
+                         quantile.linetype = "solid", 
+                         quantiles = c(0.025, 0.975)) + 
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
@@ -126,7 +128,9 @@ plot.netlogit <- function(x, ...){
   distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
   distrib$name <- factor(distrib$name, x$names)
   ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
-    ggplot2::geom_violin(draw_quantiles = c(0.025, 0.975)) + 
+    ggplot2::geom_violin(quantile.color = ag_base(),
+                         quantile.linetype = "solid", 
+                         quantiles = c(0.025, 0.975)) + 
     ggplot2::theme_minimal() +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 

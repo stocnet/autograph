@@ -14,13 +14,13 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
 Depends: 
-    R (>= 3.6.0),
+    R (>= 4.0.0),
     manynet
 Imports:
     dplyr (>= 1.1.0),
     ggdendro,
     ggraph,
-    ggplot2,
+    ggplot2 (>= 4.0.0),
     igraph,
     patchwork,
     tidygraph
