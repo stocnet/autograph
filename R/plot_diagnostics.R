@@ -15,7 +15,7 @@ NULL
 
 #' @rdname plot_adequacy
 #' @examples
-#' plot(outliers_goldfish)
+#' plot(goldfish_outliers)
 #' @export
 plot.outliers.goldfish <- function(x, ...) {
   if (!"YES" %in% x$outlier) {
@@ -27,12 +27,12 @@ plot.outliers.goldfish <- function(x, ...) {
     ggplot2::geom_line() +
     ggplot2::geom_point(ggplot2::aes(color = .data$outlier)) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label),
-                       angle = 270, size = 2,
-                       hjust = "outward", color = "red"
+                       angle = 300, size = 4,
+                       hjust = "outward", color = ag_highlight()
     ) +
     ggplot2::theme_minimal() +
     ggplot2::scale_colour_manual(
-      values = c("black", "red"),
+      values = c(ag_base(), ag_highlight()),
       guide = "none"
     ) +
     ggplot2::xlab("") +
@@ -41,7 +41,7 @@ plot.outliers.goldfish <- function(x, ...) {
 
 #' @rdname plot_adequacy
 #' @examples
-#' plot(changepoints_goldfish)
+#' plot(goldfish_changepoints)
 #' @export
 plot.changepoints.goldfish <- function(x, ...) {
   data <- x$data
@@ -57,8 +57,8 @@ plot.changepoints.goldfish <- function(x, ...) {
     ggplot2::geom_line() +
     ggplot2::geom_point() +
     ggplot2::geom_vline(
-      xintercept = na.exclude(data$time[cpt.pts]),
-      color = "red"
+      xintercept = stats::na.exclude(data$time[cpt.pts]),
+      color = ag_highlight()
     ) +
     ggplot2::theme_minimal() +
     ggplot2::xlab("") +

@@ -27,6 +27,6 @@ These plots are useful for identifying whether there might be significant
 outliers affecting the results or significant time heterogeneity.
 }
 \examples{
-plot(outliers_goldfish)
-plot(changepoints_goldfish)
+plot(goldfish_outliers)
+plot(goldfish_changepoints)
 }
