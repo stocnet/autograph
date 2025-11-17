@@ -73,3 +73,17 @@
 #' @rdname made_earlier
 #' @usage data(ergm_gof)
 "ergm_gof"
+
+# Goldfish objects ####
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_outliers)
+"goldfish_outliers"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_changepoints)
+"goldfish_changepoints"
