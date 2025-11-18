@@ -122,13 +122,13 @@ grapht <- function(tlist, keep_isolates = TRUE,
           frame = ifelse(is.null(names(tlist)), i, names(tlist)[i]))
   })
   # Create an edge list for each time point
-  edges_lst <- time_edges_lst(tlist, edges_lst, nodes_lst)
+  edges_lst <- .time_edges_lst(tlist, edges_lst, nodes_lst)
   # Get edge IDs for all edges
   all_edges <- do.call("rbind", lapply(tlist, igraph::get.edgelist))
   all_edges <- all_edges[!duplicated(all_edges), ]
   all_edges <- cbind(all_edges, paste0(all_edges[, 1], "-", all_edges[, 2]))
   # Add edges level information for edge transitions
-  edges_lst <- transition_edge_lst(tlist, edges_lst, nodes_lst, all_edges)
+  edges_lst <- .transition_edge_lst(tlist, edges_lst, nodes_lst, all_edges)
   # Bind nodes and edges list
   edges_out <- do.call("rbind", edges_lst)
   nodes_out <- do.call("rbind", nodes_lst)
@@ -137,7 +137,7 @@ grapht <- function(tlist, keep_isolates = TRUE,
   }
   # Delete nodes for each frame if isolate
   if (isFALSE(keep_isolates)) {
-    nodes_out <- remove_isolates(edges_out, nodes_out)
+    nodes_out <- .remove_isolates(edges_out, nodes_out)
   } else {
     if (nrow(nodes_out)/length(unique(nodes_out$frame)) > 30 &
         any(unlist(lapply(tlist, manynet::node_is_isolate)) == TRUE)) {
@@ -146,7 +146,7 @@ grapht <- function(tlist, keep_isolates = TRUE,
     nodes_out$status <- TRUE
   }
   # Plot with ggplot2/ggraph and animate with gganimate
-  p <- map_dynamic(edges_out, nodes_out, edge_color, node_shape,
+  p <- .map_dynamic(edges_out, nodes_out, edge_color, node_shape,
                    node_color, node_size, edge_size, labels) +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
@@ -157,9 +157,8 @@ grapht <- function(tlist, keep_isolates = TRUE,
                      end_pause = 10, renderer = gganimate::gifski_renderer())
 }
 
-map_dynamic <- function(edges_out, nodes_out, edge_color, node_shape,
+.map_dynamic <- function(edges_out, nodes_out, edge_color, node_shape,
                         node_color, node_size, edge_size, labels) {
-  x <- xend <- y <- yend <- id <- status <- Infected <- name <- NULL
   alphad <- ifelse(nodes_out$status == TRUE, 1, 0)
   alphae <- ifelse(edges_out$status == TRUE, 1, 0)
   if (all(unique(alphae) == 1)) alphae <- 0.8
@@ -247,7 +246,7 @@ map_dynamic <- function(edges_out, nodes_out, edge_color, node_shape,
   v
 }
 
-time_edges_lst <- function(tlist, edges_lst, nodes_lst, edge_color) {
+.time_edges_lst <- function(tlist, edges_lst, nodes_lst, edge_color) {
   lapply(1:length(tlist), function(i) {
     edges_lst[[i]]$x <- nodes_lst[[i]]$x[match(edges_lst[[i]]$from,
                                                nodes_lst[[i]]$name)]
@@ -263,7 +262,7 @@ time_edges_lst <- function(tlist, edges_lst, nodes_lst, edge_color) {
   })
 }
 
-transition_edge_lst <- function(tlist, edges_lst, nodes_lst, all_edges) {
+.transition_edge_lst <- function(tlist, edges_lst, nodes_lst, all_edges) {
   x <- lapply(1:length(tlist), function(i) {
     idx <- which(!all_edges[, 3] %in% edges_lst[[i]]$id)
     if (length(idx) != 0) {
@@ -281,8 +280,7 @@ transition_edge_lst <- function(tlist, edges_lst, nodes_lst, all_edges) {
   })
 }
 
-remove_isolates <- function(edges_out, nodes_out) {
-  status <- frame <- from <- to <- framen <- NULL
+.remove_isolates <- function(edges_out, nodes_out) {
   # Create node metadata for node presence in certain frame
   meta <- edges_out %>%
     dplyr::filter(status == TRUE) %>%
