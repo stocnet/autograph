@@ -151,6 +151,8 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
 # Helper functions for graphr()
 .infer_layout <- function(g, layout) {
   if (is.null(layout)) {
+    if(manynet::is_list(g))
+      g <- g[[1]]
     if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
     } else if (manynet::is_twomode(g)) {
