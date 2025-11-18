@@ -101,18 +101,12 @@
 #'   graphr(node_color = "color", node_size = "size",
 #'          edge_size = 1.5, edge_color = "ecolor")
 #' @export
-graphr <- function(.data, layout, labels = TRUE,
+graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
                    edge_color, edge_size, snap = FALSE, ...,
                    node_colour, edge_colour) {
   g <- manynet::as_tidygraph(.data)
-  if (missing(layout)) {
-    if (manynet::net_nodes(g) <= 6) {
-      layout <- "configuration"
-    } else if (manynet::is_twomode(g)) {
-      layout <- "hierarchy"
-    } else layout <- "stress"
-  }
+  layout <- .infer_layout(g, layout)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
@@ -127,7 +121,8 @@ graphr <- function(.data, layout, labels = TRUE,
   }
   if (missing(node_group)) node_group <- NULL else {
     node_group <- as.character(substitute(node_group))
-    g <- manynet::mutate_nodes(g, node_group = reduce_categories(g, node_group))
+    g <- manynet::mutate_nodes(g, 
+                               node_group = .reduce_categories(g, node_group))
   }
   if (missing(edge_color) && missing(edge_colour)) {
     edge_color <- NULL
@@ -153,8 +148,19 @@ graphr <- function(.data, layout, labels = TRUE,
   p
 }
 
-# `graphr()` helper functions
-reduce_categories <- function(g, node_group) {
+# Helper functions for graphr()
+.infer_layout <- function(g, layout) {
+  if (is.null(layout)) {
+    if (manynet::net_nodes(g) <= 6) {
+      layout <- "configuration"
+    } else if (manynet::is_twomode(g)) {
+      layout <- "hierarchy"
+    } else layout <- "stress"
+  }
+  layout
+}
+
+.reduce_categories <- function(g, node_group) {
   limit <- toCondense <- NULL
   if (sum(table(manynet::node_attribute(g, node_group)) <= 2) > 2 &
       length(unique(manynet::node_attribute(g, node_group))) > 2) {

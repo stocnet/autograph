@@ -52,24 +52,15 @@
 #' #grapht(play_diffusion(ison_adolescents, seeds = 5))
 #' @export
 grapht <- function(tlist, keep_isolates = TRUE,
-                   layout, labels = TRUE,
+                   layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size,
                    edge_color, edge_size, ...,
                    node_colour, edge_colour) {
   thisRequires("gganimate")
   thisRequires("gifski")
   # thisRequires("png")
-  x <- y <- name <- status <- frame <- NULL
   # Check arguments
-  if (missing(layout)) {
-    if (length(tlist[[1]]) == 3) {
-      layout <- "triad" 
-    } else if (length(tlist[[1]]) == 4) {
-      layout <- "quad" 
-    } else if (is_twomode(tlist[[1]])) {
-      layout <- "hierarchy"
-    } else layout <- "stress"
-  }
+  layout <- .infer_layout(tlist, layout)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
