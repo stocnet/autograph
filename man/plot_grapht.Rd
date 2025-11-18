@@ -11,7 +11,7 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 grapht(
   tlist,
   keep_isolates = TRUE,
-  layout,
+  layout = NULL,
   labels = TRUE,
   node_color,
   node_shape,

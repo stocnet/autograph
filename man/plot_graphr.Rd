@@ -7,7 +7,7 @@
 \usage{
 graphr(
   .data,
-  layout,
+  layout = NULL,
   labels = TRUE,
   node_color,
   node_shape,

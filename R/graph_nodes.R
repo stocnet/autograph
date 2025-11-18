@@ -3,7 +3,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   if(is.null(node_color) && manynet::is_changing(g)){
     p <- .map_diff_model_nodes(p, g, out)
   } else if(is.null(node_color) && "diffusion" %in% names(manynet::node_attribute(g))){
-    p <- .map_infected_nodes(p, out)
+    p <- .map_infected_nodes(p, g, out)
   } else {
     p <- .map_nodes(p, out)
     # Check legends
@@ -94,17 +94,23 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
 }
 
 .map_infected_nodes<- function(p, g, out) {
-  node_color <- as.factor(ifelse(manynet::node_attribute(g, "Exposed"), "Exposed",
-                                 ifelse(manynet::node_attribute(g, "Infected"),"Infected", 
-                                        ifelse(manynet::node_attribute(g, "Recovered"), "Recovered",
-                                               "Susceptible"))))
+  # node_color <- as.factor(ifelse(manynet::node_attribute(g, "Exposed"), "Exposed",
+  #                                ifelse(manynet::node_attribute(g, "Infected"),"Infected", 
+  #                                       ifelse(manynet::node_attribute(g, "Recovered"), "Recovered",
+  #                                              "Susceptible"))))
+  node_color <- dplyr::case_match(manynet::node_attribute(g, "diffusion"),
+                                 "E" ~ "Exposed",
+                                 "I" ~ "Infected",
+                                 "R" ~ "Recovered",
+                                 "S" ~ "Susceptible")
+  cols <- match_color(c("#d73027", "#4575b4", "#E6AB02", "#66A61E"))
   p + ggraph::geom_node_point(ggplot2::aes(color = node_color),
                               size = out[["nsize"]], shape = out[["nshape"]]) +
     ggplot2::scale_color_manual(name = NULL, guide = ggplot2::guide_legend(""),
-                                values = c("Infected" = "#d73027",
-                                           "Susceptible" = "#4575b4",
-                                           "Exposed" = "#E6AB02",
-                                           "Recovered" = "#66A61E"))
+                                values = c("Infected" = cols[1],
+                                           "Susceptible" = cols[2],
+                                           "Exposed" = cols[3],
+                                           "Recovered" = cols[4]))
 }
 
 .map_diff_model_nodes <- function(p, g, out) {
