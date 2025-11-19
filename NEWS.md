@@ -1,3 +1,23 @@
+# autograph 0.5.0
+
+## Package
+
+- Shortened startup messages
+
+## Plotting
+
+- Added `plot.goldfish.changepoints()`
+- Added `plot.goldfish.outliers()`
+- Added `plot.mnet()` to avoid `igraph::plot.igraph()` dispatching
+
+## Graphing
+
+- Restructured scripts for improved maintenance and development in the future
+- Fixed `ggplot2::geom_violin()` call in `graphr()` to avoid warnings with ggplot2 v4.0.0
+- Improved `graphr()` internals to rely on a NULL "layout" parameter and `.infer_layout()`
+- Improved `graphr()` to use `match_color()` for diffusion palettes
+- Fixed `graphs()` handling of changing networks
+
 # autograph 0.4.2
 
 ## Package
