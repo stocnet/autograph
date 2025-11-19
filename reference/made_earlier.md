@@ -27,6 +27,10 @@ data(monan_gof)
 data(ergm_res)
 
 data(ergm_gof)
+
+data(goldfish_outliers)
+
+data(goldfish_changepoints)
 ```
 
 ## Format
@@ -56,3 +60,9 @@ An object of class `gof.stats.monan` of length 2.
 An object of class `ergm` of length 35.
 
 An object of class `gof.ergm` (inherits from `gof`) of length 30.
+
+An object of class `outliers.goldfish` (inherits from
+`dependent.goldfish`, `data.frame`) with 12 rows and 7 columns.
+
+An object of class `changepoints.goldfish` (inherits from `list`) of
+length 2.

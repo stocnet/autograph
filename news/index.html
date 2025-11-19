@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,29 @@
       <small>Source: <a href="https://github.com/stocnet/autograph/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="autograph-050">autograph 0.5.0<a class="anchor" aria-label="anchor" href="#autograph-050"></a></h2>
+<div class="section level3">
+<h3 id="package-0-5-0">Package<a class="anchor" aria-label="anchor" href="#package-0-5-0"></a></h3>
+<ul><li>Shortened startup messages</li></ul></div>
+<div class="section level3">
+<h3 id="plotting-0-5-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-5-0"></a></h3>
+<ul><li>Added <code>plot.goldfish.changepoints()</code>
+</li>
+<li>Added <code>plot.goldfish.outliers()</code>
+</li>
+<li>Added <code>plot.mnet()</code> to avoid <code><a href="https://r.igraph.org/reference/plot.igraph.html" class="external-link">igraph::plot.igraph()</a></code> dispatching</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-0-5-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-0-5-0"></a></h3>
+<ul><li>Restructured scripts for improved maintenance and development in the future</li>
+<li>Fixed <code><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html" class="external-link">ggplot2::geom_violin()</a></code> call in <code><a href="../reference/plot_graphr.html">graphr()</a></code> to avoid warnings with ggplot2 v4.0.0</li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> internals to rely on a NULL “layout” parameter and <code>.infer_layout()</code>
+</li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> to use <code><a href="../reference/theme_match.html">match_color()</a></code> for diffusion palettes</li>
+<li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code> handling of changing networks</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2" id="autograph-042">autograph 0.4.2<a class="anchor" aria-label="anchor" href="#autograph-042"></a></h2>
 <div class="section level3">

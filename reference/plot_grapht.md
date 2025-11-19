@@ -18,7 +18,7 @@ files into a .gif.
 grapht(
   tlist,
   keep_isolates = TRUE,
-  layout,
+  layout = NULL,
   labels = TRUE,
   node_color,
   node_shape,

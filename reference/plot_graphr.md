@@ -27,7 +27,7 @@ To learn more about what can be done visually, try
 ``` r
 graphr(
   .data,
-  layout,
+  layout = NULL,
   labels = TRUE,
   node_color,
   node_shape,
