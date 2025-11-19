@@ -19,8 +19,8 @@
   
   greet_startup_cli <- function() {
     tips <- c(
-      "i" = "Theming all your graphs and plots is straightforward with `stocnet_theme()`",
-      "i" = "Share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}. It's really helpful!",
+      "i" = "Theming graphs and plots is straightforward with `stocnet_theme()`",
+      "i" = "Please share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}.",
       # "i" = "To eliminate package startup messages, use: `suppressPackageStartupMessages(library({.pkg autograph}))`.",
       # "i" = "If there are too many messages in the console, run `options(manynet_verbosity = 'quiet')`",
       "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}."

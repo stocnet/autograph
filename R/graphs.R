@@ -43,7 +43,7 @@ graphs <- function(netlist, waves,
                    based_on = c("first", "last", "both"), ...) {
   thisRequires("patchwork")
   based_on <- match.arg(based_on)
-  if (any(class(netlist) == "diff_model")){
+  if (manynet::is_manynet(netlist) && manynet::is_changing(netlist)){
     if (manynet::is_list(attr(netlist, "network"))) netlist <- attr(netlist, "network") else
       netlist <- manynet::to_waves(netlist)
   } 

@@ -14,6 +14,8 @@
 \alias{monan_gof}
 \alias{ergm_res}
 \alias{ergm_gof}
+\alias{goldfish_outliers}
+\alias{goldfish_changepoints}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -37,6 +39,10 @@ An object of class \code{gof.stats.monan} of length 2.
 An object of class \code{ergm} of length 35.
 
 An object of class \code{gof.ergm} (inherits from \code{gof}) of length 30.
+
+An object of class \code{outliers.goldfish} (inherits from \code{dependent.goldfish}, \code{data.frame}) with 12 rows and 7 columns.
+
+An object of class \code{changepoints.goldfish} (inherits from \code{list}) of length 2.
 }
 \usage{
 data(res_migraph_reg)
@@ -60,6 +66,10 @@ data(monan_gof)
 data(ergm_res)
 
 data(ergm_gof)
+
+data(goldfish_outliers)
+
+data(goldfish_changepoints)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

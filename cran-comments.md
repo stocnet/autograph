@@ -9,4 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Fixed node overflow issues as reported by CRAN
+- Fixed issues reported by CRAN in previous submission

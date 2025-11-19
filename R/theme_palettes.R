@@ -15,9 +15,9 @@
 #'   in the [rainbow palette](https://colorspace.r-forge.r-project.org/articles/endrainbow.html), 
 #'   for instance.
 #'   Fortunately there are a range of palettes that function fairly well for
-#'   those who .
-#'   These include the [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) 
-#'   palette (included in the package of the same name),
+#'   those who are color-blind.
+#'   These include the [viridis](https://CRAN.R-project.org/package=viridis) 
+#'   palette,
 #'   and the ColorBrewer palettes (included in the RColorBrewer package).
 #'   The default palettes in `{autograph}` are designed to be colour-blind
 #'   friendly, but users should always check that their visualisations serve

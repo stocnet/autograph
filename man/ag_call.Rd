@@ -52,9 +52,9 @@ finds it difficult to distinguish between the red and green hues used
 in the \href{https://colorspace.r-forge.r-project.org/articles/endrainbow.html}{rainbow palette},
 for instance.
 Fortunately there are a range of palettes that function fairly well for
-those who .
-These include the \href{https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html}{viridis}
-palette (included in the package of the same name),
+those who are color-blind.
+These include the \href{https://CRAN.R-project.org/package=viridis}{viridis}
+palette,
 and the ColorBrewer palettes (included in the RColorBrewer package).
 The default palettes in \code{{autograph}} are designed to be colour-blind
 friendly, but users should always check that their visualisations serve

@@ -391,8 +391,6 @@ plot.network_motif <- function(x, ...) {
 #' plot(res_manynet_diff)
 #' @export
 plot.diff_model <- function(x, ..., all_steps = TRUE){
-  # initialize variables to avoid CMD check notes
-  S <- E <- I <- I_new <- n <- R <- NULL 
   # if(nrow(x)==1) snet_warn("No diffusion observed.") else {
   if(nrow(x)==1) warning("No diffusion observed.") else {
     data <- x
@@ -415,13 +413,13 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
     if(any(data$E>0)){
       p <- p +
         ggplot2::geom_line(ggplot2::aes(x = time, y = E/n, color = "B"), 
-                           size = 1.25)
+                           linewidth = 1.25)
       labs <- c("Susceptible", "Exposed", "Infected")
     }
     if(any(data$R>0)){
       p <- p +
         ggplot2::geom_line(ggplot2::aes(x = time, y = R/n, color = "D"),
-                           size = 1.25)
+                           linewidth = 1.25)
       labs <- c(labs, "Recovered")
     }
     
@@ -431,6 +429,16 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
                                     labels = labs,
                                     values = colval,
                                     guide = "legend")
+  }
+}
+
+#' @noRd
+#' @export
+plot.mnet <- function(x, ...){
+  if(manynet::is_changing(x)){
+    plot(manynet::as_diffusion(x))
+  } else {
+    graphr(x)
   }
 }
 
