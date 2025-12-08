@@ -1,7 +1,7 @@
 Package: autograph
-Title: Automatic Plotting of Many Graphs
-Version: 0.5.0
-Date: 2025-11-19
+Title: Automatic Plotting and Theming of Many Graphs
+Version: 0.5.1
+Date: 2025-12-08
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
    It includes 'ggplot2'-based plot methods for many popular network package classes.
