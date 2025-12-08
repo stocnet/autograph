@@ -227,11 +227,11 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
   args <- list(...)
   if(statistic == "degree" && (any(grepl("odeg", names(x))))){
     statistic <- "odegree"
-    snet_minor_info("Changing to 'odegree' based on available statistics.")
+    manynet::snet_minor_info("Changing to 'odegree' based on available statistics.")
   }
   if(statistic == "degree" && (any(grepl("b1deg", names(x))))){
     statistic <- "b1degree"
-    snet_minor_info("Changing to 'b1degree' based on available statistics.")
+    manynet::snet_minor_info("Changing to 'b1degree' based on available statistics.")
   }
     
   if (is.null(args$main)) {
@@ -263,7 +263,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
                     value = x[[paste0("obs.",statistic)]]) %>% 
     dplyr::tibble()
   if(nrow(obs) == 0){
-    snet_abort("Note: {statdescription} {.code {statistic}} is not available in this GOF object.")
+    manynet::snet_abort("Note: {statdescription} {.code {statistic}} is not available in this GOF object.")
   }
   simsMat <- x[[paste0("sim.",statistic)]]
   sims.min <- apply(simsMat, 2, min)
