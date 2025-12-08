@@ -1,6 +1,21 @@
 # Changelog
 
+## autograph 0.5.1
+
+### Plotting
+
+  - Improved `plot.gof.ergm()` (closes
+    [\#31](https://github.com/stocnet/autograph/issues/31))
+      - Now works on directed and two-mode networks and dyadwise shared
+        partners
+      - Now has more informative error message if statistic not
+        available
+      - Now accepts more descriptive and gof-formula consistent
+        statistic names
+
 ## autograph 0.5.0
+
+CRAN release: 2025-11-19
 
 ### Package
 

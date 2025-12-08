@@ -28,7 +28,13 @@ plot(x, cumulative = FALSE, ...)
 plot(x, cumulative = FALSE, ...)
 
 # S3 method for class 'gof.ergm'
-plot(x, cumulative = FALSE, statistic = c("deg", "espart", "dist"), ...)
+plot(
+  x,
+  cumulative = FALSE,
+  statistic = c("degree", "odegree", "idegree", "b1degree", "b2degree", "espartners",
+    "dspartners", "distance"),
+  ...
+)
 ```
 
 ## Arguments
