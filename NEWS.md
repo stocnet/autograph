@@ -2,7 +2,7 @@
 
 ## Plotting
 
-- Improved `plot.gof.ergm()`
+- Improved `plot.gof.ergm()` (closes #31)
   - Now works on directed and two-mode networks and dyadwise shared partners
   - Now has more informative error message if statistic not available
   - Now accepts more descriptive and gof-formula consistent statistic names
