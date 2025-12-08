@@ -250,7 +250,6 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     main = args$main
   }
   
-  obs <- data.frame(name = as.factor(as.numeric(names(x[[paste0("obs.",statistic)]]))),
   if(statistic == "degree") statistic <- "deg"
   if(statistic == "idegree") statistic <- "ideg"
   if(statistic == "odegree") statistic <- "odeg"
@@ -259,6 +258,8 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
   if(statistic == "espartners") statistic <- "espart"
   if(statistic == "dspartners") statistic <- "dspart"
   if(statistic == "distance") statistic <- "dist"
+  
+  obs <- data.frame(name = .to_factor(names(x[[paste0("obs.",statistic)]])),
                     value = x[[paste0("obs.",statistic)]]) %>% 
     dplyr::tibble()
   if(nrow(obs) == 0){
@@ -284,7 +285,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
                  times = colnames(sims)[-ncol(sims)],
                  idvar = "sim") %>% 
     dplyr::tibble() %>% 
-    dplyr::mutate(name = as.factor(as.numeric(name))) %>% 
+    dplyr::mutate(name = .to_factor(name)) %>% 
     dplyr::arrange(sim)
   
   p_value <- NULL
@@ -301,4 +302,19 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
   class(out) <- "ag_gof"
   plot.ag_gof(out)
   
+}
+
+
+.to_factor <- function(x) {
+  # Try coercion to numeric
+  num_x <- suppressWarnings(as.numeric(x))
+  
+  # Check if coercion succeeded (no new NAs introduced)
+  if (!any(is.na(num_x) & !is.na(x))) {
+    # If coercible, convert to numeric first, then factor
+    factor(num_x)
+  } else {
+    # Otherwise, convert directly to factor
+    factor(x)
+  }
 }
