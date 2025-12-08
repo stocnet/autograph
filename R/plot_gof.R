@@ -218,22 +218,52 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
 #' plot(ergm_gof, statistic = "espart")
 #' @export
 plot.gof.ergm <- function(x, cumulative = FALSE, 
-                          statistic = c("deg","espart","dist"), ...){
+                          statistic = c("degree","odegree","idegree",
+                                        "b1degree","b2degree",
+                                        "espartners","dspartners",
+                                        # "triadcensus",
+                                        "distance"), ...){
   statistic <- match.arg(statistic)
   args <- list(...)
+  if(statistic == "degree" && (any(grepl("odeg", names(x))))){
+    statistic <- "odegree"
+    snet_minor_info("Changing to 'odegree' based on available statistics.")
+  }
+  if(statistic == "degree" && (any(grepl("b1deg", names(x))))){
+    statistic <- "b1degree"
+    snet_minor_info("Changing to 'b1degree' based on available statistics.")
+  }
+    
   if (is.null(args$main)) {
     statdescription <- switch(statistic,
-                              deg = "degree distribution",
-                              espart = "edgewise shared partners",
-                              dist = "geodesic distance")
+                              degree = "degree distribution",
+                              idegree = "in-degree distribution",
+                              odegree = "out-degree distribution",
+                              b1degree = "mode 1 degree distribution",
+                              b2degree = "mode 2 degree distribution",
+                              espartners = "edgewise shared partners",
+                              dspartners = "dyadwise shared partners",
+                              # triadcensus = "triad census",
+                              distance = "geodesic distance")
     main = paste("Goodness of fit of", statdescription)
   } else {
     main = args$main
   }
   
   obs <- data.frame(name = as.factor(as.numeric(names(x[[paste0("obs.",statistic)]]))),
+  if(statistic == "degree") statistic <- "deg"
+  if(statistic == "idegree") statistic <- "ideg"
+  if(statistic == "odegree") statistic <- "odeg"
+  if(statistic == "b1degree") statistic <- "b1deg"
+  if(statistic == "b2degree") statistic <- "b2deg"
+  if(statistic == "espartners") statistic <- "espart"
+  if(statistic == "dspartners") statistic <- "dspart"
+  if(statistic == "distance") statistic <- "dist"
                     value = x[[paste0("obs.",statistic)]]) %>% 
     dplyr::tibble()
+  if(nrow(obs) == 0){
+    snet_abort("Note: {statdescription} {.code {statistic}} is not available in this GOF object.")
+  }
   simsMat <- x[[paste0("sim.",statistic)]]
   sims.min <- apply(simsMat, 2, min)
   sims.max <- apply(simsMat, 2, max)

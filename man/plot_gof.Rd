@@ -14,7 +14,13 @@
 
 \method{plot}{sienaGOF}(x, cumulative = FALSE, ...)
 
-\method{plot}{gof.ergm}(x, cumulative = FALSE, statistic = c("deg", "espart", "dist"), ...)
+\method{plot}{gof.ergm}(
+  x,
+  cumulative = FALSE,
+  statistic = c("degree", "odegree", "idegree", "b1degree", "b2degree", "espartners",
+    "dspartners", "distance"),
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class "sienaGOF", "gof.stats.monan", or "gof.ergm".}
