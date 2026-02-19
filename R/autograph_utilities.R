@@ -1,3 +1,4 @@
+# nocov start
 # Helper function for checking and downloading packages
 thisRequires <- function(pkgname){
   if (!requireNamespace(pkgname, quietly = TRUE) & interactive()) {
@@ -18,6 +19,7 @@ thisRequiresBio <- function(pkgname) {
       BiocManager::install(pkgname)
     }}
 }
+# nocov end
 
 seq_nodes <- function(.data){
   seq.int(manynet::net_nodes(.data))

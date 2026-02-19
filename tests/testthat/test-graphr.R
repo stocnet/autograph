@@ -121,3 +121,52 @@ test_that("unquoted arguments plot correctly", {
                graphr(ison_lawfirm, node_color = gender))
 })
 
+# Tests for fill aesthetic (color-to-fill change)
+test_that("nodes use fill aesthetic instead of colour", {
+  skip_on_cran()
+  # Default node uses fill parameter
+  p <- graphr(ison_brandes)
+  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], "black")
+  # Mapped node_color uses fill in aes
+  p2 <- ison_brandes %>%
+    dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) %>%
+    graphr(node_color = color)
+  expect_false(is.null(p2[["layers"]][[2]][["mapping"]][["fill"]]))
+})
+
+test_that("node_color with multiple values uses fill scale", {
+  skip_on_cran()
+  # More than 2 colors triggers scale_fill_manual with qualitative palette
+  p <- ison_brandes %>%
+    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) %>%
+    graphr(node_color = grp)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Check that fill scale is used (not colour)
+  scale_names <- vapply(p[["scales"]][["scales"]], function(s) {
+    paste(s[["aesthetics"]], collapse = ",")
+  }, character(1))
+  expect_true(any(grepl("fill", scale_names)))
+})
+
+test_that("two-mode networks get correct node shapes", {
+  skip_on_cran()
+  p <- graphr(ison_southern_women)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Two-mode shape mapping should use "One"/"Two" labels
+  node_layer <- p[["layers"]][[2]]
+  expect_false(is.null(node_layer[["mapping"]][["shape"]]))
+})
+
+test_that("node_color with 2 values uses highlight palette", {
+  skip_on_cran()
+  p <- ison_brandes %>%
+    dplyr::mutate(grp = c(rep(c("x", "y"), 5), "x")) %>%
+    graphr(node_color = grp)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Should use scale_fill_manual with highlight defaults
+  scale_names <- vapply(p[["scales"]][["scales"]], function(s) {
+    paste(s[["aesthetics"]], collapse = ",")
+  }, character(1))
+  expect_true(any(grepl("fill", scale_names)))
+})
+
