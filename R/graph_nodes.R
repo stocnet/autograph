@@ -56,7 +56,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   } else if (is_twomode(g) & is.null(node_shape)) {
     out <- ifelse(igraph::V(g)$type, "One", "Two")
   } else {
-    out <- "circle"
+    out <- 21  # Use fillable circle shape (was "circle")
   }
   out
 }
@@ -132,10 +132,10 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
                                   name = "Time of\nAdoption\n") +
     ggplot2::scale_shape_manual(name = "",
                                 breaks = c("Seed(s)", "Adopter", "Non-Adopter"),
-                                values = c("Seed(s)" = "triangle",
-                                           "Adopter" = "circle",
-                                           "Non-Adopter" = "square")) +
-    ggplot2::guides(color = ggplot2::guide_colorbar(order = 1, reverse = TRUE),
+                                values = c("Seed(s)" = 24,    # triangle
+                                           "Adopter" = 21,     # circle
+                                           "Non-Adopter" = 22)) +  # square
+    ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1, reverse = TRUE),
                     shape = ggplot2::guide_legend(order = 2))
 }
 

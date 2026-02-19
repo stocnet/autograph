@@ -195,10 +195,10 @@ grapht <- function(tlist, keep_isolates = TRUE,
     if (node_shape %in% names(nodes_out)) {
       node_shape <- as.factor(nodes_out[[node_shape]])
       if (!any(grepl("circle|square|triangle", node_shape))) {
-        node_shape <- c("circle", "square", "triangle")[node_shape]
+        node_shape <- c(21, 22, 24)[node_shape]  # circle, square, triangle (fillable)
       }
     }
-  } else node_shape <- "circle"
+  } else node_shape <- 21  # fillable circle (was "circle")
   if (!is.null(node_color)) {
     if (node_color %in% names(nodes_out)) {
       node_color <- .check_color(nodes_out[[node_color]])
