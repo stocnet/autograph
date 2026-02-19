@@ -10,7 +10,7 @@ test_that("unweighted, unsigned, undirected networks graph correctly", {
   expect_equal(test_brandes[["layers"]][[1]][["aes_params"]][["edge_linetype"]], "solid")
   # Node parameters
   expect_equal(round(test_brandes[["layers"]][[2]][["aes_params"]][["size"]]), 11)
-  expect_equal(as.character(test_brandes[["layers"]][[2]][["aes_params"]][["shape"]]), "circle")
+  expect_equal(test_brandes[["layers"]][[2]][["aes_params"]][["shape"]], 21)  # fillable circle
 })
 
 test_that("unweighted, signed, undirected networks graph correctly", {
@@ -40,7 +40,7 @@ test_that("unweighted, unsigned, directed networks graph correctly", {
   #expect_equal(test_algebra[["layers"]][[1]][["mapping"]][["edge_colour"]], "black")
   # Node parameters
   expect_equal(round(test_algebra[["layers"]][[2]][["aes_params"]][["size"]]), 8)
-  expect_equal(test_algebra[["layers"]][[2]][["aes_params"]][["shape"]], "circle")
+  expect_equal(test_algebra[["layers"]][[2]][["aes_params"]][["shape"]], 21)  # fillable circle
 })
 
 test_that("weighted, unsigned, directed networks graph correctly", {

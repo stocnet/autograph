@@ -2,17 +2,20 @@ graph_labels <- function(p, g, layout) {
   if (layout == "circle" | layout == "concentric") {
     angles <- as.data.frame(.cart2pol(as.matrix(p[["data"]][,1:2])))
     angles$degree <- angles$phi * 180/pi
-    angles <- dplyr::case_when(p[["data"]][,2] == 0 & p[["data"]][,1] == 0 ~ 0.1,
-                               p[["data"]][,2] >= 0 & p[["data"]][,1] > 0 ~ angles$degree,
-                               p[["data"]][,2] < 0 & p[["data"]][,1] > 0 ~ angles$degree,
-                               p[["data"]][,1] == 1 ~ angles$degree,
+    # Extract x and y as vectors for case_when
+    x_coord <- p[["data"]][[1]]
+    y_coord <- p[["data"]][[2]]
+    angles <- dplyr::case_when(y_coord == 0 & x_coord == 0 ~ 0.1,
+                               y_coord >= 0 & x_coord > 0 ~ angles$degree,
+                               y_coord < 0 & x_coord > 0 ~ angles$degree,
+                               x_coord == 1 ~ angles$degree,
                                TRUE ~ angles$degree - 180)
     if (manynet::net_nodes(g) < 10) {
-      hj <- ifelse(p[["data"]][,1] >= 0, -0.8, 1.8)
+      hj <- ifelse(x_coord >= 0, -0.8, 1.8)
     } else if (manynet::net_nodes(g) < 20) {
-      hj <- ifelse(p[["data"]][,1] >= 0, -0.4, 1.4)
+      hj <- ifelse(x_coord >= 0, -0.4, 1.4)
     } else {
-      hj <- ifelse(p[["data"]][,1] >= 0, -0.2, 1.2)
+      hj <- ifelse(x_coord >= 0, -0.2, 1.2)
     }
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name), repel = TRUE,
                                     family = ag_font(),
