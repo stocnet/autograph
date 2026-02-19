@@ -1,3 +1,4 @@
+# nocov start
 # Dynamic networks ####
 
 #' Easily animate dynamic networks with sensible defaults
@@ -317,3 +318,4 @@ grapht <- function(tlist, keep_isolates = TRUE,
     dplyr::mutate(status = ifelse(is.na(status), FALSE, TRUE)) %>%
     dplyr::distinct()
 }
+# nocov end

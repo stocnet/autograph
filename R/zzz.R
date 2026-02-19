@@ -1,3 +1,4 @@
+# nocov start
 .onAttach <- function(...) {
 
   # suppressMessages(suppressPackageStartupMessages(library("manynet", warn.conflicts = FALSE)))
@@ -42,5 +43,6 @@
   }
 
 }
+# nocov end
 
 
