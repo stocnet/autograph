@@ -23,7 +23,6 @@ test_that("concentric layout works when node names are missing", {
 
 test_that("hierarchy and lineage layouts graph correctly", {
   skip_on_cran()
-  skip_on_ci()
   test_lin <- ison_adolescents %>% 
     mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) %>%
     graphr(layout = "lineage", rank = "year")
@@ -54,10 +53,25 @@ test_that("hierarchy and lineage layouts graph correctly", {
 
 test_that("hierarchy layout works for two mode networks", {
   skip_on_cran()
-  skip_on_ci()
   tm <- ison_brandes %>%
     mutate(type = twomode_type, name = LETTERS[1:11]) %>%
     graphr()
   expect_length(unique(tm$data[tm$data$type == TRUE, "y"]), 1)
   expect_length(unique(tm$data[tm$data$type == FALSE, "y"]), 1)
+})
+
+test_that("hierarchy layout without center works for two-mode networks", {
+  skip_on_cran()
+  p <- graphr(ison_southern_women, layout = "hierarchy")
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  expect_equal(p$plot_env$layout, "hierarchy")
+  # Two-mode should have exactly 2 unique y values (layers)
+  expect_equal(length(unique(round(p$data$y, 6))), 2)
+})
+
+test_that("alluvial layout works", {
+  skip_on_cran()
+  p <- graphr(ison_southern_women, layout = "alluvial")
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  expect_equal(p$plot_env$layout, "alluvial")
 })

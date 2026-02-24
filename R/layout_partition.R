@@ -3,11 +3,6 @@
 #' @description
 #'   These algorithms layout networks based on two or more partitions,
 #'   and are recommended for use with `graphr()` or `{ggraph}`.
-#'   Note that these layout algorithms use `{Rgraphviz}`, 
-#'   a package that is only available on Bioconductor.
-#'   It will first need to be downloaded using `BiocManager::install("Rgraphviz")`.
-#'   If it has not already been installed, there is a prompt the first time
-#'   these functions are used though.
 #'
 #'   The "hierarchy" layout layers the first node set along the bottom,
 #'   and the second node set along the top, 
@@ -167,7 +162,6 @@ layout_lineage <- function(.data, rank, circular = FALSE) {
   } else if (length(rank) != length(.data)) {
     rank <- as.numeric(manynet::node_attribute(.data, rank))
   }
-  thisRequiresBio("Rgraphviz")
   out <- layout_tbl_graph_alluvial(
     manynet::as_igraph(mutate(.data, type = ifelse(
       rank > mean(rank), TRUE, FALSE)), twomode = TRUE))
@@ -191,24 +185,25 @@ layout_tbl_graph_lineage <- layout_lineage
 layout_hierarchy <- function(.data, center = NULL,
                                        circular = FALSE, times = 1000) {
   if (is.null(center)) {
-    thisRequiresBio("Rgraphviz")
-    prep <- manynet::as_matrix(.data)
-    if (anyDuplicated(rownames(prep))) {
-      rownames(prep) <- seq_len(nrow(prep))
-      colnames(prep) <- seq_len(ncol(prep)) + max(nrow(prep))
+    g <- manynet::as_igraph(.data)
+    if (manynet::is_twomode(.data)) {
+      layers <- ifelse(igraph::V(g)$type, 2, 1)
+    } else {
+      layers <- NULL
     }
-    if (any(prep<0)) prep[prep<0] <- 0
-    out <- manynet::as_graphAM(prep)
-    out <- suppressMessages(Rgraphviz::layoutGraph(out, layoutType = 'dot',
-                                                   attrs = list(graph = list(rankdir = "BT"))))
-    nodeX <- .rescale(out@renderInfo@nodes$nodeX)
-    nodeY <- .rescale(out@renderInfo@nodes$nodeY)
+    lo <- igraph::layout_with_sugiyama(g, layers = layers,
+                                       maxiter = times)
+    nodeX <- lo$layout[, 1]
+    nodeY <- lo$layout[, 2]
+    if (length(unique(nodeX)) > 1) nodeX <- .rescale(nodeX)
+    if (length(unique(nodeY)) > 1) nodeY <- .rescale(nodeY)
     if (manynet::is_twomode(.data) & "name" %in% igraph::vertex_attr_names(.data)) {
       names <- igraph::vertex_attr(.data, "name")
+      names(nodeX) <- igraph::vertex_attr(g, "name")
+      names(nodeY) <- igraph::vertex_attr(g, "name")
       nodeX <- nodeX[order(match(names(nodeX), names))]
       nodeY <- nodeY[order(match(names(nodeY), names))]
     }
-    # nodeY <- abs(nodeY - max(nodeY))
     out <- .to_lo(cbind(nodeX, nodeY))
   } else {
     if (!manynet::is_twomode(.data)) manynet::snet_abort("Please declare a two-mode network.")
@@ -260,20 +255,20 @@ layout_tbl_graph_hierarchy <- layout_hierarchy
 #' @export
 layout_alluvial <- function(.data,
                                       circular = FALSE, times = 1000){
-  thisRequiresBio("Rgraphviz")
-  prep <- manynet::as_matrix(.data, twomode = FALSE)
-  if(anyDuplicated(rownames(prep))){
-    rownames(prep) <- seq_len(nrow(prep))
-    colnames(prep) <- seq_len(ncol(prep))
+  g <- manynet::as_igraph(.data)
+  if (manynet::is_twomode(.data)) {
+    layers <- ifelse(igraph::V(g)$type, 2, 1)
+  } else {
+    layers <- NULL
   }
-  if(any(prep<0)) prep[prep<0] <- 0
-  out <- manynet::as_graphAM(prep)
-  out <- suppressMessages(Rgraphviz::layoutGraph(out, layoutType = 'dot',
-                                                 attrs = list(graph = list(rankdir = "LR"))))
-  nodeX <- .rescale(out@renderInfo@nodes$nodeX)
-  nodeY <- .rescale(out@renderInfo@nodes$nodeY)
-  # nodeY <- abs(nodeY - max(nodeY))
-  .to_lo(cbind(nodeX, nodeY))  
+  lo <- igraph::layout_with_sugiyama(g, layers = layers,
+                                     maxiter = times)
+  nodeX <- lo$layout[, 1]
+  nodeY <- lo$layout[, 2]
+  # Swap x and y for left-to-right layout (alluvial)
+  if (length(unique(nodeY)) > 1) nodeY <- .rescale(nodeY)
+  if (length(unique(nodeX)) > 1) nodeX <- .rescale(nodeX)
+  .to_lo(cbind(nodeY, nodeX))
 }
 
 #' @rdname layout_partition

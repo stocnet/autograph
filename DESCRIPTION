@@ -25,7 +25,6 @@ Imports:
     patchwork,
     tidygraph
 Suggests:
-    BiocManager,
     gganimate,
     ggforce (>= 0.5.0),
     gifski,
@@ -34,7 +33,6 @@ Suggests:
     testthat (>= 3.0.0)
 Enhances:
     ergm,
-    Rgraphviz,
     RSiena
 Authors@R: 
     c(person(given = "James",
