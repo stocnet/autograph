@@ -60,7 +60,7 @@ test_that("hierarchy layout works for two mode networks", {
   expect_length(unique(tm$data[tm$data$type == FALSE, "y"]), 1)
 })
 
-test_that("hierarchy layout without center works for two-mode networks", {
+test_that("default hierarchy layout uses sugiyama for two-mode networks", {
   skip_on_cran()
   p <- graphr(ison_southern_women, layout = "hierarchy")
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
