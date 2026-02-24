@@ -194,7 +194,7 @@ layout_tbl_graph_lineage <- layout_lineage
   if (n_layers < 2) {
     return(cbind(seq_len(n), node_layer))
   }
-  # Map layers to 0-based indices
+  # Map layers to 0-based indices (used as list keys offset by 1)
   layer_idx <- match(node_layer, layer_vals) - 1L
   # Build adjacency between original nodes
   adj <- vector("list", n)
