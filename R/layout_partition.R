@@ -177,6 +177,119 @@ layout_tbl_graph_lineage <- layout_lineage
   (vector - min(vector)) / (max(vector) - min(vector))
 }
 
+# Sugiyama-style layout with dummy nodes and barycenter heuristic
+# for better edge crossing minimization
+.sugiyama_layout <- function(g, layers = NULL, times = 100) {
+  n <- igraph::vcount(g)
+  el <- igraph::as_edgelist(g, names = FALSE)
+  # Layer assignment
+  if (is.null(layers)) {
+    lo <- igraph::layout_with_sugiyama(g, maxiter = times)
+    node_layer <- lo$layout[, 2]
+  } else {
+    node_layer <- layers
+  }
+  layer_vals <- sort(unique(node_layer))
+  n_layers <- length(layer_vals)
+  if (n_layers < 2) {
+    return(cbind(seq_len(n), node_layer))
+  }
+  # Map layers to 0-based indices
+  layer_idx <- match(node_layer, layer_vals) - 1L
+  # Build adjacency between original nodes
+  adj <- vector("list", n)
+  radj <- vector("list", n)
+  for (i in seq_len(n)) { adj[[i]] <- integer(0); radj[[i]] <- integer(0) }
+  if (nrow(el) > 0) {
+    for (i in seq_len(nrow(el))) {
+      u <- el[i, 1]; v <- el[i, 2]
+      adj[[u]] <- c(adj[[u]], v)
+      radj[[v]] <- c(radj[[v]], u)
+    }
+  }
+  # Insert dummy nodes for edges spanning multiple layers
+  dummy_id <- n
+  # For barycenter, we need per-layer node lists and inter-layer edges
+  all_layer <- layer_idx  # will grow with dummies
+  # Build inter-layer edges (only between adjacent layers)
+  inter_edges <- list()
+  if (nrow(el) > 0) {
+    for (i in seq_len(nrow(el))) {
+      u <- el[i, 1]; v <- el[i, 2]
+      lu <- layer_idx[u]; lv <- layer_idx[v]
+      if (lu == lv) next
+      # Ensure direction goes from lower layer to higher
+      if (lu > lv) { tmp <- u; u <- v; v <- tmp; tmp <- lu; lu <- lv; lv <- tmp }
+      if (lv - lu == 1) {
+        inter_edges[[length(inter_edges) + 1]] <- c(u, v)
+      } else {
+        # Insert dummy nodes
+        prev <- u
+        for (k in (lu + 1):(lv - 1)) {
+          dummy_id <- dummy_id + 1
+          all_layer <- c(all_layer, k)
+          inter_edges[[length(inter_edges) + 1]] <- c(prev, dummy_id)
+          prev <- dummy_id
+        }
+        inter_edges[[length(inter_edges) + 1]] <- c(prev, v)
+      }
+    }
+  }
+  total_nodes <- length(all_layer)
+  if (length(inter_edges) == 0) {
+    return(cbind(seq_len(n), node_layer))
+  }
+  inter_edges_mat <- do.call(rbind, inter_edges)
+  # Build per-layer node lists
+  layer_nodes <- lapply(0:(n_layers - 1), function(k) which(all_layer == k))
+  # Initialize x positions: sequential within each layer
+  x_pos <- rep(0, total_nodes)
+  for (k in seq_along(layer_nodes)) {
+    nodes_in_layer <- layer_nodes[[k]]
+    x_pos[nodes_in_layer] <- seq_along(nodes_in_layer)
+  }
+  # Build forward/backward adjacency for the expanded graph
+  fwd_adj <- vector("list", total_nodes)
+  bwd_adj <- vector("list", total_nodes)
+  for (i in seq_len(total_nodes)) { fwd_adj[[i]] <- integer(0); bwd_adj[[i]] <- integer(0) }
+  if (!is.null(inter_edges_mat) && nrow(inter_edges_mat) > 0) {
+    for (i in seq_len(nrow(inter_edges_mat))) {
+      u <- inter_edges_mat[i, 1]; v <- inter_edges_mat[i, 2]
+      fwd_adj[[u]] <- c(fwd_adj[[u]], v)
+      bwd_adj[[v]] <- c(bwd_adj[[v]], u)
+    }
+  }
+  # Barycenter crossing minimization sweeps
+  for (iter in seq_len(times)) {
+    # Forward sweep: layer 1 to n_layers-1
+    for (k in 2:n_layers) {
+      nodes_k <- layer_nodes[[k]]
+      if (length(nodes_k) <= 1) next
+      bc <- sapply(nodes_k, function(nd) {
+        neighbors <- bwd_adj[[nd]]
+        if (length(neighbors) == 0) return(x_pos[nd])
+        mean(x_pos[neighbors])
+      })
+      ord <- order(bc)
+      x_pos[nodes_k[ord]] <- seq_along(nodes_k)
+    }
+    # Backward sweep: layer n_layers-2 to 0
+    for (k in (n_layers - 1):1) {
+      nodes_k <- layer_nodes[[k]]
+      if (length(nodes_k) <= 1) next
+      bc <- sapply(nodes_k, function(nd) {
+        neighbors <- fwd_adj[[nd]]
+        if (length(neighbors) == 0) return(x_pos[nd])
+        mean(x_pos[neighbors])
+      })
+      ord <- order(bc)
+      x_pos[nodes_k[ord]] <- seq_along(nodes_k)
+    }
+  }
+  # Extract coordinates for original nodes only
+  cbind(x_pos[seq_len(n)], node_layer)
+}
+
 #' @rdname layout_partition
 #' @examples
 #' #graphr(ison_southern_women, layout = "hierarchy", center = "events",
@@ -191,10 +304,9 @@ layout_hierarchy <- function(.data, center = NULL,
     } else {
       layers <- NULL
     }
-    lo <- igraph::layout_with_sugiyama(g, layers = layers,
-                                       maxiter = times)
-    nodeX <- lo$layout[, 1]
-    nodeY <- lo$layout[, 2]
+    lo <- .sugiyama_layout(g, layers = layers, times = times)
+    nodeX <- lo[, 1]
+    nodeY <- lo[, 2]
     if (length(unique(nodeX)) > 1) nodeX <- .rescale(nodeX)
     if (length(unique(nodeY)) > 1) nodeY <- .rescale(nodeY)
     if (manynet::is_twomode(.data) & "name" %in% igraph::vertex_attr_names(.data)) {
@@ -261,10 +373,9 @@ layout_alluvial <- function(.data,
   } else {
     layers <- NULL
   }
-  lo <- igraph::layout_with_sugiyama(g, layers = layers,
-                                     maxiter = times)
-  nodeX <- lo$layout[, 1]
-  nodeY <- lo$layout[, 2]
+  lo <- .sugiyama_layout(g, layers = layers, times = times)
+  nodeX <- lo[, 1]
+  nodeY <- lo[, 2]
   # Swap x and y for left-to-right layout (alluvial)
   if (length(unique(nodeY)) > 1) nodeY <- .rescale(nodeY)
   if (length(unique(nodeX)) > 1) nodeX <- .rescale(nodeX)

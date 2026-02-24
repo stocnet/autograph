@@ -75,3 +75,39 @@ test_that("alluvial layout works", {
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
   expect_equal(p$plot_env$layout, "alluvial")
 })
+
+test_that("hierarchy layout minimises edge crossings", {
+  skip_on_cran()
+  # Helper: count bipartite edge crossings given x positions
+  count_crossings <- function(el, x_pos) {
+    crossings <- 0
+    if (nrow(el) < 2) return(0)
+    for (i in 1:(nrow(el) - 1)) {
+      for (j in (i + 1):nrow(el)) {
+        a1 <- x_pos[el[i, 1]]; b1 <- x_pos[el[i, 2]]
+        a2 <- x_pos[el[j, 1]]; b2 <- x_pos[el[j, 2]]
+        if ((a1 - a2) * (b1 - b2) < 0) crossings <- crossings + 1
+      }
+    }
+    crossings
+  }
+  # Test with ison_southern_women (18 women, 14 events, 89 ties)
+  g <- manynet::as_igraph(ison_southern_women)
+  n <- igraph::vcount(g)
+  el <- igraph::as_edgelist(g, names = FALSE)
+  layers <- ifelse(igraph::V(g)$type, 2, 1)
+  lo <- autograph:::.sugiyama_layout(g, layers = layers, times = 100)
+  x_pos <- lo[, 1]
+  # Naive layout: sequential ordering within each layer
+  naive_x <- rep(0, n)
+  naive_x[layers == 1] <- seq_len(sum(layers == 1))
+  naive_x[layers == 2] <- seq_len(sum(layers == 2))
+  optimised_crossings <- count_crossings(el, x_pos)
+  naive_crossings <- count_crossings(el, naive_x)
+  # The optimised layout should have fewer crossings than naive
+  expect_lt(optimised_crossings, naive_crossings)
+  # Verify all nodes got valid positions
+  expect_true(all(is.finite(x_pos)))
+  expect_equal(length(unique(lo[layers == 1, 2])), 1)
+  expect_equal(length(unique(lo[layers == 2, 2])), 1)
+})
