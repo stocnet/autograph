@@ -176,6 +176,8 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                       edge_width = ggplot2::guide_legend(order = 1),
                       alpha = ggplot2::guide_legend(order = 99,
                                 override.aes = list( alpha = 0, size = 0, shape = NA )))
+  } else if(isolates == "caption"){
+    p <- p + ggplot2::labs(caption = paste("Isolates:", paste(isos, collapse = ", ")))
   }
   # assign("last.warning", NULL, envir = baseenv()) # to avoid persistent ggrepel
   p
