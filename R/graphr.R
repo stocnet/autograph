@@ -103,9 +103,22 @@
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
-                   edge_color, edge_size, snap = FALSE, ...,
+                   edge_color, edge_size, 
+                   isolates = c("legend","caption","include"), snap = FALSE, ...,
                    node_colour, edge_colour) {
   g <- manynet::as_tidygraph(.data)
+  
+  # Separate isolates ----
+  isolates <- match.arg(isolates)
+  if(isolates != "include"){
+    if(is_labelled(g)){
+      isos <- manynet::node_names(g)[manynet::node_is_isolate(g)]
+    } else {
+      isos <- which(manynet::node_is_isolate(g))
+    }
+    g <- manynet::to_no_isolates(g)
+  } 
+  
   layout <- .infer_layout(g, layout)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
