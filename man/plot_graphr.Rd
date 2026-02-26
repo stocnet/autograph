@@ -15,6 +15,7 @@ graphr(
   node_group,
   edge_color,
   edge_size,
+  isolates = c("legend", "caption", "include"),
   snap = FALSE,
   ...,
   node_colour,

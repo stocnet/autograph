@@ -366,7 +366,7 @@ layout_tbl_graph_hierarchy <- layout_hierarchy
 #' #graphr(ison_southern_women, layout = "alluvial")
 #' @export
 layout_alluvial <- function(.data,
-                                      circular = FALSE, times = 1000){
+                            circular = FALSE, times = 1000){
   g <- manynet::as_igraph(.data)
   if (manynet::is_twomode(.data)) {
     layers <- ifelse(igraph::V(g)$type, 2, 1)
