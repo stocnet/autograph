@@ -16,7 +16,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size) {
                                                       guide = ggplot2::guide_legend(
                                                         ifelse(is.null(edge_size) &
                                                                  manynet::is_weighted(g),
-                                                               "Edge Weight", "Edge Size")))
+                                                               "Weight", "Width")))
   if (length(unique(out[["ecolor"]])) == 1) {
     p <- p + ggplot2::guides(edge_colour = "none")
   } else if (length(unique(out[["ecolor"]])) == 2){

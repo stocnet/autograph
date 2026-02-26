@@ -1,3 +1,5 @@
+fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
+
 test_that("unweighted, unsigned, undirected networks graph correctly", {
   skip_on_cran()
   # Unweighted, unsigned, undirected network
@@ -16,7 +18,7 @@ test_that("unweighted, unsigned, undirected networks graph correctly", {
 test_that("unweighted, signed, undirected networks graph correctly", {
   skip_on_cran()
   # Unweighted, signed, undirected network
-  test_marvel <- graphr(to_giant(ison_marvel_relationships))
+  test_marvel <- graphr(fmrg)
   # Node position
   expect_equal(round(test_marvel[["data"]][["x"]][[1]]), -1)
   expect_equal(round(test_marvel[["data"]][["y"]][[1]]), 1)
@@ -65,9 +67,9 @@ test_that("fancy node mods graph correctly", {
   skip_on_cran()
   skip_on_ci()
   # one-mode network
-  ison_marvel_relationships <- dplyr::mutate(ison_marvel_relationships,
+  ison_marvel_relationships <- dplyr::mutate(fmrg,
                                              nodesize = Appearances/1000)
-  testcolnodes <- graphr(ison_marvel_relationships, node_color = "Gender",
+  testcolnodes <- graphr(fmrg, node_color = "Gender",
                          node_size = "nodesize", node_shape = "Attractive")
   expect_s3_class(testcolnodes, c("ggraph","gg","ggplot"))
   expect_equal(round(testcolnodes$data$x[1]), 4)

@@ -111,7 +111,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Separate isolates ----
   isolates <- match.arg(isolates)
   if(isolates != "include"){
-    if(is_labelled(g)){
+    if(manynet::is_labelled(g)){
       isos <- manynet::node_names(g)[manynet::node_is_isolate(g)]
     } else {
       isos <- which(manynet::node_is_isolate(g))
