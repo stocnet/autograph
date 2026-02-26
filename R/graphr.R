@@ -157,6 +157,26 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (isTRUE(labels) & manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout)
   }
+  
+  # Note isolates ----
+  if(isolates == "legend"){
+    if (length(isos) > 3) label_text <- paste(c(head(isos, 3),"…"), collapse = "\n") else 
+      label_text <- paste(isos, collapse = "\n")
+    p <- p + ggplot2::geom_point(aes(x=rep(0, manynet::net_nodes(g)), y=0, 
+                                     alpha = "Isolates"), 
+                                 size = 0) +
+      ggplot2::scale_alpha_manual(name = "Isolates", 
+                                  values = c("Isolates" = 0.5), 
+                                  labels = label_text) +
+      ggplot2::guides(color = ggplot2::guide_legend(order = 1), 
+                      fill = ggplot2::guide_legend(order = 1),
+                      shape = ggplot2::guide_legend(order = 1),
+                      linetype = ggplot2::guide_legend(order = 1),
+                      edge_colour = ggplot2::guide_legend(order = 1),
+                      edge_width = ggplot2::guide_legend(order = 1),
+                      alpha = ggplot2::guide_legend(order = 99,
+                                override.aes = list( alpha = 0, size = 0, shape = NA )))
+  }
   # assign("last.warning", NULL, envir = baseenv()) # to avoid persistent ggrepel
   p
 }
