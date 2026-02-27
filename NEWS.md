@@ -18,11 +18,16 @@
   - `"legend"` (default) removes isolates from the graph but notes them in the legend
   - `"caption"` removes isolates from the graph but notes them in the caption
   - `"keep"` retains isolates in the graph as-is (closes #12)
+  
+## Theming
+
+- Removed `scale_*()` functions as redundant with better theme support and `match_color()`
 
 ## Layouts
 
 - Replaced `{Rgraphviz}` (Bioconductor) with `igraph::layout_with_sugiyama` for Sugiyama/hierarchy layouts, removing the Bioconductor dependency
 - Improved Sugiyama layout with dummy node insertion and barycenter crossing minimisation for better edge routing
+- Fixed #18 for lattice layout snapping by rotating the layout to optimise edge verticality and horizontality
 
 # autograph 0.5.1
 

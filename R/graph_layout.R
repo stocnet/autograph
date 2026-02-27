@@ -23,9 +23,19 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   }
   if(snap){
     manynet::snet_info("Snapping layout coordinates to grid.")
-    if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE))
-      p$data[,c("x","y")] <- round(p$data[,c("x","y")]) else 
-        p$data[,c("x","y")] <- depth_first_recursive_search(p)
+    if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE)){
+      
+      angles <- seq(0, pi/2, length.out = 180)
+      scores <- sapply(angles, function(a) {
+        lay2 <- .rotate_layout(lo, a)
+        .edge_angle_deviation(lay2, g)
+      })
+      
+      best_angle <- angles[which.min(scores)]
+      rotated_coords <- .rotate_layout(lo, best_angle)
+      # Make sure that the coordinates, if rounded to integers, are still unique
+      p$data[,c("x","y")] <- round(rotated_coords[,c("x","y")])
+    } else p$data[,c("x","y")] <- depth_first_recursive_search(p)
   }
   # Add background ----
   if(getOption("snet_background", default = "#FFFFFF")!="#FFFFFF")
@@ -33,3 +43,30 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
                                                                                       default = "#FFFFFF")))
   p
 }
+
+# Helper functions ----
+
+.rotate_layout <- function(layout, angle) {
+  rot <- matrix(c(cos(angle), -sin(angle),
+                  sin(angle),  cos(angle)), ncol = 2)
+  coords <- as.matrix(layout[, c("x", "y")])
+  newcoords <- coords %*% rot
+  layout$x <- newcoords[,1]
+  layout$y <- newcoords[,2]
+  layout
+}
+
+.edge_angle_deviation <- function(layout, graph) {
+  ed <- igraph::as_edgelist(graph)
+  dx <- layout$x[ed[,2]] - layout$x[ed[,1]]
+  dy <- layout$y[ed[,2]] - layout$y[ed[,1]]
+  ang <- atan2(dy, dx)
+  
+  # deviation from nearest multiple of 90°
+  dev <- abs((ang %% (pi/2)) - pi/4)
+  mean(dev)
+}
+
+
+
+
