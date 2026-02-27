@@ -119,15 +119,3 @@ ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
     ggplot2::theme_void()
 }
 
-palette_gen <- function(palette, direction = 1) {
-  function(n) {
-    if (n > length(corp_palette(palette)))
-      warning("Not enough colors in this palette!")
-    else {
-      all_colors <- corp_palette(palette)
-      all_colors <- unname(unlist(all_colors))
-      all_colors <- if (direction >= 0) all_colors else rev(all_colors)
-      color_list <- all_colors[1:n]
-    }
-  }
-}
