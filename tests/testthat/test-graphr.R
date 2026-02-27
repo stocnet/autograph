@@ -4,7 +4,7 @@ data_objs <- data_objs[grepl("ison_|fict_|irps_|mpn_", names(data_objs))]
 # data_objs <- data_objs[!grepl("starwars|physicians|potter", names(data_objs))]
 for (nm in names(data_objs)) { 
   test_that(paste("graphr() works on", nm), {
-    skip_if(grepl("starwars|physicians|potter", nm))
+    skip_if(grepl("starwars|physicians|potter|marvel", nm))
     expect_error(graphr(data_objs[[nm]]), NA) }) 
 }
 

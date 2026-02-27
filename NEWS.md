@@ -6,15 +6,18 @@
 
 ## Graphing
 
-- Added `isolates` argument to `graphr()` for controlling how isolates are displayed
+- `graphr()` now auto-dispatches to `graphs()` when passed a list of graphs
+- `graphs()` no longer requires `{patchwork}` to be loaded separately
+- Closed #12 by changing node aesthetics from `color` to `fill` using fillable shape codes (21–25) for nodes to support fill-based colour scales
+- Consolidated legend modifications into internal `graph_legends()` helper
+- Improved legend labelling:
+  - edge sign legend now labelled "Sign"
+  - edge weight/width now labelled "Weight"/"Width"
+  - node mode/shape legend now labelled "Mode"/"Shape"
+- Closed #8 by adding "isolates" argument to `graphr()`:
   - `"legend"` (default) removes isolates from the graph but notes them in the legend
   - `"caption"` removes isolates from the graph but notes them in the caption
   - `"keep"` retains isolates in the graph as-is (closes #12)
-- `graphr()` now dispatches to `graphs()` automatically when passed a list of graphs
-- `graphs()` no longer requires `{patchwork}` to be loaded separately as it is now a regular import
-- Changed node aesthetics from `color` to `fill`, using fillable shape codes (21–25) for nodes to support fill-based colour scales
-- Consolidated all legend modifications into an internal `graph_legends()` helper
-- Improved legend labelling: edge sign legend now labelled "Sign"; edge weight/width now labelled "Weight"/"Width"; node mode/shape legend now labelled "Mode"/"Shape"
 
 ## Layouts
 
