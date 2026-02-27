@@ -170,7 +170,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   
   # Note isolates ----
   if(isolates == "legend"){
-    if (length(isos) > 3) label_text <- paste(c(utils::head(isos, 3),"…"), collapse = "\n") else 
+    if (length(isos) > 3) label_text <- paste(c(utils::head(isos, 3),"..."), collapse = "\n") else 
       label_text <- paste(isos, collapse = "\n")
     p <- p + ggplot2::geom_point(aes(x=rep(0, manynet::net_nodes(g)), y=0, 
                                      alpha = "Isolates"), 

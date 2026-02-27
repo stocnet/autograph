@@ -10,15 +10,6 @@ thisRequires <- function(pkgname){
     }
   }
 }
-
-thisRequiresBio <- function(pkgname) {
-  if (!requireNamespace(pkgname, quietly = TRUE) & interactive()) {
-    if(utils::askYesNo(msg = paste("The", pkgname, 
-                                   "package is required to run this function. Would you like to install", pkgname, "from BioConductor?"))) {
-      thisRequires("BiocManager")
-      BiocManager::install(pkgname)
-    }}
-}
 # nocov end
 
 seq_nodes <- function(.data){
