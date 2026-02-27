@@ -3,11 +3,10 @@
 This function provides users with an easy way to graph (m)any network
 data for exploration, investigation, inspiration, and communication.
 
-It builds upon `{ggplot2}` and `{ggraph}` to offer pretty and extensible
-graphing solutions. However, compared to those solutions, `graphr()`
-contains various algorithms to provide better looking graphs by default.
-This means that just passing the function some network data will often
-be sufficient to return a reasonable-looking graph.
+`graphr()` builds upon `{ggplot2}` and `{ggraph}` to offer pretty, easy,
+and extensible graphing solutions. Just passing the function some
+network data will often be sufficient to return a reasonable-looking
+graph.
 
 The function also makes it easy to modify many of the most commonly
 adapted aspects of a graph, including node and edge size, colour, and
@@ -35,6 +34,7 @@ graphr(
   node_group,
   edge_color,
   edge_size,
+  isolates = c("legend", "caption", "keep"),
   snap = FALSE,
   ...,
   node_colour,
@@ -116,6 +116,16 @@ graphr(
     calculate all edge-related statistics prior to using this function.
     Edges can also be sized by declaring a numeric size or vector
     instead.
+
+  - isolates:
+    
+    Character scalar, how to treat isolates. "keep" will keep isolates
+    in the graph as they are. "legend" (default) will remove isolates
+    from the graph but note them in the legend. "caption" will remove
+    isolates from the graph but note them in the caption. If there are
+    no isolates, this argument will be ignored. If the default layout
+    ("stress") is used, we recommend that the "legend" option is used to
+    avoid isolates crowding out the giant component.
 
   - snap:
     

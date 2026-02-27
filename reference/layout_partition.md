@@ -1,12 +1,7 @@
 # Layout algorithms based on bi- or other partitions
 
 These algorithms layout networks based on two or more partitions, and
-are recommended for use with `graphr()` or `{ggraph}`. Note that these
-layout algorithms use `{Rgraphviz}`, a package that is only available on
-Bioconductor. It will first need to be downloaded using
-`BiocManager::install("Rgraphviz")`. If it has not already been
-installed, there is a prompt the first time these functions are used
-though.
+are recommended for use with `graphr()` or `{ggraph}`.
 
 The "hierarchy" layout layers the first node set along the bottom, and
 the second node set along the top, sequenced and spaced as necessary to

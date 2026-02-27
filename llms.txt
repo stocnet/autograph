@@ -259,20 +259,6 @@ Functions for tailoring graphs with themes, scales, and palettes.
     `ag_qualitative()` `ag_sequential()` `ag_divergent()` `ag_font()` :
     Consistent palette calls
   - `match_color()` `is_dark()` : Matching colors across palettes
-  - `scale_fill_iheid()` `scale_colour_iheid()` `scale_color_iheid()`
-    `scale_edge_colour_iheid()` `scale_edge_color_iheid()`
-    `scale_fill_centres()` `scale_colour_centres()`
-    `scale_color_centres()` `scale_edge_colour_centres()`
-    `scale_edge_color_centres()` `scale_fill_sdgs()`
-    `scale_colour_sdgs()` `scale_color_sdgs()`
-    `scale_edge_colour_sdgs()` `scale_edge_color_sdgs()`
-    `scale_fill_ethz()` `scale_colour_ethz()` `scale_color_ethz()`
-    `scale_edge_colour_ethz()` `scale_edge_color_ethz()`
-    `scale_fill_uzh()` `scale_colour_uzh()` `scale_color_uzh()`
-    `scale_edge_colour_uzh()` `scale_edge_color_uzh()`
-    `scale_fill_rug()` `scale_colour_rug()` `scale_color_rug()`
-    `scale_edge_colour_rug()` `scale_edge_color_rug()` : Themed scales
-    for further customization
 
 ## Plotting methods
 

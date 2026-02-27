@@ -1,5 +1,52 @@
 # Changelog
 
+## autograph 0.6.0
+
+### Package
+
+  - Updated logo
+
+### Graphing
+
+  - `graphr()` now auto-dispatches to `graphs()` when passed a list of
+    graphs
+  - `graphs()` no longer requires
+    [patchwork](https://patchwork.data-imaginist.com) to be loaded
+    separately
+  - Closed [\#12](https://github.com/stocnet/autograph/issues/12) by
+    changing node aesthetics from `color` to `fill` using fillable shape
+    codes (21–25) for nodes to support fill-based colour scales
+  - Consolidated legend modifications into internal `graph_legends()`
+    helper
+  - Improved legend labelling:
+      - edge sign legend now labelled “Sign”
+      - edge weight/width now labelled “Weight”/“Width”
+      - node mode/shape legend now labelled “Mode”/“Shape”
+  - Closed [\#8](https://github.com/stocnet/autograph/issues/8) by
+    adding “isolates” argument to `graphr()`:
+      - `"legend"` (default) removes isolates from the graph but notes
+        them in the legend
+      - `"caption"` removes isolates from the graph but notes them in
+        the caption
+      - `"keep"` retains isolates in the graph as-is (closes
+        [\#12](https://github.com/stocnet/autograph/issues/12))
+
+### Theming
+
+  - Removed `scale_*()` functions as redundant with better theme support
+    and `match_color()`
+
+### Layouts
+
+  - Replaced `{Rgraphviz}` (Bioconductor) with
+    `igraph::layout_with_sugiyama` for Sugiyama/hierarchy layouts,
+    removing the Bioconductor dependency
+  - Improved Sugiyama layout with dummy node insertion and barycenter
+    crossing minimisation for better edge routing
+  - Fixed [\#18](https://github.com/stocnet/autograph/issues/18) for
+    lattice layout snapping by rotating the layout to optimise edge
+    verticality and horizontality
+
 ## autograph 0.5.1
 
 ### Plotting
