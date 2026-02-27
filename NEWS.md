@@ -1,3 +1,26 @@
+# autograph 0.6.0
+
+## Package
+
+- Updated logo
+
+## Graphing
+
+- Added `isolates` argument to `graphr()` for controlling how isolates are displayed
+  - `"legend"` (default) removes isolates from the graph but notes them in the legend
+  - `"caption"` removes isolates from the graph but notes them in the caption
+  - `"keep"` retains isolates in the graph as-is (closes #12)
+- `graphr()` now dispatches to `graphs()` automatically when passed a list of graphs
+- `graphs()` no longer requires `{patchwork}` to be loaded separately as it is now a regular import
+- Changed node aesthetics from `color` to `fill`, using fillable shape codes (21–25) for nodes to support fill-based colour scales
+- Consolidated all legend modifications into an internal `graph_legends()` helper
+- Improved legend labelling: edge sign legend now labelled "Sign"; edge weight/width now labelled "Weight"/"Width"; node mode/shape legend now labelled "Mode"/"Shape"
+
+## Layouts
+
+- Replaced `{Rgraphviz}` (Bioconductor) with `igraph::layout_with_sugiyama` for Sugiyama/hierarchy layouts, removing the Bioconductor dependency
+- Improved Sugiyama layout with dummy node insertion and barycenter crossing minimisation for better edge routing
+
 # autograph 0.5.1
 
 ## Plotting
