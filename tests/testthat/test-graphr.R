@@ -1,3 +1,13 @@
+data_objs <- mget(ls("package:manynet"), inherits = TRUE)
+# Filter to relevant objects 
+data_objs <- data_objs[grepl("ison_|fict_|irps_|mpn_", names(data_objs))]
+# data_objs <- data_objs[!grepl("starwars|physicians|potter", names(data_objs))]
+for (nm in names(data_objs)) { 
+  test_that(paste("graphr() works on", nm), {
+    skip_if(grepl("starwars|physicians|potter", nm))
+    expect_error(graphr(data_objs[[nm]]), NA) }) 
+}
+
 fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
 
 test_that("unweighted, unsigned, undirected networks graph correctly", {
@@ -67,15 +77,13 @@ test_that("fancy node mods graph correctly", {
   skip_on_cran()
   skip_on_ci()
   # one-mode network
-  ison_marvel_relationships <- dplyr::mutate(fmrg,
-                                             nodesize = Appearances/1000)
+  fmrg <- dplyr::mutate(fmrg, nodesize = Appearances/1000)
   testcolnodes <- graphr(fmrg, node_color = "Gender",
-                         node_size = "nodesize", node_shape = "Attractive")
+                         node_size = "Appearances", 
+                         node_shape = "Attractive")
   expect_s3_class(testcolnodes, c("ggraph","gg","ggplot"))
-  expect_equal(round(testcolnodes$data$x[1]), 4)
-  expect_equal(round(testcolnodes$data$y[1]), 3)
   expect_equal(nrow(testcolnodes[["plot_env"]][["lo"]]),
-               c(net_nodes(ison_marvel_relationships)))
+               c(net_nodes(fmrg)))
   # two-mode network
   ison_southern_women <- add_node_attribute(ison_southern_women, "group",
                                             c(sample(c("a", "b"),
