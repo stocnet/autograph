@@ -5,12 +5,9 @@
 #'   (m)any network data for exploration, investigation, inspiration, 
 #'   and communication.
 #'   
-#'   It builds upon `{ggplot2}` and `{ggraph}` to offer
-#'   pretty and extensible graphing solutions.
-#'   However, compared to those solutions, 
-#'   `graphr()` contains various algorithms to provide better looking
-#'   graphs by default.
-#'   This means that just passing the function some network data
+#'   `graphr()` builds upon `{ggplot2}` and `{ggraph}` to offer
+#'   pretty, easy, and extensible graphing solutions.
+#'   Just passing the function some network data
 #'   will often be sufficient to return a reasonable-looking graph.
 #'   
 #'   The function also makes it easy to modify many of the most
@@ -84,6 +81,14 @@
 #'   it is recommended to calculate all edge-related statistics prior
 #'   to using this function.
 #'   Edges can also be sized by declaring a numeric size or vector instead.
+#' @param isolates Character scalar, how to treat isolates.
+#'   "keep"  will keep isolates in the graph as they are.
+#'   "legend" (default) will remove isolates from the graph but note them in the legend.
+#'   "caption" will remove isolates from the graph but note them in the caption.
+#'   If there are no isolates, this argument will be ignored.
+#'   If the default layout ("stress") is used, 
+#'   we recommend that the "legend" option is used to avoid isolates crowding
+#'   out the giant component.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
@@ -103,9 +108,27 @@
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
-                   edge_color, edge_size, snap = FALSE, ...,
+                   edge_color, edge_size, 
+                   isolates = c("legend","caption","keep"), snap = FALSE, ...,
                    node_colour, edge_colour) {
+  if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
+                             node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
+                             edge_color = edge_color, edge_size = edge_size, 
+                             isolates = isolates, snap = snap, ...,
+                             node_colour = node_colour, edge_colour = edge_colour))
   g <- manynet::as_tidygraph(.data)
+  
+  # Separate isolates ----
+  isolates <- .infer_isolates(g, match.arg(isolates))
+  if(isolates != "keep"){
+    if(manynet::is_labelled(g)){
+      isos <- manynet::node_names(g)[manynet::node_is_isolate(g)]
+    } else {
+      isos <- which(manynet::node_is_isolate(g))
+    }
+    g <- manynet::to_no_isolates(g)
+  } 
+  
   layout <- .infer_layout(g, layout)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
@@ -144,11 +167,36 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (isTRUE(labels) & manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout)
   }
+  
+  # Note isolates ----
+  if(isolates == "legend"){
+    if (length(isos) > 3) label_text <- paste(c(utils::head(isos, 3),"..."), collapse = "\n") else 
+      label_text <- paste(isos, collapse = "\n")
+    p <- p + ggplot2::geom_point(aes(x=rep(0, manynet::net_nodes(g)), y=0, 
+                                     alpha = "Isolates"), 
+                                 size = 0) +
+      ggplot2::scale_alpha_manual(name = "+ Isolates", 
+                                  values = c("Isolates" = 0.5), 
+                                  labels = label_text)
+  } else if(isolates == "caption"){
+    p <- p + ggplot2::labs(caption = paste("Isolates:", paste(isos, collapse = ", ")))
+  }
+  
+  # Add legends ----
+  p <- graph_legends(p, g, 
+                     node_color, node_shape, node_size,
+                     edge_color, edge_size)
+  
   # assign("last.warning", NULL, envir = baseenv()) # to avoid persistent ggrepel
   p
 }
 
-# Helper functions for graphr()
+# Helper functions for graphr() ----
+.infer_isolates <- function(g, isolates){
+  if(!any(manynet::node_is_isolate(g))) isolates <- "keep"
+  isolates
+}
+
 .infer_layout <- function(g, layout) {
   if (is.null(layout)) {
     if(manynet::is_list(g))

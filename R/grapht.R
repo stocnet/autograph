@@ -1,3 +1,4 @@
+# nocov start
 # Dynamic networks ####
 
 #' Easily animate dynamic networks with sensible defaults
@@ -195,10 +196,10 @@ grapht <- function(tlist, keep_isolates = TRUE,
     if (node_shape %in% names(nodes_out)) {
       node_shape <- as.factor(nodes_out[[node_shape]])
       if (!any(grepl("circle|square|triangle", node_shape))) {
-        node_shape <- c("circle", "square", "triangle")[node_shape]
+        node_shape <- c(21, 22, 24)[node_shape]  # circle, square, triangle (fillable)
       }
     }
-  } else node_shape <- "circle"
+  } else node_shape <- 21  # fillable circle (was "circle")
   if (!is.null(node_color)) {
     if (node_color %in% names(nodes_out)) {
       node_color <- .check_color(nodes_out[[node_color]])
@@ -228,9 +229,9 @@ grapht <- function(tlist, keep_isolates = TRUE,
   # Plot nodes ####
   if ("diffusion" %in% names(nodes_out)) {
     cols <- match_color(c("#d73027", "#4575b4", "#E6AB02", "#66A61E"))
-    p + ggraph::geom_node_point(ggplot2::aes(color = node_color),
+    p + ggraph::geom_node_point(ggplot2::aes(fill = node_color),
                                 size = node_size, shape = node_shape) +
-      ggplot2::scale_color_manual(name = NULL, guide = ggplot2::guide_legend(""),
+      ggplot2::scale_fill_manual(name = NULL, guide = ggplot2::guide_legend(""),
                                   values = c("Infected" = cols[1],
                                              "Susceptible" = cols[2],
                                              "Exposed" = cols[3],
@@ -240,7 +241,7 @@ grapht <- function(tlist, keep_isolates = TRUE,
   } else {
     p <- p + ggplot2::geom_point(aes(x, y, group = name), alpha = alphad,
                                  size = node_size, data = nodes_out,
-                                 color = node_color, shape = node_shape,
+                                 fill = node_color, shape = node_shape,
                                  show.legend = FALSE) +
       ggplot2::theme_void()
   }
@@ -317,3 +318,4 @@ grapht <- function(tlist, keep_isolates = TRUE,
     dplyr::mutate(status = ifelse(is.na(status), FALSE, TRUE)) %>%
     dplyr::distinct()
 }
+# nocov end

@@ -118,3 +118,4 @@ ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
     ggplot2::coord_equal() +
     ggplot2::theme_void()
 }
+

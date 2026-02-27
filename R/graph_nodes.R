@@ -11,19 +11,22 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
       p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = node_size))
     if (length(unique(out[["nshape"]])) > 1) 
       p <- p + ggplot2::guides(shape = ggplot2::guide_legend(
-        title = ifelse(manynet::is_twomode(g) & is.null(node_shape), "Node Mode", "Node Shape")))
+        title = ifelse(manynet::is_twomode(g) & is.null(node_shape), 
+                       "Mode", node_shape)))
     if (length(unique(out[["ncolor"]])) > 1){
       if(length(unique(out[["ncolor"]])) == 2){
-        p <- p + ggplot2::scale_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
+        p <- p + ggplot2::scale_fill_manual(values = getOption("snet_highlight", 
+                                                               default = c("grey","black")),
                                               guide = ggplot2::guide_legend(node_color))
       } else {
-        p <- p + ggplot2::scale_colour_manual(values = ag_qualitative(length(unique(out[["ncolor"]]))),
+        p <- p + ggplot2::scale_fill_manual(values = ag_qualitative(length(unique(out[["ncolor"]]))),
                                               guide = ggplot2::guide_legend(node_color))
       }
     }
   }
   # Consider rescaling nodes
-  p <- p + ggplot2::scale_size(range = c(1/manynet::net_nodes(g)*50, 1/manynet::net_nodes(g)*100))
+  p <- p + ggplot2::scale_size(range = c(1/manynet::net_nodes(g)*50, 
+                                         1/manynet::net_nodes(g)*100))
   p
 }
 
@@ -56,7 +59,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   } else if (is_twomode(g) & is.null(node_shape)) {
     out <- ifelse(igraph::V(g)$type, "One", "Two")
   } else {
-    out <- "circle"
+    out <- 21  # Use fillable circle shape (was "circle")
   }
   out
 }
@@ -104,9 +107,9 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
                                  "R" ~ "Recovered",
                                  "S" ~ "Susceptible")
   cols <- match_color(c("#d73027", "#4575b4", "#E6AB02", "#66A61E"))
-  p + ggraph::geom_node_point(ggplot2::aes(color = node_color),
+  p + ggraph::geom_node_point(ggplot2::aes(fill = node_color),
                               size = out[["nsize"]], shape = out[["nshape"]]) +
-    ggplot2::scale_color_manual(name = NULL, guide = ggplot2::guide_legend(""),
+    ggplot2::scale_fill_manual(name = NULL, guide = ggplot2::guide_legend(""),
                                 values = c("Infected" = cols[1],
                                            "Susceptible" = cols[2],
                                            "Exposed" = cols[3],
@@ -121,9 +124,9 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   node_color <- ifelse(is.infinite(node_adopts), 
                        max(node_adopts[!is.infinite(node_adopts)]) + 1, 
                        node_adopts)
-  p + ggraph::geom_node_point(ggplot2::aes(shape = nshape, color = node_color),
+  p + ggraph::geom_node_point(ggplot2::aes(shape = nshape, fill = node_color),
                               size = out[["nsize"]]) +
-    ggplot2::scale_color_gradient(low = match_color("#d73027"), high = match_color("#4575b4"),
+    ggplot2::scale_fill_gradient(low = match_color("#d73027"), high = match_color("#4575b4"),
                                   breaks=c(min(node_color)+1, 
                                            ifelse(any(nshape=="Non-Adopter"),
                                                   max(node_color)-1,
@@ -132,40 +135,51 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
                                   name = "Time of\nAdoption\n") +
     ggplot2::scale_shape_manual(name = "",
                                 breaks = c("Seed(s)", "Adopter", "Non-Adopter"),
-                                values = c("Seed(s)" = "triangle",
-                                           "Adopter" = "circle",
-                                           "Non-Adopter" = "square")) +
-    ggplot2::guides(color = ggplot2::guide_colorbar(order = 1, reverse = TRUE),
+                                values = c("Seed(s)" = 24,    # triangle
+                                           "Adopter" = 21,     # circle
+                                           "Non-Adopter" = 22)) +  # square
+    ggplot2::guides(fill = ggplot2::guide_colorbar(order = 1, reverse = TRUE),
                     shape = ggplot2::guide_legend(order = 2))
 }
 
 .map_nodes <- function(p, out) {
-  if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(colour = out[["ncolor"]], size = out[["nsize"]],
+  if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & 
+      length(out[["nshape"]]) == 1) {
+    p <- p + ggraph::geom_node_point(fill = out[["ncolor"]], size = out[["nsize"]],
                                      shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(colour = out[["ncolor"]]), 
+  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & 
+             length(out[["nshape"]]) == 1) {
+    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]]), 
                                      size = out[["nsize"]], shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & length(out[["nshape"]]) == 1) {
+  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & 
+             length(out[["nshape"]]) == 1) {
     p <- p + ggraph::geom_node_point(ggplot2::aes(size = out[["nsize"]]),
-                                     colour = out[["ncolor"]], shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & length(out[["nshape"]]) > 1) {
+                                     fill = out[["ncolor"]], shape = out[["nshape"]])
+  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & 
+             length(out[["nshape"]]) > 1) {
     p <- p + ggraph::geom_node_point(ggplot2::aes(shape = out[["nshape"]]),
-                                     colour = out[["ncolor"]], size = out[["nsize"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) > 1 & length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(colour = out[["ncolor"]], size = out[["nsize"]]),
+                                     fill = out[["ncolor"]], size = out[["nsize"]])
+  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) > 1 & 
+             length(out[["nshape"]]) == 1) {
+    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]], 
+                                                  size = out[["nsize"]]),
                                      shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & length(out[["nshape"]]) > 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(colour = out[["ncolor"]], shape = out[["nshape"]]),
+  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & 
+             length(out[["nshape"]]) > 1) {
+    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]], 
+                                                  shape = out[["nshape"]]),
                                      size = out[["nsize"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & length(out[["nshape"]]) > 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(size = out[["nsize"]], shape = out[["nshape"]]),
-                                     colour = out[["ncolor"]])
+  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & 
+             length(out[["nshape"]]) > 1) {
+    p <- p + ggraph::geom_node_point(ggplot2::aes(size = out[["nsize"]], 
+                                                  shape = out[["nshape"]]),
+                                     fill = out[["ncolor"]])
   } else {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(colour = out[["ncolor"]],
+    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]],
                                                   shape = out[["nshape"]],
                                                   size = out[["nsize"]]))
   }
+  p <- p + ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25))
   p
 }
 

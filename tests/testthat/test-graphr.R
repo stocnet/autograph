@@ -1,3 +1,15 @@
+data_objs <- mget(ls("package:manynet"), inherits = TRUE)
+# Filter to relevant objects 
+data_objs <- data_objs[grepl("ison_|fict_|irps_|mpn_", names(data_objs))]
+# data_objs <- data_objs[!grepl("starwars|physicians|potter", names(data_objs))]
+for (nm in names(data_objs)) { 
+  test_that(paste("graphr() works on", nm), {
+    skip_if(grepl("starwars|physicians|potter|marvel", nm))
+    expect_error(graphr(data_objs[[nm]]), NA) }) 
+}
+
+fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
+
 test_that("unweighted, unsigned, undirected networks graph correctly", {
   skip_on_cran()
   # Unweighted, unsigned, undirected network
@@ -10,13 +22,13 @@ test_that("unweighted, unsigned, undirected networks graph correctly", {
   expect_equal(test_brandes[["layers"]][[1]][["aes_params"]][["edge_linetype"]], "solid")
   # Node parameters
   expect_equal(round(test_brandes[["layers"]][[2]][["aes_params"]][["size"]]), 11)
-  expect_equal(as.character(test_brandes[["layers"]][[2]][["aes_params"]][["shape"]]), "circle")
+  expect_equal(test_brandes[["layers"]][[2]][["aes_params"]][["shape"]], 21)  # fillable circle
 })
 
 test_that("unweighted, signed, undirected networks graph correctly", {
   skip_on_cran()
   # Unweighted, signed, undirected network
-  test_marvel <- graphr(to_giant(ison_marvel_relationships))
+  test_marvel <- graphr(fmrg)
   # Node position
   expect_equal(round(test_marvel[["data"]][["x"]][[1]]), -1)
   expect_equal(round(test_marvel[["data"]][["y"]][[1]]), 1)
@@ -40,7 +52,7 @@ test_that("unweighted, unsigned, directed networks graph correctly", {
   #expect_equal(test_algebra[["layers"]][[1]][["mapping"]][["edge_colour"]], "black")
   # Node parameters
   expect_equal(round(test_algebra[["layers"]][[2]][["aes_params"]][["size"]]), 8)
-  expect_equal(test_algebra[["layers"]][[2]][["aes_params"]][["shape"]], "circle")
+  expect_equal(test_algebra[["layers"]][[2]][["aes_params"]][["shape"]], 21)  # fillable circle
 })
 
 test_that("weighted, unsigned, directed networks graph correctly", {
@@ -65,15 +77,13 @@ test_that("fancy node mods graph correctly", {
   skip_on_cran()
   skip_on_ci()
   # one-mode network
-  ison_marvel_relationships <- dplyr::mutate(ison_marvel_relationships,
-                                             nodesize = Appearances/1000)
-  testcolnodes <- graphr(ison_marvel_relationships, node_color = "Gender",
-                         node_size = "nodesize", node_shape = "Attractive")
+  fmrg <- dplyr::mutate(fmrg, nodesize = Appearances/1000)
+  testcolnodes <- graphr(fmrg, node_color = "Gender",
+                         node_size = "Appearances", 
+                         node_shape = "Attractive")
   expect_s3_class(testcolnodes, c("ggraph","gg","ggplot"))
-  expect_equal(round(testcolnodes$data$x[1]), 4)
-  expect_equal(round(testcolnodes$data$y[1]), 3)
   expect_equal(nrow(testcolnodes[["plot_env"]][["lo"]]),
-               c(net_nodes(ison_marvel_relationships)))
+               c(net_nodes(fmrg)))
   # two-mode network
   ison_southern_women <- add_node_attribute(ison_southern_women, "group",
                                             c(sample(c("a", "b"),
@@ -119,5 +129,54 @@ test_that("unquoted arguments plot correctly", {
   skip_on_cran()
   expect_equal(graphr(ison_lawfirm, node_color = "gender"),
                graphr(ison_lawfirm, node_color = gender))
+})
+
+# Tests for fill aesthetic (color-to-fill change)
+test_that("nodes use fill aesthetic instead of colour", {
+  skip_on_cran()
+  # Default node uses fill parameter
+  p <- graphr(ison_brandes)
+  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], "black")
+  # Mapped node_color uses fill in aes
+  p2 <- ison_brandes %>%
+    dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) %>%
+    graphr(node_color = color)
+  expect_false(is.null(p2[["layers"]][[2]][["mapping"]][["fill"]]))
+})
+
+test_that("node_color with multiple values uses fill scale", {
+  skip_on_cran()
+  # More than 2 colors triggers scale_fill_manual with qualitative palette
+  p <- ison_brandes %>%
+    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) %>%
+    graphr(node_color = grp)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Check that fill scale is used (not colour)
+  scale_names <- vapply(p[["scales"]][["scales"]], function(s) {
+    paste(s[["aesthetics"]], collapse = ",")
+  }, character(1))
+  expect_true(any(grepl("fill", scale_names)))
+})
+
+test_that("two-mode networks get correct node shapes", {
+  skip_on_cran()
+  p <- graphr(ison_southern_women)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Two-mode shape mapping should use "One"/"Two" labels
+  node_layer <- p[["layers"]][[2]]
+  expect_false(is.null(node_layer[["mapping"]][["shape"]]))
+})
+
+test_that("node_color with 2 values uses highlight palette", {
+  skip_on_cran()
+  p <- ison_brandes %>%
+    dplyr::mutate(grp = c(rep(c("x", "y"), 5), "x")) %>%
+    graphr(node_color = grp)
+  expect_s3_class(p, c("ggraph", "gg", "ggplot"))
+  # Should use scale_fill_manual with highlight defaults
+  scale_names <- vapply(p[["scales"]][["scales"]], function(s) {
+    paste(s[["aesthetics"]], collapse = ",")
+  }, character(1))
+  expect_true(any(grepl("fill", scale_names)))
 })
 

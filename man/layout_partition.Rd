@@ -107,11 +107,6 @@ Defaults to NULL.}
 \description{
 These algorithms layout networks based on two or more partitions,
 and are recommended for use with \code{graphr()} or \code{{ggraph}}.
-Note that these layout algorithms use \code{{Rgraphviz}},
-a package that is only available on Bioconductor.
-It will first need to be downloaded using \code{BiocManager::install("Rgraphviz")}.
-If it has not already been installed, there is a prompt the first time
-these functions are used though.
 
 The "hierarchy" layout layers the first node set along the bottom,
 and the second node set along the top,

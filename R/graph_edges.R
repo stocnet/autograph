@@ -16,7 +16,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size) {
                                                       guide = ggplot2::guide_legend(
                                                         ifelse(is.null(edge_size) &
                                                                  manynet::is_weighted(g),
-                                                               "Edge Weight", "Edge Size")))
+                                                               "Weight", "Width")))
   if (length(unique(out[["ecolor"]])) == 1) {
     p <- p + ggplot2::guides(edge_colour = "none")
   } else if (length(unique(out[["ecolor"]])) == 2){
@@ -24,12 +24,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size) {
                                               guide = ggplot2::guide_legend(
                                                 ifelse(is.null(edge_color) &
                                                          manynet::is_signed(g),
-                                                       "Edge Sign", edge_color)))
+                                                       "Sign", edge_color)))
   } else p <- p + ggraph::scale_edge_colour_manual(values = ag_qualitative(length(unique(out[["ecolor"]]))),
                                                    guide = ggplot2::guide_legend(
                                                      ifelse(is.null(edge_color) &
                                                               manynet::is_signed(g),
-                                                            "Edge Sign", edge_color)))
+                                                            "Sign", edge_color)))
   p
 }
 
