@@ -111,6 +111,11 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                    edge_color, edge_size, 
                    isolates = c("legend","caption","keep"), snap = FALSE, ...,
                    node_colour, edge_colour) {
+  if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
+                             node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
+                             edge_color = edge_color, edge_size = edge_size, 
+                             isolates = isolates, snap = snap, ...,
+                             node_colour = node_colour, edge_colour = edge_colour))
   g <- manynet::as_tidygraph(.data)
   
   # Separate isolates ----
