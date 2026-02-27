@@ -23,11 +23,9 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   }
   if(snap){
     manynet::snet_info("Snapping layout coordinates to grid.")
-    if(grepl("lattice", 
-             igraph::graph_attr(attr(p$data, "graph"), "grand")$name, 
-             ignore.case = TRUE))
-      p$data[,c("x","y")] <- round(p$data[,c("x","y")])
-    else p$data[,c("x","y")] <- depth_first_recursive_search(p)
+    if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE))
+      p$data[,c("x","y")] <- round(p$data[,c("x","y")]) else 
+        p$data[,c("x","y")] <- depth_first_recursive_search(p)
   }
   # Add background ----
   if(getOption("snet_background", default = "#FFFFFF")!="#FFFFFF")
