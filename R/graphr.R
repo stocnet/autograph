@@ -172,18 +172,16 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                                  size = 0) +
       ggplot2::scale_alpha_manual(name = "+ Isolates", 
                                   values = c("Isolates" = 0.5), 
-                                  labels = label_text) +
-      ggplot2::guides(color = ggplot2::guide_legend(order = 1), 
-                      fill = ggplot2::guide_legend(order = 1),
-                      shape = ggplot2::guide_legend(order = 1),
-                      linetype = ggplot2::guide_legend(order = 1),
-                      edge_colour = ggplot2::guide_legend(order = 1),
-                      edge_width = ggplot2::guide_legend(order = 1),
-                      alpha = ggplot2::guide_legend(order = 99,
-                                override.aes = list( alpha = 0, size = 0, shape = NA )))
+                                  labels = label_text)
   } else if(isolates == "caption"){
     p <- p + ggplot2::labs(caption = paste("Isolates:", paste(isos, collapse = ", ")))
   }
+  
+  # Add legends ----
+  p <- graph_legends(p, g, 
+                     node_color, node_shape, node_size,
+                     edge_color, edge_size)
+  
   # assign("last.warning", NULL, envir = baseenv()) # to avoid persistent ggrepel
   p
 }
