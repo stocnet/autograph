@@ -179,7 +179,10 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
                                                   shape = out[["nshape"]],
                                                   size = out[["nsize"]]))
   }
-  p <- p + ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25))
+  p <- p + ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25, 
+                                                  3, 4, 8,
+                                                  10, 12, 9,
+                                                  13, 7, 11, 14))
   p
 }
 
