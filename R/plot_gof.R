@@ -67,6 +67,10 @@
 plot.ag_gof <- function(x, ...){
   obs <- x[[1]]
   sims <- x[[2]]
+  if(all(!is.na(suppressWarnings(as.numeric(sims$name))))){
+    obs <- obs %>% dplyr::mutate(name = .to_factor(name))
+    sims <- sims %>% dplyr::mutate(name = .to_factor(name))
+  }
   main <- x[[3]]
   p_value <- x[[4]]
   
@@ -96,7 +100,8 @@ plot.ag_gof <- function(x, ...){
                        color = ag_highlight()) +
     ggplot2::theme_minimal(base_family = ag_font()) +
     ggplot2::labs(y = "Statistic", title = main, 
-                  x = if(is.null(p_value)) "" else paste("p:", round(p_value, 3), collapse = " "))
+                  x = if(is.null(p_value)) "" else 
+                    paste("p:", round(p_value, 3), collapse = " "))
 }
 
 #' @rdname plot_gof
@@ -157,9 +162,9 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   args <- list(...)
   if (is.null(args$main)) {
     statName <- tolower(add_spaces(attr(x, "auxiliaryStatisticName")))
-    main = paste("Goodness of fit of", statName)
+    main <- paste("Goodness of fit of", statName)
     if (!attr(x, "joined")) {
-      main = paste(main, "Period", period)
+      main <- paste(main, "Period", period)
     }
   } else {
     main = args$main
@@ -179,7 +184,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   no_vary <- sims.min == obs & sims.min == sims.max
   if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
     statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    snet_info("Note: statistic{?s} {statkeys} not plotted because the{?ir} variance is 0.")
   }
   
   itns <- nrow(sims)
@@ -191,15 +196,15 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
                          idvar = "sim", direction = "long") %>% 
     dplyr::tibble() %>% dplyr::arrange(sim)
   obs <- obs[!no_vary]
-  obs <- data.frame(name = as.character((1:length(obs))-1), value = obs)
+  obs <- data.frame(name = sims$name[!duplicated(sims$name)], value = obs)
   
-  if(!cumulative){
-    sims <- sims %>% dplyr::group_by(sim) %>%
-      dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
-      dplyr::ungroup()
-    obs <- obs %>% 
-      mutate(value = c(.data$value[1], diff(.data$value)))
-  }
+  # if(!cumulative){
+  #   sims <- sims %>% dplyr::group_by(sim) %>%
+  #     dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
+  #     dplyr::ungroup()
+  #   obs <- obs %>% 
+  #     mutate(value = c(.data$value[1], diff(.data$value)))
+  # }
   
   out <- list(obs, sims, main, x$p)
   class(out) <- "ag_gof"
