@@ -17,7 +17,7 @@
 #' @returns `plot.node_measure()` and `plot.tie_measure()` returns a histogram 
 #'   and/or density plot of the distribution of the measure.
 #' @examples
-#' plot(manynet::node_deg(ison_karateka))
+#' plot(netrics::node_by_deg(ison_karateka))
 #' @export
 plot.node_measure <- function(x, type = c("h", "d"), ...) {
   #type <- match.arg(type)
@@ -57,7 +57,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
 
 #' @rdname map_measure
 #' @examples
-#' plot(manynet::tie_betweenness(ison_karateka))
+#' plot(netrics::tie_by_betweenness(ison_karateka))
 #' @export
 plot.tie_measure <- function(x, type = c("h", "d"), ...) {
   # type <- match.arg(type)
@@ -120,7 +120,7 @@ plot.network_measures <- function(x, ...) {
 #' @importFrom stats cutree
 #' @importFrom ggdendro ggdendrogram
 #' @examples
-#' plot(manynet::node_in_walktrap(ison_southern_women, "e"))
+#' plot(netrics::node_in_walktrap(ison_southern_women, "e"))
 #' @export
 plot.node_member <- function(x, ...) {
   hc <- attr(x, "hc")
@@ -208,9 +208,9 @@ plot.node_member <- function(x, ...) {
 #'   membership vector.
 #' @examples
 #' plot(as_matrix(ison_adolescents),
-#'   membership = node_in_walktrap(ison_adolescents, "e"))
+#'   membership = netrics::node_in_walktrap(ison_adolescents, "e"))
 #' plot(as_matrix(ison_southern_women),
-#'   membership = node_in_walktrap(ison_southern_women, "e"))
+#'   membership = netrics::node_in_walktrap(ison_southern_women, "e"))
 #' @export
 plot.matrix <- function(x, ..., membership = NULL) {
   
