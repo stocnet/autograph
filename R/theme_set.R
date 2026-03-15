@@ -46,9 +46,9 @@
 #'   stocnet packages. The palettes are written to options and held there.
 #' @examples
 #' stocnet_theme("default")
-#' plot(manynet::node_degree(ison_karateka))
+#' plot(netrics::node_by_degree(ison_karateka))
 #' stocnet_theme("rug")
-#' plot(manynet::node_degree(ison_karateka))
+#' plot(netrics::node_by_degree(ison_karateka))
 NULL
 
 theme_opts <- c("default", "bw", "crisp", "neon", 
