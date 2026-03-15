@@ -54,7 +54,7 @@ plot.network_test <- function(x, ...,
       ggplot2::geom_area(data = subset(d, x > thresh[2]), 
                          aes(x = x, y = .data$y), fill = "lightgrey")
   }
-  p + ggplot2::theme_classic() + ggplot2::geom_density() +
+  p + ggplot2::theme_classic(base_family = ag_font()) + ggplot2::geom_density() +
     ggplot2::geom_vline(ggplot2::aes(xintercept = x$testval),
                         color = utils::tail(getOption("snet_highlight", 
                                                default = "red"), n = 1), 
@@ -100,7 +100,7 @@ plot.netlm <- function(x, ...){
     ggplot2::geom_violin(quantile.color = ag_base(),
                          quantile.linetype = "solid", 
                          quantiles = c(0.025, 0.975)) + 
-    ggplot2::theme_minimal() +
+    ggplot2::theme_minimal(base_family = ag_font()) +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
                         colour = utils::tail(getOption("snet_highlight", 
@@ -131,7 +131,7 @@ plot.netlogit <- function(x, ...){
     ggplot2::geom_violin(quantile.color = ag_base(),
                          quantile.linetype = "solid", 
                          quantiles = c(0.025, 0.975)) + 
-    ggplot2::theme_minimal() +
+    ggplot2::theme_minimal(base_family = ag_font()) +
     ylab("") + xlab("Statistic") + 
     ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
                         colour = utils::tail(getOption("snet_highlight", 
