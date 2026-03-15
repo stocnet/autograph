@@ -71,7 +71,7 @@ and \code{snet_cat} for categorical palettes.
 \examples{
 stocnet_theme("default")
 plot(netrics::node_by_degree(ison_karateka))
-stocnet_theme("rug")
+stocnet_theme("uzh")
 plot(netrics::node_by_degree(ison_karateka))
 }
 \concept{themes}
