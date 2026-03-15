@@ -118,7 +118,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
 
 .map_diff_model_nodes <- function(p, g, out) {
   dm <- manynet::as_diffusion(g)
-  node_adopts <- manynet::node_adoption_time(g)
+  node_adopts <- .node_adoption_time(g)
   nshape <- ifelse(node_adopts == min(node_adopts), "Seed(s)",
                    ifelse(node_adopts == Inf, "Non-Adopter", "Adopter"))
   node_color <- ifelse(is.infinite(node_adopts), 
@@ -186,3 +186,44 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   p
 }
 
+.node_adoption_time <- function(.data){
+  
+  if(inherits(.data, "diff_model")){
+    net <- attr(.data, "network") 
+    out <- summary(.data) %>% dplyr::filter(event == "I") %>% 
+      dplyr::distinct(nodes, .keep_all = TRUE) %>% 
+      dplyr::select(nodes,t)
+    if(!manynet::is_labelled(net))
+      out <- dplyr::arrange(out, nodes) else if (is.numeric(out$nodes))
+        out$nodes <- manynet::node_names(net)[out$nodes]
+    out <- stats::setNames(out$t, out$nodes)
+    if(length(out) != manynet::net_nodes(net)){
+      full <- rep(Inf, manynet::net_nodes(net))
+      names(full) <- `if`(manynet::is_labelled(net), 
+                          manynet::node_names(net), 
+                          as.character(seq_len(manynet::net_nodes(net))))
+      full[match(names(out), names(full))] <- out
+      out <- `if`(manynet::is_labelled(net), full, unname(full))
+    }
+  } else {
+    net <- .data
+    out <- manynet::as_changelist(.data) %>% dplyr::filter(value == "I") %>% 
+      dplyr::distinct(node, .keep_all = TRUE) %>% 
+      dplyr::select(node,time)
+    if(!manynet::is_labelled(net))
+      out <- dplyr::arrange(out, node) else if (is.numeric(out$node))
+        out$node <- manynet::node_names(net)[out$node]
+    out <- stats::setNames(out$time, out$node)
+    if(length(out) != manynet::net_nodes(net)){
+      full <- rep(Inf, manynet::net_nodes(net))
+      names(full) <- `if`(manynet::is_labelled(net), 
+                          manynet::node_names(net), 
+                          as.character(seq_len(manynet::net_nodes(net))))
+      full[match(names(out), names(full))] <- out
+      out <- `if`(manynet::is_labelled(net), full, unname(full))
+    }
+  }
+  
+  if(!manynet::is_labelled(net)) out <- unname(out)
+  out
+}

@@ -122,9 +122,9 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   isolates <- .infer_isolates(g, match.arg(isolates))
   if(isolates != "keep"){
     if(manynet::is_labelled(g)){
-      isos <- manynet::node_names(g)[manynet::node_is_isolate(g)]
+      isos <- manynet::node_names(g)[.node_is_isolate(g)]
     } else {
-      isos <- which(manynet::node_is_isolate(g))
+      isos <- which(.node_is_isolate(g))
     }
     g <- manynet::to_no_isolates(g)
   } 
@@ -192,8 +192,20 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
 }
 
 # Helper functions for graphr() ----
+.node_is_isolate <- function(g) {
+  if (manynet::is_directed(g)) {
+    in_degree <- igraph::degree(g, mode = "in")
+    out_degree <- igraph::degree(g, mode = "out")
+    isolates <- (in_degree == 0) & (out_degree == 0)
+  } else {
+    degree <- igraph::degree(g)
+    isolates <- degree == 0
+  }
+  isolates
+}
+
 .infer_isolates <- function(g, isolates){
-  if(!any(manynet::node_is_isolate(g))) isolates <- "keep"
+  if(!any(.node_is_isolate(g))) isolates <- "keep"
   isolates
 }
 

@@ -148,7 +148,7 @@ grapht <- function(tlist, keep_isolates = TRUE,
     nodes_out <- .remove_isolates(edges_out, nodes_out)
   } else {
     if (nrow(nodes_out)/length(unique(nodes_out$frame)) > 30 &
-        any(unlist(lapply(tlist, manynet::node_is_isolate)) == TRUE)) {
+        any(unlist(lapply(tlist, .node_is_isolate)) == TRUE)) {
       manynet::snet_info("Please considering deleting isolates to improve visualisation.")
     } 
     nodes_out$status <- TRUE
