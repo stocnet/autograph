@@ -75,14 +75,23 @@ plot.ag_gof <- function(x, ...){
   p_value <- x[[4]]
   
   # Compute quantiles for each x
-  bounds <- sims %>%
-    dplyr::group_by(name) %>%
-    dplyr::summarise(
-      q05 = stats::quantile(value, 0.05),
-      q95 = stats::quantile(value, 0.95),
-      .groups = "drop")
+  if("ego" %in% names(obs)) {
+    bounds <- sims %>%
+      dplyr::group_by(name, ego) %>%
+      dplyr::summarise(
+        q05 = stats::quantile(value, 0.05),
+        q95 = stats::quantile(value, 0.95),
+        .groups = "drop")
+    } else {
+    bounds <- sims %>%
+      dplyr::group_by(name) %>%
+      dplyr::summarise(
+        q05 = stats::quantile(value, 0.05),
+        q95 = stats::quantile(value, 0.95),
+        .groups = "drop")
+  }
   
-  ggplot2::ggplot(sims, aes(x = name, y = value)) +
+  p <- ggplot2::ggplot(sims, aes(x = name, y = value)) +
     ggplot2::geom_violin(scale = "width", trim = FALSE, color = ag_base()) +
     ggplot2::geom_boxplot(width = 0.1, outlier.shape = 4, 
                           fill = ag_base()) +
@@ -102,6 +111,15 @@ plot.ag_gof <- function(x, ...){
     ggplot2::labs(y = "Statistic", title = main, 
                   x = if(is.null(p_value)) "" else 
                     paste("p:", round(p_value, 3), collapse = " "))
+  if("ego" %in% names(obs)) {
+    p <- p + ggplot2::facet_wrap(ggplot2::vars(ego)) +
+      ggplot2::labs(x = "Alter")
+    if(!is.null(p_value)) {
+      p <- p + ggplot2::labs(caption = paste("p:", round(p_value, 3), 
+                                             collapse = " "))
+    }
+  }
+  p
 }
 
 #' @rdname plot_gof
@@ -169,6 +187,8 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   } else {
     main = args$main
   }
+  EA <- attr(x, "EgoAlter")
+  if(is.null(EA)) EA <- FALSE
   if (attr(x, "joined")) {
     x <- x[[1]]
   } else {
@@ -205,6 +225,18 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   #   obs <- obs %>% 
   #     mutate(value = c(.data$value[1], diff(.data$value)))
   # }
+  
+  if(EA){
+    if(!all(nchar(obs[,"name"])==2))
+      snet_abort("Ego-alter GOF statistic names should be two characters long,",
+      " but some are not. Please check the number or names in the GOF object.")
+    obs <- obs %>% dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
+                                 name = substr(name, 2, 2)) %>% 
+      dplyr::mutate(ego = .to_factor(ego), name = .to_factor(name))
+    sims <- sims %>% dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
+                                   name = substr(name, 2, 2)) %>% 
+      dplyr::mutate(ego = .to_factor(ego), name = .to_factor(name))
+  }
   
   out <- list(obs, sims, main, x$p)
   class(out) <- "ag_gof"
