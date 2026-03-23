@@ -11,6 +11,7 @@
 
 ## Plotting
 
+- Closed #37 by adding EgoAlter sienaGOF plot
 - Fixed #36 by using `.to_factor()` in `plot.ag_gof()` to correct numeric ordering of statistics, and dropped cumulative correction in `plot.sienaGOF()`
 - Fixed #38 by dropping linetype in favour of colours even for bw theme in `plot.influenceTable()`
 - Fixed option reference from `snet_theme` to `stocnet_theme` in `plot.selectionTable()` and `plot.influenceTable()`
