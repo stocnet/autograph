@@ -259,8 +259,9 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
   if(statistic == "dspartners") statistic <- "dspart"
   if(statistic == "distance") statistic <- "dist"
   
-  obs <- data.frame(name = .to_factor(names(x[[paste0("obs.",statistic)]])),
-                    value = x[[paste0("obs.",statistic)]]) %>% 
+  obs <- data.frame(name = names(x[[paste0("obs.",statistic)]]),
+                    value = x[[paste0("obs.",statistic)]],
+                    stringsAsFactors = FALSE) %>% 
     dplyr::tibble()
   if(nrow(obs) == 0){
     manynet::snet_abort("Note: {statdescription} {.code {statistic}} is not available in this GOF object.")
@@ -275,7 +276,8 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     obs <- obs[!no_vary, ]
     snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
   }
-  sims <- as.data.frame(simsMat)
+  obs <- obs %>% dplyr::mutate(name = .to_factor(name))
+  sims <- as.data.frame(simsMat, check.names = FALSE)
   sims$sim <- 1:nrow(sims)
   sims <- stats::reshape(sims,
                  direction = "long",
