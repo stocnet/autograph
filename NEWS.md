@@ -8,7 +8,7 @@
 
 - Improved `node_shape` to accept more categories
 - Moved `node_is_isolate` and `node_adoption_time` to internal helpers to reduce dependencies
-- Fixed #47 color legend not showing colors by overriding shape to fillable (21) 
+- Fixed #47 by overriding shape to fillable (21) 
 
 ## Plotting
 
@@ -18,6 +18,7 @@
 - Fixed option reference from `snet_theme` to `stocnet_theme` in `plot.selectionTable()` and `plot.influenceTable()`
 - Applied `ag_font()` to migraph model plots for consistent typography
 - Reorganised plot scripts by purpose: summaries, tests, and analysis
+- Fixed #46 by not appending "X" to the names when creating the data frame and moving factor coercion later in the process
 
 ## Tutorial
 
