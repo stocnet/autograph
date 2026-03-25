@@ -40,8 +40,7 @@ NULL
 #' @export
 plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 
-  bw <- ifelse(getOption("snet_theme","bw") %in% c("bw","crisp"), 
-               TRUE, FALSE)
+  bw <- ifelse(getOption("stocnet_theme","bw") %in% c("bw","crisp"), TRUE, FALSE)
   vselect <- x
   levls <- attr(x, "levls")
   multiplier <- attr(x, "multiplier")
@@ -94,7 +93,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
     ggplot2::theme(legend.key.width = ggplot2::unit(2.5, "cm")) +
     # of course you could vary the key.width - or anything else...
     ggplot2::theme(plot.title=element_text(hjust=0.5),
-                   base_family=ag_font())
+                   text = element_text(family = ag_font()))
   ssp
 }
 
@@ -109,7 +108,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 #' @export
 plot.influenceTable <- function(x, separation=0, ...){
   zselect <- x
-  bw <- ifelse(getOption("snet_theme","bw") %in% c("bw","crisp"), TRUE, FALSE)
+  bw <- ifelse(getOption("stocnet_theme","bw") %in% c("bw","crisp"), TRUE, FALSE)
   quad <- attr(x, "quad")
   netname <- attr(x, "netname")
   behname <- attr(x, "behname")
@@ -142,10 +141,11 @@ plot.influenceTable <- function(x, separation=0, ...){
   title <- paste0('Influence effect "',netname,'" on "',behname,'"')
   sp + ggplot2::theme(legend.key=element_blank()) +
     ggplot2::labs(x=paste(beh.label,'ego value'), y=ylabel, title=title,
-                  linetype=paste(beh.label,'\nalter\nvalue'),
-         colour=paste(beh.label,'\nalter\nvalue')) +
+                  # linetype=paste(beh.label,'\nalter\nvalue'),
+                  colour=paste(beh.label,'\nalter\nvalue')) +
     # ggplot2::theme_grey(base_size=14, base_family="") +
     ggplot2::theme(legend.key.width = ggplot2::unit(1, "cm")) +
-    ggplot2::theme(plot.title=element_text(hjust=0.5),
-                   base_family=ag_font())
+    ggplot2::theme(text = element_text(family = ag_font()),
+                   plot.title = element_text(hjust=0.5,
+                                           family = ag_font()))
 }

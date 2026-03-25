@@ -330,6 +330,9 @@ the grammar of graphics,
 it's easy to extend or alter aesthetic aspects.
 Here let's try and change the colors
 assigned to the different races in the `fict_lotr` dataset.
+Note that despite the argument being `node_color`, 
+when overwriting the colors please use functions of the type `ggplot2::scale_fill_*()`,
+as it is the "fill" aesthetic that is being mapped to the variable in this case.
 
 ```{r colorch, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
@@ -337,7 +340,7 @@ graphr(fict_lotr,
 
 graphr(fict_lotr,
            node_color = "Race") +
-  ggplot2::scale_colour_hue()
+  ggplot2::scale_fill_hue()
 ```
 
 At this stage, it is worth noting that not everyone experiences colours in the
@@ -361,7 +364,7 @@ replace `_hue` from above with `_grey` (note the 'e' spelling):
 ```{r greyscale, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
            node_color = "Race") +
-  ggplot2::scale_colour_grey()
+  ggplot2::scale_fill_grey()
 ```
 
 As you can see, grayscale is more effective for continuous variables
@@ -378,14 +381,14 @@ Unspecified categories are coloured (dark) grey.
 ```{r mancolor, exercise=TRUE, fig.width=9}
 graphr(fict_lotr,
            node_color = "Race") +
-  ggplot2::scale_colour_manual(
+  ggplot2::scale_fill_manual(
     values = c("Dwarf" = "red",
                "Hobbit" = "orange",
                "Maiar" = "#DEC20B",
                "Human" = "lightblue",
                "Elf" = "lightgreen",
                "Ent" = "darkgreen")) +
-  labs(color = "Color")
+  labs(fill = "Color")
 ```
 
 ## Titles, labels, and legends

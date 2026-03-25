@@ -17,14 +17,16 @@
   snet_info("You are using {.pkg autograph} version {.version {local_version}}.")
   old.list <- as.data.frame(utils::old.packages())
   behind_cran <- "autograph" %in% old.list$Package
+  curr_theme <- getOption('stocnet_theme')
   
   greet_startup_cli <- function() {
     tips <- c(
-      "i" = "Theming graphs and plots is straightforward with `stocnet_theme()`",
-      "i" = "Please share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}.",
+      # "i" = "Theming graphs and plots is straightforward with `stocnet_theme()`",
+      "i" = "Theme set to {.code {getOption('stocnet_theme')}}. Use {.fn stocnet_theme} to change the theme."
+      # "i" = "Please share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}.",
       # "i" = "To eliminate package startup messages, use: `suppressPackageStartupMessages(library({.pkg autograph}))`.",
       # "i" = "If there are too many messages in the console, run `options(manynet_verbosity = 'quiet')`",
-      "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}."
+      # "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}."
       # "i" = "We recommend the 'Function Overview' page online to discover new analytic opportunities: {.url https://stocnet.github.io/autograph/reference/index.html}.",
     )
     snet_info(sample(tips, 1))
