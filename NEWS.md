@@ -8,6 +8,7 @@
 
 - Improved `node_shape` to accept more categories
 - Moved `node_is_isolate` and `node_adoption_time` to internal helpers to reduce dependencies
+- Fixed #47 color legend not showing colors by overriding shape to fillable (21) 
 
 ## Plotting
 
