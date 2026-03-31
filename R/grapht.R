@@ -131,7 +131,7 @@ grapht <- function(tlist, keep_isolates = TRUE,
   if (length(unique(unname(lapply(tlist, length)))) != 1) {
     if (any(c(node_shape, node_color, node_size) %in% names(manynet::node_attribute(tlist[[1]])))) {
       node_info <- dplyr::distinct(do.call(rbind, lapply(1:length(tlist), function(i)
-        tlist[[i]] %>% tidygraph::activate("nodes") %>% data.frame())))
+        tlist[[i]] %>% tidygraph::activate("nodes") %>% data.frame()))) # keep node info for later
     } else node_info <- NULL
     tlist <- manynet::to_waves(manynet::as_tidygraph(do.call("rbind", edges_lst)), attribute = "frame")
     tlist <- lapply(tlist, manynet::as_tidygraph)
@@ -378,7 +378,7 @@ print.grapht <- function(x, ...) {
   if (nshape_mapped) {
     p <- p + ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25))
   }
-  # Node size rescaling (consistent with graphr)
+  # Node size rescaling: range adapts to network density, matching graphr's graph_nodes()
   p <- p + ggplot2::scale_size(range = c(1/n_per_frame*50, 1/n_per_frame*100))
   
   # --- Apply theme ----
