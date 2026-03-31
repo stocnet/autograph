@@ -17,6 +17,7 @@ graphr(
   edge_size,
   isolates = c("legend", "caption", "keep"),
   snap = FALSE,
+  label_dist = NULL,
   ...,
   node_colour,
   edge_colour
@@ -98,6 +99,12 @@ we recommend that the "legend" option is used to avoid isolates crowding
 out the giant component.}
 
 \item{snap}{Logical scalar, whether the layout should be snapped to a grid.}
+
+\item{label_dist}{Numeric scalar controlling the distance between labels
+and nodes (in points). Higher values push labels further from node centers.
+The default (\code{NULL}) uses sensible spacing that adapts to network size.
+Set to \code{0} for labels directly at node centers,
+or to a larger value (e.g. \code{15}) for more spacing.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 }

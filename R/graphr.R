@@ -89,6 +89,11 @@
 #'   If the default layout ("stress") is used, 
 #'   we recommend that the "legend" option is used to avoid isolates crowding
 #'   out the giant component.
+#' @param label_dist Numeric scalar controlling the distance between labels
+#'   and nodes (in points). Higher values push labels further from node centers.
+#'   The default (`NULL`) uses sensible spacing that adapts to network size.
+#'   Set to `0` for labels directly at node centers,
+#'   or to a larger value (e.g. `15`) for more spacing.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
@@ -109,7 +114,8 @@
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
                    edge_color, edge_size, 
-                   isolates = c("legend","caption","keep"), snap = FALSE, ...,
+                   isolates = c("legend","caption","keep"), snap = FALSE,
+                   label_dist = NULL, ...,
                    node_colour, edge_colour) {
   if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
                              node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
@@ -165,7 +171,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   p <- graph_nodes(p, g, node_color, node_shape, node_size)
   # Add labels ----
   if (isTRUE(labels) & manynet::is_labelled(g)) {
-    p <- graph_labels(p, g, layout)
+    p <- graph_labels(p, g, layout, label_dist)
   }
   
   # Note isolates ----

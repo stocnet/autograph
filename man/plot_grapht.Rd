@@ -3,6 +3,7 @@
 \name{plot_grapht}
 \alias{plot_grapht}
 \alias{grapht}
+\alias{print.grapht}
 \title{Easily animate dynamic networks with sensible defaults}
 \source{
 https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with-gganimate/
@@ -22,10 +23,14 @@ grapht(
   node_colour,
   edge_colour
 )
+
+\method{print}{grapht}(x, ...)
 }
 \arguments{
-\item{tlist}{The same migraph-compatible network listed according to
-a time attribute, waves, or slices.}
+\item{tlist}{A manynet-compatible network listed according to
+a time attribute, waves, or slices.
+This can also be a diffusion model result from e.g.
+\code{manynet::play_diffusion()}.}
 
 \item{keep_isolates}{Logical, whether to keep isolate nodes in the graph.
 TRUE by default.
@@ -88,10 +93,16 @@ to using this function.
 Edges can also be sized by declaring a numeric size or vector instead.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
+
+\item{x}{A grapht object to print.}
 }
 \value{
-Shows a .gif image. Assigning the result of the function
-saves the gif to a temporary folder and the object holds the path to this file.
+A \code{{ggplot2}}-compatible object with \code{{gganimate}} animation layers.
+This object can be extended with additional \code{{ggplot2}} layers
+(e.g. \code{+ labs(subtitle = "My subtitle")}).
+When printed or displayed, the animation is rendered as a .gif.
+For more control over animation parameters,
+pass the result to \code{gganimate::animate()} directly.
 }
 \description{
 This function provides users with an easy way to graph
@@ -105,7 +116,20 @@ between successive iterations of a network.
 This is useful for networks in which the ties and/or the node or tie
 attributes are changing.
 
-A progress bar is shown if it takes some time to encoding all the
+\code{grapht()} returns a \code{{ggplot2}}-compatible object that can be
+extended with additional layers such as \code{ggplot2::labs()},
+\code{ggplot2::theme()}, scale functions, and others,
+just like plots produced by \code{graphr()} and \code{graphs()}.
+The animation is rendered when the object is printed or displayed.
+Users who want more control over animation parameters can call
+\code{gganimate::animate()} directly on the returned object.
+
+The visual appearance is consistent with \code{graphr()}:
+nodes use fillable shapes with the fill aesthetic,
+the same colour palettes are applied,
+and labels use the current theme font.
+
+A progress bar is shown if it takes some time to encode all the
 .png files into a .gif.
 }
 \examples{
