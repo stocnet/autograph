@@ -1,4 +1,9 @@
-graph_labels <- function(p, g, layout) {
+graph_labels <- function(p, g, layout, label_dist = NULL) {
+  padding <- if (!is.null(label_dist)) {
+    ggplot2::unit(label_dist, "pt")
+  } else {
+    ggplot2::unit(5, "pt")
+  }
   if (layout == "circle" | layout == "concentric") {
     angles <- as.data.frame(.cart2pol(as.matrix(p[["data"]][,1:2])))
     angles$degree <- angles$phi * 180/pi
@@ -19,29 +24,34 @@ graph_labels <- function(p, g, layout) {
     }
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name), repel = TRUE,
                                     family = ag_font(),
-                                    size = 3, hjust = hj, angle = angles) +
-      ggplot2::coord_cartesian(xlim=c(-1.2,1.2), ylim=c(-1.2,1.2))
+                                    size = 3, hjust = hj, angle = angles,
+                                    point.padding = padding) +
+      ggplot2::coord_cartesian(xlim=c(-1.3,1.3), ylim=c(-1.3,1.3))
   } else if (layout %in% c("bipartite", "railway") | layout == "hierarchy" &
              length(unique(p[["data"]][["y"]])) <= 2) {
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name), angle = 90,
                                     family = ag_font(),
                                     size = 3, hjust = "outward", repel = TRUE,
+                                    point.padding = padding,
                                     nudge_y = ifelse(p[["data"]][,2] == 1,
                                                      0.05, -0.05)) +
       ggplot2::coord_cartesian(ylim=c(-0.2, 1.2))
   } else if (layout == "hierarchy" & length(unique(p[["data"]][["y"]])) > 2) {
     p <- p + ggraph::geom_node_text(ggplot2::aes(label = name),
                                     family = ag_font(),
-                                    size = 3, hjust = "inward", repel = TRUE)
+                                    size = 3, hjust = "inward", repel = TRUE,
+                                    point.padding = padding)
   } else if (layout %in% c("alluvial", "lineage")) {
     p <- p + ggraph::geom_node_label(ggplot2::aes(label = name), size = 3,
                                      family = ag_font(),
-                                     repel = TRUE, nudge_x = ifelse(p[["data"]][,1] == 1, 
+                                     repel = TRUE, point.padding = padding,
+                                     nudge_x = ifelse(p[["data"]][,1] == 1, 
                                                                     0.02, -0.02))
   } else {
     p <- p + ggraph::geom_node_label(ggplot2::aes(label = name),
                                      family = ag_font(),
-                                     repel = TRUE, seed = 1234, size = 3)
+                                     repel = TRUE, seed = 1234, size = 3,
+                                     point.padding = padding)
   }
 }
 
