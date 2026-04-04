@@ -167,6 +167,17 @@ test_that("two-mode networks get correct node shapes", {
   expect_false(is.null(node_layer[["mapping"]][["shape"]]))
 })
 
+test_that("color legend uses fillable shape when node_shape is also mapped", {
+  skip_on_cran()
+  p <- ison_brandes %>%
+    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b"),
+                  cat = c(rep(c("x", "y"), 5), "x")) %>%
+    graphr(node_color = grp, node_shape = cat)
+  # The fill guide should override shape to 21 so colors render in legend
+  fill_guide <- p[["guides"]][["guides"]][["fill"]]
+  expect_equal(fill_guide[["params"]][["override.aes"]][["shape"]], 21)
+})
+
 test_that("node_color with 2 values uses highlight palette", {
   skip_on_cran()
   p <- ison_brandes %>%

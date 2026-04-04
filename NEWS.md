@@ -1,3 +1,31 @@
+# autograph 1.0.0
+
+## Package
+
+- Updated startup message to declare the set theme
+
+## Graphing
+
+- Improved `node_shape` to accept more categories
+- Moved `node_is_isolate` and `node_adoption_time` to internal helpers to reduce dependencies
+- Fixed #47 by overriding shape to fillable (21)
+- Fixed #10 and #52 by adding label distance parameter
+- Fixed #17 and #40 by improving `grapht()`
+
+## Plotting
+
+- Closed #37 by adding EgoAlter sienaGOF plot
+- Fixed #36 by using `.to_factor()` in `plot.ag_gof()` to correct numeric ordering of statistics, and dropped cumulative correction in `plot.sienaGOF()`
+- Fixed #38 by dropping linetype in favour of colours even for bw theme in `plot.influenceTable()`
+- Fixed option reference from `snet_theme` to `stocnet_theme` in `plot.selectionTable()` and `plot.influenceTable()`
+- Applied `ag_font()` to migraph model plots for consistent typography
+- Reorganised plot scripts by purpose: summaries, tests, and analysis
+- Fixed #46 by not appending "X" to the names when creating the data frame and moving factor coercion later in the process
+
+## Tutorial
+
+- Fixed #41 by updating tutorials to use fill aesthetics (`scale_fill_*()`) instead of colour aesthetics (`scale_colour_*()`)
+
 # autograph 0.6.0
 
 ## Package
