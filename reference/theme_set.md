@@ -67,8 +67,8 @@ and `snet_cat` for categorical palettes.
 
 ``` r
 stocnet_theme("default")
-plot(manynet::node_degree(ison_karateka))
+plot(netrics::node_by_degree(ison_karateka))
 
-stocnet_theme("rug")
-plot(manynet::node_degree(ison_karateka))
+stocnet_theme("uzh")
+plot(netrics::node_by_degree(ison_karateka))
 ```

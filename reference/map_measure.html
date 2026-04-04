@@ -9,7 +9,7 @@ as defined in the {manynet} package."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@ as defined in the {manynet} package."><meta property="og:image" content="https:/
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plotting logical marks Plotting numeric measures</h1>
-      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/plot_manynet.R" class="external-link"><code>R/plot_manynet.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/plot_analysis.R" class="external-link"><code>R/plot_analysis.R</code></a></small>
       <div class="d-none name"><code>map_measure.Rd</code></div>
     </div>
 
@@ -81,9 +81,9 @@ time.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_central_degree.html" class="external-link">node_deg</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="map_measure-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_central_between.html" class="external-link">tie_betweenness</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_centralities_between.html" class="external-link">tie_by_betweenness</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="map_measure-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

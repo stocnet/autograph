@@ -25,7 +25,8 @@ stocnet packages.
 
   - `graphr()` : Easily graph networks with sensible defaults
   - `graphs()` : Easily graph a set of networks with sensible defaults
-  - `grapht()` : Easily animate dynamic networks with sensible defaults
+  - `grapht()` `print(<grapht>)` : Easily animate dynamic networks with
+    sensible defaults
   - `plot(<node_measure>)` `plot(<tie_measure>)`
     `plot(<network_measures>)` : Plotting logical marks Plotting numeric
     measures

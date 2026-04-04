@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,38 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.6.0" id="autograph-060">autograph 0.6.0<a class="anchor" aria-label="anchor" href="#autograph-060"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.0.0" id="autograph-100">autograph 1.0.0<a class="anchor" aria-label="anchor" href="#autograph-100"></a></h2>
+<div class="section level3">
+<h3 id="package-1-0-0">Package<a class="anchor" aria-label="anchor" href="#package-1-0-0"></a></h3>
+<ul><li>Updated startup message to declare the set theme</li></ul></div>
+<div class="section level3">
+<h3 id="graphing-1-0-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-0-0"></a></h3>
+<ul><li>Improved <code>node_shape</code> to accept more categories</li>
+<li>Moved <code>node_is_isolate</code> and <code>node_adoption_time</code> to internal helpers to reduce dependencies</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/47" class="external-link">#47</a> by overriding shape to fillable (21)</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/10" class="external-link">#10</a> and <a href="https://github.com/stocnet/autograph/issues/52" class="external-link">#52</a> by adding label distance parameter</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/17" class="external-link">#17</a> and <a href="https://github.com/stocnet/autograph/issues/40" class="external-link">#40</a> by improving <code><a href="../reference/plot_grapht.html">grapht()</a></code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-1-0-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-0-0"></a></h3>
+<ul><li>Closed <a href="https://github.com/stocnet/autograph/issues/37" class="external-link">#37</a> by adding EgoAlter sienaGOF plot</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/36" class="external-link">#36</a> by using <code>.to_factor()</code> in <code><a href="../reference/plot_gof.html">plot.ag_gof()</a></code> to correct numeric ordering of statistics, and dropped cumulative correction in <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code>
+</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/38" class="external-link">#38</a> by dropping linetype in favour of colours even for bw theme in <code><a href="../reference/plot_interp.html">plot.influenceTable()</a></code>
+</li>
+<li>Fixed option reference from <code>snet_theme</code> to <code>stocnet_theme</code> in <code><a href="../reference/plot_interp.html">plot.selectionTable()</a></code> and <code><a href="../reference/plot_interp.html">plot.influenceTable()</a></code>
+</li>
+<li>Applied <code><a href="../reference/ag_call.html">ag_font()</a></code> to migraph model plots for consistent typography</li>
+<li>Reorganised plot scripts by purpose: summaries, tests, and analysis</li>
+<li>Fixed <a href="https://github.com/stocnet/autograph/issues/46" class="external-link">#46</a> by not appending “X” to the names when creating the data frame and moving factor coercion later in the process</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorial-1-0-0">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial-1-0-0"></a></h3>
+<ul><li>Fixed <a href="https://github.com/stocnet/autograph/issues/41" class="external-link">#41</a> by updating tutorials to use fill aesthetics (<code>scale_fill_*()</code>) instead of colour aesthetics (<code>scale_colour_*()</code>)</li></ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="autograph-060">autograph 0.6.0<a class="anchor" aria-label="anchor" href="#autograph-060"></a></h2><p class="text-muted">CRAN release: 2026-03-01</p>
 <div class="section level3">
 <h3 id="package-0-6-0">Package<a class="anchor" aria-label="anchor" href="#package-0-6-0"></a></h3>
 <ul><li>Updated logo</li></ul></div>

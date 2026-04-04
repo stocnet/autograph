@@ -9,7 +9,18 @@ the `{gganimate}` package to animate the changes between successive
 iterations of a network. This is useful for networks in which the ties
 and/or the node or tie attributes are changing.
 
-A progress bar is shown if it takes some time to encoding all the .png
+`grapht()` returns a `{ggplot2}`-compatible object that can be extended
+with additional layers such as `ggplot2::labs()`, `ggplot2::theme()`,
+scale functions, and others, just like plots produced by `graphr()` and
+`graphs()`. The animation is rendered when the object is printed or
+displayed. Users who want more control over animation parameters can
+call `gganimate::animate()` directly on the returned object.
+
+The visual appearance is consistent with `graphr()`: nodes use fillable
+shapes with the fill aesthetic, the same colour palettes are applied,
+and labels use the current theme font.
+
+A progress bar is shown if it takes some time to encode all the .png
 files into a .gif.
 
 ## Usage
@@ -29,6 +40,9 @@ grapht(
   node_colour,
   edge_colour
 )
+
+# S3 method for class 'grapht'
+print(x, ...)
 ```
 
 ## Source
@@ -39,8 +53,9 @@ https://blog.schochastics.net/posts/2021-09-15\_animating-network-evolutions-wit
 
   - tlist:
     
-    The same migraph-compatible network listed according to a time
-    attribute, waves, or slices.
+    A manynet-compatible network listed according to a time attribute,
+    waves, or slices. This can also be a diffusion model result from
+    e.g. `manynet::play_diffusion()`.
 
   - keep\_isolates:
     
@@ -113,10 +128,17 @@ https://blog.schochastics.net/posts/2021-09-15\_animating-network-evolutions-wit
     
     Extra arguments to pass on to the layout algorithm, if necessary.
 
+  - x:
+    
+    A grapht object to print.
+
 ## Value
 
-Shows a .gif image. Assigning the result of the function saves the gif
-to a temporary folder and the object holds the path to this file.
+A `{ggplot2}`-compatible object with `{gganimate}` animation layers.
+This object can be extended with additional `{ggplot2}` layers (e.g. `+
+labs(subtitle = "My subtitle")`). When printed or displayed, the
+animation is rendered as a .gif. For more control over animation
+parameters, pass the result to `gganimate::animate()` directly.
 
 ## See also
 

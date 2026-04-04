@@ -43,7 +43,7 @@ time.
 ## Examples
 
 ``` r
-plot(manynet::node_deg(ison_karateka))
+plot(netrics::node_by_deg(ison_karateka))
 
-plot(manynet::tie_betweenness(ison_karateka))
+plot(netrics::tie_by_betweenness(ison_karateka))
 ```

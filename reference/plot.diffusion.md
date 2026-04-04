@@ -45,19 +45,19 @@ plot(res_manynet_diff)
 plot(res_migraph_diff)
 #> Warning: pseudoinverse used at -0.015
 #> Warning: neighborhood radius 2.015
-#> Warning: reciprocal condition number  3.9979e-17
+#> Warning: reciprocal condition number  4.9596e-17
 #> Warning: There are other near singularities as well. 4.0602
 #> Warning: pseudoinverse used at -0.015
 #> Warning: neighborhood radius 2.015
-#> Warning: reciprocal condition number  3.9979e-17
+#> Warning: reciprocal condition number  4.9596e-17
 #> Warning: There are other near singularities as well. 4.0602
 #> Warning: pseudoinverse used at -0.015
 #> Warning: neighborhood radius 2.015
-#> Warning: reciprocal condition number  3.9979e-17
+#> Warning: reciprocal condition number  4.9596e-17
 #> Warning: There are other near singularities as well. 4.0602
 #> Warning: pseudoinverse used at -0.015
 #> Warning: neighborhood radius 2.015
-#> Warning: reciprocal condition number  3.9979e-17
+#> Warning: reciprocal condition number  4.9596e-17
 #> Warning: There are other near singularities as well. 4.0602
 
 plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))

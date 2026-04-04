@@ -41,11 +41,11 @@ additional membership vector.
 ## Examples
 
 ``` r
-plot(manynet::node_in_walktrap(ison_southern_women, "e"))
+plot(netrics::node_in_walktrap(ison_southern_women, "e"))
 
 plot(as_matrix(ison_adolescents),
-  membership = node_in_walktrap(ison_adolescents, "e"))
+  membership = netrics::node_in_walktrap(ison_adolescents, "e"))
 
 plot(as_matrix(ison_southern_women),
-  membership = node_in_walktrap(ison_southern_women, "e"))
+  membership = netrics::node_in_walktrap(ison_southern_women, "e"))
 ```

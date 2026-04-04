@@ -36,6 +36,7 @@ graphr(
   edge_size,
   isolates = c("legend", "caption", "keep"),
   snap = FALSE,
+  label_dist = NULL,
   ...,
   node_colour,
   edge_colour
@@ -131,6 +132,14 @@ graphr(
     
     Logical scalar, whether the layout should be snapped to a grid.
 
+  - label\_dist:
+    
+    Numeric scalar controlling the distance between labels and nodes (in
+    points). Higher values push labels further from node centers. The
+    default (`NULL`) uses sensible spacing that adapts to network size.
+    Set to `0` for labels directly at node centers, or to a larger value
+    (e.g. `15`) for more spacing.
+
   - ...:
     
     Extra arguments to pass on to the layout algorithm, if necessary.
@@ -152,7 +161,7 @@ graphr(ison_adolescents)
 
 ison_adolescents %>%
   mutate(color = rep(c("introvert","extrovert"), times = 4),
-         size = ifelse(node_is_cutpoint(ison_adolescents), 6, 3)) %>%
+         size = ifelse(netrics::node_is_cutpoint(ison_adolescents), 6, 3)) %>%
   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) %>%
   graphr(node_color = "color", node_size = "size",
          edge_size = 1.5, edge_color = "ecolor")

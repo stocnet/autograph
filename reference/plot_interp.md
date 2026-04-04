@@ -75,10 +75,6 @@ Thanks to Steffen Triebel and Rene Veenstra for corrections.
 
 ``` r
 plot(siena_selection)
-#> Warning: The `base_family` theme element is not defined in the element hierarchy.
 
 plot(siena_influence)
-#> Ignoring unknown labels:
-#> • linetype : "\"mybeh\" alter value"
-#> Warning: The `base_family` theme element is not defined in the element hierarchy.
 ```
