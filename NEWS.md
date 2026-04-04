@@ -8,7 +8,9 @@
 
 - Improved `node_shape` to accept more categories
 - Moved `node_is_isolate` and `node_adoption_time` to internal helpers to reduce dependencies
-- Fixed #47 by overriding shape to fillable (21) 
+- Fixed #47 by overriding shape to fillable (21)
+- Fixed #10 and #52 by adding label distance parameter
+- Fixed #17 and #40 by improving `grapht()`
 
 ## Plotting
 

@@ -9,4 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-- Fixed issues reported by CRAN in previous submission
+- Updates to bring autograph into line with latest version of manynet (> v2.0.0)
