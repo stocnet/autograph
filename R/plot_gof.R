@@ -228,7 +228,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   
   if(EA){
     if(!all(nchar(obs[,"name"])==2))
-      snet_abort("Ego-alter GOF statistic names should be two characters long,",
+      manynet::snet_abort("Ego-alter GOF statistic names should be two characters long,",
       " but some are not. Please check the number or names in the GOF object.")
     obs <- obs %>% dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
                                  name = substr(name, 2, 2)) %>% 

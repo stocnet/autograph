@@ -14,7 +14,7 @@
   # cran_version <- pkgs[pkgs$Package == "manynet","Version"]
 
   local_version <- utils::packageVersion("autograph")
-  snet_info("You are using {.pkg autograph} version {.version {local_version}}.")
+  snet_info("You are using {.auto autograph} version {.version {local_version}}.")
   old.list <- as.data.frame(utils::old.packages())
   behind_cran <- "autograph" %in% old.list$Package
   curr_theme <- getOption('stocnet_theme')
