@@ -273,7 +273,7 @@ to the node.
 
 ```{r degsize, exercise = TRUE, fig.width=9}
 fict_lotr %>% 
-  mutate(Degree = node_deg(fict_lotr)) %>% 
+  mutate(Degree = node_by_deg(fict_lotr)) %>% 
   graphr(node_size = "Degree")
 ```
 
@@ -291,7 +291,7 @@ then `graphr()` will even try to use this information automatically.
 
 ```{r tiesize, exercise = TRUE, fig.width=9}
 fict_lotr %>% 
-  mutate_ties(weight = tie_closeness(fict_lotr),
+  mutate_ties(weight = tie_by_closeness(fict_lotr),
               is_tri = tie_is_triangular(fict_lotr)) %>% 
   graphr(edge_color = "is_tri")
 ```
@@ -444,7 +444,7 @@ such as in the following figure, or are absent.
 
 ```{r maxbet, exercise = TRUE, fig.width=9}
 fict_lotr %>% 
-  mutate(maxbet = node_is_max(node_betweenness(fict_lotr))) %>% 
+  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) %>% 
   graphr(node_color = "maxbet")
 ```
 
@@ -457,7 +457,7 @@ span multiple lines.
 
 ```{r legend, exercise=TRUE, fig.width=9}
 fict_lotr %>% 
-  mutate(maxbet = node_is_max(node_betweenness(fict_lotr))) %>% 
+  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) %>% 
   graphr(node_color = "maxbet") +
   guides(color = "legend") + 
   labs(color = "Maximum\nBetweenness")
@@ -519,7 +519,7 @@ FR offers a good baseline for most types of networks.
 
 The _Stress Minimisation_ (stress) method is related to the KK algorithm,
 but offers better runtime, quality, and stability and so is generally preferred.
-Indeed, `{manynet}` uses it as the default for most networks.
+Indeed, `{autograph}` uses it as the default for most networks.
 It has the advantage of returning the same layout each time it is run on the same network.
 
 ```{r layoutinterp-Q, echo=FALSE, purl = FALSE}
@@ -679,10 +679,10 @@ While the `grapht()` function is not as flexible as `graphr()`,
 it is very useful for visualising changes in networks over time.
   
 ```{r grapht, exercise=TRUE}
-fict_lotr %>%
-  mutate_ties(year = sample(1:12, 66, replace = TRUE)) %>%
-  to_waves(attribute = "year", cumulative = TRUE) %>%
-  grapht()
+# fict_lotr %>%
+  # mutate_ties(year = sample(1:12, 66, replace = TRUE)) %>%
+  # to_waves(attribute = "year", cumulative = TRUE) %>%
+  # grapht()
 ```
 
 More functionality will be added to this function in future releases.
@@ -772,11 +772,11 @@ Let's try this now with a few examples.
 
 ```{r plotexamples, exercise=TRUE, fig.width=9}
 stocnet_theme("default")
-plot(node_degree(fict_lotr)) + 
-plot(node_closeness(fict_lotr))
+plot(node_by_degree(fict_lotr)) + 
+plot(node_by_closeness(fict_lotr))
 stocnet_theme("oxf")
-plot(node_degree(fict_lotr)) + 
-plot(node_closeness(fict_lotr))
+plot(node_by_degree(fict_lotr)) + 
+plot(node_by_closeness(fict_lotr))
 ```
 
 This is a very simple example, but the same principle applies to
