@@ -46,6 +46,7 @@ for use in the \code{{autograph}} package.
 }
 \examples{
 plot(siena_selection)
+plot(siena_selection) + ggplot2::scale_colour_discrete()
 plot(siena_influence)
 }
 \references{

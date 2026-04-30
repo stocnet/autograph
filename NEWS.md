@@ -1,3 +1,18 @@
+# autograph 1.0.1
+
+## Package
+
+- Updated the logo
+- Fixed the error in some flavours by removing environment references in included objects
+
+## Plotting
+
+- Closed #44 by adding example that uses `ggplot2::scale_colour_discrete()` to tweak colour output
+
+## Tutorials
+
+- Fixed the tutorial to use netrics functions
+
 # autograph 1.0.0
 
 ## Package

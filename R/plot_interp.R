@@ -37,6 +37,7 @@ NULL
 #'   Use `quad = FALSE` for similarity effects.
 #' @examples
 #' plot(siena_selection)
+#' plot(siena_selection) + ggplot2::scale_colour_discrete()
 #' @export
 plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
 
