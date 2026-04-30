@@ -31,7 +31,7 @@ it is shown beneath the x-axis."><meta property="og:image" content="https://stoc
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ it is shown beneath the x-axis."><meta property="og:image" content="https://stoc
 
     <div class="ref-description section level2">
     <p>These plot methods plot goodness of fit objects created using
-<code><a href="https://rdrr.io/pkg/RSiena/man/sienaGOF.html" class="external-link">RSiena::sienaGOF()</a></code>, <code>MoNAn::monanGOF()</code>, or the 'ergm' package's gof() function.
+<code><a href="https://rdrr.io/pkg/RSiena/man/test_gof.html" class="external-link">RSiena::sienaGOF()</a></code>, <code>MoNAn::monanGOF()</code>, or the 'ergm' package's gof() function.
 Internally, the GOF object is translated into a common class (<code>ag_gof</code>),
 which has its own plot method to ensure a consistent look and feel.
 It is not expected that users will create <code>ag_gof</code> class objects themselves.</p>
@@ -70,7 +70,7 @@ and dashed lines connecting the 5th and 95th percentiles.
 The boxplot also shows outliers as crosses.
 The observed statistics are shown as points and connected by a line.
 The observed statistics are also labelled with their value.
-If a p-value is available (as in the case of <code><a href="https://rdrr.io/pkg/RSiena/man/sienaGOF.html" class="external-link">RSiena::sienaGOF()</a></code>),
+If a p-value is available (as in the case of <code><a href="https://rdrr.io/pkg/RSiena/man/test_gof.html" class="external-link">RSiena::sienaGOF()</a></code>),
 it is shown beneath the x-axis.</p>
     </div>
 
@@ -144,7 +144,7 @@ this can be customised by specifying the <code>main</code> argument in the plott
 or added after the fact using <code>{ggplot2}</code> functions such as
 <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle()</a></code> or <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code>.</p>
 <p>The user can choose whether to plot the statistics cumulatively or not.
-This is typically handled within <code><a href="https://rdrr.io/pkg/RSiena/man/sienaGOF.html" class="external-link">RSiena::sienaGOF()</a></code>,
+This is typically handled within <code><a href="https://rdrr.io/pkg/RSiena/man/test_gof.html" class="external-link">RSiena::sienaGOF()</a></code>,
 but for <code>MoNAn::monanGOF()</code> and the 'ergm' package's gof() function
 the cumulative option is handled here.
 The default is to plot the non-cumulative statistics.

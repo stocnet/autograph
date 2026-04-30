@@ -76,5 +76,9 @@ Thanks to Steffen Triebel and Rene Veenstra for corrections.
 ``` r
 plot(siena_selection)
 
+plot(siena_selection) + ggplot2::scale_colour_discrete()
+#> Scale for colour is already present.
+#> Adding another scale for colour, which will replace the existing scale.
+
 plot(siena_influence)
 ```

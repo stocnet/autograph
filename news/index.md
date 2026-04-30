@@ -1,6 +1,26 @@
 # Changelog
 
+## autograph 1.0.1
+
+### Package
+
+  - Updated the logo
+  - Fixed the error in some flavours by removing environment references
+    in included objects
+
+### Plotting
+
+  - Closed [\#44](https://github.com/stocnet/autograph/issues/44) by
+    adding example that uses `ggplot2::scale_colour_discrete()` to tweak
+    colour output
+
+### Tutorials
+
+  - Fixed the tutorial to use netrics functions
+
 ## autograph 1.0.0
+
+CRAN release: 2026-04-04
 
 ### Package
 

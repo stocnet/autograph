@@ -10,8 +10,8 @@ straightforward, consistent themes.
 ## Details
 
 For more details, please consult the README and work through the
-tutorial. The tutorial can be run locally using
-`run_tute("visualisation")`.
+tutorial. The tutorial is available in the package documentation and on
+the package website.
 
 ## See also
 
