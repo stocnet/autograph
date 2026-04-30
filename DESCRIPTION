@@ -1,6 +1,6 @@
 Package: autograph
 Title: Automatic Plotting and Theming of Many Graphs
-Version: 1.0.1
+Version: 1.0.2
 Date: 2026-04-30
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
