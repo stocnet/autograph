@@ -2,7 +2,7 @@
 #' @keywords internal
 #' @details
 #'   For more details, please consult the README and work through the tutorial.
-#'   The tutorial can be run locally using `migraph::run_tute("visualisation")`.
+#'   The tutorial is available in the package documentation and on the package website.
 #' @author James Hollway
 "_PACKAGE"
 
