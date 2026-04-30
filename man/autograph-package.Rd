@@ -12,7 +12,7 @@ Visual exploration and presentation of networks should not be difficult. This pa
 }
 \details{
 For more details, please consult the README and work through the tutorial.
-The tutorial can be run locally using \code{run_tute("visualisation")}.
+The tutorial can be run locally using \code{migraph::run_tute("visualisation")}.
 }
 \seealso{
 Useful links:
