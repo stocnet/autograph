@@ -1,15 +1,22 @@
 # Changelog
 
+## autograph 1.0.2
+
+### Plotting
+
+  - Fixed the error produced by a namespace reference in a call in
+    `ergm_res`
+
 ## autograph 1.0.1
 
 ### Package
 
   - Updated the logo
-  - Fixed the error in some flavours by removing environment references
-    in included objects
 
 ### Plotting
 
+  - Fixed the error in some flavours by removing environment references
+    in included objects
   - Closed [\#44](https://github.com/stocnet/autograph/issues/44) by
     adding example that uses `ggplot2::scale_colour_discrete()` to tweak
     colour output
