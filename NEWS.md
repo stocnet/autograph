@@ -7,7 +7,7 @@
 
 ## Plotting
 
-- Closed #44 by adding example that uses `ggplot2::scale_color_discrete()` to tweak colour output
+- Closed #44 by adding example that uses `ggplot2::scale_colour_discrete()` to tweak colour output
 
 ## Tutorials
 
