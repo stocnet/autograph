@@ -85,6 +85,6 @@ plot.ergm <- function(x, ...) {
 #' @rdname plot_convergence
 #' @export
 load_ergm_res <- function() {
-  readRDS(file = system.file("extdata", "ergm_res.rds", package = "autograph"))
+  readRDS(file = system.file("extdata", "ergm_res.rds", package = "autograph", mustWork = TRUE))
 }
 
