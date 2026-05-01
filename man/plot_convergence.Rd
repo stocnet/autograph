@@ -5,6 +5,7 @@
 \alias{plot.ag_conv}
 \alias{plot.traces.monan}
 \alias{plot.ergm}
+\alias{load_ergm_res}
 \title{Plotting convergence diagnostics}
 \usage{
 \method{plot}{ag_conv}(x, ...)
@@ -12,6 +13,8 @@
 \method{plot}{traces.monan}(x, ...)
 
 \method{plot}{ergm}(x, ...)
+
+load_ergm_res()
 }
 \arguments{
 \item{x}{An object of class "traces.monan".}
@@ -33,6 +36,7 @@ distribution.
 }
 \examples{
 plot(monan_conv)
+ergm_res <- load_ergm_res()
 plot(ergm_res)
 }
 \seealso{

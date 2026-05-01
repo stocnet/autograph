@@ -65,12 +65,6 @@
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
-#' @usage data(ergm_res)
-"ergm_res"
-
-#' @docType data
-#' @keywords datasets
-#' @rdname made_earlier
 #' @usage data(ergm_gof)
 "ergm_gof"
 
