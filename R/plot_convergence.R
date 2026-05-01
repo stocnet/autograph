@@ -64,6 +64,7 @@ plot.traces.monan <- function(x, ...) {
 #' @rdname plot_convergence
 #' @family ergm
 #' @examples
+#' ergm_res <- load_ergm_res()
 #' plot(ergm_res)
 #' @export
 plot.ergm <- function(x, ...) {
@@ -79,5 +80,11 @@ plot.ergm <- function(x, ...) {
     dplyr::tibble() %>% dplyr::arrange(sim)
   class(dat) <- c("ag_conv", class(dat))
   plot.ag_conv(dat)
+}
+
+#' @rdname plot_convergence
+#' @export
+load_ergm_res <- function() {
+  readRDS(file = system.file("extdata", "ergm_res.rds", package = "autograph"))
 }
 

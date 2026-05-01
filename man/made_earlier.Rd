@@ -12,7 +12,6 @@
 \alias{siena_selection}
 \alias{monan_conv}
 \alias{monan_gof}
-\alias{ergm_res}
 \alias{ergm_gof}
 \alias{goldfish_outliers}
 \alias{goldfish_changepoints}
@@ -35,8 +34,6 @@ An object of class \code{selectionTable} (inherits from \code{data.frame}) with 
 An object of class \code{traces.monan} of length 3.
 
 An object of class \code{gof.stats.monan} of length 2.
-
-An object of class \code{ergm} of length 35.
 
 An object of class \code{gof.ergm} (inherits from \code{gof}) of length 30.
 
@@ -62,8 +59,6 @@ data(siena_selection)
 data(monan_conv)
 
 data(monan_gof)
-
-data(ergm_res)
 
 data(ergm_gof)
 

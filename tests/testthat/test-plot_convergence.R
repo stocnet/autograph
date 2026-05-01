@@ -6,6 +6,7 @@ test_that("monan diagnostics works", {
 
 test_that("ergm diagnostics works", {
   skip_on_os("linux") # CRAN R CMD check issue
+  ergm_res <- load_ergm_res()
   p <- plot(ergm_res)
   expect_s3_class(p, "ggplot")
 })
