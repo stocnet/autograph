@@ -24,8 +24,6 @@ data(monan_conv)
 
 data(monan_gof)
 
-data(ergm_res)
-
 data(ergm_gof)
 
 data(goldfish_outliers)
@@ -56,8 +54,6 @@ rows and 4 columns.
 An object of class `traces.monan` of length 3.
 
 An object of class `gof.stats.monan` of length 2.
-
-An object of class `ergm` of length 35.
 
 An object of class `gof.ergm` (inherits from `gof`) of length 30.
 

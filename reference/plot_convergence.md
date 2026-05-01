@@ -17,6 +17,8 @@ plot(x, ...)
 
 # S3 method for class 'ergm'
 plot(x, ...)
+
+load_ergm_res()
 ```
 
 ## Arguments
@@ -46,5 +48,6 @@ Other ergm: `plot_gof`
 ``` r
 plot(monan_conv)
 
+ergm_res <- load_ergm_res()
 plot(ergm_res)
 ```

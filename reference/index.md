@@ -41,8 +41,8 @@ stocnet packages.
   - `plot(<network_test>)` : Plotting methods for CUG and QAP tests
   - `plot(<outliers.goldfish>)` `plot(<changepoints.goldfish>)` :
     Plotting adequacy diagnostics
-  - `plot(<ag_conv>)` `plot(<traces.monan>)` `plot(<ergm>)` : Plotting
-    convergence diagnostics
+  - `plot(<ag_conv>)` `plot(<traces.monan>)` `plot(<ergm>)`
+    `load_ergm_res()` : Plotting convergence diagnostics
   - `plot(<ag_gof>)` `plot(<gof.stats.monan>)` `plot(<sienaGOF>)`
     `plot(<gof.ergm>)` : Plotting goodness-of-fit results
   - `plot(<selectionTable>)` `plot(<influenceTable>)` : Plotting effects
@@ -83,6 +83,6 @@ improved or additional layouts to those offered in
 
   - `res_migraph_reg` `res_migraph_test` `res_migraph_diff`
     `res_manynet_diff` `siena_gof` `siena_influence` `siena_selection`
-    `monan_conv` `monan_gof` `ergm_res` `ergm_gof` `goldfish_outliers`
+    `monan_conv` `monan_gof` `ergm_gof` `goldfish_outliers`
     `goldfish_changepoints` : Precooked results for demonstrating
     plotting

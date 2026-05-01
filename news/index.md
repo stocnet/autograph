@@ -1,5 +1,13 @@
 # Changelog
 
+## autograph 1.0.3
+
+### Plotting
+
+  - Fixed the error produced by a namespace reference in a call in
+    `ergm_res` by serializing it, moving to extdata, and loading it via
+    `load_ergm_res()`
+
 ## autograph 1.0.2
 
 ### Plotting
