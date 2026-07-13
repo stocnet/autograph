@@ -19,6 +19,7 @@ graphr(
   snap = FALSE,
   label_dist = NULL,
   label_repel = TRUE,
+  edge_bundle = FALSE,
   ...,
   node_colour,
   edge_colour
@@ -120,6 +121,17 @@ Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
 without the (sometimes slow, and non-deterministic between runs for
 some layouts) repelling algorithm.}
 
+\item{edge_bundle}{Edge bundling, off by default (\code{FALSE}). When \code{TRUE} (or
+equivalently \code{"force"}), edges are bundled together using ggraph's
+force-directed edge bundling (\code{geom_edge_bundle_force()}), which pulls
+nearby edges into shared paths to reduce visual clutter in dense networks.
+Alternative non-hierarchical algorithms can be selected by name:
+\code{"path"} (\code{geom_edge_bundle_path()}) or \code{"minimal"}
+(\code{geom_edge_bundle_minimal()}). Bundling only makes a visible difference
+when a network has enough edges; for directed networks arrowheads are
+retained, but the slight reciprocal-tie curvature used for unbundled edges
+does not apply.}
+
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 }
 \value{
@@ -160,6 +172,7 @@ ison_adolescents \%>\%
          edge_size = 1.5, edge_color = "ecolor")
 graphr(ison_southern_women, labels = TRUE, label_dist = 10)
 graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 }
 \seealso{
 Other mapping: 

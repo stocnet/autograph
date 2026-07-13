@@ -235,3 +235,33 @@ test_that("graphr() works on a stocnet-class object", {
   expect_error(graphr(sn), NA)
 })
 
+test_that("edge_bundle swaps in a bundling geom (#19)", {
+  skip_on_cran()
+  set.seed(123)
+  net <- manynet::generate_random(40, 0.1)
+  # Off by default: unchanged straight-edge geom
+  p_off <- graphr(net)
+  expect_s3_class(p_off$layers[[1]]$geom, "GeomEdgeSegment")
+  expect_false(inherits(p_off$layers[[1]]$geom, "GeomEdgePath"))
+  # TRUE / "force" both use force-directed bundling
+  p_force <- graphr(net, edge_bundle = TRUE)
+  expect_s3_class(p_force$layers[[1]]$geom, "GeomEdgePath")
+  p_force2 <- graphr(net, edge_bundle = "force")
+  expect_s3_class(p_force2$layers[[1]]$geom, "GeomEdgePath")
+  # Alternative algorithms selectable by name
+  p_path <- graphr(net, edge_bundle = "path")
+  expect_s3_class(p_path$layers[[1]]$geom, "GeomEdgePath")
+  # Bundling renders without error
+  expect_error(ggplot2::ggplot_build(p_force), NA)
+  # Directed networks bundle and retain an arrow
+  dnet <- manynet::to_directed(manynet::generate_random(30, 0.12))
+  p_dir <- graphr(dnet, edge_bundle = TRUE)
+  expect_s3_class(p_dir$layers[[1]]$geom, "GeomEdgePath")
+  expect_error(ggplot2::ggplot_build(p_dir), NA)
+})
+
+test_that("edge_bundle rejects unknown algorithms", {
+  skip_on_cran()
+  expect_error(graphr(ison_adolescents, edge_bundle = "banana"))
+})
+

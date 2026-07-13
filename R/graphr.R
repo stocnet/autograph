@@ -107,11 +107,22 @@
 #'   without the (sometimes slow, and non-deterministic between runs for
 #'   some layouts) repelling algorithm.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
+#' @param edge_bundle Edge bundling, off by default (`FALSE`). When `TRUE` (or
+#'   equivalently `"force"`), edges are bundled together using ggraph's
+#'   force-directed edge bundling (`geom_edge_bundle_force()`), which pulls
+#'   nearby edges into shared paths to reduce visual clutter in dense networks.
+#'   Alternative non-hierarchical algorithms can be selected by name:
+#'   `"path"` (`geom_edge_bundle_path()`) or `"minimal"`
+#'   (`geom_edge_bundle_minimal()`). Bundling only makes a visible difference
+#'   when a network has enough edges; for directed networks arrowheads are
+#'   retained, but the slight reciprocal-tie curvature used for unbundled edges
+#'   does not apply.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
 #'   The last plot can be saved to the file system using `ggplot2::ggsave()`.
-#' @importFrom ggraph geom_edge_link geom_node_text geom_conn_bundle
-#'   get_con geom_node_point scale_edge_width_continuous geom_node_label
+#' @importFrom ggraph geom_edge_link geom_node_text
+#'   geom_edge_bundle_force geom_edge_bundle_path geom_edge_bundle_minimal
+#'   geom_node_point scale_edge_width_continuous geom_node_label
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
 #' @importFrom tidygraph activate
 #' @examples
@@ -124,17 +135,19 @@
 #'          edge_size = 1.5, edge_color = "ecolor")
 #' graphr(ison_southern_women, labels = TRUE, label_dist = 10)
 #' graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+#' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
                    edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
-                   label_dist = NULL, label_repel = TRUE, ...,
-                   node_colour, edge_colour) {
+                   label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
+                   ..., node_colour, edge_colour) {
   if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
                              node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
                              edge_color = edge_color, edge_size = edge_size,
-                             isolates = isolates, snap = snap, ...,
+                             isolates = isolates, snap = snap,
+                             edge_bundle = edge_bundle, ...,
                              node_colour = node_colour, edge_colour = edge_colour))
   g <- manynet::as_tidygraph(.data)
   
@@ -180,7 +193,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
   # Add edges ----
-  p <- graph_edges(p, g, edge_color, edge_size, node_size)
+  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle)
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size)
   # Add labels ----
