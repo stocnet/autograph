@@ -191,6 +191,20 @@ test_that("node_color with 2 values uses highlight palette", {
   expect_true(any(grepl("fill", scale_names)))
 })
 
+test_that("edge_size = 0 fully suppresses arrowheads on directed networks (#50)", {
+  skip_on_cran()
+  net <- to_directed(ison_adolescents)
+  p_zero <- graphr(net, edge_size = 0, labels = FALSE)
+  expect_null(p_zero$layers[[1]]$geom_params$arrow)
+
+  p_default <- graphr(net, labels = FALSE)
+  expect_false(is.null(p_default$layers[[1]]$geom_params$arrow))
+
+  p_thick <- graphr(net, edge_size = 3, labels = FALSE)
+  expect_gt(grid::convertUnit(p_thick$layers[[1]]$geom_params$arrow$length, "mm", valueOnly = TRUE),
+            grid::convertUnit(p_default$layers[[1]]$geom_params$arrow$length, "mm", valueOnly = TRUE))
+})
+
 test_that("label_dist and label_repel are respected (#52)", {
   skip_on_cran()
   net <- ison_adolescents

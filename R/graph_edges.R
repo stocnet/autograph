@@ -111,6 +111,18 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size) {
   out
 }
 
+.infer_arrow <- function(esize) {
+  # `arrow=` is a fixed layer parameter, not a mappable aesthetic, so a
+  # per-edge width vector (`esize` mapped from an attribute) is summarised by
+  # its mean to pick one arrowhead size for the whole layer.
+  repr <- if (length(esize) > 1) mean(esize, na.rm = TRUE) else esize
+  if (length(repr) == 0 || is.na(repr) || repr <= 0) return(NULL)
+  # 2mm at the default edge width (0.5), scaled proportionally and capped so
+  # heavily-weighted edges don't get oversized arrowheads.
+  len_mm <- min(repr / 0.5 * 2, 4)
+  ggplot2::arrow(angle = 15, type = "closed", length = ggplot2::unit(len_mm, 'mm'))
+}
+
 .infer_line_type <- function(g) {
   if (manynet::is_signed(g)) {
     out <- ifelse(as.numeric(manynet::tie_signs(g)) >= 0,
@@ -140,30 +152,26 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size) {
                                    edge_colour = out[["ecolor"]], edge_width = out[["esize"]],
                                    edge_linetype = out[["line_type"]],
                                    edge_alpha = 0.4, strength = ifelse(igraph::which_mutual(g), 0.2, 0),
-                                   arrow = ggplot2::arrow(angle = 15, type = "closed",
-                                                          length = ggplot2::unit(2, 'mm')))
+                                   arrow = .infer_arrow(out[["esize"]]))
   } else if (length(out[["ecolor"]]) > 1 & length(out[["esize"]]) == 1) {
     p <- p + ggraph::geom_edge_arc(ggplot2::aes(edge_colour = out[["ecolor"]],
                                                 end_cap = ggraph::circle(c(out[["end_cap"]]), 'mm')),
                                    edge_width = out[["esize"]], edge_linetype = out[["line_type"]],
                                    edge_alpha = 0.4, strength = ifelse(igraph::which_mutual(g), 0.2, 0),
-                                   arrow = ggplot2::arrow(angle = 15, type = "closed",
-                                                          length = ggplot2::unit(2, 'mm')))
+                                   arrow = .infer_arrow(out[["esize"]]))
   } else if (length(out[["ecolor"]]) == 1 & length(out[["esize"]]) > 1) {
     p <- p + ggraph::geom_edge_arc(ggplot2::aes(edge_width = out[["esize"]],
                                                 end_cap = ggraph::circle(c(out[["end_cap"]]), 'mm')),
                                    edge_colour = out[["ecolor"]], edge_linetype = out[["line_type"]],
                                    edge_alpha = 0.4, strength = ifelse(igraph::which_mutual(g), 0.2, 0),
-                                   arrow = ggplot2::arrow(angle = 15, type = "closed",
-                                                          length = ggplot2::unit(2, 'mm')))
+                                   arrow = .infer_arrow(out[["esize"]]))
   } else {
     p <- p + ggraph::geom_edge_arc(ggplot2::aes(edge_colour = getOption("snet_cat")[out[["ecolor"]]],
                                                 edge_width = out[["esize"]],
                                                 end_cap = ggraph::circle(c(out[["end_cap"]]), 'mm')),
                                    # edge_linetype = out[["line_type"]],
                                    edge_alpha = 0.4, strength = ifelse(igraph::which_mutual(g), 0.2, 0),
-                                   arrow = ggplot2::arrow(angle = 15, type = "closed",
-                                                          length = ggplot2::unit(2, 'mm')))
+                                   arrow = .infer_arrow(out[["esize"]]))
   }
   p
 }
