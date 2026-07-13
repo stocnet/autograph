@@ -191,3 +191,33 @@ test_that("node_color with 2 values uses highlight palette", {
   expect_true(any(grepl("fill", scale_names)))
 })
 
+test_that("label_dist and label_repel are respected (#52)", {
+  skip_on_cran()
+  net <- ison_adolescents
+  p_default <- graphr(net)
+  p_dist <- graphr(net, label_dist = 25)
+  label_layer <- function(p) p$layers[[length(p$layers)]]
+  expect_equal(grid::convertUnit(label_layer(p_dist)$geom_params$point.padding, "pt", valueOnly = TRUE), 25)
+  expect_equal(grid::convertUnit(label_layer(p_default)$geom_params$point.padding, "pt", valueOnly = TRUE), 5)
+
+  p_norepel <- graphr(net, label_repel = FALSE)
+  expect_s3_class(label_layer(p_norepel)$geom, "GeomLabel")
+  expect_s3_class(label_layer(p_default)$geom, "GeomLabelRepel")
+})
+
+test_that("labels stay clear of larger nodes (#13)", {
+  skip_on_cran()
+  small <- graphr(ison_adolescents, node_size = 3)
+  big <- graphr(ison_adolescents, node_size = 20)
+  built_small <- ggplot2::ggplot_build(small)
+  built_big <- ggplot2::ggplot_build(big)
+  n <- length(small$layers)
+  expect_gt(mean(built_big$data[[n]]$point.size), mean(built_small$data[[n]]$point.size))
+})
+
+test_that("graphr() works on a stocnet-class object", {
+  skip_on_cran()
+  sn <- manynet::as_stocnet(ison_adolescents)
+  expect_error(graphr(sn), NA)
+})
+

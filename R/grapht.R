@@ -38,6 +38,12 @@
 #' @param keep_isolates Logical, whether to keep isolate nodes in the graph.
 #'   TRUE by default.
 #'   If FALSE, removes nodes from each frame they are isolated in.
+#' @details
+#'   Unlike `graphr()`, `grapht()` does not use `ggrepel`-based label
+#'   repelling (there is no straightforward way to repel labels consistently
+#'   across animation frames), so `label_repel` here instead toggles a fixed
+#'   offset nudging labels away from their nodes, and `label_dist` scales the
+#'   size of that nudge rather than being used as repel padding.
 #' @inheritParams plot_graphr
 #' @importFrom igraph gsize as_data_frame get.edgelist vcount
 #' @importFrom ggplot2 ggplot geom_segment geom_point geom_text
@@ -73,7 +79,8 @@
 grapht <- function(tlist, keep_isolates = TRUE,
                    layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size,
-                   edge_color, edge_size, ...,
+                   edge_color, edge_size,
+                   label_dist = NULL, label_repel = TRUE, ...,
                    node_colour, edge_colour) {
   thisRequires("gganimate")
   thisRequires("gifski")
@@ -177,7 +184,8 @@ grapht <- function(tlist, keep_isolates = TRUE,
   
   # Plot with ggplot2 and animate with gganimate ####
   p <- .map_dynamic(edges_out, nodes_out, edge_color, node_shape,
-                   node_color, node_size, edge_size, labels) +
+                   node_color, node_size, edge_size, labels,
+                   label_dist, label_repel) +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
     gganimate::enter_fade() +
@@ -205,7 +213,8 @@ print.grapht <- function(x, ...) {
 
 # Aesthetic mapping for dynamic networks, consistent with graphr()
 .map_dynamic <- function(edges_out, nodes_out, edge_color, node_shape,
-                         node_color, node_size, edge_size, labels) {
+                         node_color, node_size, edge_size, labels,
+                         label_dist = NULL, label_repel = TRUE) {
   alphad <- ifelse(nodes_out$status == TRUE, 1, 0)
   alphae <- ifelse(edges_out$status == TRUE, 1, 0)
   if (all(unique(alphae) == 1)) alphae <- 0.4
@@ -301,10 +310,18 @@ print.grapht <- function(x, ...) {
   
   # --- Add labels ----
   if (isTRUE(labels)) {
+    # No ggrepel-based repelling here (see @details in grapht()'s docs);
+    # `label_repel` toggles a fixed offset instead, scaled by `label_dist`
+    # when supplied (calibrated so the previous fixed offset of 0.2
+    # corresponds to a `label_dist` of 10, consistent with graphr()'s default).
+    label_offset <- if (isTRUE(label_repel)) {
+      if (!is.null(label_dist)) label_dist / 50 else 0.2
+    } else 0
     p <- p + ggplot2::geom_text(ggplot2::aes(x, y, label = name),
                                 alpha = alphad, data = nodes_out,
                                 color = "black", family = ag_font(),
-                                hjust = -0.2, vjust = -0.2, show.legend = FALSE)
+                                hjust = -label_offset, vjust = -label_offset,
+                                show.legend = FALSE)
   }
   
   # --- Plot nodes (8 mapping cases, consistent with graphr) ----

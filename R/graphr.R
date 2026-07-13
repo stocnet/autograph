@@ -89,11 +89,23 @@
 #'   If the default layout ("stress") is used, 
 #'   we recommend that the "legend" option is used to avoid isolates crowding
 #'   out the giant component.
-#' @param label_dist Numeric scalar controlling the distance between labels
-#'   and nodes (in points). Higher values push labels further from node centers.
-#'   The default (`NULL`) uses sensible spacing that adapts to network size.
-#'   Set to `0` for labels directly at node centers,
+#' @param label_dist Numeric scalar, in points (pt), controlling the extra
+#'   gap left between labels and node borders -- similar to `igraph`'s
+#'   `vertex.label.dist`. Node size is always accounted for automatically
+#'   (larger nodes push labels further away without any extra configuration);
+#'   `label_dist` adds further spacing on top of that, and defaults to a
+#'   small gap (5pt). Set to `0` for labels right at the node border,
 #'   or to a larger value (e.g. `15`) for more spacing.
+#'   Only used when `labels = TRUE` and `label_repel = TRUE`
+#'   (as the padding passed to the repel algorithm) or `label_repel = FALSE`
+#'   (as a fixed nudge away from the node, in the layouts where this makes
+#'   sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").
+#' @param label_repel Logical scalar, whether labels should be repelled away
+#'   from each other and from nodes using `ggrepel`
+#'   (via `ggraph`'s `repel` argument). Defaults to `TRUE`.
+#'   Set to `FALSE` to place labels at a fixed offset (see `label_dist`)
+#'   without the (sometimes slow, and non-deterministic between runs for
+#'   some layouts) repelling algorithm.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
@@ -110,16 +122,18 @@
 #'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) %>%
 #'   graphr(node_color = "color", node_size = "size",
 #'          edge_size = 1.5, edge_color = "ecolor")
+#' graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+#' graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
-                   edge_color, edge_size, 
+                   edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
-                   label_dist = NULL, ...,
+                   label_dist = NULL, label_repel = TRUE, ...,
                    node_colour, edge_colour) {
   if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
                              node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
-                             edge_color = edge_color, edge_size = edge_size, 
+                             edge_color = edge_color, edge_size = edge_size,
                              isolates = isolates, snap = snap, ...,
                              node_colour = node_colour, edge_colour = edge_colour))
   g <- manynet::as_tidygraph(.data)
@@ -171,7 +185,8 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   p <- graph_nodes(p, g, node_color, node_shape, node_size)
   # Add labels ----
   if (isTRUE(labels) & manynet::is_labelled(g)) {
-    p <- graph_labels(p, g, layout, label_dist)
+    p <- graph_labels(p, g, layout, label_dist, label_repel,
+                      node_size = .infer_nsize(g, node_size))
   }
   
   # Note isolates ----

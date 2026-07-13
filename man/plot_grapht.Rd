@@ -19,6 +19,8 @@ grapht(
   node_size,
   edge_color,
   edge_size,
+  label_dist = NULL,
+  label_repel = TRUE,
   ...,
   node_colour,
   edge_colour
@@ -92,6 +94,25 @@ it is recommended to calculate all edge-related statistics prior
 to using this function.
 Edges can also be sized by declaring a numeric size or vector instead.}
 
+\item{label_dist}{Numeric scalar, in points (pt), controlling the extra
+gap left between labels and node borders -- similar to \code{igraph}'s
+\code{vertex.label.dist}. Node size is always accounted for automatically
+(larger nodes push labels further away without any extra configuration);
+\code{label_dist} adds further spacing on top of that, and defaults to a
+small gap (5pt). Set to \code{0} for labels right at the node border,
+or to a larger value (e.g. \code{15}) for more spacing.
+Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
+(as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
+(as a fixed nudge away from the node, in the layouts where this makes
+sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").}
+
+\item{label_repel}{Logical scalar, whether labels should be repelled away
+from each other and from nodes using \code{ggrepel}
+(via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
+Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
+without the (sometimes slow, and non-deterministic between runs for
+some layouts) repelling algorithm.}
+
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 
 \item{x}{A grapht object to print.}
@@ -131,6 +152,13 @@ and labels use the current theme font.
 
 A progress bar is shown if it takes some time to encode all the
 .png files into a .gif.
+}
+\details{
+Unlike \code{graphr()}, \code{grapht()} does not use \code{ggrepel}-based label
+repelling (there is no straightforward way to repel labels consistently
+across animation frames), so \code{label_repel} here instead toggles a fixed
+offset nudging labels away from their nodes, and \code{label_dist} scales the
+size of that nudge rather than being used as repel padding.
 }
 \examples{
 #ison_adolescents \%>\%

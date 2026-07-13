@@ -18,6 +18,7 @@ graphr(
   isolates = c("legend", "caption", "keep"),
   snap = FALSE,
   label_dist = NULL,
+  label_repel = TRUE,
   ...,
   node_colour,
   edge_colour
@@ -100,11 +101,24 @@ out the giant component.}
 
 \item{snap}{Logical scalar, whether the layout should be snapped to a grid.}
 
-\item{label_dist}{Numeric scalar controlling the distance between labels
-and nodes (in points). Higher values push labels further from node centers.
-The default (\code{NULL}) uses sensible spacing that adapts to network size.
-Set to \code{0} for labels directly at node centers,
-or to a larger value (e.g. \code{15}) for more spacing.}
+\item{label_dist}{Numeric scalar, in points (pt), controlling the extra
+gap left between labels and node borders -- similar to \code{igraph}'s
+\code{vertex.label.dist}. Node size is always accounted for automatically
+(larger nodes push labels further away without any extra configuration);
+\code{label_dist} adds further spacing on top of that, and defaults to a
+small gap (5pt). Set to \code{0} for labels right at the node border,
+or to a larger value (e.g. \code{15}) for more spacing.
+Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
+(as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
+(as a fixed nudge away from the node, in the layouts where this makes
+sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").}
+
+\item{label_repel}{Logical scalar, whether labels should be repelled away
+from each other and from nodes using \code{ggrepel}
+(via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
+Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
+without the (sometimes slow, and non-deterministic between runs for
+some layouts) repelling algorithm.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 }
@@ -144,6 +158,8 @@ ison_adolescents \%>\%
   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) \%>\%
   graphr(node_color = "color", node_size = "size",
          edge_size = 1.5, edge_color = "ecolor")
+graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
 }
 \seealso{
 Other mapping: 
