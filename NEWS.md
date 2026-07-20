@@ -13,7 +13,10 @@
 
 ## Graphing
 
-- `grapht()` has been rewritten for smoother, more consistent animations of dynamic networks
+- Improved how `graphr()` treats labels
+  - Fixed labels overlapping nodes (closes #13): labels now keep clear of node borders automatically by giving ggrepel each node's true rendered size, with `label_dist` adding a further points-based gap (mirroring igraph's `vertex.label.dist`) and `label_repel = FALSE` selecting a fixed offset instead of repulsion. 
+  - This also fixed a pre-existing bug where non-repelled labels rendered with a fully transparent fill under this package's theme, making them invisible over nodes. 
+- Improved `grapht()` has been rewritten for smoother, more consistent animations of dynamic networks
   - Node positions now transition seamlessly between waves using the dynamic stress layout
     from `{graphlayouts}` (`layout_as_dynamic()`), with a new `alpha` argument controlling
     layout stability; other layouts are computed once on the aggregate network and held fixed
@@ -38,7 +41,12 @@
   - Aesthetic-resolution helpers are now shared between `graphr()` and `grapht()`
     (new R/graph_aes.R), so styling cannot drift between static and animated plots
   - Added a test suite for `grapht()` (no gif rendering required)
-  - Now aborts with a clear message when its input cannot be split into waves or slices, instead of failing much later with a cryptic igraph error (#40); the underlying cause — `to_waves()` silently ignoring a time attribute not named "wave" — will be fixed in `{manynet}` 2.2.2, and the tutorial example now uses a `wave` attribute, which splits correctly with `{manynet}` 2.2.1
+  - Now aborts with a clear message when its input cannot be split into waves or slices, instead of failing much later with a cryptic igraph error (closes #40); the underlying cause — `to_waves()` silently ignoring a time attribute not named "wave" — will be fixed in `{manynet}` 2.2.2, and the tutorial example now uses a `wave` attribute, which splits correctly with `{manynet}` 2.2.1
+- Added an `edge_bundle` argument to `graphr()` for bundling edges in dense networks (closes #19): 
+  - `TRUE`/`"force"` uses force-directed bundling, with `"path"` and `"minimal"` selecting the other non-hierarchical algorithms
+  - colour/width/linetype mappings are preserved and directed networks keep their arrowheads. 
+  - This wires up ggraph's non-hierarchical bundling geoms (added in ggraph 2.2.0), which were previously imported but never called, so the ggraph dependency is now `(>= 2.2.0)`
+- Fixed `edge_size = 0` not fully suppressing edges on directed networks (closes #50): arrowhead length was hard-coded regardless of `edge_size`, leaving a visible arrowhead when the line was hidden. Arrow length now scales with the resolved edge width (capped so heavily-weighted edges don't get oversized heads) and is omitted entirely when the width is 0
 - Fixed two-mode auto-shapes assigning circles to the second mode: the first mode now takes circles and the second squares, as intended
 - Fixed `graphr()` returning an empty plot for networks consisting only of isolates (e.g. the empty dyad/triad motifs): isolates are now kept whenever removing them would empty the graph
 - Fixed `graphs()` erroring on lists containing tie-less networks (e.g. `plot()` on motif censuses): panels sharing a layout now keep isolates so every node has a coordinate in every wave
@@ -47,7 +55,7 @@
 
 ## Tutorials
 
-- Fixed the "Tying up loose ends" exercise in the visualisation tutorial erroring on `tie_closeness()` (#39): the tutorial now loads `{netrics}` and uses its measure functions (`tie_by_closeness()`, `tie_is_triangular()`), and every tutorial code chunk is now exercised by the functional tests below
+- Fixed the "Tying up loose ends" exercise in the visualisation tutorial erroring on `tie_closeness()` (closes #39): the tutorial now loads `{netrics}` and uses its measure functions (`tie_by_closeness()`, `tie_is_triangular()`), and every tutorial code chunk is now exercised by the functional tests below
 - Reworked the "Visualising Networks" tutorial to match the structure and features of the `{manynet}` v2.2 tutorials
   - Rebranded the tutorial in autograph red, with larger, more readable text and matching 'Run code' buttons
   - Added a checkbox Aims section, "Catching up", "Going further", "Beginner note", and "In brief" callout boxes, per-page mini-tables of contents, and free play sections with a choose-your-own-data difficulty ladder
