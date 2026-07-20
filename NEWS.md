@@ -13,6 +13,32 @@
 
 ## Graphing
 
+- `grapht()` has been rewritten for smoother, more consistent animations of dynamic networks
+  - Node positions now transition seamlessly between waves using the dynamic stress layout
+    from `{graphlayouts}` (`layout_as_dynamic()`), with a new `alpha` argument controlling
+    layout stability; other layouts are computed once on the aggregate network and held fixed
+  - Changing node composition is now handled properly: every node that ever appears gets a
+    stable position and fades in and out in place as it enters and exits the network
+  - New `isolates` argument (`"keep"` or `"fade"`) controls whether temporarily isolated nodes
+    stay visible or fade out; `keep_isolates` is deprecated
+  - Dynamic (time-stamped, event-based) networks such as `irps_nuclear` are now split
+    automatically into cumulative time slices via `manynet::to_slices()`, so a single
+    dynamic network object passed to `grapht()` works without manual conversion
+  - `grapht()` now uses the dynamic stress layout by default even for two-mode networks
+    (rather than a hierarchy layout, which collapsed many nodes onto a line), suppresses
+    node labels by default for networks with more than 30 nodes to keep frames legible,
+    and fades densely overlapping ties so they read as a density gradient rather than a
+    solid mass
+  - Fixed an error when animating networks whose node names contain non-ASCII characters
+  - Waves without any ties are no longer silently dropped
+  - Closer visual parity with `graphr()`: directed networks get arrowheads on segments trimmed
+    at the target node, signed networks distinguish positive/negative ties by linetype and
+    colour, mapped aesthetics use the same palettes with factor levels consistent across
+    frames, and legends transition along with the animation
+  - Aesthetic-resolution helpers are now shared between `graphr()` and `grapht()`
+    (new R/graph_aes.R), so styling cannot drift between static and animated plots
+  - Added a test suite for `grapht()` (no gif rendering required)
+  - Now aborts with a clear message when its input cannot be split into waves or slices, instead of failing much later with a cryptic igraph error (#40); the underlying cause — `to_waves()` silently ignoring a time attribute not named "wave" — will be fixed in `{manynet}` 2.2.2, and the tutorial example now uses a `wave` attribute, which splits correctly with `{manynet}` 2.2.1
 - Fixed two-mode auto-shapes assigning circles to the second mode: the first mode now takes circles and the second squares, as intended
 - Fixed `graphr()` returning an empty plot for networks consisting only of isolates (e.g. the empty dyad/triad motifs): isolates are now kept whenever removing them would empty the graph
 - Fixed `graphs()` erroring on lists containing tie-less networks (e.g. `plot()` on motif censuses): panels sharing a layout now keep isolates so every node has a coordinate in every wave

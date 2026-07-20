@@ -11,7 +11,6 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 \usage{
 grapht(
   tlist,
-  keep_isolates = TRUE,
   layout = NULL,
   labels = TRUE,
   node_color,
@@ -19,8 +18,11 @@ grapht(
   node_size,
   edge_color,
   edge_size,
+  isolates = c("keep", "fade"),
+  alpha = 0.5,
   label_dist = NULL,
   label_repel = TRUE,
+  keep_isolates = NULL,
   ...,
   node_colour,
   edge_colour
@@ -31,12 +33,14 @@ grapht(
 \arguments{
 \item{tlist}{A manynet-compatible network listed according to
 a time attribute, waves, or slices.
-This can also be a diffusion model result from e.g.
+This can also be a single manynet network object that encodes time,
+which will be split automatically:
+longitudinal or changing networks are split into waves via
+\code{manynet::to_waves()}, and dynamic (time-stamped, event-based) networks
+such as \code{manynet::irps_nuclear} into cumulative time slices via
+\code{manynet::to_slices()}.
+It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.}
-
-\item{keep_isolates}{Logical, whether to keep isolate nodes in the graph.
-TRUE by default.
-If FALSE, removes nodes from each frame they are isolated in.}
 
 \item{layout}{An igraph, ggraph, or manynet layout algorithm.
 If not declared, defaults to "triad" for networks with 3 nodes,
@@ -94,6 +98,20 @@ it is recommended to calculate all edge-related statistics prior
 to using this function.
 Edges can also be sized by declaring a numeric size or vector instead.}
 
+\item{isolates}{One of \code{"keep"} (the default) or \code{"fade"}.
+\code{"keep"} retains isolated nodes at their layout positions in every
+wave in which they are present.
+\code{"fade"} fades nodes out during waves in which they are isolates,
+and fades them back in when they regain ties.
+Nodes that are absent from a wave altogether
+(composition change) always fade out.}
+
+\item{alpha}{A number between 0 and 1 controlling the stability of
+node positions across waves when the default dynamic (stress) layout
+is used. 0 computes each wave's layout freely,
+1 fixes all nodes at their aggregate-network positions.
+By default 0.5. Passed to \code{graphlayouts::layout_as_dynamic()}.}
+
 \item{label_dist}{Numeric scalar, in points (pt), controlling the extra
 gap left between labels and node borders -- similar to \code{igraph}'s
 \code{vertex.label.dist}. Node size is always accounted for automatically
@@ -112,6 +130,9 @@ from each other and from nodes using \code{ggrepel}
 Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
 without the (sometimes slow, and non-deterministic between runs for
 some layouts) repelling algorithm.}
+
+\item{keep_isolates}{Deprecated. Use \code{isolates = "keep"} or
+\code{isolates = "fade"} instead.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 
@@ -135,7 +156,27 @@ See \code{graphr()} for more.
 However, it uses the \code{{gganimate}} package to animate the changes
 between successive iterations of a network.
 This is useful for networks in which the ties and/or the node or tie
-attributes are changing.
+attributes are changing, including networks whose node composition
+changes over time: every node that ever appears is assigned a stable
+position, and nodes fade in and out in place as they enter and exit
+the network.
+
+By default node positions transition smoothly between waves using
+the dynamic stress layout from \code{{graphlayouts}}
+(\code{graphlayouts::layout_as_dynamic()}), which anchors each wave's
+layout to a reference layout of the aggregate network.
+The \code{alpha} argument controls this trade-off:
+0 lets each wave's layout follow that wave's structure freely,
+while 1 freezes every node at its aggregate position.
+When another \code{layout} is requested,
+a single static layout is computed on the aggregate
+(union of waves) network instead, so that positions remain constant.
+Unlike \code{graphr()}, \code{grapht()} uses this dynamic stress layout by default
+even for two-mode networks (rather than a hierarchy layout, which would
+collapse many nodes onto a line); the two modes remain distinguishable
+by node shape.
+For networks with more than 30 nodes, node labels are suppressed by
+default to keep frames legible; pass \code{labels = TRUE} to force them.
 
 \code{grapht()} returns a \code{{ggplot2}}-compatible object that can be
 extended with additional layers such as \code{ggplot2::labs()},
@@ -148,7 +189,10 @@ Users who want more control over animation parameters can call
 The visual appearance is consistent with \code{graphr()}:
 nodes use fillable shapes with the fill aesthetic,
 the same colour palettes are applied,
+directed networks receive arrowheads,
+signed networks distinguish positive from negative ties by linetype,
 and labels use the current theme font.
+Legends transition along with the mapped aesthetics.
 
 A progress bar is shown if it takes some time to encode all the
 .png files into a .gif.
@@ -159,29 +203,33 @@ repelling (there is no straightforward way to repel labels consistently
 across animation frames), so \code{label_repel} here instead toggles a fixed
 offset nudging labels away from their nodes, and \code{label_dist} scales the
 size of that nudge rather than being used as repel padding.
+
+Some further \code{graphr()} features are not available in animations:
+\code{node_group} hulls, edge bundling, curved arcs for reciprocated ties,
+and self-loops (loops are not drawn; a note is printed if present).
 }
 \examples{
+\donttest{
 #ison_adolescents \%>\%
-#  mutate_ties(year = sample(1995:1998, 10, replace = TRUE)) \%>\%
-#  to_waves(attribute = "year", cumulative = TRUE) \%>\%
+#  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) \%>\%
+#  to_waves(cumulative = TRUE) \%>\%
 #  grapht()
-#ison_adolescents \%>\% 
+#ison_adolescents \%>\%
 #  mutate(gender = rep(c("male", "female"), times = 4),
 #         hair = rep(c("black", "brown"), times = 4),
 #         age = sample(11:16, 8, replace = TRUE)) \%>\%
-#  mutate_ties(year = sample(1995:1998, 10, replace = TRUE),
+#  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE),
 #              links = sample(c("friends", "not_friends"), 10, replace = TRUE),
 #              weekly_meetings = sample(c(3, 5, 7), 10, replace = TRUE)) \%>\%
-#  to_waves(attribute = "year") \%>\%
-#  grapht(layout = "concentric", membership = "gender",
-#             node_shape = "gender", node_color = "hair",
-#             node_size =  "age", edge_color = "links",
-#             edge_size = "weekly_meetings")
+#  grapht(node_shape = "gender", node_color = "hair",
+#         node_size =  "age", edge_color = "links",
+#         edge_size = "weekly_meetings")
 #grapht(play_diffusion(ison_adolescents, seeds = 5))
 }
+}
 \seealso{
-Other mapping: 
-\code{\link{layout_configuration}()},
+Other mapping:
+\code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}}
