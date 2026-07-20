@@ -47,7 +47,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   #                                ifelse(manynet::node_attribute(g, "Infected"),"Infected", 
   #                                       ifelse(manynet::node_attribute(g, "Recovered"), "Recovered",
   #                                              "Susceptible"))))
-  node_color <- dplyr::case_match(manynet::node_attribute(g, "diffusion"),
+  node_color <- dplyr::recode_values(manynet::node_attribute(g, "diffusion"),
                                  "E" ~ "Exposed",
                                  "I" ~ "Infected",
                                  "R" ~ "Recovered",

@@ -29,8 +29,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{dplyr}{\code{\link[dplyr:reexports]{\%>\%}}}
+  \item{dplyr}{\code{\link[dplyr:\%>\%]{\%>\%}}}
 
-  \item{ggplot2}{\code{\link[ggplot2]{aes}}, \code{\link[ggplot2:element]{element_blank}}, \code{\link[ggplot2:element]{element_text}}, \code{\link[ggplot2]{geom_point}}, \code{\link[ggplot2]{geom_smooth}}, \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{ggsave}}, \code{\link[ggplot2:labs]{ggtitle}}, \code{\link[ggplot2]{guides}}, \code{\link[ggplot2]{labs}}, \code{\link[ggplot2:scale_hue]{scale_colour_hue}}, \code{\link[ggplot2]{scale_size}}, \code{\link[ggplot2:scale_continuous]{scale_x_continuous}}, \code{\link[ggplot2]{theme}}, \code{\link[ggplot2:ggtheme]{theme_grey}}, \code{\link[ggplot2:reexports]{unit}}, \code{\link[ggplot2:labs]{xlab}}, \code{\link[ggplot2:labs]{ylab}}}
+  \item{ggplot2}{\code{\link[ggplot2:aes]{aes()}}, \code{\link[ggplot2:element_blank]{element_blank()}}, \code{\link[ggplot2:element_text]{element_text()}}, \code{\link[ggplot2:geom_point]{geom_point()}}, \code{\link[ggplot2:geom_smooth]{geom_smooth()}}, \code{\link[ggplot2:ggplot]{ggplot()}}, \code{\link[ggplot2:ggsave]{ggsave()}}, \code{\link[ggplot2:ggtitle]{ggtitle()}}, \code{\link[ggplot2:guides]{guides()}}, \code{\link[ggplot2:labs]{labs()}}, \code{\link[ggplot2:scale_colour_hue]{scale_colour_hue()}}, \code{\link[ggplot2:scale_size]{scale_size()}}, \code{\link[ggplot2:scale_x_continuous]{scale_x_continuous()}}, \code{\link[ggplot2:theme]{theme()}}, \code{\link[ggplot2:theme_grey]{theme_grey()}}, \code{\link[ggplot2:unit]{unit}}, \code{\link[ggplot2:xlab]{xlab()}}, \code{\link[ggplot2:ylab]{ylab()}}}
 }}
 

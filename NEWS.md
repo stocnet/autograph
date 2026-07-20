@@ -28,6 +28,8 @@
 ## Layouts
 
 - Fixed `layout_tbl_graph_layered()` ordering nodes by the names rather than the positions of their neighbours in adjacent layers, which degraded every barycenter sweep to NA and raised warnings
+- Replaced deprecated `dplyr::case_match()` with `dplyr::recode_values()`
+
 
 # autograph 1.0.3
 
