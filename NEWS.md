@@ -2,7 +2,13 @@
 
 ## Package
 
+- Test coverage raised by introducing functional testing infrastructure (`tests/testthat/helper-functional.R` and `test-functional_*.R`) for:
+  - the layout family
+  - the `plot.*` S3 method family
+  - the `ag_*` palette accessors across all themes
+  - `graphr()`'s aesthetic arguments each enumerated automatically and audited against fixture grids
 - Removed the unused internal helper `seq_nodes()`
+- Added `{migraph}` to Suggests (used in tests only)
 
 ## Tutorials
 
