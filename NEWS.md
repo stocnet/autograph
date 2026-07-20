@@ -30,6 +30,9 @@
 - Fixed `layout_tbl_graph_layered()` ordering nodes by the names rather than the positions of their neighbours in adjacent layers, which degraded every barycenter sweep to NA and raised warnings
 - Replaced deprecated `dplyr::case_match()` with `dplyr::recode_values()`
 
+## Plotting
+
+- Fixed `plot.matrix()` erroring when no `membership` argument was supplied, for both one-mode and two-mode matrices
 
 # autograph 1.0.3
 

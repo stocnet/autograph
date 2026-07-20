@@ -289,36 +289,40 @@ plot.matrix <- function(x, ..., membership = NULL) {
       ggplot2::scale_y_discrete(expand = c(0, 0),
                                 limits = rev(rownames(blocked_data))
       )
-    if (!is.null(membership))
+    if (!is.null(membership)) {
       if(!is.numeric(membership)) membership <- as.numeric(as.factor(membership))
-    g <- g + ggplot2::geom_vline(
-      xintercept = c(1 + which(diff(membership[order(membership)]) != 0)) - .5,
-      colour = ag_highlight()
-    ) +
-      ggplot2::geom_hline(
-        yintercept = nrow(blocked_data) -
-          c(1 + which(diff(membership[order(membership)]) != 0)) + 1.5,
+      g <- g + ggplot2::geom_vline(
+        xintercept = c(1 + which(diff(membership[order(membership)]) != 0)) - .5,
         colour = ag_highlight()
-      )
+      ) +
+        ggplot2::geom_hline(
+          yintercept = nrow(blocked_data) -
+            c(1 + which(diff(membership[order(membership)]) != 0)) + 1.5,
+          colour = ag_highlight()
+        )
+    }
   } else {
-    group_boundaries <- diff(as.numeric(factor(membership[order(membership)])))
     g <- g +
       ggplot2::scale_y_discrete(expand = c(0, 0),
                                 limits = rev(rownames(blocked_data))
       ) +
       ggplot2::scale_x_discrete(expand = c(0, 0), position = "top",
                                 limits = colnames(blocked_data)
-      ) +
-      ggplot2::geom_vline(
-        xintercept =
-          c(1 + which(group_boundaries != 0)) - .5,
-        colour = ag_positive()
-      ) +
-      ggplot2::geom_hline(
-        yintercept = nrow(blocked_data) - 
-          c(1 + which(group_boundaries != 0)) + 1.5,
-        colour = ag_negative()
       )
+    if (!is.null(membership)) {
+      group_boundaries <- diff(as.numeric(factor(membership[order(membership)])))
+      g <- g +
+        ggplot2::geom_vline(
+          xintercept =
+            c(1 + which(group_boundaries != 0)) - .5,
+          colour = ag_positive()
+        ) +
+        ggplot2::geom_hline(
+          yintercept = nrow(blocked_data) -
+            c(1 + which(group_boundaries != 0)) + 1.5,
+          colour = ag_negative()
+        )
+    }
   }
   g
 }
