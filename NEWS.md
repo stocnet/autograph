@@ -11,6 +11,14 @@
 - Excluded the interactive-only palette helper `ggpizza()` from coverage
 - Added `{migraph}` to Suggests (used in tests only)
 
+## Graphing
+
+- Fixed two-mode auto-shapes assigning circles to the second mode: the first mode now takes circles and the second squares, as intended
+- Fixed `graphr()` returning an empty plot for networks consisting only of isolates (e.g. the empty dyad/triad motifs): isolates are now kept whenever removing them would empty the graph
+- Fixed `graphs()` erroring on lists containing tie-less networks (e.g. `plot()` on motif censuses): panels sharing a layout now keep isolates so every node has a coordinate in every wave
+- Fixed `graphr()` erroring on weight or size attributes carrying measure classes (e.g. `tie_measure` results from `{netrics}` stored as attributes)
+- Fixed a vector-recycling warning in `graphs()`' ego-network detection
+
 ## Tutorials
 
 - Fixed the "Tying up loose ends" exercise in the visualisation tutorial erroring on `tie_closeness()` (#39): the tutorial now loads `{netrics}` and uses its measure functions (`tie_by_closeness()`, `tie_is_triangular()`), and every tutorial code chunk is now exercised by the functional tests below

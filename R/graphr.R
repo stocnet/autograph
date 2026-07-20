@@ -240,7 +240,9 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
 }
 
 .infer_isolates <- function(g, isolates){
-  if(!any(.node_is_isolate(g))) isolates <- "keep"
+  # Keep isolates when there are none to remove, or when removing them
+  # would empty the graph (e.g. tie-less motif networks)
+  if(!any(.node_is_isolate(g)) || all(.node_is_isolate(g))) isolates <- "keep"
   isolates
 }
 
