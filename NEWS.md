@@ -1,3 +1,17 @@
+# autograph 1.1.0
+
+
+## Tutorials
+
+- Fixed the "Tying up loose ends" exercise in the visualisation tutorial erroring on `tie_closeness()` (#39): the tutorial now loads `{netrics}` and uses its measure functions (`tie_by_closeness()`, `tie_is_triangular()`), and every tutorial code chunk is now exercised by the functional tests below
+- Reworked the "Visualising Networks" tutorial to match the structure and features of the `{manynet}` v2.2 tutorials
+  - Rebranded the tutorial in autograph red, with larger, more readable text and matching 'Run code' buttons
+  - Added a checkbox Aims section, "Catching up", "Going further", "Beginner note", and "In brief" callout boxes, per-page mini-tables of contents, and free play sections with a choose-your-own-data difficulty ladder
+  - Added hover-over glossary terms throughout and a closing Summary section with a function overview table and glossary
+  - Added quiz questions with feedback, and hints for the coding exercises
+  - New coverage of `edge_bundle`, `label_repel`/`label_dist`, the `isolates` argument, `snap` grid-snapping, autograph's own special-purpose layouts, and programmatic export with `ggsave()`
+  - New sections on directed networks (automatic, width-scaled arrowheads and manual control via `edge_size`), automatic mode shapes in two-mode networks, and manually adjusting a layout's coordinate table before passing it back via `x`/`y`
+  - Added artist-themed gifs throughout, including as quiz-answer feedback
 # autograph 1.0.3
 
 ## Plotting
