@@ -57,10 +57,7 @@ For plotting selection tables,
 please consult the RSiena manual, Sections 13.2 and 13.4.
 }
 \seealso{
-Other RSiena: 
-\code{\link{plot_gof}}
-
-Other RSiena: 
+Other RSiena:
 \code{\link{plot_gof}}
 }
 \author{

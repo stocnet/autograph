@@ -23,6 +23,12 @@
   - New sections on directed networks (automatic, width-scaled arrowheads and manual control via `edge_size`), automatic mode shapes in two-mode networks, and manually adjusting a layout's coordinate table before passing it back via `x`/`y`
   - Added artist-themed gifs throughout, including as quiz-answer feedback
 - Added a static, read-only version of the tutorial as a pkgdown article ("Tutorials" menu on the website), as in `{manynet}`
+- Added functional testing of all tutorial code chunks (`tests/testthat/test-tutorials_autograph.R`), mirroring `{manynet}`'s tutorial testing infrastructure
+
+## Layouts
+
+- Fixed `layout_tbl_graph_layered()` ordering nodes by the names rather than the positions of their neighbours in adjacent layers, which degraded every barycenter sweep to NA and raised warnings
+
 # autograph 1.0.3
 
 ## Plotting

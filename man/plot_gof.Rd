@@ -107,13 +107,13 @@ Hintze, J. L. and Nelson, R. D. 1998.
 \doi{10.1080/00031305.1998.10480559}
 }
 \seealso{
-Other MoNAn: 
+Other MoNAn:
 \code{\link{plot_convergence}}
 
-Other RSiena: 
+Other RSiena:
 \code{\link{plot_interp}}
 
-Other ergm: 
+Other ergm:
 \code{\link{plot_convergence}}
 }
 \concept{MoNAn}

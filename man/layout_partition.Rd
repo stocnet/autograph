@@ -137,8 +137,8 @@ The "lineage" layout ranks nodes in Y axis according to values.
 #graphr(ison_southern_women, layout = "alluvial")
 }
 \seealso{
-Other mapping: 
-\code{\link{layout_configuration}()},
+Other mapping:
+\code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},
 \code{\link{plot_grapht}}

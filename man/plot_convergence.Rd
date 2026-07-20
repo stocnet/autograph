@@ -40,10 +40,10 @@ ergm_res <- load_ergm_res()
 plot(ergm_res)
 }
 \seealso{
-Other MoNAn: 
+Other MoNAn:
 \code{\link{plot_gof}}
 
-Other ergm: 
+Other ergm:
 \code{\link{plot_gof}}
 }
 \concept{MoNAn}

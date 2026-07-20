@@ -175,8 +175,8 @@ graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
 graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 }
 \seealso{
-Other mapping: 
-\code{\link{layout_configuration}()},
+Other mapping:
+\code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphs}},
 \code{\link{plot_grapht}}

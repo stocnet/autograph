@@ -55,7 +55,7 @@ The "configuration" layout will choose the appropriate configurational
 layout automatically.
 }
 \seealso{
-Other mapping: 
+Other mapping:
 \code{\link{layout_partition}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},
