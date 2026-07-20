@@ -12,6 +12,7 @@
   - New coverage of `edge_bundle`, `label_repel`/`label_dist`, the `isolates` argument, `snap` grid-snapping, autograph's own special-purpose layouts, and programmatic export with `ggsave()`
   - New sections on directed networks (automatic, width-scaled arrowheads and manual control via `edge_size`), automatic mode shapes in two-mode networks, and manually adjusting a layout's coordinate table before passing it back via `x`/`y`
   - Added artist-themed gifs throughout, including as quiz-answer feedback
+- Added a static, read-only version of the tutorial as a pkgdown article ("Tutorials" menu on the website), as in `{manynet}`
 # autograph 1.0.3
 
 ## Plotting
