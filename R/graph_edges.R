@@ -60,46 +60,8 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
        "line_type" = .infer_line_type(g))
 }
 
-.infer_ecolor <- function(g, edge_color){
-  if (!is.null(edge_color)) {
-    if (edge_color %in% names(manynet::tie_attribute(g))) {
-      if ("tie_mark" %in% class(manynet::tie_attribute(g, edge_color))) {
-        out <- factor(as.character(manynet::tie_attribute(g, edge_color)),
-                      levels = c("FALSE", "TRUE"))
-      } else out <- as.factor(as.character(manynet::tie_attribute(g, edge_color)))
-      if (length(unique(out)) == 1) {
-        out <- rep("black", manynet::net_ties(g))
-        manynet::snet_info("Please indicate a variable with more than one value or level when mapping edge colors.")
-      }
-    } else {
-      out <- edge_color
-    }
-  } else if (is.null(edge_color) & manynet::is_signed(g)) {
-    out <- factor(ifelse(igraph::E(g)$sign >= 0, "Positive", "Negative"),
-                  levels = c("Positive", "Negative"))
-    if (length(unique(out)) == 1) {
-      out <- "black"
-    }
-  } else {
-    out <- "black"
-  }
-  out
-}
-
-.infer_esize <- function(g, edge_size){
-  if (!is.null(edge_size)) {
-    if (any(edge_size %in% names(manynet::tie_attribute(g)))) {
-      out <- manynet::tie_attribute(g, edge_size)
-    } else {
-      out <- edge_size
-    }
-  } else if (is.null(edge_size) & manynet::is_weighted(g)) {
-    out <- manynet::tie_attribute(g, "weight")
-  } else {
-    out <- 0.5
-  }
-  out
-}
+# .infer_ecolor/.infer_esize/.infer_arrow/.infer_line_type/.check_edge_variables
+# live in R/graph_aes.R, shared with grapht().
 
 .infer_end_cap <- function(g, node_size) {
   nsize <- .infer_nsize(g, node_size)/2
@@ -119,41 +81,6 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
       (1 / manynet::net_nodes(g) * 50)
   }
   out
-}
-
-.infer_arrow <- function(esize) {
-  # `arrow=` is a fixed layer parameter, not a mappable aesthetic, so a
-  # per-edge width vector (`esize` mapped from an attribute) is summarised by
-  # its mean to pick one arrowhead size for the whole layer.
-  repr <- if (length(esize) > 1) mean(esize, na.rm = TRUE) else esize
-  if (length(repr) == 0 || is.na(repr) || repr <= 0) return(NULL)
-  # 2mm at the default edge width (0.5), scaled proportionally and capped so
-  # heavily-weighted edges don't get oversized arrowheads.
-  len_mm <- min(repr / 0.5 * 2, 4)
-  ggplot2::arrow(angle = 15, type = "closed", length = ggplot2::unit(len_mm, 'mm'))
-}
-
-.infer_line_type <- function(g) {
-  if (manynet::is_signed(g)) {
-    out <- ifelse(as.numeric(manynet::tie_signs(g)) >= 0,
-                  "solid", "dashed")
-    # ifelse(length(unique(out)) == 1, unique(out), out)
-  } else out <- "solid"
-  out
-}
-
-.check_edge_variables <- function(g, edge_color, edge_size) {
-  if (!is.null(edge_color)) {
-    if (any(!tolower(edge_color) %in% tolower(igraph::edge_attr_names(g))) &
-        any(!edge_color %in% grDevices::colors())) {
-      manynet::snet_info("Please make sure you spelled `edge_color` variable correctly.")
-    } 
-  }
-  if (!is.null(edge_size)) {
-    if (!is.numeric(edge_size) & any(!tolower(edge_size) %in% tolower(igraph::edge_attr_names(g)))) {
-      manynet::snet_info("Please make sure you spelled `edge_size` variable correctly.")
-    } 
-  }
 }
 
 .map_directed_edges <- function(p, g, out) {

@@ -39,62 +39,8 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
        "ncolor" = .infer_ncolor(g, node_color))
 }
 
-.infer_nsize <- function(g, node_size) {
-  if (!is.null(node_size)) {
-    if (is.character(node_size)) {
-      out <- manynet::node_attribute(g, node_size)
-    } else out <- node_size
-    if (length(node_size > 1) & all(out <= 1 & out >= 0)) out <- out * 10
-  } else {
-    out <- min(20, (250 / manynet::net_nodes(g)) / 2)
-  }
-  as.numeric(out)
-}
-
-.infer_nshape <- function(g, node_shape) {
-  if (!is.null(node_shape)) {
-    if (node_shape %in% names(manynet::node_attribute(g))) {
-      out <- as.factor(as.character(manynet::node_attribute(g, node_shape)))
-    } else out <- node_shape
-  } else if (is_twomode(g) & is.null(node_shape)) {
-    out <- ifelse(igraph::V(g)$type, "One", "Two")
-  } else {
-    out <- 21  # Use fillable circle shape (was "circle")
-  }
-  out
-}
-
-.infer_ncolor <- function(g, node_color) {
-  if (!is.null(node_color)) {
-    if (node_color %in% names(manynet::node_attribute(g))) {
-      if ("node_mark" %in% class(manynet::node_attribute(g, node_color))) {
-        out <- factor(as.character(manynet::node_attribute(g, node_color)),
-                      levels = c("FALSE", "TRUE"))
-      } else out <- as.factor(as.character(manynet::node_attribute(g, node_color)))
-      if (length(unique(out)) == 1) {
-        out <- rep("black", manynet::net_nodes(g))
-        manynet::snet_info("Please indicate a variable with more than one value or level when mapping node colors.")
-      }
-    } else out <- node_color
-  } else {
-    out <- "black"
-  }
-  out
-}
-
-.check_node_variables <- function(g, node_color, node_size) {
-  if (!is.null(node_color)) {
-    if (any(!tolower(node_color) %in% tolower(igraph::vertex_attr_names(g))) &
-        any(!node_color %in% grDevices::colors())) {
-      manynet::snet_info("Please make sure you spelled `node_color` variable correctly.")
-    } 
-  }
-  if (!is.null(node_size)) {
-    if (!is.numeric(node_size) & any(!tolower(node_size) %in% tolower(igraph::vertex_attr_names(g)))) {
-      manynet::snet_info("Please make sure you spelled `node_size` variable correctly.")
-    }
-  }
-}
+# .infer_nsize/.infer_nshape/.infer_ncolor/.check_node_variables live in
+# R/graph_aes.R, shared with grapht().
 
 .map_infected_nodes<- function(p, g, out) {
   # node_color <- as.factor(ifelse(manynet::node_attribute(g, "Exposed"), "Exposed",

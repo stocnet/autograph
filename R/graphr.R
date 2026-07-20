@@ -121,8 +121,9 @@
 #' @return A `ggplot2::ggplot()` object.
 #'   The last plot can be saved to the file system using `ggplot2::ggsave()`.
 #' @importFrom ggraph geom_edge_link geom_node_text
-#'   geom_edge_bundle_force geom_edge_bundle_path geom_edge_bundle_minimal
-#'   geom_node_point scale_edge_width_continuous geom_node_label
+#' @importFrom ggraph geom_edge_bundle_force geom_edge_bundle_path 
+#' @importFrom ggraph geom_edge_bundle_minimal geom_node_label
+#' @importFrom ggraph geom_node_point scale_edge_width_continuous 
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
 #' @importFrom tidygraph activate
 #' @examples
