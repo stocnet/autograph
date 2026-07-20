@@ -1,5 +1,8 @@
 # autograph 1.1.0
 
+## Package
+
+- Removed the unused internal helper `seq_nodes()`
 
 ## Tutorials
 
