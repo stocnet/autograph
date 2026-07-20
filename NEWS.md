@@ -8,6 +8,7 @@
   - the `ag_*` palette accessors across all themes
   - `graphr()`'s aesthetic arguments each enumerated automatically and audited against fixture grids
 - Removed the unused internal helper `seq_nodes()`
+- Excluded the interactive-only palette helper `ggpizza()` from coverage
 - Added `{migraph}` to Suggests (used in tests only)
 
 ## Tutorials
