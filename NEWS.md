@@ -7,6 +7,10 @@
   - Splits it into waves or time slices automatically (consistent with `grapht()`), 
   instead of erroring with "invalid to use names()<- on an S4 object of class 'dgCMatrix'"
 - Fixed various errors and warnings in `graphr()`/`graphs()` on signed, directed, or changing networks:
+  - Fixed fails at draw time with "invalid hex digit in 'color' or 'lty'" in `graphr()` on a signed multiplex network (e.g. `fict_marvel`)
+    - ties on non-signed layers (which have a missing sign) are now drawn solid/positive rather than passing `NA` to grid
+  - Fixed error with "Aesthetics must be either length 1 or the same as the data" in `graphr()`/`graphs()` on signed longitudinal or directed networks (e.g. `to_waves(ison_monks)`)
+    - per-tie sign linetypes are now mapped through `aes()` (with an identity scale) so ggraph's edge geoms expand and subset them consistently with edge colour and width
   - Fixed `graphr(..., snap = TRUE)` erroring on two-mode networks: their default "hierarchy" layout is now left un-snapped (with an informative message) since collapsing its layered coordinates onto a square grid is not meaningful, while snapping a two-mode network under a force-directed layout continues to work; also hardened the grid-snapping search so a coordinate landing exactly on a grid point is no longer mistaken for a node's zero self-distance
 
 # autograph 1.1.0

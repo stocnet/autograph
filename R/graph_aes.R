@@ -82,7 +82,11 @@
       out <- edge_color
     }
   } else if (is.null(edge_color) & manynet::is_signed(g)) {
-    out <- factor(ifelse(igraph::E(g)$sign >= 0, "Positive", "Negative"),
+    # Multiplex/complex signed networks carry a sign only on the signed layer;
+    # ties on other layers have `NA` sign. Treat those (and any NA) as positive
+    # so the resulting factor never contains NA, which grid rejects at draw time.
+    signs <- igraph::E(g)$sign
+    out <- factor(ifelse(!is.na(signs) & signs >= 0, "Positive", "Negative"),
                   levels = c("Positive", "Negative"))
     if (length(unique(out)) == 1) {
       out <- "black"
@@ -123,9 +127,14 @@
 
 .infer_line_type <- function(g) {
   if (manynet::is_signed(g)) {
-    out <- ifelse(as.numeric(manynet::tie_signs(g)) >= 0,
-                  "solid", "dashed")
-    # ifelse(length(unique(out)) == 1, unique(out), out)
+    signs <- as.numeric(manynet::tie_signs(g))
+    # Ties without a sign (e.g. non-signed layers of a multiplex network) come
+    # back as NA; draw them solid rather than passing NA (an invalid linetype)
+    # through to grid. Only genuinely negative ties are dashed.
+    out <- ifelse(!is.na(signs) & signs < 0, "dashed", "solid")
+    # Collapse to a scalar when every tie is the same so it is treated as a
+    # constant layer parameter rather than a per-tie aesthetic.
+    if (length(unique(out)) == 1) out <- unique(out)
   } else out <- "solid"
   out
 }
