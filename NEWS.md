@@ -3,6 +3,9 @@
 ## Graphing
 
 - Fixed `grapht()` example, which took too long to run, by couching it in `\donttest{}`
+- Improved `graphs()` to accept bare longitudinal or dynamic networks
+  - Splits it into waves or time slices automatically (consistent with `grapht()`), 
+  instead of erroring with "invalid to use names()<- on an S4 object of class 'dgCMatrix'"
 
 # autograph 1.1.0
 

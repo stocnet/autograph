@@ -196,3 +196,17 @@ test_that("graphs() handles ego networks and changing networks", {
   uneven <- list(manynet::create_ring(4), manynet::create_ring(6))
   expect_s3_class(suppressMessages(graphs(uneven)), "patchwork")
 })
+
+test_that("graphs() splits a bare longitudinal or dynamic network", {
+  skip_on_cran()
+  # A single longitudinal network (longitudinal but not "changing") is split
+  # into its waves via to_waves(), mirroring grapht(). Previously this was not
+  # split and iterating the raw object errored with
+  # "invalid to use names()<- on an S4 object of class 'dgCMatrix'".
+  expect_s3_class(suppressMessages(graphs(manynet::ison_monks)), "patchwork")
+  # A single dynamic (event) network is split into cumulative slices via
+  # to_slices(), so a bare dynamic network is accepted directly.
+  expect_s3_class(suppressMessages(graphs(manynet::irps_nuclear)), "patchwork")
+  # An interval (spell) network is split into per-period snapshots.
+  expect_s3_class(suppressMessages(graphs(manynet::irps_wwi)), "patchwork")
+})
