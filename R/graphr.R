@@ -89,17 +89,41 @@
 #'   If the default layout ("stress") is used, 
 #'   we recommend that the "legend" option is used to avoid isolates crowding
 #'   out the giant component.
-#' @param label_dist Numeric scalar controlling the distance between labels
-#'   and nodes (in points). Higher values push labels further from node centers.
-#'   The default (`NULL`) uses sensible spacing that adapts to network size.
-#'   Set to `0` for labels directly at node centers,
+#' @param label_dist Numeric scalar, in points (pt), controlling the extra
+#'   gap left between labels and node borders -- similar to `igraph`'s
+#'   `vertex.label.dist`. Node size is always accounted for automatically
+#'   (larger nodes push labels further away without any extra configuration);
+#'   `label_dist` adds further spacing on top of that, and defaults to a
+#'   small gap (5pt). Set to `0` for labels right at the node border,
 #'   or to a larger value (e.g. `15`) for more spacing.
+#'   Only used when `labels = TRUE` and `label_repel = TRUE`
+#'   (as the padding passed to the repel algorithm) or `label_repel = FALSE`
+#'   (as a fixed nudge away from the node, in the layouts where this makes
+#'   sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").
+#' @param label_repel Logical scalar, whether labels should be repelled away
+#'   from each other and from nodes using `ggrepel`
+#'   (via `ggraph`'s `repel` argument). Defaults to `TRUE`.
+#'   Set to `FALSE` to place labels at a fixed offset (see `label_dist`)
+#'   without the (sometimes slow, and non-deterministic between runs for
+#'   some layouts) repelling algorithm.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
+#' @param edge_bundle Edge bundling, off by default (`FALSE`). When `TRUE` (or
+#'   equivalently `"force"`), edges are bundled together using ggraph's
+#'   force-directed edge bundling (`geom_edge_bundle_force()`), which pulls
+#'   nearby edges into shared paths to reduce visual clutter in dense networks.
+#'   Alternative non-hierarchical algorithms can be selected by name:
+#'   `"path"` (`geom_edge_bundle_path()`) or `"minimal"`
+#'   (`geom_edge_bundle_minimal()`). Bundling only makes a visible difference
+#'   when a network has enough edges; for directed networks arrowheads are
+#'   retained, but the slight reciprocal-tie curvature used for unbundled edges
+#'   does not apply.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
 #'   The last plot can be saved to the file system using `ggplot2::ggsave()`.
-#' @importFrom ggraph geom_edge_link geom_node_text geom_conn_bundle
-#'   get_con geom_node_point scale_edge_width_continuous geom_node_label
+#' @importFrom ggraph geom_edge_link geom_node_text
+#' @importFrom ggraph geom_edge_bundle_force geom_edge_bundle_path 
+#' @importFrom ggraph geom_edge_bundle_minimal geom_node_label
+#' @importFrom ggraph geom_node_point scale_edge_width_continuous 
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
 #' @importFrom tidygraph activate
 #' @examples
@@ -110,17 +134,21 @@
 #'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) %>%
 #'   graphr(node_color = "color", node_size = "size",
 #'          edge_size = 1.5, edge_color = "ecolor")
+#' graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+#' graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+#' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
-                   edge_color, edge_size, 
+                   edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
-                   label_dist = NULL, ...,
-                   node_colour, edge_colour) {
+                   label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
+                   ..., node_colour, edge_colour) {
   if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
                              node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
-                             edge_color = edge_color, edge_size = edge_size, 
-                             isolates = isolates, snap = snap, ...,
+                             edge_color = edge_color, edge_size = edge_size,
+                             isolates = isolates, snap = snap,
+                             edge_bundle = edge_bundle, ...,
                              node_colour = node_colour, edge_colour = edge_colour))
   g <- manynet::as_tidygraph(.data)
   
@@ -166,12 +194,13 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
   # Add edges ----
-  p <- graph_edges(p, g, edge_color, edge_size, node_size)
+  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle)
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size)
   # Add labels ----
   if (isTRUE(labels) & manynet::is_labelled(g)) {
-    p <- graph_labels(p, g, layout, label_dist)
+    p <- graph_labels(p, g, layout, label_dist, label_repel,
+                      node_size = .infer_nsize(g, node_size))
   }
   
   # Note isolates ----
@@ -211,7 +240,9 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
 }
 
 .infer_isolates <- function(g, isolates){
-  if(!any(.node_is_isolate(g))) isolates <- "keep"
+  # Keep isolates when there are none to remove, or when removing them
+  # would empty the graph (e.g. tie-less motif networks)
+  if(!any(.node_is_isolate(g)) || all(.node_is_isolate(g))) isolates <- "keep"
   isolates
 }
 

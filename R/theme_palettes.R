@@ -82,6 +82,8 @@ ag_font <- function(){
   getOption("snet_font", default = "sans")
 }
 
+# nocov start
+# Interactive helper for displaying palettes; not called by any package code
 ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
   n <- length(colors)
   angles <- seq(0, 2*pi, length.out = n + 1) + init.angle * pi/180
@@ -118,4 +120,5 @@ ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
     ggplot2::coord_equal() +
     ggplot2::theme_void()
 }
+# nocov end
 

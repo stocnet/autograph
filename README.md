@@ -128,7 +128,9 @@ together informatively.
 
 The third graph drawing function, `grapht()`, is used to visualise
 dynamic networks. It uses `{gganimate}` and `{gifski}` to create a gif
-that visualises network changes over time. It really couldn’t be easier.
+that visualises network changes over time, with node positions
+transitioning smoothly between waves and nodes fading in and out as
+they enter and exit the network. It really couldn’t be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 

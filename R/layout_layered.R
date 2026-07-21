@@ -74,19 +74,22 @@ layout_tbl_graph_layered <- function(.data,
   }
   
   for (s in seq_len(times)) {
-    # Forward sweep (top-down)
+    # Forward sweep (top-down), sorting by the positions (not names) of
+    # each node's neighbours in the adjacent layer
     for (l in 2:length(layer_map)) {
       prev <- x_pos[[l - 1]]
-      cur <- layer_map[[as.character(l - 1 + 1)]]
-      rev_adj <- lapply(cur, function(n) radj[[n]][radj[[n]] %in% names(prev)])
-      x_pos[[l]] <- barycenter_sort(cur, setNames(rev_adj, cur))
+      cur <- layer_map[[l]]
+      rev_pos <- lapply(cur, function(n)
+        unname(prev[radj[[n]][radj[[n]] %in% names(prev)]]))
+      x_pos[[l]] <- barycenter_sort(cur, setNames(rev_pos, cur))
     }
     # Backward sweep (bottom-up)
     for (l in (length(layer_map) - 1):1) {
       next_ <- x_pos[[l + 1]]
-      cur <- layer_map[[as.character(l - 1 + 1)]]
-      fwd_adj <- lapply(cur, function(n) adj[[n]][adj[[n]] %in% names(next_)])
-      x_pos[[l]] <- barycenter_sort(cur, setNames(fwd_adj, cur))
+      cur <- layer_map[[l]]
+      fwd_pos <- lapply(cur, function(n)
+        unname(next_[adj[[n]][adj[[n]] %in% names(next_)]]))
+      x_pos[[l]] <- barycenter_sort(cur, setNames(fwd_pos, cur))
     }
   }
   

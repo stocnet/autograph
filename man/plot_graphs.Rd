@@ -51,8 +51,8 @@ or a mix, "both", of them.
 #graphs(play_diffusion(ison_adolescents))
 }
 \seealso{
-Other mapping: 
-\code{\link{layout_configuration}()},
+Other mapping:
+\code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphr}},
 \code{\link{plot_grapht}}

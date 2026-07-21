@@ -177,18 +177,19 @@ ison_adolescents %>%
 
 ### More time
 
-The third graph drawing function, `grapht()`, 
+The third graph drawing function, `grapht()`,
 is used to visualise dynamic networks.
 It uses `{gganimate}` and `{gifski}` to create a gif that
-visualises network changes over time.
+visualises network changes over time,
+with node positions transitioning smoothly between waves
+and nodes fading in and out as they enter and exit the network.
 It really couldn't be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
 ```{r autographd, echo = FALSE, dpi = 250, fig.height=3.5, eval=FALSE}
 ison_adolescents %>%
-  mutate_ties(year = sample(1995:1998, 10, replace = TRUE)) %>%
-  to_waves(attribute = "year") %>%
+  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) %>%
   grapht()
 ```
 
