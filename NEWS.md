@@ -6,6 +6,8 @@
 - Improved `graphs()` to accept bare longitudinal or dynamic networks
   - Splits it into waves or time slices automatically (consistent with `grapht()`), 
   instead of erroring with "invalid to use names()<- on an S4 object of class 'dgCMatrix'"
+- Fixed various errors and warnings in `graphr()`/`graphs()` on signed, directed, or changing networks:
+  - Fixed `graphr(..., snap = TRUE)` erroring on two-mode networks: their default "hierarchy" layout is now left un-snapped (with an informative message) since collapsing its layered coordinates onto a square grid is not meaningful, while snapping a two-mode network under a force-directed layout continues to work; also hardened the grid-snapping search so a coordinate landing exactly on a grid point is no longer mistaken for a node's zero self-distance
 
 # autograph 1.1.0
 
