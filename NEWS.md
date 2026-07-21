@@ -17,6 +17,10 @@
     - per-tie sign linetypes are now mapped through `aes()` (with an identity scale) so ggraph's edge geoms expand and subset them consistently with edge colour and width
   - Fixed `graphr(..., snap = TRUE)` erroring on two-mode networks: their default "hierarchy" layout is now left un-snapped (with an informative message) since collapsing its layered coordinates onto a square grid is not meaningful, while snapping a two-mode network under a force-directed layout continues to work; also hardened the grid-snapping search so a coordinate landing exactly on a grid point is no longer mistaken for a node's zero self-distance
 
+## Tutorials
+
+- Updated visualisation tutorial with a bit more structuring of further options
+
 # autograph 1.1.0
 
 ## Package
