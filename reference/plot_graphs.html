@@ -39,7 +39,7 @@ or a mix, &quot;both&quot;, of them."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,16 @@ or a mix, "both", of them.</p>
 
 
 <dl><dt id="arg-netlist">netlist<a class="anchor" aria-label="anchor" href="#arg-netlist"></a></dt>
-<dd><p>A list of manynet-compatible networks.</p></dd>
+<dd><p>A list of manynet-compatible networks.
+This can also be a single manynet network object that encodes time,
+which will be split automatically (as in <code><a href="plot_grapht.html">grapht()</a></code>):
+longitudinal or changing networks are split into waves via
+<code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_waves()</a></code>; dynamic (time-stamped, event-based) networks
+such as <code><a href="https://stocnet.github.io/manynet/reference/irps_nuclear.html" class="external-link">manynet::irps_nuclear</a></code> into cumulative time slices via
+<code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_slices()</a></code>; and interval (spell) networks that record tie
+<code>begin</code>/<code>end</code> lifespans, such as <code><a href="https://stocnet.github.io/manynet/reference/irps_wwi.html" class="external-link">manynet::irps_wwi</a></code>, into one snapshot
+per change point. It can also be a diffusion model result from e.g.
+<code><a href="https://stocnet.github.io/manynet/reference/make_play.html" class="external-link">manynet::play_diffusion()</a></code>.</p></dd>
 
 
 <dt id="arg-waves">waves<a class="anchor" aria-label="anchor" href="#arg-waves"></a></dt>

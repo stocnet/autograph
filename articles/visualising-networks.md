@@ -264,7 +264,8 @@ scales with `+` — you can do to a graph.
 
 ## Illustrating graphs
 
-On this page: Shaping · Colouring · Sizing · Ties · Arrows · Free play
+On this page: Shaping · Colouring · Sizing · Ties · Arrows · Taming ·
+Free play
 
 Once we have an initial graph of our network, we can start to explore
 features of the network and its structure in more detail. There are a
@@ -273,21 +274,39 @@ illustrate different aspects of the network. On [her excellent and
 helpful website](https://kateto.net/network-visualization), Katya
 Ognyanova outlines some of these dimensions:
 
-| Nodes    |                               | Ties   |                               |
-| :------- | :---------------------------- | :----- | :---------------------------- |
-| Position | `layout=`                     | Arrows | (e.g. capped, head shape)     |
-| Labels   | `labels=`, `node_group=`      | Type   | (e.g. solid, dashed)          |
-| Shape    | `node_shape=`                 | Shape  | (e.g. straight, bent)         |
-| Size     | `node_size=`                  | Size   | `edge_size=`                  |
-| Color    | `node_color=`, `node_colour=` | Color  | `edge_color=`, `edge_colour=` |
+| Nodes    |                               | Ties   |                                 |
+| :------- | :---------------------------- | :----- | :------------------------------ |
+| Position | `layout=`                     | Arrows | *automatic* (directed ties)     |
+| Labels   | `labels=`, `node_group=`      | Type   | *automatic* (signed ties)       |
+| Shape    | `node_shape=`                 | Shape  | *automatic* (reciprocated ties) |
+| Size     | `node_size=`                  | Size   | `edge_size=`                    |
+| Color    | `node_color=`, `node_colour=` | Color  | `edge_color=`, `edge_colour=`   |
 
-Currently only those options with named parameters in the table above
-are available to be customised in
-[autograph](https://stocnet.github.io/autograph/). Tie arrows and shapes
-are used to indicate directionality and reciprocity , where present in
-the data.
+The named arguments in the table above cover the aesthetics you will
+reach for most often. Several other visual features are not arguments at
+all: `graphr()` reads them off the data and sets them for you, so that a
+first graph already reads correctly without any tweaking. In particular:
 
-Each of these arguments can be given either a literal value
+  - **arrowheads** are drawn (and trimmed back from the node) where the
+    network is directed , and omitted where it is undirected ;
+  - ties **curve** apart slightly where a dyad is reciprocated , and are
+    drawn straight otherwise;
+  - ties are drawn **dashed** where a signed network marks them
+    negative, and solid where positive;
+  - **self-ties** (loops) are drawn where the network is complex ; and
+  - edges are drawn semi-transparent, so that denser bundles of ties
+    read as darker.
+
+You do not set these by hand — but because every graph is a
+[ggplot2](https://ggplot2.tidyverse.org) object, you can always override
+them by dropping down to [ggraph](https://ggraph.data-imaginist.com)
+(see the *Going further with ggraph* section near the end of this
+tutorial). A handful of further arguments — `node_group`,
+`label_repel`/`label_dist`, `edge_bundle`, `isolates`, and `snap` — tune
+grouping, labelling, and how dense or disconnected networks are drawn;
+we meet each in its own section below.
+
+Each of the mapping arguments can be given either a literal value
 (e.g. `node_size = 6`) or, more interestingly, the name of a node or
 tie attribute in the data (e.g. `node_color = "Race"`), in which case
 `graphr()` maps the attribute to that aesthetic and adds a legend where
@@ -439,6 +458,46 @@ automatic sizing with a manually thickened version.**
    graphr(ison_networkers, edge_size = 1) + ggtitle("Manual (edge_size = 1)"))
 ```
 
+### Taming dense or disconnected networks
+
+Two arguments help when a network is too dense, or too sparse, to read
+at a glance.
+
+Larger, denser networks can turn into a ‘hairball’, where the sheer
+number of ties obscures everything. `edge_bundle` pulls ties that travel
+in similar directions into shared paths — like cabling them together —
+so that the main ‘highways’ of the network stand out. It is off by
+default; set `edge_bundle = TRUE` (or name a specific algorithm:
+`"force"`, `"path"`, or `"minimal"`) to switch it on. **Compare a dense
+random network with and without bundling.**
+
+``` r
+rand <- manynet::generate_random(40, 0.1)
+(graphr(rand) + ggtitle("Unbundled") |
+   graphr(rand, edge_bundle = TRUE) + ggtitle("Bundled"))
+```
+
+At the other extreme, many networks contain isolates — unconnected nodes
+— which, under a force-directed layout, drift to the margins and squeeze
+the connected core into a clump. The `isolates` argument decides what
+happens to them: `"legend"` (the default) drops them from the drawing
+but records how many there were in the legend, `"caption"` notes them in
+a caption instead, and `"keep"` leaves them in place. **Add two
+unconnected characters to `fict_lotr` and compare keeping them with
+noting them in the legend.**
+
+``` r
+lotr_iso <- fict_lotr |>
+  add_nodes(2, list(name = c("Tom Bombadil", "Goldberry")))
+(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
+   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
+```
+
+For very large real-world networks such as `irps_blogs`, the two work
+well together: `edge_bundle = TRUE` untangles the connected core while
+`isolates = "legend"` keeps its several hundred unconnected blogs from
+crowding that core out.
+
 ### Free play
 
 **Your turn**: choose another network and illustrate something about it.
@@ -452,20 +511,14 @@ per flavour:
 Print the network first to see which attributes are available, then map
 one or two of them to colour, shape, size, or groups.
 
-**Going further**: Larger, denser networks like `irps_blogs` can turn
-into a ‘hairball’ where the ties obscure everything. Two recent
-additions to `graphr()` help: `edge_bundle = TRUE` bundles edges that
-travel in similar directions (like cables tied together) so the main
-‘highways’ of the network stand out, and the `isolates` argument
-controls whether unconnected nodes are kept in the graph, moved to a
-legend, or noted in a caption. See `?graphr` for the details.
-
 **In brief**: `graphr()` maps node and tie attributes to visual
 aesthetics by name: `node_color`, `node_shape`, `node_size`, and
 `node_group` for nodes, `edge_color` and `edge_size` for ties. Use
 colour or shape for categorical attributes (colour scales better), size
 for continuous ones, and `node_group` to shade spatially clustered
-memberships.
+memberships. For dense or disconnected networks, `edge_bundle` and
+`isolates` (see *Taming dense or disconnected networks* above) keep the
+picture legible.
 
 ## Theming
 
@@ -769,8 +822,17 @@ Note that `"hierarchy"` and `"railway"` use a different algorithm to
 better, especially where there are multiple layers. Whereas
 `"hierarchy"` tries to position nodes to minimise overlaps, `"railway"`
 sequences the nodes in each layer to a grid so that nodes are matched as
-far as possible. If you want to flip the horizontal and vertical, you
-could flip the coordinates, or use something like the following layout.
+far as possible. For the `"hierarchy"` layout you can also steer which
+set sits where by passing a `center` argument — `"events"` or `"actors"`
+for a two-mode network, or the name of a particular node — which helps
+when the default places the less interesting set on top.
+
+``` r
+graphr(ison_southern_women, layout = "hierarchy", center = "events")
+```
+
+If you want to flip the horizontal and vertical, you could flip the
+coordinates, or use something like the following layout.
 
 ``` r
 graphr(ison_southern_women, layout = "alluvial") + ggtitle("Alluvial")
@@ -790,6 +852,15 @@ or mode.
 
 ``` r
 graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric")
+```
+
+The `"concentric"` layout can also place nodes on rings by a grouping
+you choose: pass a `membership` argument (a node attribute name, or a
+vector the same length as the number of nodes). **Ring the Lord of the
+Rings characters by their race.**
+
+``` r
+graphr(fict_lotr, layout = "concentric", membership = "Race")
 ```
 
 Other such layouts include:
@@ -844,6 +915,17 @@ Other grid layouts include:
   - orthogonal layouts for e.g. printed circuit boards
   - grid snapping for other layouts
 
+That last point deserves a demonstration. Rather than committing to a
+full grid, `graphr()`’s `snap = TRUE` argument keeps whatever layout you
+asked for but snaps its coordinates onto a grid — trading a little
+positional accuracy for the label legibility of a grid. **Compare the
+stress layout with its snapped version.**
+
+``` r
+(graphr(fict_lotr) + ggtitle("stress") |
+   graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+```
+
 ### Manual layouts
 
 Whatever their differences, all these layout algorithms do the same job:
@@ -868,13 +950,14 @@ The same trick lets you reuse a layout across plots (compute once, pass
 the same `x`/`y` to each call), which keeps node positions identical
 between figures — useful when readers need to compare them.
 
-**Going further**: `graphr()`’s `snap = TRUE` argument snaps any
-layout’s coordinates to a grid, combining a familiar layout with the
-label legibility of a grid.
-[autograph](https://stocnet.github.io/autograph/) also provides its own
-special-purpose layouts — `"configuration"`, `"lineage"`,
-`"multilevel"`, `"triad"`/`"quad"`, and layouts that align nodes by
-partition — documented at `?layout_partition` and friends.
+**Going further**: [autograph](https://stocnet.github.io/autograph/)
+also provides its own special-purpose layouts — `"configuration"`,
+`"lineage"`, `"multilevel"`, `"triad"`/`"quad"`, and layouts that align
+nodes by partition — documented at `?layout_partition` and friends.
+Several layouts take a layout-specific extra argument (passed through
+`...`) to control how nodes are ordered: `"concentric"` a `membership`,
+`"multilevel"` a `level`, and `"lineage"` a `rank` — each a node
+attribute name or a vector. See `?graphr` for the full list.
 
 **In brief**: Pass `layout =` to `graphr()` to choose among
 force-directed (`"stress"`, `"fr"`, `"kk"`), layered (`"hierarchy"`,
@@ -926,6 +1009,13 @@ six race subgraphs. Left to its own devices, `graphs()` plots just the
 first and last networks of longer lists, which suits before-and-after
 comparisons of longitudinal networks.
 
+When the panels share the same nodes, `graphs()` computes a single
+layout and reuses it across panels so that positions line up and can be
+compared; by default it uses the `"first"` network’s layout, but
+`based_on = "last"` or `"both"` are available. Sharing a layout means
+every panel has to draw every node, so in that case isolates are kept in
+place.
+
 ### Dynamics
 
 ![gif of a hand flipping through a flipbook of animated stick
@@ -958,6 +1048,16 @@ being told which attribute to use. From
 [manynet](https://stocnet.github.io/manynet/) 2.2.2, any other name
 (say, `year`) works just as well — it only needs declaring via
 `to_waves()`’s `attribute` argument.
+
+**Going further**: Animation constrains a few things that a static graph
+allows. `grapht()`’s `isolates` argument takes `"keep"` (the default) or
+`"fade"` (fading nodes out in the waves where they have no ties), rather
+than `graphr()`’s `"legend"`/`"caption"`. And because they do not
+translate cleanly from frame to frame, `node_group` hulls,
+`edge_bundle`, the slight curve on reciprocated ties, and self-loops are
+not drawn in animations. Labels, too, are placed at a fixed offset
+rather than repelled, and are hidden by default once a network has more
+than 30 nodes (pass `labels = TRUE` to force them).
 
 **In brief**: Combine individual graphs with
 [patchwork](https://patchwork.data-imaginist.com) operators (`+`/`|`
@@ -1167,12 +1267,15 @@ Here are some of the terms that we have covered in this tutorial:
     the sum of its distances to all other nodes.
   - Community : A community is a set of nodes more densely connected to
     one another than to other nodes in the network.
+  - Complex : A complex network is one that includes or can include
+    loops or self-ties.
   - Degree : The degree of a node is the number of connections it has.
   - Directed : A directed network is a network where the ties have a
     direction, from a sender to a receiver.
   - Distribution : A degree distribution is the frequency distribution
     of the degrees of the nodes in a network.
   - Homophily : A tendency for nodes to connect to similar nodes.
+  - Isolate : An isolate is a node with degree equal to zero.
   - Label : A labelled network includes unique labels for each node (or
     ties) in the network.
   - Lattice : A network that can be drawn as a regular tiling.
@@ -1184,6 +1287,8 @@ Here are some of the terms that we have covered in this tutorial:
   - Node : A node or vertex is an entity or actor within a network.
   - Reciprocity : A measure of how often nodes in a directed network are
     mutually linked.
+  - Signed : A signed network is one where ties are marked as positive
+    or negative, such as friendship and enmity or alliance and conflict.
   - Subgraph : A subgraph comprises a subset of the nodes and ties in a
     network.
   - Tie : A tie, edge, or link is a connection or relationship between

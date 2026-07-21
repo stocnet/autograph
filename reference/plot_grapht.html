@@ -93,7 +93,7 @@ A progress bar is shown if it takes some time to encode all the
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -375,8 +375,12 @@ and self-loops (loops are not drawn; a note is printed if present).</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># A dynamic signed network of shifting European alliances 1872-1918,</span></span></span>
-<span class="r-in"><span><span class="co"># split automatically into snapshots of the ties active in each spell:</span></span></span>
+<span class="r-in"><span><span class="co"># split automatically into snapshots of the ties active in each spell.</span></span></span>
+<span class="r-in"><span><span class="co"># Wrapped in \donttest{} because rendering the animation to a .gif is</span></span></span>
+<span class="r-in"><span><span class="co"># slow, not because the code is unsafe to run.</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">grapht</span><span class="op">(</span><span class="va">irps_wwi</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

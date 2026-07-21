@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,25 @@
       <small>Source: <a href="https://github.com/stocnet/autograph/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.1" id="autograph-111">autograph 1.1.1<a class="anchor" aria-label="anchor" href="#autograph-111"></a></h2>
+<div class="section level3">
+<h3 id="graphing-1-1-1">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-1-1"></a></h3>
+<ul><li>Fixed <code><a href="../reference/plot_grapht.html">grapht()</a></code> example, which took too long to run, by couching it in <code>\donttest{}</code>
+</li>
+<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> to accept bare longitudinal or dynamic networks<ul><li>Splits it into waves or time slices automatically (consistent with <code><a href="../reference/plot_grapht.html">grapht()</a></code>), instead of erroring with “invalid to use names()&lt;- on an S4 object of class ‘dgCMatrix’”</li></ul></li>
+<li>Fixed various errors and warnings in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed, directed, or changing networks:<ul><li>Fixed recycling warnings (“longer object length is not a multiple of shorter object length”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a complex network<ul><li>arc geom’s <code>strength</code> parameter now excludes loop edges, which are drawn separately by <code><a href="https://ggraph.data-imaginist.com/reference/geom_edge_loop.html" class="external-link">geom_edge_loop0()</a></code>
+</li></ul></li>
+<li>Fixed spurious warning (“no non-missing arguments to max; returning -Inf”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a changing network without any adoption events (e.g. <code>fict_potter</code>)<ul><li>such networks now rendered as standard changing networks rather than routed through the diffusion node-colour mapping</li></ul></li>
+<li>Fixed fails at draw time with “invalid hex digit in ‘color’ or ‘lty’” in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a signed multiplex network (e.g. <code>fict_marvel</code>)<ul><li>ties on non-signed layers (which have a missing sign) are now drawn solid/positive rather than passing <code>NA</code> to grid</li></ul></li>
+<li>Fixed error with “Aesthetics must be either length 1 or the same as the data” in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed longitudinal or directed networks (e.g. <code>to_waves(ison_monks)</code>)<ul><li>per-tie sign linetypes are now mapped through <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code> (with an identity scale) so ggraph’s edge geoms expand and subset them consistently with edge colour and width</li></ul></li>
+<li>Fixed <code>graphr(..., snap = TRUE)</code> erroring on two-mode networks: their default “hierarchy” layout is now left un-snapped (with an informative message) since collapsing its layered coordinates onto a square grid is not meaningful, while snapping a two-mode network under a force-directed layout continues to work; also hardened the grid-snapping search so a coordinate landing exactly on a grid point is no longer mistaken for a node’s zero self-distance</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorials-1-1-1">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-1"></a></h3>
+<ul><li>Updated visualisation tutorial with a bit more structuring of further options</li></ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="autograph-110">autograph 1.1.0<a class="anchor" aria-label="anchor" href="#autograph-110"></a></h2>
 <div class="section level3">

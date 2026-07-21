@@ -232,6 +232,10 @@ Other mapping: `layout_configuration()`, `layout_partition`,
 
 ``` r
 # A dynamic signed network of shifting European alliances 1872-1918,
-# split automatically into snapshots of the ties active in each spell:
+# split automatically into snapshots of the ties active in each spell.
+# Wrapped in \donttest{} because rendering the animation to a .gif is
+# slow, not because the code is unsafe to run.
+# \donttest{
 grapht(irps_wwi)
+# }
 ```

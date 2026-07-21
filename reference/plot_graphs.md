@@ -27,7 +27,15 @@ graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 
   - netlist:
     
-    A list of manynet-compatible networks.
+    A list of manynet-compatible networks. This can also be a single
+    manynet network object that encodes time, which will be split
+    automatically (as in `grapht()`): longitudinal or changing networks
+    are split into waves via `manynet::to_waves()`; dynamic
+    (time-stamped, event-based) networks such as `manynet::irps_nuclear`
+    into cumulative time slices via `manynet::to_slices()`; and interval
+    (spell) networks that record tie `begin`/`end` lifespans, such as
+    `manynet::irps_wwi`, into one snapshot per change point. It can also
+    be a diffusion model result from e.g. `manynet::play_diffusion()`.
 
   - waves:
     

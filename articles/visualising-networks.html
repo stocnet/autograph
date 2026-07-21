@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -230,7 +230,7 @@ html { font-size: 115%; }
 <div class="section level2">
 <h2 id="illustrating-graphs">Illustrating graphs<a class="anchor" aria-label="anchor" href="#illustrating-graphs"></a>
 </h2>
-<p><span class="page-toc">On this page: <span class="page-toc-link" onclick="document.getElementById('section-shaping-nodes').scrollIntoView({behavior:'auto',block:'start'});">Shaping</span> · <span class="page-toc-link" onclick="document.getElementById('section-colouring-nodes').scrollIntoView({behavior:'auto',block:'start'});">Colouring</span> · <span class="page-toc-link" onclick="document.getElementById('section-sizing-nodes').scrollIntoView({behavior:'auto',block:'start'});">Sizing</span> · <span class="page-toc-link" onclick="document.getElementById('section-tying-up-loose-ends').scrollIntoView({behavior:'auto',block:'start'});">Ties</span> · <span class="page-toc-link" onclick="document.getElementById('section-pointing-arrows').scrollIntoView({behavior:'auto',block:'start'});">Arrows</span> · <span class="page-toc-link" onclick="document.getElementById('section-illustrating-free-play').scrollIntoView({behavior:'auto',block:'start'});">Free play</span></span></p>
+<p><span class="page-toc">On this page: <span class="page-toc-link" onclick="document.getElementById('section-shaping-nodes').scrollIntoView({behavior:'auto',block:'start'});">Shaping</span> · <span class="page-toc-link" onclick="document.getElementById('section-colouring-nodes').scrollIntoView({behavior:'auto',block:'start'});">Colouring</span> · <span class="page-toc-link" onclick="document.getElementById('section-sizing-nodes').scrollIntoView({behavior:'auto',block:'start'});">Sizing</span> · <span class="page-toc-link" onclick="document.getElementById('section-tying-up-loose-ends').scrollIntoView({behavior:'auto',block:'start'});">Ties</span> · <span class="page-toc-link" onclick="document.getElementById('section-pointing-arrows').scrollIntoView({behavior:'auto',block:'start'});">Arrows</span> · <span class="page-toc-link" onclick="document.getElementById('section-taming-networks').scrollIntoView({behavior:'auto',block:'start'});">Taming</span> · <span class="page-toc-link" onclick="document.getElementById('section-illustrating-free-play').scrollIntoView({behavior:'auto',block:'start'});">Free play</span></span></p>
 <p>Once we have an initial graph of our network, we can start to explore features of the network and its structure in more detail. There are a number of different dimensions network researchers can play with to illustrate different aspects of the network. On <a href="https://kateto.net/network-visualization" class="external-link">her excellent and helpful website</a>, Katya Ognyanova outlines some of these dimensions:</p>
 <table class="table">
 <thead><tr class="header">
@@ -244,7 +244,8 @@ html { font-size: 115%; }
 <td align="left">Position</td>
 <td align="left"><code>layout=</code></td>
 <td align="left">Arrows</td>
-<td align="left">(e.g. capped, head shape)</td>
+<td align="left">
+<em>automatic</em> (directed ties)</td>
 </tr>
 <tr class="even">
 <td align="left">Labels</td>
@@ -252,13 +253,15 @@ html { font-size: 115%; }
 <code>labels=</code>, <code>node_group=</code>
 </td>
 <td align="left">Type</td>
-<td align="left">(e.g. solid, dashed)</td>
+<td align="left">
+<em>automatic</em> (signed ties)</td>
 </tr>
 <tr class="odd">
 <td align="left">Shape</td>
 <td align="left"><code>node_shape=</code></td>
 <td align="left">Shape</td>
-<td align="left">(e.g. straight, bent)</td>
+<td align="left">
+<em>automatic</em> (reciprocated ties)</td>
 </tr>
 <tr class="even">
 <td align="left">Size</td>
@@ -278,8 +281,18 @@ html { font-size: 115%; }
 </tr>
 </tbody>
 </table>
-<p>Currently only those options with named parameters in the table above are available to be customised in <a href="https://stocnet.github.io/autograph/">autograph</a>. Tie arrows and shapes are used to indicate directionality and <abbr><dfn title="A measure of how often nodes in a directed network are mutually linked."> reciprocity </dfn></abbr>, where present in the data.</p>
-<p>Each of these arguments can be given either a literal value (e.g. <code>node_size = 6</code>) or, more interestingly, the name of a node or tie attribute in the data (e.g. <code>node_color = "Race"</code>), in which case <code><a href="../reference/plot_graphr.html">graphr()</a></code> maps the attribute to that aesthetic and adds a legend where appropriate. Let’s go through some of these options in more detail.</p>
+<p>The named arguments in the table above cover the aesthetics you will reach for most often. Several other visual features are not arguments at all: <code><a href="../reference/plot_graphr.html">graphr()</a></code> reads them off the data and sets them for you, so that a first graph already reads correctly without any tweaking. In particular:</p>
+<ul>
+<li>
+<strong>arrowheads</strong> are drawn (and trimmed back from the node) where the network is <abbr><dfn title="A directed network is a network where the ties have a direction, from a sender to a receiver."> directed </dfn></abbr>, and omitted where it is <abbr><dfn title="An undirected or line network is one in which tie direction is undefined."> undirected </dfn></abbr>;</li>
+<li>ties <strong>curve</strong> apart slightly where a dyad is <abbr><dfn title="A measure of how often nodes in a directed network are mutually linked."> reciprocated </dfn></abbr>, and are drawn straight otherwise;</li>
+<li>ties are drawn <strong>dashed</strong> where a <abbr><dfn title="A signed network is one where ties are marked as positive or negative, such as friendship and enmity or alliance and conflict."> signed </dfn></abbr> network marks them negative, and solid where positive;</li>
+<li>
+<strong>self-ties</strong> (loops) are drawn where the network is <abbr><dfn title="A complex network is one that includes or can include loops or self-ties."> complex </dfn></abbr>; and</li>
+<li>edges are drawn semi-transparent, so that denser bundles of ties read as darker.</li>
+</ul>
+<p>You do not set these by hand — but because every graph is a <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> object, you can always override them by dropping down to <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a> (see the <em>Going further with ggraph</em> section near the end of this tutorial). A handful of further arguments — <code>node_group</code>, <code>label_repel</code>/<code>label_dist</code>, <code>edge_bundle</code>, <code>isolates</code>, and <code>snap</code> — tune grouping, labelling, and how dense or disconnected networks are drawn; we meet each in its own section below.</p>
+<p>Each of the mapping arguments can be given either a literal value (e.g. <code>node_size = 6</code>) or, more interestingly, the name of a node or tie attribute in the data (e.g. <code>node_color = "Race"</code>), in which case <code><a href="../reference/plot_graphr.html">graphr()</a></code> maps the attribute to that aesthetic and adds a legend where appropriate. Let’s go through some of these options in more detail.</p>
 <div class="section level3">
 <h3 id="shaping-nodes">Shaping nodes<a class="anchor" aria-label="anchor" href="#shaping-nodes"></a>
 </h3>
@@ -340,6 +353,23 @@ html { font-size: 115%; }
 <span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_networkers</span>, edge_size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Manual (edge_size = 1)"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="taming-networks">Taming dense or disconnected networks<a class="anchor" aria-label="anchor" href="#taming-networks"></a>
+</h3>
+<p>Two arguments help when a network is too dense, or too sparse, to read at a glance.</p>
+<p>Larger, denser networks can turn into a ‘hairball’, where the sheer number of ties obscures everything. <code>edge_bundle</code> pulls ties that travel in similar directions into shared paths — like cabling them together — so that the main ‘highways’ of the network stand out. It is off by default; set <code>edge_bundle = TRUE</code> (or name a specific algorithm: <code>"force"</code>, <code>"path"</code>, or <code>"minimal"</code>) to switch it on. <strong>Compare a dense random network with and without bundling.</strong></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rand</span> <span class="op">&lt;-</span> <span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">rand</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Unbundled"</span><span class="op">)</span> <span class="op">|</span></span>
+<span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">rand</span>, edge_bundle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Bundled"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>At the other extreme, many networks contain <abbr><dfn title="An isolate is a node with degree equal to zero."> isolates </dfn></abbr> — unconnected nodes — which, under a force-directed layout, drift to the margins and squeeze the connected core into a clump. The <code>isolates</code> argument decides what happens to them: <code>"legend"</code> (the default) drops them from the drawing but records how many there were in the legend, <code>"caption"</code> notes them in a caption instead, and <code>"keep"</code> leaves them in place. <strong>Add two unconnected characters to <code>fict_lotr</code> and compare keeping them with noting them in the legend.</strong></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lotr_iso</span> <span class="op">&lt;-</span> <span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_num.html" class="external-link">add_nodes</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tom Bombadil"</span>, <span class="st">"Goldberry"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">lotr_iso</span>, isolates <span class="op">=</span> <span class="st">"keep"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"keep"</span><span class="op">)</span> <span class="op">|</span></span>
+<span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">lotr_iso</span>, isolates <span class="op">=</span> <span class="st">"legend"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"legend"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>For very large real-world networks such as <code>irps_blogs</code>, the two work well together: <code>edge_bundle = TRUE</code> untangles the connected core while <code>isolates = "legend"</code> keeps its several hundred unconnected blogs from crowding that core out.</p>
+</div>
+<div class="section level3">
 <h3 id="illustrating-free-play">Free play<a class="anchor" aria-label="anchor" href="#illustrating-free-play"></a>
 </h3>
 <p><strong>Your turn</strong>: choose another network and illustrate something about it. Pick a dataset with interesting node attributes — here is one suggestion per flavour:</p>
@@ -365,10 +395,7 @@ html { font-size: 115%; }
 </table>
 <p>Print the network first to see which attributes are available, then map one or two of them to colour, shape, size, or groups.</p>
 <div class="callout">
-<p><span class="callout-label"><strong>Going further</strong>:</span> Larger, denser networks like <code>irps_blogs</code> can turn into a ‘hairball’ where the ties obscure everything. Two recent additions to <code><a href="../reference/plot_graphr.html">graphr()</a></code> help: <code>edge_bundle = TRUE</code> bundles edges that travel in similar directions (like cables tied together) so the main ‘highways’ of the network stand out, and the <code>isolates</code> argument controls whether unconnected nodes are kept in the graph, moved to a legend, or noted in a caption. See <code><a href="../reference/plot_graphr.html">?graphr</a></code> for the details.</p>
-</div>
-<div class="callout">
-<p><span class="callout-label"><strong>In brief</strong>:</span> <code><a href="../reference/plot_graphr.html">graphr()</a></code> maps node and tie attributes to visual aesthetics by name: <code>node_color</code>, <code>node_shape</code>, <code>node_size</code>, and <code>node_group</code> for nodes, <code>edge_color</code> and <code>edge_size</code> for ties. Use colour or shape for categorical attributes (colour scales better), size for continuous ones, and <code>node_group</code> to shade spatially clustered memberships.</p>
+<p><span class="callout-label"><strong>In brief</strong>:</span> <code><a href="../reference/plot_graphr.html">graphr()</a></code> maps node and tie attributes to visual aesthetics by name: <code>node_color</code>, <code>node_shape</code>, <code>node_size</code>, and <code>node_group</code> for nodes, <code>edge_color</code> and <code>edge_size</code> for ties. Use colour or shape for categorical attributes (colour scales better), size for continuous ones, and <code>node_group</code> to shade spatially clustered memberships. For dense or disconnected networks, <code>edge_bundle</code> and <code>isolates</code> (see <em>Taming dense or disconnected networks</em> above) keep the picture legible.</p>
 </div>
 </div>
 </div>
@@ -380,7 +407,7 @@ html { font-size: 115%; }
 <h3 id="setting-a-theme">Setting a theme<a class="anchor" aria-label="anchor" href="#setting-a-theme"></a>
 </h3>
 <p>Perhaps you are preparing a presentation, representing your institution, department, or research centre at home or abroad. In this case, you may wish to theme the whole network with institutional colors and fonts. Indeed, you may even want to set a theme that is then reused across all your graphs and plots. <a href="https://stocnet.github.io/autograph/">autograph</a> offers a number of themes that can be set using the <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> function. Once set, the theme applies to <em>every</em> subsequent graph and plot in your session — no need to repeat yourself.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"default"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, node_color <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"iheid"</span><span class="op">)</span></span>
@@ -393,7 +420,7 @@ html { font-size: 115%; }
 </h3>
 <p><img src="https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif" alt="gif from The Devil Wears Prada: that is not just blue, that is cerulean"></p>
 <p>By default, <code><a href="../reference/plot_graphr.html">graphr()</a></code> will use a color palette that offers fairly good contrast and better accessibility. However, a different hue might offer a better aesthetic or identifiability for some nodes. Because the <code><a href="../reference/plot_graphr.html">graphr()</a></code> function is based on the grammar of graphics, it’s easy to extend or alter aesthetic aspects. Here let’s try and change the colors assigned to the different races in the <code>fict_lotr</code> dataset. Note that despite the argument being <code>node_color</code>, when overwriting the colors please use functions of the type <code>ggplot2::scale_fill_*()</code>, as it is the “fill” aesthetic that is being mapped to the variable in this case.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>,</span>
 <span>           node_color <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span></span>
 <span></span>
@@ -410,7 +437,7 @@ html { font-size: 115%; }
 <h3 id="grayscale">Grayscale<a class="anchor" aria-label="anchor" href="#grayscale"></a>
 </h3>
 <p>Other times color may not be desired. Some publications require grayscale images. To use a grayscale color palette, replace <code>_hue</code> from above with <code>_grey</code> (note the ‘e’ spelling):</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>,</span>
 <span>           node_color <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_fill_grey</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -420,7 +447,7 @@ html { font-size: 115%; }
 <h3 id="manual-override">Manual override<a class="anchor" aria-label="anchor" href="#manual-override"></a>
 </h3>
 <p>Or we may want to choose particular colors for each category. This is pretty straightforward to do with <code><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">ggplot2::scale_fill_manual()</a></code>. Some common color names are available, but otherwise hex color codes can be used for more specific colors. Unspecified categories are coloured (dark) grey.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>,</span>
 <span>           node_color <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span></span>
@@ -445,7 +472,7 @@ html { font-size: 115%; }
 <h3 id="labels">Labels<a class="anchor" aria-label="anchor" href="#labels"></a>
 </h3>
 <p>With our <code>fict_lotr</code> example above, because the network is itself labelled, <code><a href="../reference/plot_graphr.html">graphr()</a></code> automatically adds the node labels. If you do not want these labels, you can remove them from the network before passing it on to <code><a href="../reference/plot_graphr.html">graphr()</a></code>, or more simply use the argument <code>labels = FALSE</code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, labels <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Without the labels, the structure of the network is clearer and easier to interpret, though we lose the information about which node is which character. Which you prefer depends on what the graph is <em>for</em>: exploring who-is-who, or communicating overall structure.</p>
 <div class="callout">
@@ -462,12 +489,12 @@ html { font-size: 115%; }
 <h3 id="legends">Legends<a class="anchor" aria-label="anchor" href="#legends"></a>
 </h3>
 <p>While <a href="https://stocnet.github.io/autograph/">autograph</a> attempts to provide legends where necessary, in some cases the legends offer insufficient detail, or are absent, such as in the following figure, where we highlight the node with the highest <abbr><dfn title="The betweenness centrality of a node is the proportion of shortest paths between all pairs of nodes that pass through that node."> betweenness </dfn></abbr> centrality.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>maxbet <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/mark_select_node.html" class="external-link">node_is_max</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_between.html" class="external-link">node_by_betweenness</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_color <span class="op">=</span> <span class="st">"maxbet"</span><span class="op">)</span></span></code></pre></div>
 <p>Which node is highlighted here, and why might that be? Without a legend title, a reader cannot know what the colour signifies. <a href="https://stocnet.github.io/autograph/">autograph</a> supports the <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> way of adding legends after the main plot has been constructed, using <code><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides()</a></code> to add in the legends, and <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs()</a></code> for giving those legends particular titles. Note that we can use <code>"\n"</code> within the legend title to make the title span multiple lines.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>maxbet <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/mark_select_node.html" class="external-link">node_is_max</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_between.html" class="external-link">node_by_betweenness</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_color <span class="op">=</span> <span class="st">"maxbet"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -505,7 +532,7 @@ html { font-size: 115%; }
 </h3>
 <p><img src="https://giffiles.alphacoders.com/131/13131.gif" alt="gif of yoda moving things with the force"></p>
 <p>Force-directed layouts update some initial placement of vertices through the operation of some system of metaphorically-physical forces. These might include attractive and repulsive forces.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"kk"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Kamada-Kawai"</span><span class="op">)</span> <span class="op">|</span></span>
 <span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"fr"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Fruchterman-Reingold"</span><span class="op">)</span> <span class="op">|</span></span>
 <span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"stress"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Stress Minimisation"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -531,12 +558,15 @@ html { font-size: 115%; }
 <h3 id="layered-layouts">Layered layouts<a class="anchor" aria-label="anchor" href="#layered-layouts"></a>
 </h3>
 <p>Layered layouts arrange nodes into horizontal (or vertical) layers, positioning them so that they reduce crossings. These layouts are best suited for directed acyclic graphs, two-mode networks, or other data with a natural hierarchy or ordering.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"bipartite"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Bipartite"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"hierarchy"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Hierarchy"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"railway"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Railway"</span><span class="op">)</span></span></code></pre></div>
-<p>Note that <code>"hierarchy"</code> and <code>"railway"</code> use a different algorithm to <a href="https://r.igraph.org/" class="external-link">igraph</a>’s <code>"bipartite"</code>, and generally perform better, especially where there are multiple layers. Whereas <code>"hierarchy"</code> tries to position nodes to minimise overlaps, <code>"railway"</code> sequences the nodes in each layer to a grid so that nodes are matched as far as possible. If you want to flip the horizontal and vertical, you could flip the coordinates, or use something like the following layout.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p>Note that <code>"hierarchy"</code> and <code>"railway"</code> use a different algorithm to <a href="https://r.igraph.org/" class="external-link">igraph</a>’s <code>"bipartite"</code>, and generally perform better, especially where there are multiple layers. Whereas <code>"hierarchy"</code> tries to position nodes to minimise overlaps, <code>"railway"</code> sequences the nodes in each layer to a grid so that nodes are matched as far as possible. For the <code>"hierarchy"</code> layout you can also steer which set sits where by passing a <code>center</code> argument — <code>"events"</code> or <code>"actors"</code> for a two-mode network, or the name of a particular node — which helps when the default places the less interesting set on top.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"hierarchy"</span>, center <span class="op">=</span> <span class="st">"events"</span><span class="op">)</span></span></code></pre></div>
+<p>If you want to flip the horizontal and vertical, you could flip the coordinates, or use something like the following layout.</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"alluvial"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Alluvial"</span><span class="op">)</span></span></code></pre></div>
 <p>Other layered layouts include:</p>
 <ul>
@@ -549,8 +579,11 @@ html { font-size: 115%; }
 <h3 id="circular-layouts">Circular layouts<a class="anchor" aria-label="anchor" href="#circular-layouts"></a>
 </h3>
 <p>Circular layouts arrange nodes around (potentially concentric) circles, such that crossings are minimised and adjacent nodes are located close together. In some cases, location or layer can be specified by attribute or mode.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"concentric"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Concentric"</span><span class="op">)</span></span></code></pre></div>
+<p>The <code>"concentric"</code> layout can also place nodes on rings by a grouping you choose: pass a <code>membership</code> argument (a node attribute name, or a vector the same length as the number of nodes). <strong>Ring the Lord of the Rings characters by their race.</strong></p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, layout <span class="op">=</span> <span class="st">"concentric"</span>, membership <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span></span></code></pre></div>
 <p>Other such layouts include:</p>
 <ul>
 <li>circular: <code>"circle"</code>
@@ -567,10 +600,10 @@ html { font-size: 115%; }
 <h3 id="spectral-layouts">Spectral layouts<a class="anchor" aria-label="anchor" href="#spectral-layouts"></a>
 </h3>
 <p>Spectral layouts arrange nodes according to the eigenvalues of the Laplacian matrix of a graph. These layouts tend to exaggerate the clustering of like-nodes and the separation of less similar nodes in two-dimensional space.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"eigen"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Eigenvector"</span><span class="op">)</span></span></code></pre></div>
 <p>Somewhat similar are multidimensional scaling (MDS) techniques, which visualise the similarity between nodes in terms of their proximity in a two-dimensional (or more) space.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"mds"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Multidimensional Scaling"</span><span class="op">)</span></span></code></pre></div>
 <p>Other such layouts include:</p>
 <ul>
@@ -586,19 +619,23 @@ html { font-size: 115%; }
 </h3>
 <p><img src="https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif" alt="gif of a cartoon character energetically rearranging the living room furniture"></p>
 <p>Grid layouts arrange nodes based on some Cartesian coordinates. These can be useful for making sure all nodes’ labels are visible, but horizontal and vertical lines can overlap, making it difficult to distinguish whether some nodes are tied or not.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, layout <span class="op">=</span> <span class="st">"grid"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Grid"</span><span class="op">)</span></span></code></pre></div>
 <p>Other grid layouts include:</p>
 <ul>
 <li>orthogonal layouts for e.g. printed circuit boards</li>
 <li>grid snapping for other layouts</li>
 </ul>
+<p>That last point deserves a demonstration. Rather than committing to a full grid, <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>snap = TRUE</code> argument keeps whatever layout you asked for but snaps its coordinates onto a grid — trading a little positional accuracy for the label legibility of a grid. <strong>Compare the stress layout with its snapped version.</strong></p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"stress"</span><span class="op">)</span> <span class="op">|</span></span>
+<span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, snap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"stress + snap"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="manual-layouts">Manual layouts<a class="anchor" aria-label="anchor" href="#manual-layouts"></a>
 </h3>
 <p>Whatever their differences, all these layout algorithms do the same job: they return a table of node coordinates. Nothing stops you computing that table yourself, inspecting it, adjusting a coordinate or two, and handing the result back to <code><a href="../reference/plot_graphr.html">graphr()</a></code> via its <code>x</code> and <code>y</code> arguments. This is handy when a layout is <em>almost</em> right — say one label sits awkwardly, or you want a particular node set apart — or when you need the same hand-tuned positions across several figures. <strong>Compute a stress layout for <code>fict_lotr</code>, inspect the coordinate table, banish Gollum to the top-right corner, and re-graph.</strong></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lo</span> <span class="op">&lt;-</span> <span class="fu">ggraph</span><span class="fu">::</span><span class="fu"><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">create_layout</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/coerce_graph.html" class="external-link">as_tidygraph</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span>, layout <span class="op">=</span> <span class="st">"stress"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lo</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">lo</span><span class="op">$</span><span class="va">x</span><span class="op">[</span><span class="va">lo</span><span class="op">$</span><span class="va">name</span> <span class="op">==</span> <span class="st">"Gollum"</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">lo</span><span class="op">$</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span></span>
@@ -606,7 +643,7 @@ html { font-size: 115%; }
 <span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, x <span class="op">=</span> <span class="va">lo</span><span class="op">$</span><span class="va">x</span>, y <span class="op">=</span> <span class="va">lo</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span></code></pre></div>
 <p>The same trick lets you reuse a layout across plots (compute once, pass the same <code>x</code>/<code>y</code> to each call), which keeps node positions identical between figures — useful when readers need to compare them.</p>
 <div class="callout">
-<p><span class="callout-label"><strong>Going further</strong>:</span> <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>snap = TRUE</code> argument snaps any layout’s coordinates to a grid, combining a familiar layout with the label legibility of a grid. <a href="https://stocnet.github.io/autograph/">autograph</a> also provides its own special-purpose layouts — <code>"configuration"</code>, <code>"lineage"</code>, <code>"multilevel"</code>, <code>"triad"</code>/<code>"quad"</code>, and layouts that align nodes by partition — documented at <code><a href="../reference/layout_partition.html">?layout_partition</a></code> and friends.</p>
+<p><span class="callout-label"><strong>Going further</strong>:</span> <a href="https://stocnet.github.io/autograph/">autograph</a> also provides its own special-purpose layouts — <code>"configuration"</code>, <code>"lineage"</code>, <code>"multilevel"</code>, <code>"triad"</code>/<code>"quad"</code>, and layouts that align nodes by partition — documented at <code><a href="../reference/layout_partition.html">?layout_partition</a></code> and friends. Several layouts take a layout-specific extra argument (passed through <code>...</code>) to control how nodes are ordered: <code>"concentric"</code> a <code>membership</code>, <code>"multilevel"</code> a <code>level</code>, and <code>"lineage"</code> a <code>rank</code> — each a node attribute name or a vector. See <code><a href="../reference/plot_graphr.html">?graphr</a></code> for the full list.</p>
 </div>
 <div class="callout">
 <p><span class="callout-label"><strong>In brief</strong>:</span> Pass <code>layout =</code> to <code><a href="../reference/plot_graphr.html">graphr()</a></code> to choose among force-directed (<code>"stress"</code>, <code>"fr"</code>, <code>"kk"</code>), layered (<code>"hierarchy"</code>, <code>"railway"</code>, <code>"alluvial"</code>), circular (<code>"concentric"</code>, <code>"circle"</code>), spectral (<code>"eigen"</code>, <code>"mds"</code>), and grid layouts. Force-directed layouts are illustrative — do not over-interpret distances; spectral/MDS layouts place nodes by measured similarity; layered layouts suit two-mode or hierarchical data. And since every layout is just a table of coordinates, you can always compute one with <code><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">ggraph::create_layout()</a></code>, adjust it, and pass it back via <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>x</code> and <code>y</code> arguments.</p>
@@ -627,22 +664,26 @@ html { font-size: 115%; }
 <h3 id="sets">Sets<a class="anchor" aria-label="anchor" href="#sets"></a>
 </h3>
 <p><code><a href="../reference/plot_graphr.html">graphr()</a></code> is not the only graphing function included in <a href="https://stocnet.github.io/autograph/">autograph</a>. To graph <em>sets</em> of networks together, <code><a href="../reference/plot_graphs.html">graphs()</a></code> makes sure that two or more networks are plotted together, using a consistent layout and theme across the panels so that they can be compared. This might be a set of ego networks, <abbr><dfn title="A subgraph comprises a subset of the nodes and ties in a network."> subgraphs </dfn></abbr>, or waves of a <abbr><dfn title="A longitudinal network is one observed in two or more discrete waves or panels over time."> longitudinal </dfn></abbr> network.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphs.html">graphs</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_subgraphs</a></span><span class="op">(</span><span class="va">fict_lotr</span>, <span class="st">"Race"</span><span class="op">)</span>,</span>
 <span>       waves <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>What is happening here is that <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_subgraphs()</a></code> is creating a list of subgraphs — one per race — and then <code><a href="../reference/plot_graphs.html">graphs()</a></code> is plotting them together at once with the same set of aesthetic parameters. The <code>waves</code> argument selects which networks in the list to plot — here the first four of the six race subgraphs. Left to its own devices, <code><a href="../reference/plot_graphs.html">graphs()</a></code> plots just the first and last networks of longer lists, which suits before-and-after comparisons of longitudinal networks.</p>
+<p>When the panels share the same nodes, <code><a href="../reference/plot_graphs.html">graphs()</a></code> computes a single layout and reuses it across panels so that positions line up and can be compared; by default it uses the <code>"first"</code> network’s layout, but <code>based_on = "last"</code> or <code>"both"</code> are available. Sharing a layout means every panel has to draw every node, so in that case isolates are kept in place.</p>
 </div>
 <div class="section level3">
 <h3 id="dynamics">Dynamics<a class="anchor" aria-label="anchor" href="#dynamics"></a>
 </h3>
 <p><img src="https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif" alt="gif of a hand flipping through a flipbook of animated stick figures"></p>
 <p><code><a href="../reference/plot_grapht.html">grapht()</a></code> is another alternative to <code><a href="../reference/plot_graphr.html">graphr()</a></code>, this time rendering network changes over time as an animated gif. Longitudinal networks (with discrete waves) and dynamic networks (with dated changes) are both supported. Nodes appear, move, and fade as they enter and exit the network, and node positions transition smoothly between waves. <strong>Run the following to animate a randomly-evolving version of our Lord of the Rings network.</strong> (Be patient — rendering an animation takes considerably longer than drawing a static graph, and requires the suggested <a href="https://gganimate.com" class="external-link">gganimate</a> and <a href="https://r-rust.r-universe.dev/gifski" class="external-link">gifski</a> packages.)</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_ties_attr.html" class="external-link">mutate_ties</a></span><span class="op">(</span>wave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">2001</span><span class="op">:</span><span class="fl">2012</span>, <span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/measure_dims.html" class="external-link">net_ties</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves</a></span><span class="op">(</span>cumulative <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_grapht.html">grapht</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Note that here, as with <code>weight</code> and <code>type</code> in the previous section, attribute naming matters a little: a time attribute called <code>wave</code> marks the network as longitudinal for <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>, so <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves()</a></code> (and <code><a href="../reference/plot_grapht.html">grapht()</a></code> itself, passed such a network directly) will split it without being told which attribute to use. From <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> 2.2.2, any other name (say, <code>year</code>) works just as well — it only needs declaring via <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves()</a></code>’s <code>attribute</code> argument.</p>
+<div class="callout">
+<p><span class="callout-label"><strong>Going further</strong>:</span> Animation constrains a few things that a static graph allows. <code><a href="../reference/plot_grapht.html">grapht()</a></code>’s <code>isolates</code> argument takes <code>"keep"</code> (the default) or <code>"fade"</code> (fading nodes out in the waves where they have no ties), rather than <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>"legend"</code>/<code>"caption"</code>. And because they do not translate cleanly from frame to frame, <code>node_group</code> hulls, <code>edge_bundle</code>, the slight curve on reciprocated ties, and self-loops are not drawn in animations. Labels, too, are placed at a fixed offset rather than repelled, and are hidden by default once a network has more than 30 nodes (pass <code>labels = TRUE</code> to force them).</p>
+</div>
 <div class="callout">
 <p><span class="callout-label"><strong>In brief</strong>:</span> Combine individual graphs with <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> operators (<code>+</code>/<code>|</code> beside, <code>/</code> above), graph lists of related networks with <code><a href="../reference/plot_graphs.html">graphs()</a></code> for comparable panels, and animate longitudinal or dynamic networks with <code><a href="../reference/plot_grapht.html">grapht()</a></code>.</p>
 </div>
@@ -653,7 +694,7 @@ html { font-size: 115%; }
 </h2>
 <p><img src="https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif" alt="gif of Mr Bean taking the restoration of a painting into his own hands"></p>
 <p>For more flexibility with visualisations, <a href="https://stocnet.github.io/autograph/">autograph</a> users are encouraged to use the excellent <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a> package. <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a> is built upon the venerable <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> package and works with <code>tbl_graph</code> and <code>igraph</code> objects. As with <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a> users are expected to build a particular plot from the ground up, adding explicit layers to visualise the nodes and edges. This means more typing, but near-total control.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">ggraph</a></span><span class="op">(</span><span class="va">fict_greys</span>, layout <span class="op">=</span> <span class="st">"fr"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggraph.data-imaginist.com/reference/geom_edge_link.html" class="external-link">geom_edge_link</a></span><span class="op">(</span>edge_colour <span class="op">=</span> <span class="st">"dark grey"</span>,</span>
@@ -686,7 +727,7 @@ html { font-size: 115%; }
 <h2 id="plotting-results">Plotting results<a class="anchor" aria-label="anchor" href="#plotting-results"></a>
 </h2>
 <p>While researchers will probably want to start with using <code><a href="../reference/plot_graphr.html">graphr()</a></code> to visualise the network itself, <a href="https://stocnet.github.io/autograph/">autograph</a> also offers <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods for a number of different network-related objects, so that <code>plot(result)</code> “just works” without you needing to remember a special function for each object. These include measures of centrality, cohesion, and clustering, as well as goodness-of-fit plots for network models from packages such as <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a>, <a href="https://statnet.org" class="external-link">ergm</a>, and <code>{MoNAn}</code>. Usefully, all these plots use the same theming system as <code><a href="../reference/plot_graphr.html">graphr()</a></code>, so that you can set a theme once and have it apply to all your graphs and plots. <strong>Let’s try this now with a few examples, plotting the distributions of two centrality measures under two themes.</strong></p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"default"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_degree</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_close.html" class="external-link">node_by_closeness</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span></span>
@@ -702,7 +743,7 @@ html { font-size: 115%; }
 <p><img src="https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif" alt="gif of a maker declaring that the masterpiece is done and it is time to show the world"></p>
 <p>We can save the plots we have made by point-and-click by selecting ‘Save as PDF…’ from under the ‘Export’ dropdown menu in the plots panel tab of RStudio.</p>
 <p>If you want to do this programmatically, say because you want to record how you have saved it so that you can e.g. make some changes to the parameters at some point, this is also not too difficult. After running the (gg-based) plot you want to save, use <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave()</a></code> to save it to disk:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, node_color <span class="op">=</span> <span class="st">"Race"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"lotr_race.pdf"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"lotr_race.png"</span>, width <span class="op">=</span> <span class="fl">9</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
@@ -815,6 +856,12 @@ Community
 A community is a set of nodes more densely connected to one another than to other nodes in the network.
 </dd>
 <dt>
+Complex
+</dt>
+<dd>
+A complex network is one that includes or can include loops or self-ties.
+</dd>
+<dt>
 Degree
 </dt>
 <dd>
@@ -837,6 +884,12 @@ Homophily
 </dt>
 <dd>
 A tendency for nodes to connect to similar nodes.
+</dd>
+<dt>
+Isolate
+</dt>
+<dd>
+An isolate is a node with degree equal to zero.
 </dd>
 <dt>
 Label
@@ -873,6 +926,12 @@ Reciprocity
 </dt>
 <dd>
 A measure of how often nodes in a directed network are mutually linked.
+</dd>
+<dt>
+Signed
+</dt>
+<dd>
+A signed network is one where ties are marked as positive or negative, such as friendship and enmity or alliance and conflict.
 </dd>
 <dt>
 Subgraph
