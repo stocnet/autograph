@@ -63,8 +63,6 @@ Sections 13.2 and 13.4.
 
 Other RSiena: `plot_gof`
 
-Other RSiena: `plot_gof`
-
 ## Author
 
 Tom Snijders

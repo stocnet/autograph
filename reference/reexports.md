@@ -9,7 +9,8 @@ to see their documentation.
 
   - ggplot2:
     
-    `aes`, `element_blank`, `element_text`, `geom_point`, `geom_smooth`,
-    `ggplot`, `ggsave`, `ggtitle`, `guides`, `labs`, `scale_colour_hue`,
-    `scale_size`, `scale_x_continuous`, `theme`, `theme_grey`, `unit`,
-    `xlab`, `ylab`
+    `aes()`, `element_blank()`, `element_text()`, `geom_point()`,
+    `geom_smooth()`, `ggplot()`, `ggsave()`, `ggtitle()`, `guides()`,
+    `labs()`, `scale_colour_hue()`, `scale_size()`,
+    `scale_x_continuous()`, `theme()`, `theme_grey()`, `unit`, `xlab()`,
+    `ylab()`

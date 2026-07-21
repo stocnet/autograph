@@ -36,48 +36,13 @@ ties <- data.frame(
   stringsAsFactors = FALSE)
 
 coords <- layout_tbl_graph_layered(ties, times = 6)
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
-#> Warning: argument is not numeric or logical: returning NA
 coords
-#>    x y
-#> A NA 4
-#> B  2 3
-#> C  1 3
-#> D  1 2
-#> F NA 4
-#> E  1 1
-#> G  1 0
+#>   x y
+#> A 1 4
+#> B 1 3
+#> C 2 3
+#> D 1 2
+#> F 2 4
+#> E 1 1
+#> G 1 0
 ```
