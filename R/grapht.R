@@ -105,8 +105,12 @@
 #'   pass the result to `gganimate::animate()` directly.
 #' @examples
 #' # A dynamic signed network of shifting European alliances 1872-1918,
-#' # split automatically into snapshots of the ties active in each spell:
+#' # split automatically into snapshots of the ties active in each spell.
+#' # Wrapped in \donttest{} because rendering the animation to a .gif is
+#' # slow, not because the code is unsafe to run.
+#' \donttest{
 #' grapht(irps_wwi)
+#' }
 #' @export
 grapht <- function(tlist, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size,

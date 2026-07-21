@@ -1,3 +1,9 @@
+# autograph 1.1.1
+
+## Graphing
+
+- Fixed `grapht()` example, which took too long to run, by couching it in `\donttest{}`
+
 # autograph 1.1.0
 
 ## Package
