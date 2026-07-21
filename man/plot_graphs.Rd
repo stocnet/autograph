@@ -8,7 +8,16 @@
 graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 }
 \arguments{
-\item{netlist}{A list of manynet-compatible networks.}
+\item{netlist}{A list of manynet-compatible networks.
+This can also be a single manynet network object that encodes time,
+which will be split automatically (as in \code{grapht()}):
+longitudinal or changing networks are split into waves via
+\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
+such as \code{manynet::irps_nuclear} into cumulative time slices via
+\code{manynet::to_slices()}; and interval (spell) networks that record tie
+\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
+per change point. It can also be a diffusion model result from e.g.
+\code{manynet::play_diffusion()}.}
 
 \item{waves}{Numeric, the number of plots to be displayed side-by-side.
 If missing, the number of plots will be reduced to the first and last

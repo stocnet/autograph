@@ -4,7 +4,7 @@ data_objs <- data_objs[grepl("ison_|fict_|irps_|mpn_", names(data_objs))]
 # data_objs <- data_objs[!grepl("starwars|physicians|potter", names(data_objs))]
 for (nm in names(data_objs)) { 
   test_that(paste("graphr() works on", nm), {
-    skip_if(grepl("starwars|physicians|potter|marvel", nm))
+    skip_if(grepl("starwars|physicians|potter", nm))
     expect_error(graphr(data_objs[[nm]]), NA) }) 
 }
 
@@ -268,3 +268,60 @@ test_that("edge_bundle rejects unknown algorithms", {
   expect_error(graphr(ison_adolescents, edge_bundle = "banana"))
 })
 
+
+test_that("graphr() on a changing network without diffusion events emits no max() warning (#57)", {
+  skip_on_cran()
+  # fict_potter is a dynamic/changing network but has no adoption ("I") events,
+  # so the diffusion node-colour path must not warn on an all-infinite vector.
+  expect_true(manynet::is_changing(manynet::fict_potter))
+  expect_no_warning(p <- graphr(manynet::fict_potter))
+  expect_s3_class(p, "ggplot")
+  expect_error(ggplot2::ggplot_build(p), NA)
+})
+
+
+test_that("graphr() on a complex network (self-loops) emits no recycling warnings", {
+  skip_on_cran()
+  # geom_edge_arc()'s stat drops self-loops before drawing, so its length-
+  # preserving `strength` parameter must exclude loop edges. Otherwise a full-
+  # length vector recycles against the loop-free edge set, emitting ~14 "longer
+  # object length is not a multiple" / "items to replace" warnings at build time.
+  expect_true(manynet::is_complex(manynet::ison_emotions))
+  p <- graphr(manynet::ison_emotions)
+  expect_s3_class(p, "ggplot")
+  expect_no_warning(ggplot2::ggplot_build(p))
+})
+
+
+test_that("graphr() renders a signed multiplex two-mode network without error", {
+  skip_on_cran()
+  # fict_marvel is signed, complex, multiplex, and two-mode. Because only its
+  # signed layer carries a `sign`, the other layers' ties come back with NA
+  # signs. Those NAs used to flow into the edge linetype/colour vectors and grid
+  # rejected them at draw time ("invalid hex digit in 'color' or 'lty'"). They
+  # must instead be drawn solid/positive, and the plot must build cleanly.
+  expect_true(manynet::is_signed(manynet::fict_marvel))
+  expect_true(manynet::is_multiplex(manynet::fict_marvel))
+  expect_true(manynet::is_twomode(manynet::fict_marvel))
+  p <- graphr(manynet::fict_marvel)
+  expect_s3_class(p, "ggplot")
+  expect_error(ggplot2::ggplot_build(p), NA)
+  # Signed styling is preserved: positives solid, negatives dashed.
+  lts <- unique(ggplot2::ggplot_build(p)$data[[1]]$edge_linetype)
+  expect_setequal(lts, c("solid", "dashed"))
+})
+
+test_that("graphs()/graphr() render signed longitudinal snapshots without error", {
+  skip_on_cran()
+  # to_waves(ison_monks) yields signed, directed, weighted snapshots. Their
+  # per-tie linetype must be mapped through aes() (not passed as a constant
+  # parameter), otherwise geom_edge_arc's point expansion length-checks the
+  # linetype vector against the expanded data and fails ("Aesthetics must be
+  # either length 1 or the same as the data").
+  waves <- manynet::to_waves(manynet::ison_monks)
+  expect_true(manynet::is_signed(waves[[1]]))
+  p1 <- graphr(waves[[1]])
+  expect_error(ggplot2::ggplot_build(p1), NA)
+  ps <- graphs(waves)
+  expect_error(ggplot2::ggplot_build(ps), NA)
+})

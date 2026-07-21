@@ -1,6 +1,10 @@
 graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   out <- .infer_node_mapping(g, node_color, node_size, node_shape)
-  if(is.null(node_color) && manynet::is_changing(g)){
+  # A changing network is only treated as a diffusion when nodes actually
+  # adopt; otherwise (e.g. `fict_potter`) it is rendered as a standard
+  # changing network. TODO: revisit once diffusion is reworked in manynet.
+  if(is.null(node_color) && manynet::is_changing(g) &&
+     any(is.finite(.node_adoption_time(g)))){
     p <- .map_diff_model_nodes(p, g, out)
   } else if(is.null(node_color) && "diffusion" %in% names(manynet::node_attribute(g))){
     p <- .map_infected_nodes(p, g, out)
@@ -67,8 +71,8 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   node_adopts <- .node_adoption_time(g)
   nshape <- ifelse(node_adopts == min(node_adopts), "Seed(s)",
                    ifelse(node_adopts == Inf, "Non-Adopter", "Adopter"))
-  node_color <- ifelse(is.infinite(node_adopts), 
-                       max(node_adopts[!is.infinite(node_adopts)]) + 1, 
+  node_color <- ifelse(is.infinite(node_adopts),
+                       max(node_adopts[!is.infinite(node_adopts)]) + 1,
                        node_adopts)
   p + ggraph::geom_node_point(ggplot2::aes(shape = nshape, fill = node_color),
                               size = out[["nsize"]]) +

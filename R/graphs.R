@@ -24,6 +24,15 @@
 #'   or a mix, "both", of them.
 #' @family mapping
 #' @param netlist A list of manynet-compatible networks.
+#'   This can also be a single manynet network object that encodes time,
+#'   which will be split automatically (as in `grapht()`):
+#'   longitudinal or changing networks are split into waves via
+#'   `manynet::to_waves()`; dynamic (time-stamped, event-based) networks
+#'   such as `manynet::irps_nuclear` into cumulative time slices via
+#'   `manynet::to_slices()`; and interval (spell) networks that record tie
+#'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
+#'   per change point. It can also be a diffusion model result from e.g.
+#'   `manynet::play_diffusion()`.
 #' @param waves Numeric, the number of plots to be displayed side-by-side.
 #'   If missing, the number of plots will be reduced to the first and last
 #'   when there are more than four plots.
@@ -42,10 +51,17 @@
 graphs <- function(netlist, waves,
                    based_on = c("first", "last", "both"), ...) {
   based_on <- match.arg(based_on)
-  if (manynet::is_manynet(netlist) && manynet::is_changing(netlist)){
-    if (manynet::is_list(attr(netlist, "network"))) netlist <- attr(netlist, "network") else
-      netlist <- manynet::to_waves(netlist)
-  } 
+  # A single manynet network that encodes time is split into a list of
+  # snapshots, mirroring grapht()'s handling (see .split_time_network()):
+  # longitudinal/changing networks (and diffusion results) into waves,
+  # spell (begin/end) networks into per-period snapshots, and other dynamic
+  # (event) networks into cumulative slices. Splitting is why a bare
+  # longitudinal or dynamic network can be passed directly; without it the
+  # raw graph object would be iterated over and crash later.
+  if (!manynet::is_list(netlist) &&
+      (manynet::is_manynet(netlist) || inherits(netlist, "diff_model"))) {
+    netlist <- .split_time_network(netlist)
+  }
   if (missing(waves)) {
     if (length(netlist) > 4) {
       netlist <- netlist[c(1, length(netlist))]

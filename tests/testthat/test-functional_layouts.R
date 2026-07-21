@@ -86,3 +86,28 @@ test_that("lattice networks snap by rotation to align edges to the grid", {
   expect_buildable(p)
   expect_true(all(p$data$x == round(p$data$x)))
 })
+
+test_that("snapping a two-mode (hierarchy) layout falls back gracefully", {
+  skip_on_cran()
+  # The default two-mode layout is "hierarchy", whose layered coordinates
+  # would be collapsed by square-grid snapping, so snapping is skipped and
+  # the original coordinates are retained (see graph_layout()).
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  expect_message(
+    graphr(manynet::ison_southern_women, snap = TRUE),
+    "hierarchy")
+  snapped <- suppressMessages(graphr(manynet::ison_southern_women, snap = TRUE))
+  plain   <- graphr(manynet::ison_southern_women)
+  expect_buildable(snapped)
+  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")])
+})
+
+test_that("snapping still works on a two-mode network with a force layout", {
+  skip_on_cran()
+  p <- suppressMessages(
+    graphr(manynet::ison_southern_women, layout = "stress", snap = TRUE))
+  expect_buildable(p)
+  # every node lands on its own grid point
+  expect_false(any(duplicated(p$data[, c("x", "y")])))
+})
