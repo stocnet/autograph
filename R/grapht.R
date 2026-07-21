@@ -234,17 +234,9 @@ print.grapht <- function(x, ...) {
   # `irps_nuclear` split into cumulative time slices; and interval/spell
   # networks that record tie `begin`/`end` spells (e.g. `irps_wwi`) split into
   # per-period snapshots of the ties active in each spell.
-  if (!manynet::is_list(tlist) && manynet::is_manynet(tlist)) {
-    if (inherits(tlist, "diff_model") ||
-        manynet::is_changing(tlist) || manynet::is_longitudinal(tlist)) {
-      tlist <- manynet::to_waves(tlist)
-    } else if (.grapht_is_spell(tlist)) {
-      tlist <- .grapht_spell_slices(tlist)
-    } else if (manynet::is_dynamic(tlist)) {
-      tlist <- manynet::to_slices(tlist)
-    }
-  } else if (inherits(tlist, "diff_model")) {
-    tlist <- manynet::to_waves(tlist)
+  if ((!manynet::is_list(tlist) && manynet::is_manynet(tlist)) ||
+      inherits(tlist, "diff_model")) {
+    tlist <- .split_time_network(tlist)
   }
   # If the input is still a single network at this point, none of the
   # splitting strategies above applied; iterating over it would decompose
@@ -291,6 +283,27 @@ print.grapht <- function(x, ...) {
   waves <- lapply(waves, manynet::as_tidygraph)
   list(waves = waves, frames = frames, present = present,
        isolated = isolated, has_names = has_names)
+}
+
+# Splits a single time-encoding manynet network into a list of snapshots,
+# shared by grapht() and graphs() so both accept a bare longitudinal or
+# dynamic network directly. Diffusion results and longitudinal or changing
+# networks split into waves (a changing network that already carries its
+# waves as a list attribute is unwrapped directly); spell (begin/end)
+# networks split into per-period snapshots of the ties active in each spell;
+# other dynamic (event) networks split into cumulative time slices. Anything
+# that matches none of these is returned unchanged.
+.split_time_network <- function(x) {
+  if (inherits(x, "diff_model") ||
+      manynet::is_changing(x) || manynet::is_longitudinal(x)) {
+    if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
+      attr(x, "network")
+    else manynet::to_waves(x)
+  } else if (.grapht_is_spell(x)) {
+    .grapht_spell_slices(x)
+  } else if (manynet::is_dynamic(x)) {
+    manynet::to_slices(x)
+  } else x
 }
 
 # A spell (interval) network records each tie's lifespan as `begin`/`end` tie

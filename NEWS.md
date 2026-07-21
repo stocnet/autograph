@@ -7,6 +7,10 @@
   - Splits it into waves or time slices automatically (consistent with `grapht()`), 
   instead of erroring with "invalid to use names()<- on an S4 object of class 'dgCMatrix'"
 - Fixed various errors and warnings in `graphr()`/`graphs()` on signed, directed, or changing networks:
+  - Fixed recycling warnings ("longer object length is not a multiple of shorter object length") in `graphr()` on a complex network
+    - arc geom's `strength` parameter now excludes loop edges, which are drawn separately by `geom_edge_loop0()`
+  - Fixed spurious warning ("no non-missing arguments to max; returning -Inf") in `graphr()` on a changing network without any adoption events (e.g. `fict_potter`)
+    - such networks now rendered as standard changing networks rather than routed through the diffusion node-colour mapping
   - Fixed fails at draw time with "invalid hex digit in 'color' or 'lty'" in `graphr()` on a signed multiplex network (e.g. `fict_marvel`)
     - ties on non-signed layers (which have a missing sign) are now drawn solid/positive rather than passing `NA` to grid
   - Fixed error with "Aesthetics must be either length 1 or the same as the data" in `graphr()`/`graphs()` on signed longitudinal or directed networks (e.g. `to_waves(ison_monks)`)

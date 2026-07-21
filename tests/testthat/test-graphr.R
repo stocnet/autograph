@@ -269,6 +269,30 @@ test_that("edge_bundle rejects unknown algorithms", {
 })
 
 
+test_that("graphr() on a changing network without diffusion events emits no max() warning (#57)", {
+  skip_on_cran()
+  # fict_potter is a dynamic/changing network but has no adoption ("I") events,
+  # so the diffusion node-colour path must not warn on an all-infinite vector.
+  expect_true(manynet::is_changing(manynet::fict_potter))
+  expect_no_warning(p <- graphr(manynet::fict_potter))
+  expect_s3_class(p, "ggplot")
+  expect_error(ggplot2::ggplot_build(p), NA)
+})
+
+
+test_that("graphr() on a complex network (self-loops) emits no recycling warnings", {
+  skip_on_cran()
+  # geom_edge_arc()'s stat drops self-loops before drawing, so its length-
+  # preserving `strength` parameter must exclude loop edges. Otherwise a full-
+  # length vector recycles against the loop-free edge set, emitting ~14 "longer
+  # object length is not a multiple" / "items to replace" warnings at build time.
+  expect_true(manynet::is_complex(manynet::ison_emotions))
+  p <- graphr(manynet::ison_emotions)
+  expect_s3_class(p, "ggplot")
+  expect_no_warning(ggplot2::ggplot_build(p))
+})
+
+
 test_that("graphr() renders a signed multiplex two-mode network without error", {
   skip_on_cran()
   # fict_marvel is signed, complex, multiplex, and two-mode. Because only its
