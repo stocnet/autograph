@@ -336,11 +336,13 @@ test_that("grapht() splits a begin/end spell network into active-spell slices", 
 
   slices <- autograph:::.grapht_spell_slices(manynet::irps_wwi)
   expect_type(slices, "list")
-  # One slice per distinct tie `begin`, named by year, each with active ties.
-  expect_equal(names(slices),
-               as.character(sort(unique(manynet::tie_attribute(manynet::irps_wwi,
-                                                               "begin")))))
-  expect_true(all(vapply(slices, manynet::net_ties, numeric(1)) > 0))
+  # One slice per change point (each moment a tie begins or ends), named by year
+  # and in order; this mirrors manynet::to_time() on manynet >= 2.2.2.
+  changes <- sort(unique(c(manynet::tie_attribute(manynet::irps_wwi, "begin"),
+                           manynet::tie_attribute(manynet::irps_wwi, "end"))))
+  expect_equal(names(slices), as.character(changes))
+  # Ties active at the first change point (begin <= t < end) are non-empty.
+  expect_gt(manynet::net_ties(slices[[1]]), 0)
 
   p <- grapht(manynet::irps_wwi)
   expect_s3_class(p, "grapht")

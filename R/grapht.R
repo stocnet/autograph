@@ -298,15 +298,30 @@ print.grapht <- function(x, ...) {
   "begin" %in% atts && "end" %in% atts && !("time" %in% atts)
 }
 
-# Splits a spell network into one snapshot per change point (each distinct tie
-# `begin`), keeping the ties active during that spell (begin <= t < end). Unlike
-# the cumulative slices of an event network, these show the network as it stood
-# at each moment, so ties that dissolve disappear again.
+# Splits a spell network into one snapshot per change point (each moment at
+# which some tie begins or ends), keeping the ties active during that spell
+# (begin <= t < end). Unlike the cumulative slices of an event network, these
+# show the network as it stood at each moment, so ties that dissolve disappear
+# again. `manynet::to_time()` gained this behaviour in manynet 2.2.2, so it is
+# used when available and reimplemented equivalently for older manynet. The
+# version guard is paired with a check that to_time() actually accepts a missing
+# `time` (its 2.2.2 signature), because a pre-release 2.2.2 dev build can carry
+# the version string without yet exposing the feature; the fallback is
+# behaviourally identical either way.
 .grapht_spell_slices <- function(net) {
+  if (utils::packageVersion("manynet") >= "2.2.2" &&
+      !identical(formals(manynet::to_time)[["time"]], quote(expr = ))) {
+    out <- manynet::to_time(net)
+    # to_time() returns a single network when there is only one change point,
+    # but grapht() always needs a list of snapshots to iterate over.
+    if (!manynet::is_list(out)) out <- list(out)
+    return(out)
+  }
   begin <- end <- NULL # for R CMD check (used inside filter_ties' data mask)
-  moments <- sort(unique(stats::na.omit(manynet::tie_attribute(net, "begin"))))
+  moments <- sort(unique(stats::na.omit(c(manynet::tie_attribute(net, "begin"),
+                                          manynet::tie_attribute(net, "end")))))
   out <- lapply(moments, function(t)
-    manynet::filter_ties(net, begin <= t & end > t))
+    manynet::filter_ties(net, begin <= t & (is.na(end) | end > t)))
   names(out) <- as.character(moments)
   out
 }
