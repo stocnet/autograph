@@ -36,9 +36,11 @@ a time attribute, waves, or slices.
 This can also be a single manynet network object that encodes time,
 which will be split automatically:
 longitudinal or changing networks are split into waves via
-\code{manynet::to_waves()}, and dynamic (time-stamped, event-based) networks
+\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
 such as \code{manynet::irps_nuclear} into cumulative time slices via
-\code{manynet::to_slices()}.
+\code{manynet::to_slices()}; and interval (spell) networks that record tie
+\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
+per change point showing the ties active in that spell.
 It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.}
 
@@ -209,23 +211,9 @@ Some further \code{graphr()} features are not available in animations:
 and self-loops (loops are not drawn; a note is printed if present).
 }
 \examples{
-\donttest{
-#ison_adolescents \%>\%
-#  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) \%>\%
-#  to_waves(cumulative = TRUE) \%>\%
-#  grapht()
-#ison_adolescents \%>\%
-#  mutate(gender = rep(c("male", "female"), times = 4),
-#         hair = rep(c("black", "brown"), times = 4),
-#         age = sample(11:16, 8, replace = TRUE)) \%>\%
-#  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE),
-#              links = sample(c("friends", "not_friends"), 10, replace = TRUE),
-#              weekly_meetings = sample(c(3, 5, 7), 10, replace = TRUE)) \%>\%
-#  grapht(node_shape = "gender", node_color = "hair",
-#         node_size =  "age", edge_color = "links",
-#         edge_size = "weekly_meetings")
-#grapht(play_diffusion(ison_adolescents, seeds = 5))
-}
+# A dynamic signed network of shifting European alliances 1872-1918,
+# split automatically into snapshots of the ties active in each spell:
+grapht(irps_wwi)
 }
 \seealso{
 Other mapping:

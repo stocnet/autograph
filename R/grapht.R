@@ -58,9 +58,11 @@
 #'   This can also be a single manynet network object that encodes time,
 #'   which will be split automatically:
 #'   longitudinal or changing networks are split into waves via
-#'   `manynet::to_waves()`, and dynamic (time-stamped, event-based) networks
+#'   `manynet::to_waves()`; dynamic (time-stamped, event-based) networks
 #'   such as `manynet::irps_nuclear` into cumulative time slices via
-#'   `manynet::to_slices()`.
+#'   `manynet::to_slices()`; and interval (spell) networks that record tie
+#'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
+#'   per change point showing the ties active in that spell.
 #'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
 #' @param isolates One of `"keep"` (the default) or `"fade"`.
@@ -102,23 +104,9 @@
 #'   For more control over animation parameters,
 #'   pass the result to `gganimate::animate()` directly.
 #' @examples
-#' \donttest{
-#' #ison_adolescents %>%
-#' #  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) %>%
-#' #  to_waves(cumulative = TRUE) %>%
-#' #  grapht()
-#' #ison_adolescents %>%
-#' #  mutate(gender = rep(c("male", "female"), times = 4),
-#' #         hair = rep(c("black", "brown"), times = 4),
-#' #         age = sample(11:16, 8, replace = TRUE)) %>%
-#' #  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE),
-#' #              links = sample(c("friends", "not_friends"), 10, replace = TRUE),
-#' #              weekly_meetings = sample(c(3, 5, 7), 10, replace = TRUE)) %>%
-#' #  grapht(node_shape = "gender", node_color = "hair",
-#' #         node_size =  "age", edge_color = "links",
-#' #         edge_size = "weekly_meetings")
-#' #grapht(play_diffusion(ison_adolescents, seeds = 5))
-#' }
+#' # A dynamic signed network of shifting European alliances 1872-1918,
+#' # split automatically into snapshots of the ties active in each spell:
+#' grapht(irps_wwi)
 #' @export
 grapht <- function(tlist, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size,
@@ -238,12 +226,16 @@ print.grapht <- function(x, ...) {
 .grapht_waves <- function(tlist) {
   # A single manynet object is split into a list of snapshots depending on how
   # it encodes time: diffusion results and changing or longitudinal networks
-  # split into waves, while dynamic (time-stamped, event-based) networks such
-  # as `irps_nuclear` split into cumulative time slices.
+  # split into waves; dynamic (time-stamped, event-based) networks such as
+  # `irps_nuclear` split into cumulative time slices; and interval/spell
+  # networks that record tie `begin`/`end` spells (e.g. `irps_wwi`) split into
+  # per-period snapshots of the ties active in each spell.
   if (!manynet::is_list(tlist) && manynet::is_manynet(tlist)) {
     if (inherits(tlist, "diff_model") ||
         manynet::is_changing(tlist) || manynet::is_longitudinal(tlist)) {
       tlist <- manynet::to_waves(tlist)
+    } else if (.grapht_is_spell(tlist)) {
+      tlist <- .grapht_spell_slices(tlist)
     } else if (manynet::is_dynamic(tlist)) {
       tlist <- manynet::to_slices(tlist)
     }
@@ -295,6 +287,28 @@ print.grapht <- function(x, ...) {
   waves <- lapply(waves, manynet::as_tidygraph)
   list(waves = waves, frames = frames, present = present,
        isolated = isolated, has_names = has_names)
+}
+
+# A spell (interval) network records each tie's lifespan as `begin`/`end` tie
+# attributes rather than as discrete time-stamped events (a `time` attribute).
+# `manynet::is_dynamic()` is TRUE for both, but only the event form can be split
+# by `to_slices()`, so spell networks are detected and sliced separately here.
+.grapht_is_spell <- function(net) {
+  atts <- names(manynet::tie_attribute(net))
+  "begin" %in% atts && "end" %in% atts && !("time" %in% atts)
+}
+
+# Splits a spell network into one snapshot per change point (each distinct tie
+# `begin`), keeping the ties active during that spell (begin <= t < end). Unlike
+# the cumulative slices of an event network, these show the network as it stood
+# at each moment, so ties that dissolve disappear again.
+.grapht_spell_slices <- function(net) {
+  begin <- end <- NULL # for R CMD check (used inside filter_ties' data mask)
+  moments <- sort(unique(stats::na.omit(manynet::tie_attribute(net, "begin"))))
+  out <- lapply(moments, function(t)
+    manynet::filter_ties(net, begin <= t & end > t))
+  names(out) <- as.character(moments)
+  out
 }
 
 # Nodes added to a wave during harmonisation carry NA attributes; fill them

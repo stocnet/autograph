@@ -27,6 +27,11 @@
   - Dynamic (time-stamped, event-based) networks such as `irps_nuclear` are now split
     automatically into cumulative time slices via `manynet::to_slices()`, so a single
     dynamic network object passed to `grapht()` works without manual conversion
+  - Interval (spell) networks that record tie `begin`/`end` lifespans, such as `irps_wwi`,
+    are now split automatically into one snapshot per change point showing the ties active
+    in that spell, so `grapht(irps_wwi)` works directly (previously it errored because such
+    networks are dynamic but carry no `time` attribute for `to_slices()`); `irps_wwi` is now
+    a runnable example in the documentation
   - `grapht()` now uses the dynamic stress layout by default even for two-mode networks
     (rather than a hierarchy layout, which collapsed many nodes onto a line), suppresses
     node labels by default for networks with more than 30 nodes to keep frames legible,

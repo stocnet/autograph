@@ -325,3 +325,24 @@ test_that("grapht() works on to_waves() output split by a custom attribute (#40)
 test_that("grapht() aborts clearly when the input cannot be split into waves", {
   expect_error(grapht(manynet::ison_adolescents), "waves, or slices")
 })
+
+# Interval/spell networks (begin/end ties, e.g. irps_wwi) ----
+
+test_that("grapht() splits a begin/end spell network into active-spell slices", {
+  # irps_wwi records tie lifespans as begin/end spells; it is_dynamic() but has
+  # no `time` attribute, so it must not be routed to to_slices().
+  expect_true(autograph:::.grapht_is_spell(manynet::irps_wwi))
+  expect_false(autograph:::.grapht_is_spell(manynet::irps_nuclear))
+
+  slices <- autograph:::.grapht_spell_slices(manynet::irps_wwi)
+  expect_type(slices, "list")
+  # One slice per distinct tie `begin`, named by year, each with active ties.
+  expect_equal(names(slices),
+               as.character(sort(unique(manynet::tie_attribute(manynet::irps_wwi,
+                                                               "begin")))))
+  expect_true(all(vapply(slices, manynet::net_ties, numeric(1)) > 0))
+
+  p <- grapht(manynet::irps_wwi)
+  expect_s3_class(p, "grapht")
+  expect_equal(attr(p, "nwaves"), length(slices))
+})
