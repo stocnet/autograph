@@ -23,7 +23,7 @@ plot.outliers.goldfish <- function(x, ...) {
     return(invisible(NULL))
   }
   
-  ggplot2::ggplot(x, ggplot2::aes(x = .data$time, y = .data$intervalLogL)) +
+  ggplot2::ggplot(x, ggplot2::aes(x = .data$time, y = .data$interval_log_lik)) +
     ggplot2::geom_line() +
     ggplot2::geom_point(ggplot2::aes(color = .data$outlier)) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label),
@@ -53,7 +53,7 @@ plot.changepoints.goldfish <- function(x, ...) {
   }
   
   ggplot2::ggplot(data, 
-                  ggplot2::aes(x = .data$time, y = .data$intervalLogL)) +
+                  ggplot2::aes(x = .data$time, y = .data$interval_log_lik)) +
     ggplot2::geom_line() +
     ggplot2::geom_point() +
     ggplot2::geom_vline(
