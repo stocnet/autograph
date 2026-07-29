@@ -2,31 +2,72 @@
 % Please edit documentation in R/plot_diagnostics.R
 \name{plot_adequacy}
 \alias{plot_adequacy}
-\alias{plot.outliers.goldfish}
-\alias{plot.changepoints.goldfish}
+\alias{plot.diagnose_outliers}
+\alias{plot.diagnose_changepoints}
+\alias{plot.margin_table}
 \title{Plotting adequacy diagnostics}
 \usage{
-\method{plot}{outliers.goldfish}(x, ...)
+\method{plot}{diagnose_outliers}(x, ...)
 
-\method{plot}{changepoints.goldfish}(x, ...)
+\method{plot}{diagnose_changepoints}(x, ...)
+
+\method{plot}{margin_table}(x, ..., top = 25)
 }
 \arguments{
-\item{x}{An object of class "outliers.goldfish" or "changepoints.goldfish".}
+\item{x}{An object of class \code{diagnose_outliers}, \code{diagnose_changepoints}
+or \code{margin_table}, as returned by the goldfish functions of the same
+names.}
 
 \item{...}{Additional plotting parameters, currently unused.}
+
+\item{top}{The number of actors to draw, those furthest from the reference.}
 }
 \value{
-The function shows a line plot tracing the statistics obtained at
-each simulation step, as well as a density plot showing the distribution
-of the statistics over the entire simulation.
+A ggplot object.
 }
 \description{
-These plotting methods are for diagnosing the adequacy of model specification,
-such as those used in goldfish.
+These plotting methods are for diagnosing the adequacy of model
+specification, such as those used in goldfish.
 These plots are useful for identifying whether there might be significant
-outliers affecting the results or significant time heterogeneity.
+outliers affecting the results, whether there is significant time
+heterogeneity, and which actors' activity the model does not reproduce.
+}
+\details{
+goldfish emits these objects plot-ready. Each is a tibble carrying the
+diagnostic metadata contract --- which function produced it, which model
+and sub-model it came from, and the arguments that shape how it is read
+--- so these methods take their series, their labels and their reference
+lines from the object rather than inferring them from the columns that
+happen to be present.
+
+The \code{.series} column is the series the diagnostic actually analysed: the
+per-interval log-likelihood by default, and the selected term's own
+series when the diagnostic was called with \verb{effect =}. It is \code{NA} on the
+intervals that took no part, which on a rate or REM fit are the
+right-censored ones.
+
+\code{plot.margin_table()} shows each actor's observed activity against what
+the model expected of them. Which comparison it draws follows the scales
+the fit's model class defines, which the object records: where a
+compensator is defined (the exact-time sub-models) the difference
+\code{observed - expected_count} is the per-actor martingale residual, read
+against zero; on the multinomial sub-models, which have no exposure-time
+term and so no compensator, the ratio \code{observed / expected_probability}
+is a calibration ratio, read against one.
+
+These are descriptives rather than per-actor tests: the differences are
+plug-in quantities and are negatively correlated across actors. Read the
+plot as a map screening for unmodelled actor heterogeneity.
+
+A node set large enough to make one row per actor unreadable is the
+ordinary case, so only the \code{top} actors furthest from the reference are
+drawn, and the subtitle says how many were left out. Actors are ranked by
+their largest deviation over the roles they appear in, so an actor kept
+for one margin keeps the other beside it. Pass \code{top = Inf} for all of
+them.
 }
 \examples{
 plot(goldfish_outliers)
 plot(goldfish_changepoints)
+plot(goldfish_margins)
 }

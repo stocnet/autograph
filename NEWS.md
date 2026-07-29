@@ -1,3 +1,38 @@
+# autograph 1.0.4
+
+## Plotting
+
+- Rebound the goldfish diagnostic plot methods to the classes goldfish 1.9.21
+  emits: `plot.diagnose_outliers()` and `plot.diagnose_changepoints()` replace
+  `plot.outliers.goldfish()` and `plot.changepoints.goldfish()`
+- Both methods now read the metadata each object carries --- which function
+  produced it, which model it came from, and the arguments that shape it ---
+  rather than inferring what they received from the columns present. They plot
+  the `.series` column, which is the series the diagnostic actually analysed,
+  so a diagnostic called with `effect =` is drawn as the term's own series
+  with the term named in the subtitle, rather than as a log-likelihood trace
+  beside flags computed from something else
+- `plot.diagnose_outliers()` consumes the now-logical `outlier` column,
+  replacing a string comparison against `"YES"`
+- `plot.diagnose_changepoints()` was rewritten rather than adjusted: the
+  object is a tibble with a logical `cpt` column, where it used to be a list
+  of a data frame and a vector of positions. The axis is labelled with the
+  break times only where they are numbers, so a dated event stream keeps its
+  date scale
+- Added `plot.margin_table()`, comparing each actor's observed activity with
+  what the model expected of them. It draws the per-actor martingale residual
+  where the model class defines a compensator and the calibration ratio where
+  it does not, choosing between them from the scales the object records. It
+  draws the `top` actors furthest from the reference and reports how many it
+  left out
+- Refreshed the precooked `goldfish_outliers` and `goldfish_changepoints`
+  fixtures and added `goldfish_margins`, all produced by goldfish 1.9.21 and
+  stamped with that version, so a fixture that has aged can be spotted.
+  `goldfish_outliers` comes from a receiver-choice model of the
+  `social_evolution` calls, the other two from a relational event model of the
+  `fisheries_treaties` layer --- dated events whose covariate updates open
+  right-censored intervals, and both margins per actor
+
 # autograph 1.0.3
 
 ## Plotting

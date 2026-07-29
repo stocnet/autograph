@@ -81,3 +81,9 @@
 #' @rdname made_earlier
 #' @usage data(goldfish_changepoints)
 "goldfish_changepoints"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_margins)
+"goldfish_margins"
