@@ -89,7 +89,6 @@ test_that("grapht() accepts an unsplit dynamic network", {
 # Layout and label defaults ----
 
 test_that("two-mode networks default to the dynamic stress layout, not hierarchy", {
-  skip_if_not_installed("graphlayouts")
   w1 <- manynet::as_tidygraph(igraph::make_bipartite_graph(
     c(TRUE, TRUE, FALSE, FALSE, FALSE),
     c(1, 3, 1, 4, 2, 5)))
@@ -146,7 +145,6 @@ test_that("dense frames fade present edges below the sparse-network default", {
 })
 
 test_that("alpha = 1 anchors every node across frames", {
-  skip_if_not_installed("graphlayouts")
   p <- grapht(.wave_fixture(), alpha = 1)
   nd <- .node_layer(p)$data
   stable <- vapply(split(nd[, c("x", "y")], nd$name),

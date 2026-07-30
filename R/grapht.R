@@ -431,8 +431,7 @@ print.grapht <- function(x, ...) {
 # the aggregate network and held fixed across frames.
 .grapht_layout <- function(waves, layout, alpha, ...) {
   all_names <- igraph::V(manynet::as_igraph(waves[[1]]))$name
-  if (identical(layout, "stress") &&
-      requireNamespace("graphlayouts", quietly = TRUE)) {
+  if (identical(layout, "stress")) {
     gl <- lapply(waves, function(w) {
       ig <- manynet::as_igraph(w)
       for (a in setdiff(igraph::vertex_attr_names(ig), "name"))
@@ -447,8 +446,6 @@ print.grapht <- function(x, ...) {
     lapply(xy, function(m)
       data.frame(name = all_names, x = m[, 1], y = m[, 2]))
   } else {
-    if (identical(layout, "stress"))
-      thisRequires("graphlayouts")
     manynet::snet_info("Using a static ", layout,
                        " layout computed on the aggregate network.")
     lo <- suppressWarnings(ggraph::create_layout(.grapht_union(waves), layout, ...))

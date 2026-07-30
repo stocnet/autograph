@@ -5,6 +5,7 @@
 - Trimmed and tightened declared dependencies
   - Removed `{knitr}` from Suggests: it was used solely by the tutorial tests, which now extract the tutorials' `{r}` chunks with the same small scanner used in `{manynet}` and `{netrics}` (verified to yield an identical expression set to `knitr::purl()` on the autograph tutorial)
   - Removed `{tidygraph}` from Imports: its only functional use was reading the edgelist's target column in `.infer_end_cap()`, which now uses `igraph::as_edgelist()` (verified to give identical end caps)
+  - Promoted `{graphlayouts}` from Suggests to Imports, since it is required for `grapht()`'s *default* "stress" layout (without it, wave-to-wave node transitions silently degraded to a static aggregate layout) and is installed regardless as `{ggraph}` imports it; its `requireNamespace()`/`thisRequires()` guards have been removed
 - Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
 - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
 

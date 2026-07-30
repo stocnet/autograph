@@ -18,13 +18,13 @@ Imports:
     dplyr (>= 1.1.0),
     ggraph (>= 2.2.0),
     ggplot2 (>= 4.0.0),
+    graphlayouts (>= 1.1.0),
     igraph,
     patchwork
 Suggests:
     gganimate,
     ggforce (>= 0.5.0),
     gifski,
-    graphlayouts,
     methods,
     migraph,
     netrics,

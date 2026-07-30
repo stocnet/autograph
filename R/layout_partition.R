@@ -139,7 +139,6 @@ layout_multilevel <- function(.data, level, circular = FALSE) {
     }
   }
   out <- igraph::set_vertex_attr(.data, "lvl", value = level)
-  thisRequires("graphlayouts")
   out <- graphlayouts::layout_as_multilevel(out, alpha = 25)
   .to_lo(out)
 }
