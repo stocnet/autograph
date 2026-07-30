@@ -5,6 +5,11 @@
 - Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
 - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
 
+## Graphing
+
+- Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
+  - such networks are now split into waves via a guarded `to_waves()` that coerces the offending attributes when {manynet}'s splitter cannot combine them
+
 # autograph 1.1.1
 
 ## Graphing

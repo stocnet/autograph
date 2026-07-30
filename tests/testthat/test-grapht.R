@@ -56,6 +56,22 @@ test_that("grapht() accepts an unsplit longitudinal network", {
   expect_gt(attr(p, "nwaves"), 1)
 })
 
+test_that("grapht() splits a longitudinal network with a logical changing attribute", {
+  # fict_starwars is a changing+longitudinal network with a logical `active`
+  # node attribute (and numeric height/mass) that change over time. manynet's
+  # to_waves() aborts splitting these ("Can't combine <character> and
+  # <logical>"); .to_waves_safe() coerces the offending attributes and retries.
+  skip_if_not(manynet::is_changing(manynet::fict_starwars))
+  expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
+  # .to_waves_safe() returns the same waves manynet would, without erroring
+  waves <- autograph:::.to_waves_safe(manynet::fict_starwars)
+  expect_type(waves, "list")
+  expect_gt(length(waves), 1)
+  p <- grapht(manynet::fict_starwars)
+  expect_s3_class(p, "grapht")
+  expect_equal(attr(p, "nwaves"), length(waves))
+})
+
 test_that("grapht() accepts an unsplit dynamic network", {
   # Dynamic (time-stamped, event-based) networks are split into cumulative
   # time slices via manynet::to_slices(), which needs an increment/weight.

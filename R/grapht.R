@@ -298,12 +298,43 @@ print.grapht <- function(x, ...) {
       manynet::is_changing(x) || manynet::is_longitudinal(x)) {
     if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
       attr(x, "network")
-    else manynet::to_waves(x)
+    else .to_waves_safe(x)
   } else if (.grapht_is_spell(x)) {
     .grapht_spell_slices(x)
   } else if (manynet::is_dynamic(x)) {
     manynet::to_slices(x)
   } else x
+}
+
+# Splits a changing/longitudinal network into waves via `manynet::to_waves()`,
+# guarding against a bug present through at least manynet 2.2.2 whereby a node
+# attribute that *changes* over time but is stored as a non-character vector
+# (e.g. the logical `active` flag, or numeric `height`/`mass`, in
+# `manynet::fict_starwars`) cannot be split. Internally `to_waves()` coalesces
+# each attribute against a character update vector built from the (always
+# character) changelist values; when the stored attribute is logical or numeric
+# this aborts with a vctrs "Can't combine <character> and <...>" error before
+# any wave is produced. autograph has an unversioned dependency on manynet, so
+# this must also work against the CRAN build that lacks any fix. We therefore
+# try `to_waves()` unchanged first -- so behaviour tracks manynet once it is
+# fixed upstream -- and only on that specific combine error coerce the changing
+# non-character node attributes to character (which is the type those columns
+# already take in the split output regardless) and retry.
+.to_waves_safe <- function(x) {
+  tryCatch(
+    manynet::to_waves(x),
+    error = function(e) {
+      if (!grepl("Can't combine", conditionMessage(e), fixed = TRUE) ||
+          !manynet::is_changing(x)) stop(e)
+      changing <- tryCatch(unique(manynet::as_changelist(x)$var),
+                           error = function(...) character(0))
+      for (a in intersect(changing, names(manynet::node_attribute(x)))) {
+        old <- manynet::node_attribute(x, a)
+        if (!is.character(old))
+          x <- manynet::add_node_attribute(x, a, as.character(unclass(old)))
+      }
+      manynet::to_waves(x)
+    })
 }
 
 # A spell (interval) network records each tie's lifespan as `begin`/`end` tie

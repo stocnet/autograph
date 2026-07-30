@@ -210,3 +210,16 @@ test_that("graphs() splits a bare longitudinal or dynamic network", {
   # An interval (spell) network is split into per-period snapshots.
   expect_s3_class(suppressMessages(graphs(manynet::irps_wwi)), "patchwork")
 })
+
+test_that("graphs() splits a longitudinal network with non-character changing attributes", {
+  skip_on_cran()
+  # fict_starwars is a changing+longitudinal network whose changing node
+  # attributes include a logical `active` flag and numeric height/mass.
+  # manynet::to_waves() (through >= 2.2.2) aborts splitting these with a vctrs
+  # "Can't combine <character> and <logical>" error; .to_waves_safe() coerces
+  # them and retries. See .split_time_network()/.to_waves_safe() in R/grapht.R.
+  expect_true(manynet::is_changing(manynet::fict_starwars))
+  expect_true("active" %in% names(manynet::node_attribute(manynet::fict_starwars)))
+  expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
+  expect_s3_class(suppressMessages(graphs(manynet::fict_starwars)), "patchwork")
+})
