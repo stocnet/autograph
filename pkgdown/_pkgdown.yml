@@ -14,6 +14,7 @@ navbar:
     - intro
     - reference
     - tutorials
+    - family
     - news
     right:
     - search
@@ -32,6 +33,15 @@ navbar:
       menu:
       - text: Visualising Networks
         href: articles/visualising-networks.html
+    family:
+      text: Related Packages
+      menu:
+      - text: manynet
+        href: https://stocnet.github.io/manynet/
+      - text: netrics
+        href: https://stocnet.github.io/netrics/
+      - text: migraph
+        href: https://stocnet.github.io/migraph/
     news:
       text: News
       href: news/index.html

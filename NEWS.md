@@ -18,6 +18,8 @@
   - Added an edge-case audit (`test-functional_errors.R`), an audit of the user-facing `layout_*` aliases, and examples for the `ag_*` palette accessors and configurational layouts, none of which were previously covered
   - Theme-mutating tests now restore the previous theme with `on.exit()`, so global theme state cannot leak between parallel test workers
 - Updated favicons
+- Updated README to send viz examples to website
+- Fixed README double logoing on pkgdown build, and added alttext
 
 ## Graphing
 
