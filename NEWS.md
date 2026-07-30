@@ -1,3 +1,10 @@
+# autograph 1.1.2
+
+## Package
+
+- Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
+- Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
+
 # autograph 1.1.1
 
 ## Graphing
