@@ -14,12 +14,18 @@
 
 - Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
   - such networks are now split into waves via a guarded `to_waves()` that coerces the offending attributes when {manynet}'s splitter cannot combine them
+- Fixed `graphr(..., snap = TRUE)` erroring ("'-' only defined for equally-sized data frames") whenever a node sat exactly on a grid point
+  - `depth_first_recursive_search()` compared each node against a distance vector that still included its own zero self-distance, so an exact hit selected that entry and yielded an empty grid point; the self-distance is now dropped before the nearest vacant point is chosen
+  - two-mode networks hit this on their very first node, since their coordinates are exactly 0 or 1
+- `snap = TRUE` is now ignored, with a message, for layered layouts ("hierarchy", "railway", "ladder", "alluvial", "multilevel", "lineage", "layered")
+  - these layouts encode rank, mode, or generation along an axis, which square-grid snapping would collapse; this fallback was described in the tests but had never been implemented
 
 ## Plotting
 
 - Improved `plot.node_member()` to draw its dendrogram with `{ggraph}`
   - Passes `hclust` object's own merge heights to the dendrogram layout to reproduce the previous plot's leaf order, merge heights, cluster label colours, and cutpoint line
   - Branches now drawn in `ag_base()` rather than black, matching the height axis and so respecting the active `stocnet_theme()`
+  - Removed `{ggdendro}` from Imports
 - Fixed a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
 
 # autograph 1.1.1

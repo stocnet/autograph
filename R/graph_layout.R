@@ -22,6 +22,18 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
                                  guide = ggplot2::guide_legend("Group"))
   }
   if(snap){
+    # Layered layouts already encode meaning in their coordinates -- rank,
+    # mode, or generation along one axis -- which square-grid snapping would
+    # collapse. Skip snapping for those and keep the layout as computed.
+    layered_layouts <- c("hierarchy", "railway", "ladder", "alluvial",
+                         "multilevel", "lineage", "layered")
+    is_layered <- is.character(layout) && length(layout) == 1L &&
+      layout %in% layered_layouts
+    if (is_layered) {
+      manynet::snet_info(paste0("Skipping snapping: the '", layout,
+                                "' layout is layered, so its coordinates ",
+                                "are kept as computed."))
+    } else {
     manynet::snet_info("Snapping layout coordinates to grid.")
     if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE)){
       
@@ -36,6 +48,7 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
       # Make sure that the coordinates, if rounded to integers, are still unique
       p$data[,c("x","y")] <- round(rotated_coords[,c("x","y")])
     } else p$data[,c("x","y")] <- depth_first_recursive_search(p)
+    }
   }
   # Add background ----
   if(getOption("snet_background", default = "#FFFFFF")!="#FFFFFF")
