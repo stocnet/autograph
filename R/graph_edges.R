@@ -76,13 +76,9 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   if (length(unique(nsize)) == 1) {
     out <- rep(unique(nsize), manynet::net_ties(g))
   } else {
-    out <- g %>%
-      tidygraph::activate("edges") %>%
-      data.frame() %>% 
-      dplyr::left_join(data.frame(node_id = 1:length(manynet::node_names(g)),
-                                  nsize = nsize),
-                       by = c("to" = "node_id"))
-    out <- out$nsize
+    # Each tie's end cap is sized from the node it points to, so index the node
+    # sizes by the edgelist's target column (kept as node indices, not names).
+    out <- nsize[igraph::as_edgelist(manynet::as_igraph(g), names = FALSE)[, 2]]
     out <- ((out - min(out)) / (max(out) - min(out))) *
       ((1 / manynet::net_nodes(g) * 100) - (1 / manynet::net_nodes(g)*50)) + 
       (1 / manynet::net_nodes(g) * 50)

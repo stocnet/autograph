@@ -125,7 +125,6 @@
 #' @importFrom ggraph geom_edge_bundle_minimal geom_node_label
 #' @importFrom ggraph geom_node_point scale_edge_width_continuous 
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
-#' @importFrom tidygraph activate
 #' @examples
 #' graphr(ison_adolescents)
 #' ison_adolescents %>%
