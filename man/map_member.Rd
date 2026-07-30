@@ -12,7 +12,7 @@
 }
 \arguments{
 \item{x}{An object of "node_member" class, for example as a result of
-running \code{manynet::node_in_community()}.}
+running \code{netrics::node_in_community()}.}
 
 \item{...}{Other arguments to be passed on.}
 

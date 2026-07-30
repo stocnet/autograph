@@ -112,13 +112,12 @@ plot.network_measures <- function(x, ...) {
 #'   `{manynet}` package, plotting the dendrogram of their membership.
 #' @name map_member
 #' @param x An object of "node_member" class, for example as a result of
-#'   running `manynet::node_in_community()`.
+#'   running `netrics::node_in_community()`.
 #' @inheritParams map_measure
 #' @returns `plot.node_member()` returns a dendrogram, with labels colored to
 #'   indicate the different clusters, and with the optimal cutpoint shown by a
 #'   dashed highlight line.
-#' @importFrom stats cutree
-#' @importFrom ggdendro ggdendrogram
+#' @importFrom stats cutree setNames
 #' @examples
 #' plot(netrics::node_in_walktrap(ison_southern_women, "e"))
 #' @export
@@ -129,13 +128,29 @@ plot.node_member <- function(x, ...) {
   clust <- memb[!duplicated(memb)]
   colors <- ifelse(match(memb, clust) %% 2,
                    ag_positive(), ag_negative())
-  ggdendro::ggdendrogram(hc, rotate = TRUE) +
+  # Drawn with ggraph rather than ggdendro: passing the hclust's own merge
+  # heights as the layout's `height` reproduces the rotated dendrogram exactly
+  # (same leaf order, same merge heights), without the extra dependency.
+  ggraph::ggraph(hc, layout = "dendrogram", height = .data$height) +
+    ggraph::geom_edge_elbow(colour = ag_base()) +
     ggplot2::geom_hline(yintercept = hc$height[length(hc$order) - k],
                         linetype = 2,
                         color = ag_highlight()) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(colour = ag_base()),
-                   axis.text.y = suppressWarnings(
-                     ggplot2::element_text(colour = colors)))
+    ggraph::geom_node_text(
+      ggplot2::aes(filter = .data$leaf, label = .data$label,
+                   colour = .data$label),
+      hjust = 1, nudge_y = -max(hc$height) / 60, size = 3.5,
+      family = ag_font(), show.legend = FALSE) +
+    ggplot2::scale_colour_manual(
+      values = stats::setNames(colors, hc$labels[hc$order])) +
+    ggplot2::scale_y_continuous(
+      expand = ggplot2::expansion(mult = c(0.22, 0.02))) +
+    ggplot2::coord_flip() +
+    ggplot2::theme_minimal(base_family = ag_font()) +
+    ggplot2::theme(axis.title = ggplot2::element_blank(),
+                   axis.text.y = ggplot2::element_blank(),
+                   axis.text.x = ggplot2::element_text(colour = ag_base()),
+                   panel.grid = ggplot2::element_blank())
 }
 
 # #' @export
