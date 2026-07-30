@@ -8,6 +8,7 @@
   - Promoted `{graphlayouts}` from Suggests to Imports, since it is required for `grapht()`'s *default* "stress" layout (without it, wave-to-wave node transitions silently degraded to a static aggregate layout) and is installed regardless as `{ggraph}` imports it; its `requireNamespace()`/`thisRequires()` guards have been removed
   - Declared a minimum `{manynet}` version (`>= 2.2.1`)
 - Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
+- Updated the Github Actions workflows to check metadata and tutorial vignette correspondence
 - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
 - Strengthened the test suite while reducing what CRAN has to run
   - The functional audits now fail rather than skip when `AUTOGRAPH_STRICT_AUDIT=true`, which the CI check step now sets, so a broken layout or plot method can no longer pass CI green

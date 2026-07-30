@@ -45,7 +45,7 @@ html { font-size: 115%; }
 
 
 ::: {.callout}
-<span class="callout-label">**Static preview**:</span> This is a static, read-only preview of the "Visualising Networks" tutorial, so the plots that the code produces and the exercise solutions are not shown here, and the quizzes are replaced with notes like this one. Install the package and run `run_tute()` at the R console to work through the tutorial interactively — running the code, seeing the graphs, and getting hints, solutions, and quizzes.
+<span class="callout-label">**Static preview**:</span> This is a static, read-only preview of the "Visualising Networks" tutorial. To keep it a preview, the code output and exercise solutions are not shown here, and the quizzes are replaced with notes like this one. Install the package and run `run_tute()` at the R console to work through the tutorial interactively — running the code, seeing the results, and getting hints, solutions, and quizzes.
 :::
 
 ## Why graph
@@ -323,11 +323,11 @@ Katya Ognyanova outlines some of these dimensions:
 
 | Nodes    |     | Ties  |     |
 | :--------|:-------------|:-------------|:-------------|
-| Position | `layout=`   | Arrows |  _automatic_ (directed ties)  |
-| Labels   | `labels=`, `node_group=`   | Type      |  _automatic_ (signed ties)  |
-| Shape    | `node_shape=`   | Shape      | _automatic_ (reciprocated ties)   |
-| Size     | `node_size=`   | Size      | `edge_size=`   |
-| Color    | `node_color=`, `node_colour=`   | Color      | `edge_color=`, `edge_colour=`   |
+| Position | `layout=`, `isolates=`, `snap=`   | Arrows |  _automatic_ (directed ties)  |
+| Labels   | `labels=`, `label_repel=`, `label_dist=`, `node_group=`   | Type      |  _automatic_ (signed ties)  |
+| Shape    | `node_shape=`   | Shape (curve)      | _automatic_ (reciprocated ties), `edge_bundle=`   |
+| Size     | `node_size=`   | Size (width)      | `edge_size=`   |
+| Color    | `node_color=`/`node_colour=`   | Color      | `edge_color=`/`edge_colour=`   |
 
 The named arguments in the table above cover the aesthetics you will reach
 for most often. Several other visual features are not arguments at all:
@@ -346,10 +346,9 @@ negative, and solid where positive;
 You do not set these by hand — but because every graph is a `{ggplot2}`
 object, you can always override them by dropping down to `{ggraph}`
 (see the _Going further with ggraph_ section near the end of this tutorial).
-A handful of further arguments — `node_group`, `label_repel`/`label_dist`,
-`edge_bundle`, `isolates`, and `snap` — tune grouping, labelling, and how
-dense or disconnected networks are drawn; we meet each in its own section
-below.
+Further arguments tune grouping, labelling, and how
+dense or disconnected networks are drawn; 
+we meet each in its own section below.
 
 Each of the mapping arguments can be given either a literal value
 (e.g. `node_size = 6`) or, more interestingly,
@@ -405,6 +404,7 @@ graphr(ison_southern_women)
 Let's try instead colouring the nodes by this "Race" variable.
 It is very similar to the shape example above.
 **Can you complete the code yourself?**
+
 
 That's much easier to read.
 Note how a legend has been added automatically,
@@ -570,6 +570,7 @@ here is one suggestion per flavour:
 
 Print the network first to see which attributes are available,
 then map one or two of them to colour, shape, size, or groups.
+
 
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `graphr()` maps node and tie attributes to visual aesthetics
@@ -758,6 +759,7 @@ Let's try this by adding a title to a plot.
 say "My graph",
 and then add also a subtitle (an argument to that function),
 say "I did this".**
+
 
 Note that you can also use `ggtitle()` to do the same thing,
 but if you just remember `labs()` you can also use it to add labels
@@ -1091,6 +1093,7 @@ and `/` to put them above one another.
 Parentheses can be used to group graphs together.
 **Try graphing `fict_lotr` and `ison_algebra` side-by-side,
 and then one above the other.**
+
 
 ### Sets {#sets}
 
