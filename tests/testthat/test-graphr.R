@@ -1,11 +1,23 @@
-data_objs <- mget(ls("package:manynet"), inherits = TRUE)
-# Filter to relevant objects 
-data_objs <- data_objs[grepl("ison_|fict_|irps_|mpn_", names(data_objs))]
-# data_objs <- data_objs[!grepl("starwars|physicians|potter", names(data_objs))]
-for (nm in names(data_objs)) { 
+# A representative sample of real {manynet} datasets, one per network format.
+# This used to sweep every ison_/fict_/irps_/mpn_ object in the package, which
+# dominated check time for little extra signal: format coverage is the job of
+# the ag_fixtures grid (helper-functional.R), and the messier datasets each have
+# a dedicated regression test further down this file. What remains here is a
+# fast smoke test that graphr() still handles real, un-synthetic data. It is
+# deliberately *not* skip_on_cran(), so CRAN retains a check of the core entry
+# point; keep this list short so that stays true.
+graphr_smoke_data <- c(
+  "ison_adolescents",   # labelled, one-mode
+  "ison_southern_women",# two-mode
+  "ison_networkers",    # directed, weighted
+  "ison_algebra",       # multiplex
+  "fict_marvel",        # signed
+  "ison_monks"          # longitudinal
+)
+for (nm in graphr_smoke_data) {
   test_that(paste("graphr() works on", nm), {
-    skip_if(grepl("starwars|physicians|potter", nm))
-    expect_error(graphr(data_objs[[nm]]), NA) }) 
+    expect_buildable(graphr(get(nm, envir = asNamespace("manynet"))))
+  })
 }
 
 fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
@@ -57,7 +69,6 @@ test_that("unweighted, unsigned, directed networks graph correctly", {
 
 test_that("weighted, unsigned, directed networks graph correctly", {
   skip_on_cran()
-  skip_on_ci()
   # Weighted, unsigned, directed network
   test_networkers <- graphr(ison_networkers)
   # Node position (exact coordinates vary across layout-engine versions,
@@ -78,7 +89,6 @@ test_that("weighted, unsigned, directed networks graph correctly", {
 # Testing the node_color, node_size, and node_shape args by specifying a node attribute
 test_that("fancy node mods graph correctly", {
   skip_on_cran()
-  skip_on_ci()
   # one-mode network
   fmrg <- dplyr::mutate(fmrg, nodesize = Appearances/1000)
   testcolnodes <- graphr(fmrg, node_color = "Gender",
@@ -114,7 +124,6 @@ test_that("edge colours and edge size graph correctly", {
 # Named networks
 test_that("named networks plot correctly", {
   skip_on_cran()
-  skip_on_ci()
   onemode <- graphr(ison_adolescents)
   twomode <- graphr(ison_southern_women)
   expect_equal(onemode[["data"]][["name"]], node_names(ison_adolescents))
@@ -235,7 +244,7 @@ test_that("labels stay clear of larger nodes (#13)", {
 test_that("graphr() works on a stocnet-class object", {
   skip_on_cran()
   sn <- manynet::as_stocnet(ison_adolescents)
-  expect_error(graphr(sn), NA)
+  expect_buildable(graphr(sn))
 })
 
 test_that("edge_bundle swaps in a bundling geom (#19)", {
@@ -255,17 +264,20 @@ test_that("edge_bundle swaps in a bundling geom (#19)", {
   p_path <- graphr(net, edge_bundle = "path")
   expect_s3_class(p_path$layers[[1]]$geom, "GeomEdgePath")
   # Bundling renders without error
-  expect_error(ggplot2::ggplot_build(p_force), NA)
+  expect_buildable(p_force)
   # Directed networks bundle and retain an arrow
   dnet <- manynet::to_directed(manynet::generate_random(30, 0.12))
   p_dir <- graphr(dnet, edge_bundle = TRUE)
   expect_s3_class(p_dir$layers[[1]]$geom, "GeomEdgePath")
-  expect_error(ggplot2::ggplot_build(p_dir), NA)
+  expect_buildable(p_dir)
 })
 
 test_that("edge_bundle rejects unknown algorithms", {
   skip_on_cran()
-  expect_error(graphr(ison_adolescents, edge_bundle = "banana"))
+  # Assert the message, not merely that *something* failed -- otherwise a
+  # typo in the test itself would also pass.
+  expect_error(graphr(ison_adolescents, edge_bundle = "banana"),
+               "banana|edge_bundle|should be one of|arg")
 })
 
 
@@ -275,8 +287,7 @@ test_that("graphr() on a changing network without diffusion events emits no max(
   # so the diffusion node-colour path must not warn on an all-infinite vector.
   expect_true(manynet::is_changing(manynet::fict_potter))
   expect_no_warning(p <- graphr(manynet::fict_potter))
-  expect_s3_class(p, "ggplot")
-  expect_error(ggplot2::ggplot_build(p), NA)
+  expect_buildable(p)
 })
 
 
@@ -304,8 +315,7 @@ test_that("graphr() renders a signed multiplex two-mode network without error", 
   expect_true(manynet::is_multiplex(manynet::fict_marvel))
   expect_true(manynet::is_twomode(manynet::fict_marvel))
   p <- graphr(manynet::fict_marvel)
-  expect_s3_class(p, "ggplot")
-  expect_error(ggplot2::ggplot_build(p), NA)
+  expect_buildable(p)
   # Signed styling is preserved: positives solid, negatives dashed.
   lts <- unique(ggplot2::ggplot_build(p)$data[[1]]$edge_linetype)
   expect_setequal(lts, c("solid", "dashed"))
@@ -321,7 +331,7 @@ test_that("graphs()/graphr() render signed longitudinal snapshots without error"
   waves <- manynet::to_waves(manynet::ison_monks)
   expect_true(manynet::is_signed(waves[[1]]))
   p1 <- graphr(waves[[1]])
-  expect_error(ggplot2::ggplot_build(p1), NA)
+  expect_buildable(p1)
   ps <- graphs(waves)
-  expect_error(ggplot2::ggplot_build(ps), NA)
+  expect_buildable(ps)
 })

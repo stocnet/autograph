@@ -28,12 +28,18 @@ ag_plot_classes <- function() {
 }
 
 # Evaluate expr; on error, skip with a structured, greppable audit message.
+# Under AUTOGRAPH_STRICT_AUDIT=true (set for CI, see .github/workflows/) the
+# error is raised as a failure instead, so a broken layout or plot method
+# cannot pass CI green. Locally the default remains skip-and-report, so the
+# audits stay usable as a to-do list of implementations still needing work.
 run_or_skip <- function(expr, fn, fixture) {
   tryCatch(
     expr,
     error = function(e) {
-      testthat::skip(paste0("AUDIT [", fn, " x ", fixture, "]: ",
-                            conditionMessage(e)))
+      msg <- paste0("AUDIT [", fn, " x ", fixture, "]: ", conditionMessage(e))
+      if (isTRUE(as.logical(Sys.getenv("AUTOGRAPH_STRICT_AUDIT", "false")))) {
+        testthat::fail(msg)
+      } else testthat::skip(msg)
     }
   )
 }

@@ -4,6 +4,9 @@
 # })
 
 test_that("setting theme provides correct palette", {
+  # Tests run in parallel (Config/testthat/parallel) and the theme is global
+  # state, so restore it rather than leaving the last theme set here in place.
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
   stocnet_theme("default")
   expect_equal(getOption("snet_cat"), c("#1B9E77","#4575b4","#d73027",
                                         "#66A61E","#E6AB02","#D95F02","#7570B3",
@@ -53,6 +56,7 @@ test_that("setting theme provides correct palette", {
 })
 
 test_that("setting fonts works", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
   stocnet_theme("iheid")
   p <- plot(monan_gof)
   expect_equal(p$theme$text$family, "Helvetica")

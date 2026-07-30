@@ -104,6 +104,19 @@ test_that("measure plots support histogram and density types", {
   expect_buildable(plot(tb, type = "d"))
 })
 
+test_that("ergm gof plot obs and sims factor levels are aligned", {
+  # Regression test: the observed and simulated statistics are joined by name,
+  # so R's check.names must not rewrite the numeric column names to "X0" etc.,
+  # and the resulting factor levels must sort numerically rather than
+  # lexically ("10" before "2").
+  p <- plot(ergm_gof)
+  sims_levels <- levels(p$data$name)
+  numeric_vals <- suppressWarnings(as.numeric(sims_levels))
+  expect_true(!any(is.na(numeric_vals)),
+              info = "Factor levels should be numeric, not R-modified names (e.g. 'X0')")
+  expect_equal(numeric_vals, sort(numeric_vals))
+})
+
 test_that("network measures over time plot as a trace", {
   meas <- data.frame(time = 1:10, value = cumsum(stats::rnorm(10)))
   class(meas) <- c("network_measures", class(meas))

@@ -20,9 +20,14 @@ depth_first_recursive_search <- function(layout) {
   gridout <- layout[order(abs(layout[,1]) + abs(layout[,2])), ] # sort centroid distance
   nodes <- seq_len(nrow(gridout))
   for (i in nodes) {
+    # Drop the first row (the node's distance to itself, always 0) before
+    # picking the nearest vacant point. Comparing against the undropped vector
+    # matched row 1 whenever a grid point coincided exactly with the node,
+    # giving mindist 0 and a zero-row vacpoint. Two-mode layouts hit this on the
+    # very first node, since their coordinates are exactly 0 or 1.
     dists <- as.matrix(stats::dist(rbind(gridout[i, 1:2], vacant_points),
-                            method = "manhattan"))[, 1]
-    mindist <- which(dists == min(dists[2:length(dists)]))[1] - 1
+                            method = "manhattan"))[-1, 1]
+    mindist <- which.min(dists)
     vacpoint <- vacant_points[mindist, ]
     changes <- vacpoint - gridout[i, 1:2]
     gridout[nodes >= i, 1] <- gridout[nodes >= i, 1] + 

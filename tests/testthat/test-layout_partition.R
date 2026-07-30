@@ -13,7 +13,6 @@ test_that("concentric and circular layouts graph correctly", {
 
 test_that("concentric layout works when node names are missing", {
   skip_on_cran()
-  skip_on_ci()
   llabel <- ison_southern_women %>%
     mutate(name = ifelse(type == TRUE, "", name)) %>%
     graphr(layout = "concentric")

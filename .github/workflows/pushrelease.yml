@@ -43,6 +43,10 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         env:
           _R_CHECK_FORCE_SUGGESTS_: false
+          # Make the functional audits fail rather than skip, so a broken layout
+          # or plot method cannot pass CI green. Locally the audits still skip
+          # with a greppable "AUDIT [...]" message (see helper-functional.R).
+          AUTOGRAPH_STRICT_AUDIT: true
         with:
           upload-snapshots: true
 
@@ -64,11 +68,16 @@ jobs:
         if: runner.os == 'macOS'
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          # Without this, every skip_on_cran() test is skipped while coverage is
+          # measured -- which is most of the suite, including all the functional
+          # audits -- and the reported figure badly under-reads.
+          NOT_CRAN: true
         run: Rscript -e 'covr::codecov(token = Sys.getenv("CODECOV_TOKEN"))'
 
   release:
     name: Bump version and release
-    if: ${{ always() }}
+    # No `if: always()` here: `needs: build` must actually gate the release, so
+    # a failing R CMD check cannot tag a version and publish binaries.
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -126,7 +135,7 @@ jobs:
 
   pkgdown:
     name: Build and deploy website
-    if: ${{ always() }}
+    # As above: a failing check must not deploy the site.
     needs: release
     runs-on: macOS-latest
     env:

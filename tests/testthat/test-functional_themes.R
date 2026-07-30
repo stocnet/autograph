@@ -36,6 +36,66 @@ test_that("theme setting is case-insensitive and rejects unknown themes", {
   expect_no_error(suppressMessages(stocnet_theme()))
 })
 
+test_that("palette accessors cope with n beyond the palette length", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
+  is_colour <- function(x) {
+    vapply(x, function(cl) {
+      tryCatch(is.matrix(grDevices::col2rgb(cl)), error = function(e) FALSE)
+    }, logical(1))
+  }
+  for (thm in autograph:::theme_opts) {
+    suppressMessages(stocnet_theme(thm))
+    # More categories than the palette has colours must still return n usable
+    # colours (by recycling or interpolating), not NA or a short vector.
+    big <- suppressWarnings(ag_qualitative(40))
+    expect_length(big, 40)
+    expect_true(all(is_colour(big)), info = thm)
+    # Degenerate n
+    expect_length(suppressWarnings(ag_sequential(1)), 1)
+    expect_length(suppressWarnings(ag_divergent(2)), 2)
+  }
+})
+
+test_that("set_stocnet_theme is an alias for stocnet_theme", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
+  suppressMessages(set_stocnet_theme("ethz"))
+  expect_equal(getOption("stocnet_theme"), "ethz")
+  expect_identical(ag_base(), {
+    suppressMessages(stocnet_theme("ethz")); ag_base()
+  })
+})
+
+test_that("palette accessors work before any theme has been set", {
+  # tests/testthat.R calls stocnet_theme("default") before the suite runs, so
+  # every other test here sees the snet_* options already populated. A user
+  # who just calls library(autograph) does not. Clear the options to reproduce
+  # that fresh session: ag_divergent() used to error with "invalid color name
+  # 'default'" because its fallback was the literal string "default".
+  snet_opts <- grep("^snet_", names(options()), value = TRUE)
+  old <- options()[snet_opts]
+  on.exit({
+    options(old)
+    suppressMessages(stocnet_theme("default"))
+  }, add = TRUE)
+  options(stats::setNames(vector("list", length(snet_opts)), snet_opts))
+
+  is_colour <- function(x) {
+    vapply(x, function(cl) {
+      tryCatch(is.matrix(grDevices::col2rgb(cl)), error = function(e) FALSE)
+    }, logical(1))
+  }
+  expect_true(all(is_colour(ag_base())))
+  expect_true(all(is_colour(ag_highlight())))
+  expect_true(all(is_colour(ag_positive())))
+  expect_true(all(is_colour(ag_negative())))
+  expect_type(ag_font(), "character")
+  for (n in c(1, 3, 5)) {
+    expect_true(all(is_colour(ag_qualitative(n))), info = paste("qualitative", n))
+    expect_true(all(is_colour(ag_sequential(n))), info = paste("sequential", n))
+    expect_true(all(is_colour(ag_divergent(n))), info = paste("divergent", n))
+  }
+})
+
 test_that("colour utilities behave", {
   expect_true(is_dark("#000000"))
   expect_false(is_dark("#FFFFFF"))

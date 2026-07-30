@@ -9,6 +9,14 @@
   - Declared a minimum `{manynet}` version (`>= 2.2.1`)
 - Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
 - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
+- Strengthened the test suite while reducing what CRAN has to run
+  - The functional audits now fail rather than skip when `AUTOGRAPH_STRICT_AUDIT=true`, which the CI check step now sets, so a broken layout or plot method can no longer pass CI green
+  - Fixed the layout audit's fixture and argument maps, which paired several layouts with networks they cannot lay out; because `skip()` aborts the enclosing `test_that()`, the first such mismatch had been silently preventing every later layout from being audited at all (the layout audit goes from 21 to 108 assertions)
+  - Coverage is now measured with `NOT_CRAN=true`, without which every `skip_on_cran()` test — most of the suite — was skipped while covr ran, badly under-reporting coverage
+  - `release` and `pkgdown` no longer run under `if: always()`, so a failing `R CMD check` can no longer tag a release or deploy the website
+  - Replaced `graphr()`'s sweep over every bundled `{manynet}` dataset with a representative sample, and dropped the `plot.*` smoke tests now subsumed by the plot-method audit; CRAN-visible test time falls while CRAN-visible assertions rise
+  - Added an edge-case audit (`test-functional_errors.R`), an audit of the user-facing `layout_*` aliases, and examples for the `ag_*` palette accessors and configurational layouts, none of which were previously covered
+  - Theme-mutating tests now restore the previous theme with `on.exit()`, so global theme state cannot leak between parallel test workers
 
 ## Graphing
 
