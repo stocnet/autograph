@@ -27,7 +27,6 @@ Suggests:
     ggforce (>= 0.5.0),
     gifski,
     graphlayouts,
-    knitr,
     methods,
     migraph,
     netrics,
