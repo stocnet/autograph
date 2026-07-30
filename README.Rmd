@@ -220,7 +220,7 @@ in `{RSiena}` and an ERGM in `{ergm}`.
 (Note that neither the data nor the model are similar;
 this is just for illustrative purposes.)
 
-```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE}
+```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"}
 plot(siena_gof) + ggtitle("SAOM goodness-of-fit")
 plot(ergm_gof) + ggtitle("ERGM goodness-of-fit")
 ```

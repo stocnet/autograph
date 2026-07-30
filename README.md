@@ -166,7 +166,7 @@ results from fitting a SAOM in `{RSiena}` and an ERGM in `{ergm}`. (Note
 that neither the data nor the model are similar; this is just for
 illustrative purposes.)
 
-<img src="man/figures/README-siena-ergm-gof-1.png" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" width="100%" />
+<img src="man/figures/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" />
 
 ### Setting a theme
 
