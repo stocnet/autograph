@@ -40,6 +40,10 @@
   - Removed `{ggdendro}` from Imports
 - Fixed a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
 
+## Tutorials
+
+- Updated visualization tutorial to use colour/color consistently
+
 # autograph 1.1.1
 
 ## Graphing
