@@ -1,7 +1,5 @@
 # autograph
 
-![autograph logo](reference/figures/logo.png)
-
 ## About the package
 
 This package aims to make network visualisation *easier*, *succinct*,
@@ -14,20 +12,20 @@ code. While there are a number of excellent packages for network
 analysis in R, they each face several of the following challenges when
 it comes to visualisation:
 
-  - defaults are often not sensible for different types of networks
-  - customisation can sometimes be difficult
-  - some require multiple lines of code to even produce a graph or plot
-  - most require multiple lines of code to produce a graph or plot that
-    is styled suitable for publication or presentation
-  - such style code needs to be repeated every time a graph or plot is
-    produced if a consistent style is to be maintained
-  - defaults and syntax are different for different packages, so a
-    workflow using multiple packages must adapt to multiple syntaxes
-  - different visual defaults can frustrate interpretation, and
-    potentially invites errors when comparing plots from different
-    packages
-  - some plotting methods are available for some networks or
-    network-related results and not others
+- defaults are often not sensible for different types of networks
+- customisation can sometimes be difficult
+- some require multiple lines of code to even produce a graph or plot
+- most require multiple lines of code to produce a graph or plot that is
+  styled suitable for publication or presentation
+- such style code needs to be repeated every time a graph or plot is
+  produced if a consistent style is to be maintained
+- defaults and syntax are different for different packages, so a
+  workflow using multiple packages must adapt to multiple syntaxes
+- different visual defaults can frustrate interpretation, and
+  potentially invites errors when comparing plots from different
+  packages
+- some plotting methods are available for some networks or
+  network-related results and not others
 
 [autograph](https://stocnet.github.io/autograph/) aims to solve these
 problems by providing automatic graph drawing for networks in any of the
@@ -38,9 +36,13 @@ plotting for results from `{stocnet}` packages, including
 and more.
 
 All you need to do is install the package (loading it last will make
-sure its plotting methods are the default), use `set_stocnet_theme()`
-(once) to set your preferred theme, and then use `graphr()` to graph
-your networks, or `plot()` to plot your results. That’s it\!
+sure its plotting methods are the default), use
+[`set_stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
+(once) to set your preferred theme, and then use
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+to graph your networks, or
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) to plot your
+results. That’s it!
 
 ## Drawing graphs
 
@@ -48,7 +50,9 @@ your networks, or `plot()` to plot your results. That’s it\!
 one-line graphing functions with sensible defaults based on the
 network’s properties.
 
-First, `graphr()` is used to graph networks in any of the
+First,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+is used to graph networks in any of the
 [manynet](https://stocnet.github.io/manynet/) formats. Because it builds
 upon [manynet](https://stocnet.github.io/manynet/), it can graph
 networks in any of the [manynet](https://stocnet.github.io/manynet/)
@@ -63,24 +67,31 @@ from [igraph](https://r.igraph.org/):
 ![Example illustrating differences in default igraph and autograph
 graphs](https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png)
 
+``` R
+#> quartz_off_screen 
+#>                 2
+```
+
 [igraph](https://r.igraph.org/) requires the bipartite layout to be
 specified, has cumbersome node size defaults for all but the smallest
 graphs, and labels also very often need resizing and adjustment to avoid
 overlap. Getting this default plot to look good can take a lot of trial
-and error, and time. By contrast, `graphr()` recognises the network as
-two-mode and uses a bipartite layout by default. It also recognises that
-the network contains names for the nodes and prints them vertically so
-that they are legible in this layout. Other ‘clever’ features include
-automatic node sizing and more.
+and error, and time. By contrast,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+recognises the network as two-mode and uses a bipartite layout by
+default. It also recognises that the network contains names for the
+nodes and prints them vertically so that they are legible in this
+layout. Other ‘clever’ features include automatic node sizing and more.
 
 ### More options
 
-All of `graphr()`’s adjustments can be overridden, however… Changing the
-size and colors of nodes and ties is as easy as specifying the
-function’s relevant argument with a replacement, e.g. `node_color =
-"darkblue"` or `node_size = 6`, or indicating from which attribute it
-should inherit this information, e.g. `node_color = "Office"` or
-`node_size = "Seniority"`.
+All of
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
+adjustments can be overridden, however… Changing the size and colors of
+nodes and ties is as easy as specifying the function’s relevant argument
+with a replacement, e.g. `node_color = "darkblue"` or `node_size = 6`,
+or indicating from which attribute it should inherit this information,
+e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 ![Graph illustrating automatic and manual use of node color and
 size](https://www.jameshollway.com/post/manynet/README-more-options-1.png)
@@ -94,7 +105,8 @@ plotting, axis labels can all be added on easily, or other elements
 
 ### More layouts
 
-`graphr()` can use all the layout algorithms offered by packages such as
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+can use all the layout algorithms offered by packages such as
 [igraph](https://r.igraph.org/),
 [ggraph](https://ggraph.data-imaginist.com), and
 [graphlayouts](https://github.com/schochastics/graphlayouts).
@@ -108,19 +120,23 @@ layouts](https://www.jameshollway.com/post/manynet/README-more-layouts-1.png)
 
 ### More networks
 
-The second graph drawing function included, `graphs()`, is used to graph
-multiple networks together. This can be useful for ego networks or
-network panels. [patchwork](https://patchwork.data-imaginist.com) is
-used to help arrange individual plots together, and is used throughout
-the package to help arrange plots together informatively.
+The second graph drawing function included,
+[`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+is used to graph multiple networks together. This can be useful for ego
+networks or network panels.
+[patchwork](https://patchwork.data-imaginist.com) is used to help
+arrange individual plots together, and is used throughout the package to
+help arrange plots together informatively.
 
 ![Example of graphs() used on longitudinal
 data](https://www.jameshollway.com/post/manynet/README-autographs-1.png)
 
 ### More time
 
-The third graph drawing function, `grapht()`, is used to visualise
-dynamic networks. It uses [gganimate](https://gganimate.com) and
+The third graph drawing function,
+[`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md),
+is used to visualise dynamic networks. It uses
+[gganimate](https://gganimate.com) and
 [gifski](https://r-rust.r-universe.dev/gifski) to create a gif that
 visualises network changes over time, with node positions transitioning
 smoothly between waves and nodes fading in and out as they enter and
@@ -135,14 +151,19 @@ Since network analysis involves not just drawing graphs,
 [autograph](https://stocnet.github.io/autograph/) also provides a
 function for plotting results from the analysis or modelling of those
 networks. To keep things simple, all users need to remember is a single,
-generic function: `plot()`. Method dispatching takes care of the rest,
-so you can concentrate on exploring and interpreting your results. Here
-are some examples, using goodness-of-fit results from fitting a SAOM in
+generic function:
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html). Method
+dispatching takes care of the rest, so you can concentrate on exploring
+and interpreting your results. Here are some examples, using
+goodness-of-fit results from fitting a SAOM in
 [RSiena](https://www.stats.ox.ac.uk/~snijders/siena/) and an ERGM in
 [ergm](https://statnet.org). (Note that neither the data nor the model
 are similar; this is just for illustrative purposes.)
 
-![](reference/figures/README-siena-ergm-gof-1.png)![](reference/figures/README-siena-ergm-gof-2.png)
+![Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted
+in ergm](reference/figures/README-siena-ergm-gof-1.png)![Goodness-of-fit
+plots for a SAOM fitted in RSiena and an ERGM fitted in
+ergm](reference/figures/README-siena-ergm-gof-2.png)
 
 ### Setting a theme
 
@@ -150,30 +171,33 @@ Note that in the above plots, the same colour scheme and fonts were
 used. They can be easily changed though.
 [autograph](https://stocnet.github.io/autograph/) includes a number of
 themes that can be used to style all graphs and plots consistently. And
-it is very easy to set a theme. Just type `stocnet_theme()` to see which
-is the theme currently set, and to get a list of available themes. Then
-enter the chosen theme name in the function to set it. All plots created
-using [autograph](https://stocnet.github.io/autograph/) functions will
-then use this theme, until you change it again.
+it is very easy to set a theme. Just type
+[`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
+to see which is the theme currently set, and to get a list of available
+themes. Then enter the chosen theme name in the function to set it. All
+plots created using [autograph](https://stocnet.github.io/autograph/)
+functions will then use this theme, until you change it again.
 
 ``` r
+
 stocnet_theme()
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
 ![Themed figures](reference/figures/README-themeset-1.png)
 
 ``` r
+
 stocnet_theme("ethz")
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
 ![Themed figures](reference/figures/README-themeset-2.png)
@@ -204,8 +228,9 @@ open the R console and enter:
 
 `install.packages('autograph')`
 
-`library(autograph)` will then load the package and make the data and
-tutorials (see below) contained within the package available.
+[`library(autograph)`](https://stocnet.github.io/autograph/) will then
+load the package and make the data and tutorials (see below) contained
+within the package available.
 
 ### Development
 
@@ -217,22 +242,22 @@ releases for all major OSes – Windows, Mac, and Linux – can be found
 the appropriate binary for your operating system, and install using an
 adapted version of the following commands:
 
-  - For Windows: `install.packages("~/Downloads/autograph_winOS.zip",
-    repos = NULL)`
-  - For Mac: `install.packages("~/Downloads/autograph_macOS.tgz", repos
-    = NULL)`
-  - For Unix: `install.packages("~/Downloads/autograph_linuxOS.tar.gz",
-    repos = NULL)`
+- For Windows:
+  `install.packages("~/Downloads/autograph_winOS.zip", repos = NULL)`
+- For Mac:
+  `install.packages("~/Downloads/autograph_macOS.tgz", repos = NULL)`
+- For Unix:
+  `install.packages("~/Downloads/autograph_linuxOS.tar.gz", repos = NULL)`
 
 To install from source the latest main version of
 [autograph](https://stocnet.github.io/autograph/) from Github, please
 install the [remotes](https://remotes.r-lib.org) package from CRAN and
 then:
 
-  - For latest stable version:
-    `remotes::install_github("stocnet/autograph")`
-  - For latest development version:
-    `remotes::install_github("stocnet/autograph@develop")`
+- For latest stable version:
+  `remotes::install_github("stocnet/autograph")`
+- For latest development version:
+  `remotes::install_github("stocnet/autograph@develop")`
 
 ### Other sources
 
@@ -243,6 +268,6 @@ Those using Mac computers may also install using Macports:
 ## Funding details
 
 Development on this package has been funded by the Swiss National
-Science Foundation (SNSF) [Grant
-Number 188976](https://data.snf.ch/grants/grant/188976): “Power and
-Networks and the Rate of Change in Institutional Complexes” (PANARCHIC).
+Science Foundation (SNSF) [Grant Number
+188976](https://data.snf.ch/grants/grant/188976): “Power and Networks
+and the Rate of Change in Institutional Complexes” (PANARCHIC).

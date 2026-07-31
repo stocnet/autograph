@@ -1,7 +1,9 @@
 # Layout algorithms based on bi- or other partitions
 
 These algorithms layout networks based on two or more partitions, and
-are recommended for use with `graphr()` or `{ggraph}`.
+are recommended for use with
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+or `{ggraph}`.
 
 The "hierarchy" layout layers the first node set along the bottom, and
 the second node set along the top, sequenced and spaced as necessary to
@@ -75,58 +77,61 @@ e6.
 
 ## Arguments
 
-  - .data:
-    
-    Some `{manynet}` compatible network data.
+- .data:
 
-  - membership:
-    
-    A node attribute or a vector to draw concentric circles for
-    "concentric" layout.
+  Some `{manynet}` compatible network data.
 
-  - radius:
-    
-    A vector of radii at which the concentric circles should be located
-    for "concentric" layout. By default this is equal placement around
-    an empty centre, unless one (the core) is a single node, in which
-    case this node occupies the centre of the graph.
+- membership:
 
-  - order.by:
-    
-    An attribute label indicating the (decreasing) order for the nodes
-    around the circles for "concentric" layout. By default ordering is
-    given by a bipartite placement that reduces the number of edge
-    crossings.
+  A node attribute or a vector to draw concentric circles for
+  "concentric" layout.
 
-  - circular:
-    
-    Should the layout be transformed into a radial representation. Only
-    possible for some layouts. Defaults to FALSE.
+- radius:
 
-  - times:
-    
-    Maximum number of iterations, where appropriate
+  A vector of radii at which the concentric circles should be located
+  for "concentric" layout. By default this is equal placement around an
+  empty centre, unless one (the core) is a single node, in which case
+  this node occupies the centre of the graph.
 
-  - level:
-    
-    A node attribute or a vector to hierarchically order levels for
-    "multilevel" layout.
+- order.by:
 
-  - rank:
-    
-    A numerical node attribute to place nodes in Y axis according to
-    values for "lineage" layout.
+  An attribute label indicating the (decreasing) order for the nodes
+  around the circles for "concentric" layout. By default ordering is
+  given by a bipartite placement that reduces the number of edge
+  crossings.
 
-  - center:
-    
-    Further split "hierarchical" layouts by declaring the "center"
-    argument as the "events", "actors", or by declaring a node name in
-    hierarchy layout. Defaults to NULL.
+- circular:
+
+  Should the layout be transformed into a radial representation. Only
+  possible for some layouts. Defaults to FALSE.
+
+- times:
+
+  Maximum number of iterations, where appropriate
+
+- level:
+
+  A node attribute or a vector to hierarchically order levels for
+  "multilevel" layout.
+
+- rank:
+
+  A numerical node attribute to place nodes in Y axis according to
+  values for "lineage" layout.
+
+- center:
+
+  Further split "hierarchical" layouts by declaring the "center"
+  argument as the "events", "actors", or by declaring a node name in
+  hierarchy layout. Defaults to NULL.
 
 ## See also
 
-Other mapping: `layout_configuration()`, `plot_graphr`, `plot_graphs`,
-`plot_grapht`
+Other mapping:
+[`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
+[`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+[`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+[`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 
 ## Examples
 

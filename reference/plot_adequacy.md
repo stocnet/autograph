@@ -17,13 +17,13 @@ plot(x, ...)
 
 ## Arguments
 
-  - x:
-    
-    An object of class "outliers.goldfish" or "changepoints.goldfish".
+- x:
 
-  - ...:
-    
-    Additional plotting parameters, currently unused.
+  An object of class "outliers.goldfish" or "changepoints.goldfish".
+
+- ...:
+
+  Additional plotting parameters, currently unused.
 
 ## Value
 

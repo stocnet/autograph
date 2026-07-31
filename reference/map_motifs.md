@@ -15,20 +15,20 @@ plot(x, ...)
 
 ## Arguments
 
-  - x:
-    
-    An object of "node\_motif" class, e.g. resulting from a call to
-    `manynet::node_by_triad()`.
+- x:
 
-  - ...:
-    
-    Other arguments to be passed on.
+  An object of "node_motif" class, e.g. resulting from a call to
+  [`manynet::node_by_triad()`](https://stocnet.github.io/manynet/reference/defunct.html).
+
+- ...:
+
+  Other arguments to be passed on.
 
 ## Value
 
 `plot.node_motif()` returns a set of graphs that illustrate the motifs
-mentioned in the results from a node\_motif function in `{manynet}`.
+mentioned in the results from a node_motif function in `{manynet}`.
 
 `plot.network_motif()` returns a set of graphs that illustrate the
-motifs mentioned in the results from a net\_motif function in
+motifs mentioned in the results from a net_motif function in
 `{manynet}`.

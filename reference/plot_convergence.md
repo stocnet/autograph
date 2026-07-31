@@ -23,13 +23,13 @@ load_ergm_res()
 
 ## Arguments
 
-  - x:
-    
-    An object of class "traces.monan".
+- x:
 
-  - ...:
-    
-    Additional plotting parameters, currently unused.
+  An object of class "traces.monan".
+
+- ...:
+
+  Additional plotting parameters, currently unused.
 
 ## Value
 
@@ -39,9 +39,11 @@ the statistics over the entire simulation.
 
 ## See also
 
-Other MoNAn: `plot_gof`
+Other MoNAn:
+[`plot_gof`](https://stocnet.github.io/autograph/reference/plot_gof.md)
 
-Other ergm: `plot_gof`
+Other ergm:
+[`plot_gof`](https://stocnet.github.io/autograph/reference/plot_gof.md)
 
 ## Examples
 

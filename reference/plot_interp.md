@@ -3,7 +3,10 @@
 These functions support the interpretation of network and behavior
 effects found in stochastic actor-oriented models. They are S3 plotting
 methods for objects of class "selectionTable" or "influenceTable",
-created using `RSiena::selectionTable()` or `RSiena::influenceTable()`,
+created using
+[`RSiena::selectionTable()`](https://rdrr.io/pkg/RSiena/man/interpret_selection.html)
+or
+[`RSiena::influenceTable()`](https://rdrr.io/pkg/RSiena/man/interpret_influence.html),
 respectively. They plot how the evaluation function for selection or
 influence changes based on ego's value and alter's value of some
 covariate. This helps to interpret the effect of that covariate on the
@@ -21,25 +24,27 @@ plot(x, separation = 0, ...)
 
 ## Arguments
 
-  - x:
-    
-    An object of class "selectionTable" or "influenceTable", created
-    using `RSiena::selectionTable()` or `RSiena::influenceTable()`,
-    respectively.
+- x:
 
-  - quad:
-    
-    When TRUE (the default), a quadratic function (average and total
-    alter) is plotted. Use `quad = FALSE` for similarity effects.
+  An object of class "selectionTable" or "influenceTable", created using
+  [`RSiena::selectionTable()`](https://rdrr.io/pkg/RSiena/man/interpret_selection.html)
+  or
+  [`RSiena::influenceTable()`](https://rdrr.io/pkg/RSiena/man/interpret_influence.html),
+  respectively.
 
-  - separation:
-    
-    This can be used to make the curves visually distinguishable if they
-    overlap too much without it. An advisable value then is, e.g., 0.01.
+- quad:
 
-  - ...:
-    
-    Other arguments to be passed.
+  When TRUE (the default), a quadratic function (average and total
+  alter) is plotted. Use `quad = FALSE` for similarity effects.
+
+- separation:
+
+  This can be used to make the curves visually distinguishable if they
+  overlap too much without it. An advisable value then is, e.g., 0.01.
+
+- ...:
+
+  Other arguments to be passed.
 
 ## Value
 
@@ -61,7 +66,8 @@ Sections 13.2 and 13.4.
 
 ## See also
 
-Other RSiena: `plot_gof`
+Other RSiena:
+[`plot_gof`](https://stocnet.github.io/autograph/reference/plot_gof.md)
 
 ## Author
 

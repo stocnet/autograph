@@ -1,6 +1,6 @@
 # Plotting categorical memberships
 
-This plotting method operates on "node\_member" class objects from the
+This plotting method operates on "node_member" class objects from the
 `{manynet}` package, plotting the dendrogram of their membership.
 
 ## Usage
@@ -15,18 +15,18 @@ plot(x, ..., membership = NULL)
 
 ## Arguments
 
-  - x:
-    
-    An object of "node\_member" class, for example as a result of
-    running `manynet::node_in_community()`.
+- x:
 
-  - ...:
-    
-    Other arguments to be passed on.
+  An object of "node_member" class, for example as a result of running
+  [`netrics::node_in_community()`](https://stocnet.github.io/netrics/reference/member_community.html).
 
-  - membership:
-    
-    A "node\_member" membership vector.
+- ...:
+
+  Other arguments to be passed on.
+
+- membership:
+
+  A "node_member" membership vector.
 
 ## Value
 

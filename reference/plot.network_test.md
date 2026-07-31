@@ -3,7 +3,7 @@
 These plotting methods are for results obtained by testing some
 statistic against those produced in a reference distribution of
 conditional uniform graphs or as a quadratic assignment procedure. The
-S3 class is "network\_test".
+S3 class is "network_test".
 
 ## Usage
 
@@ -14,24 +14,24 @@ plot(x, ..., threshold = 0.95, tails = c("two", "one"))
 
 ## Arguments
 
-  - x:
-    
-    An object obtained from a conditional uniform graph or quadratic
-    assignment procedure test. For example,
-    `migraph::test_permutation()`.
+- x:
 
-  - ...:
-    
-    Other arguments to be passed on.
+  An object obtained from a conditional uniform graph or quadratic
+  assignment procedure test. For example,
+  [`migraph::test_permutation()`](https://stocnet.github.io/migraph/reference/tests.html).
 
-  - threshold:
-    
-    The empirical threshold to shade in the plot.
+- ...:
 
-  - tails:
-    
-    By default "two" indicating a two-tailed test, but "one" for a
-    one-tailed test is also available.
+  Other arguments to be passed on.
+
+- threshold:
+
+  The empirical threshold to shade in the plot.
+
+- tails:
+
+  By default "two" indicating a two-tailed test, but "one" for a
+  one-tailed test is also available.
 
 ## Value
 

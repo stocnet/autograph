@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,12 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/visualising-networks.html">Visualising Networks</a></li>
+  </ul></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-related-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Related Packages</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-related-packages"><li><a class="external-link dropdown-item" href="https://stocnet.github.io/manynet/">manynet</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/netrics/">netrics</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/migraph/">migraph</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -67,9 +73,9 @@
         </dt>
         <dd>Matching colors across palettes</dd>
       </dl></div><div class="section level2">
-      <h2 id="plotting-methods">Plotting methods<a class="anchor" aria-label="anchor" href="#plotting-methods"></a></h2>
+      <h2 id="graphing">Graphing<a class="anchor" aria-label="anchor" href="#graphing"></a></h2>
 
-      <div class="section-desc"><p>Functions for graphing networks and plotting results. <code><a href="../reference/plot_graphr.html">graphr()</a></code> graphs any manynet-compatible class object automagically. <code><a href="../reference/plot_graphs.html">graphs()</a></code> and <code><a href="../reference/plot_grapht.html">grapht()</a></code> do the same for multiple networks and dynamic networks, respectively. <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods exist for results and other objects for stocnet packages.</p></div>
+      <div class="section-desc"><p>Functions for graphing networks. <code><a href="../reference/plot_graphr.html">graphr()</a></code> graphs any manynet-compatible class object automagically. <code><a href="../reference/plot_graphs.html">graphs()</a></code> and <code><a href="../reference/plot_grapht.html">grapht()</a></code> do the same for multiple networks and dynamic networks, respectively.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -96,8 +102,17 @@
 
         </dt>
         <dd>Easily animate dynamic networks with sensible defaults</dd>
+      </dl></div><div class="section level2">
+      <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p><code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods exist for results and other objects for stocnet packages.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="map_measure.html">plot(<i>&lt;node_measure&gt;</i>)</a></code> <code><a href="map_measure.html">plot(<i>&lt;tie_measure&gt;</i>)</a></code> <code><a href="map_measure.html">plot(<i>&lt;network_measures&gt;</i>)</a></code>
 
@@ -159,6 +174,27 @@
 
         </dt>
         <dd>Plotting goodness-of-fit results</dd>
+
+        <dt>
+
+          <code><a href="plot_graphr.html">graphr()</a></code>
+
+        </dt>
+        <dd>Easily graph networks with sensible defaults</dd>
+
+        <dt>
+
+          <code><a href="plot_graphs.html">graphs()</a></code>
+
+        </dt>
+        <dd>Easily graph a set of networks with sensible defaults</dd>
+
+        <dt>
+
+          <code><a href="plot_grapht.html">grapht()</a></code> <code><a href="plot_grapht.html">print(<i>&lt;grapht&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Easily animate dynamic networks with sensible defaults</dd>
 
         <dt>
 

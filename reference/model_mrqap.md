@@ -16,14 +16,15 @@ plot(x, ...)
 
 ## Arguments
 
-  - x:
-    
-    An object obtained by fitting an MRQAP model to some data. For
-    example, `migraph::net_regression()`.
+- x:
 
-  - ...:
-    
-    Further arguments to be passed on to plot.
+  An object obtained by fitting an MRQAP model to some data. For
+  example,
+  [`migraph::net_regression()`](https://stocnet.github.io/migraph/reference/regression.html).
+
+- ...:
+
+  Further arguments to be passed on to plot.
 
 ## Value
 

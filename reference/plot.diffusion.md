@@ -17,19 +17,19 @@ plot(x, ...)
 
 ## Arguments
 
-  - x:
-    
-    A "diff\_model" of "diffs\_model" class of object. E.g. as a result
-    from `manynet::play_diffusion()`.
+- x:
 
-  - ...:
-    
-    Other arguments to be passed.
+  A "diff_model" of "diffs_model" class of object. E.g. as a result from
+  [`manynet::play_diffusion()`](https://stocnet.github.io/manynet/reference/make_play.html).
 
-  - all\_steps:
-    
-    Whether all steps should be plotted or just those where there is
-    change in the distributions.
+- ...:
+
+  Other arguments to be passed.
+
+- all_steps:
+
+  Whether all steps should be plotted or just those where there is
+  change in the distributions.
 
 ## Value
 

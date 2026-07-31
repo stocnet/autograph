@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,14 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
 <li><a class="dropdown-item" href="articles/visualising-networks.html">Visualising Networks</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-related-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Related Packages</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-related-packages">
+<li><a class="external-link dropdown-item" href="https://stocnet.github.io/manynet/">manynet</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/netrics/">netrics</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/migraph/">migraph</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">News</a></li>
@@ -62,11 +70,11 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="autograph">autograph<a class="anchor" aria-label="anchor" href="#autograph"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="autograph-">autograph <a class="anchor" aria-label="anchor" href="#autograph-"></a>
 </h1>
 </div>
-<p><img src="reference/figures/logo.png" align="right" alt="autograph logo" width="150"></p>
 <!-- badges: start -->
+
 <div class="section level2">
 <h2 id="about-the-package">About the package<a class="anchor" aria-label="anchor" href="#about-the-package"></a>
 </h2>
@@ -91,6 +99,8 @@
 <p>First, <code><a href="reference/plot_graphr.html">graphr()</a></code> is used to graph networks in any of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> formats. Because it builds upon <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>, it can graph networks in any of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> formats, including <code>network</code>, <code>igraph</code>, <code>sna</code>, <code>tidygraph</code>, and more.</p>
 <p>Second, it includes sensible defaults so that researchers can view their network’s structure or distribution quickly with a minimum of fuss. Compare the output from <a href="https://stocnet.github.io/autograph/">autograph</a> with a similar default from <a href="https://r.igraph.org/" class="external-link">igraph</a>:</p>
 <p><img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#&gt; quartz_off_screen </span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt;                 2</span></span></code></pre></div>
 <p><a href="https://r.igraph.org/" class="external-link">igraph</a> requires the bipartite layout to be specified, has cumbersome node size defaults for all but the smallest graphs, and labels also very often need resizing and adjustment to avoid overlap. Getting this default plot to look good can take a lot of trial and error, and time. By contrast, <code><a href="reference/plot_graphr.html">graphr()</a></code> recognises the network as two-mode and uses a bipartite layout by default. It also recognises that the network contains names for the nodes and prints them vertically so that they are legible in this layout. Other ‘clever’ features include automatic node sizing and more.</p>
 <div class="section level3">
 <h3 id="more-options">More options<a class="anchor" aria-label="anchor" href="#more-options"></a>
@@ -116,33 +126,42 @@
 </h3>
 <p>The third graph drawing function, <code><a href="reference/plot_grapht.html">grapht()</a></code>, is used to visualise dynamic networks. It uses <a href="https://gganimate.com" class="external-link">gganimate</a> and <a href="https://r-rust.r-universe.dev/gifski" class="external-link">gifski</a> to create a gif that visualises network changes over time, with node positions transitioning smoothly between waves and nodes fading in and out as they enter and exit the network. It really couldn’t be easier.</p>
 <p><img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"></p>
-<!-- provide a common set of tools that can be used to import, export, create, and manipulate network data in a wide variety of formats, --><!-- and obtain a good first visualisation quickly. --><!-- This can be useful for pedagogical purposes, initial description, or checking something part way through the modelling process. --><!-- Through the most comprehensive network class-coercion available, --><!-- users can access routines not available in their chosen package or even in `{manynet}`. --><!-- `{manynet}` provides a common set of tools and a standard syntax for analysing many different types of networks. --><!-- It offers a broad range of functions to make, manipulate, map, measure, and model: --><!-- - one-, two-, and sometimes three-mode networks --><!-- - undirected, directed, and sometimes complex networks --><!-- - unweighted, weighted, and sometimes signed networks -->
+<!-- provide a common set of tools that can be used to import, export, create, and manipulate network data in a wide variety of formats, -->
+<!-- and obtain a good first visualisation quickly. -->
+<!-- This can be useful for pedagogical purposes, initial description, or checking something part way through the modelling process. -->
+<!-- Through the most comprehensive network class-coercion available, -->
+<!-- users can access routines not available in their chosen package or even in `{manynet}`. -->
+<!-- `{manynet}` provides a common set of tools and a standard syntax for analysing many different types of networks. -->
+<!-- It offers a broad range of functions to make, manipulate, map, measure, and model: -->
+<!-- - one-, two-, and sometimes three-mode networks -->
+<!-- - undirected, directed, and sometimes complex networks -->
+<!-- - unweighted, weighted, and sometimes signed networks -->
 </div>
 </div>
 <div class="section level2">
 <h2 id="generating-plots">Generating plots<a class="anchor" aria-label="anchor" href="#generating-plots"></a>
 </h2>
 <p>Since network analysis involves not just drawing graphs, <a href="https://stocnet.github.io/autograph/">autograph</a> also provides a function for plotting results from the analysis or modelling of those networks. To keep things simple, all users need to remember is a single, generic function: <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Method dispatching takes care of the rest, so you can concentrate on exploring and interpreting your results. Here are some examples, using goodness-of-fit results from fitting a SAOM in <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a> and an ERGM in <a href="https://statnet.org" class="external-link">ergm</a>. (Note that neither the data nor the model are similar; this is just for illustrative purposes.)</p>
-<p><img src="reference/figures/README-siena-ergm-gof-1.png" width="100%"><img src="reference/figures/README-siena-ergm-gof-2.png" width="100%"></p>
+<p><img src="reference/figures/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%"><img src="reference/figures/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%"></p>
 <div class="section level3">
 <h3 id="setting-a-theme">Setting a theme<a class="anchor" aria-label="anchor" href="#setting-a-theme"></a>
 </h3>
 <p>Note that in the above plots, the same colour scheme and fonts were used. They can be easily changed though. <a href="https://stocnet.github.io/autograph/">autograph</a> includes a number of themes that can be used to style all graphs and plots consistently. And it is very easy to set a theme. Just type <code><a href="reference/theme_set.html">stocnet_theme()</a></code> to see which is the theme currently set, and to get a list of available themes. Then enter the chosen theme name in the function to set it. All plots created using <a href="https://stocnet.github.io/autograph/">autograph</a> functions will then use this theme, until you change it again.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">node_degree</span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">tie_betweenness</span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span></span>
-<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">node_in_regular</span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">as_matrix</span><span class="op">(</span><span class="va">ison_southern_women</span><span class="op">)</span>,</span>
-<span>     membership <span class="op">=</span> <span class="fu">node_in_regular</span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-themeset-1.png" alt="Themed figures" width="100%"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"ethz"</span><span class="op">)</span></span>
-<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">node_degree</span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">tie_betweenness</span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span></span>
-<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">node_in_regular</span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_degree</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_centralities_between.html" class="external-link">tie_by_betweenness</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">as_matrix</span><span class="op">(</span><span class="va">ison_southern_women</span><span class="op">)</span>,</span>
-<span>     membership <span class="op">=</span> <span class="fu">node_in_regular</span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>     membership <span class="op">=</span> <span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-themeset-1.png" alt="Themed figures" width="100%"></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/theme_set.html">stocnet_theme</a></span><span class="op">(</span><span class="st">"ethz"</span><span class="op">)</span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_degree</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_centralities_between.html" class="external-link">tie_by_betweenness</a></span><span class="op">(</span><span class="va">ison_karateka</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">/</span></span>
+<span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">as_matrix</span><span class="op">(</span><span class="va">ison_southern_women</span><span class="op">)</span>,</span>
+<span>     membership <span class="op">=</span> <span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/member_equivalence.html" class="external-link">node_in_regular</a></span><span class="op">(</span><span class="va">ison_southern_women</span>, <span class="st">"e"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-themeset-2.png" alt="Themed figures" width="100%"></p>
 <p>There are a range of institutional and topical themes available, including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, iast, hwu, rainbow, with more on the way.</p>
 <p><img src="reference/figures/README-theme-opts-1.png" alt="Institutional themes" width="100%"><img src="reference/figures/README-theme-opts-2.png" alt="Institutional themes" width="100%"></p>

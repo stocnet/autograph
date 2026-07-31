@@ -22,15 +22,15 @@ is_dark(colors)
 
 ## Arguments
 
-  - colors:
-    
-    One or more hexcodes to match with colors from the palette.
+- colors:
 
-  - pal:
-    
-    Optionally, a vector of hexcodes representing a palette in which to
-    find matches. By default, the current theme's qualitative palette is
-    used.
+  One or more hexcodes to match with colors from the palette.
+
+- pal:
+
+  Optionally, a vector of hexcodes representing a palette in which to
+  find matches. By default, the current theme's qualitative palette is
+  used.
 
 ## Value
 

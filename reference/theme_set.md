@@ -32,12 +32,12 @@ set_stocnet_theme(theme = NULL)
 
 ## Arguments
 
-  - theme:
-    
-    String naming a theme. By default "default". The following themes
-    are currently available: default, bw, crisp, neon, iheid, ethz, uzh,
-    rug, unibe, oxf, unige, cmu, iast, hwu, rainbow. This string can be
-    capitalised or not.
+- theme:
+
+  String naming a theme. By default "default". The following themes are
+  currently available: default, bw, crisp, neon, iheid, ethz, uzh, rug,
+  unibe, oxf, unige, cmu, iast, hwu, rainbow. This string can be
+  capitalised or not.
 
 ## Value
 
@@ -57,11 +57,13 @@ fonts or make sure that the font is available to R using
 ## Custom
 
 If you have specific needs or preferences, you can set your own palettes
-or overwrite part of an existing one using `options()`. For example, to
-set a custom base color, you can use: `options(snet_highlight =
-c("#1b9e77", "#d95f02", "#7570b3"))`. This will set a custom highlight
-color palette. Similarly, you can set `snet_div` for divergent palettes
-and `snet_cat` for categorical palettes.
+or overwrite part of an existing one using
+[`options()`](https://rdrr.io/r/base/options.html). For example, to set
+a custom base color, you can use:
+`options(snet_highlight = c("#1b9e77", "#d95f02", "#7570b3"))`. This
+will set a custom highlight color palette. Similarly, you can set
+`snet_div` for divergent palettes and `snet_cat` for categorical
+palettes.
 
 ## Examples
 

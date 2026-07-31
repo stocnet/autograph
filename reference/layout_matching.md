@@ -1,7 +1,8 @@
 # Matching layout
 
 This layout works to position nodes opposite their matching nodes. See
-`manynet::to_matching()` for more details on the matching procedure.
+[`manynet::to_matching()`](https://stocnet.github.io/manynet/reference/modif_paths.html)
+for more details on the matching procedure.
 
 ## Usage
 
@@ -11,13 +12,13 @@ layout_tbl_graph_matching(.data, center = NULL, circular = FALSE, times = 1)
 
 ## Arguments
 
-  - .data:
-    
-    Some `{manynet}` compatible network data.
+- .data:
 
-  - center, circular, times:
-    
-    Extra parameters required for `{tidygraph}` compatibility.
+  Some `{manynet}` compatible network data.
+
+- center, circular, times:
+
+  Extra parameters required for `{tidygraph}` compatibility.
 
 ## Value
 

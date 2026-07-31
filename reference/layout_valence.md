@@ -26,27 +26,26 @@ layout_tbl_graph_valence(
 
 ## Arguments
 
-  - .data:
-    
-    Some `{manynet}` compatible network data.
+- .data:
 
-  - times:
-    
-    Integer of sweeps that the algorithm will pass through. By default
-    4.
+  Some `{manynet}` compatible network data.
 
-  - center, circular:
-    
-    Extra parameters required for `{tidygraph}` compatibility.
+- times:
 
-  - repulsion\_coef:
-    
-    Coefficient for global repulsion force. Default is 1.
+  Integer of sweeps that the algorithm will pass through. By default 4.
 
-  - attraction\_coef:
-    
-    Coefficient for edge-based attraction/repulsion force. Default is
-    0.05.
+- center, circular:
+
+  Extra parameters required for `{tidygraph}` compatibility.
+
+- repulsion_coef:
+
+  Coefficient for global repulsion force. Default is 1.
+
+- attraction_coef:
+
+  Coefficient for edge-based attraction/repulsion force. Default is
+  0.05.
 
 ## Examples
 

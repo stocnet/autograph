@@ -10,18 +10,17 @@ layout_tbl_graph_layered(.data, center = NULL, circular = FALSE, times = 4)
 
 ## Arguments
 
-  - .data:
-    
-    Some `{manynet}` compatible network data.
+- .data:
 
-  - center, circular:
-    
-    Extra parameters required for `{tidygraph}` compatibility.
+  Some `{manynet}` compatible network data.
 
-  - times:
-    
-    Integer of sweeps that the algorithm will pass through. By default
-    4.
+- center, circular:
+
+  Extra parameters required for `{tidygraph}` compatibility.
+
+- times:
+
+  Integer of sweeps that the algorithm will pass through. By default 4.
 
 ## Value
 

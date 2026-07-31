@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,12 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="articles/visualising-networks.html">Visualising Networks</a></li>
+  </ul></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-related-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Related Packages</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-related-packages"><li><a class="external-link dropdown-item" href="https://stocnet.github.io/manynet/">manynet</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/netrics/">netrics</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/migraph/">migraph</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -38,19 +44,17 @@
     </div>
 
 <div id="contributing" class="section level1">
+
 <p>Contributions to <code>autograph</code>, whether in the form of issue identification, bug fixes, new code or documentation are encouraged and welcome.</p>
+<p>Please note that the <code>autograph</code> project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 <div class="section level2">
-<h2 id="git-and-bitbucket">Git and Bitbucket<a class="anchor" aria-label="anchor" href="#git-and-bitbucket"></a></h2>
+<h2 id="git">Git<a class="anchor" aria-label="anchor" href="#git"></a></h2>
 <p><code>stocnet</code> projects are maintained using the git version control system. A plain-English introduction to git can be found <a href="https://blog.red-badger.com/2016/11/29/gitgithub-in-plain-english" class="external-link">here</a>. I recommend you read this before continuing. A more recent motivation can be found <a href="https://www.r-bloggers.com/2024/04/git-gud-version-control-best-practices/" class="external-link">here</a>. It will explain the basics of git version control, committing and repos, pulling and pushing, branching and merging.</p>
+<div class="section level3">
+<h3 id="fork">Fork<a class="anchor" aria-label="anchor" href="#fork"></a></h3>
 <p>Using git from the command line on your lap- or desktop can be intimidating, but I recommend <a href="https://git-fork.com" class="external-link">Fork</a> software for Mac and Windows. This allows mostly visual management of commits, diffs, branches, etc. There are various other git software packages available, but this one is fairly fully featured.</p>
 <p>The Github page allows to access the issues assigned to you and check the commits. You can also access the documents in the repository, although this won’t be necessary after you have cloned it on your computer via Fork.</p>
 </div>
-<div class="section level2">
-<h2 id="style">Style<a class="anchor" aria-label="anchor" href="#style"></a></h2>
-<p>In terms of style, we are aiming for pleasant predictability in terms of user experience. To that end, we have a regular syntax that users can rely on producing expected effects.</p>
-</div>
-<div class="section level2">
-<h2 id="fork">Fork<a class="anchor" aria-label="anchor" href="#fork"></a></h2>
 <div class="section level3">
 <h3 id="cloning">Cloning<a class="anchor" aria-label="anchor" href="#cloning"></a></h3>
 <p>Once you have downloaded Fork, the first thing you have to do is to clone the remote repository on your computer. Before cloning, you will be able to choose on which <code>branch</code> you want to work: develop or main.</p>
@@ -63,24 +67,119 @@
 <h3 id="commit-and-push">Commit and Push<a class="anchor" aria-label="anchor" href="#commit-and-push"></a></h3>
 <p>Once you have made modifications on a file and saved them, it will appear in your <code>commit</code> window. Here you can control one last time your file, write the commit message with the issue reference (see below) and commit. Once your commit is ready, you can <code>push</code> them to the origin/main repository. Note that you can click the “push immediately” box in the commit window if you don’t want to do it in two steps. If you are working on a separate branch, it is important to select this branch when pushing to origin/main.</p>
 </div>
+<div class="section level3">
+<h3 id="branching-and-ci">Branching and CI<a class="anchor" aria-label="anchor" href="#branching-and-ci"></a></h3>
+<ul><li>
+<code>main</code> is the release branch; <code>develop</code> is the working branch (clone/work on <code>develop</code>).</li>
+<li>PRs into <code>main</code> trigger <a href="workflows/prchecks.yml">prchecks.yml</a>: R CMD check (macOS/Windows/Linux), binary build, codecov, lintr, spell check, a check that vignette articles and tutorials stay in sync, and PR metadata checks (DESCRIPTION version bump, PR title/description conventions).</li>
+<li>Merges/pushes to <code>main</code> trigger <a href="workflows/pushrelease.yml">pushrelease.yml</a>: check, auto-bump version tag, GitHub release with binaries, then pkgdown site deploy.</li>
+</ul></div>
 </div>
 <div class="section level2">
-<h2 id="issues-and-tests">Issues and tests<a class="anchor" aria-label="anchor" href="#issues-and-tests"></a></h2>
-<p>Please use the issues tracker on Github to identify any function-related issues. You can use these issues to track progress on the issue and to comment or continue a conversation on that issue. Currently issue tracking is only open to those involved in the project.</p>
-<p>The most useful issues are ones that precisely identify an error, or propose a test that should pass but instead fails. This package uses the <code>testthat</code> package for testing functions. Please see the <a href="https://testthat.r-lib.org" class="external-link">testthat website</a> for more details.</p>
+<h2 id="package-architecture">Package architecture<a class="anchor" aria-label="anchor" href="#package-architecture"></a></h2>
+<div class="section level3">
+<h3 id="project-overview">Project overview<a class="anchor" aria-label="anchor" href="#project-overview"></a></h3>
+<p><code>autograph</code> is an R package (part of the <a href="https://github.com/stocnet" class="external-link">stocnet</a> ecosystem) providing the <em>visual layer</em> for network analysis: automatic <code>ggplot2</code>/<code>ggraph</code>-based plotting and consistent theming for network data and network-analytic results. It offers three graph-drawing entry points (<code><a href="reference/plot_graphr.html">graphr()</a></code>, <code><a href="reference/plot_graphs.html">graphs()</a></code>, <code><a href="reference/plot_grapht.html">grapht()</a></code>) plus a large family of <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> S3 methods dispatched on result objects from other packages (<code>migraph</code>, <code>netrics</code>, <code>RSiena</code>, <code>ergm</code>, <code>MoNAn</code>, <code>goldfish</code>). Division of labour to keep in mind when adding functions:</p>
+<ul><li>
+<a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>: network classes/coercion (<code>as_*()</code>) and network-level logical tests (e.g. <code>is_directed()</code>, <code>is_twomode()</code>).</li>
+<li>
+<a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a>: everything analytic — marks, measures, memberships, motifs — at the node, tie, and network level.</li>
+<li>
+<a href="https://stocnet.github.io/autograph/">autograph</a> (this package): drawing graphs and plotting analytic, modelling, or diagnostic results, along with deep (often institutional) theming. <em>All</em> plot methods should live here.</li>
+<li>
+<a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a>: testing and modelling, e.g. QAP/MRQAP and diffusion models.</li>
+</ul><p>In terms of style, we are aiming for sensible defaults in terms of user experience. As a ggplot2 object, most everything can be tweaked before or afterwards, but the default presentation should already be aesthetically pleasing, informative, and consistent.</p>
 </div>
-<div class="section level2">
-<h2 id="bug-fixing-or-adding-new-code">Bug fixing or adding new code<a class="anchor" aria-label="anchor" href="#bug-fixing-or-adding-new-code"></a></h2>
-<p>Independent or assigned code contributions are most welcome. When writing new code, please follow <a href="https://www.r-bloggers.com/%F0%9F%96%8A-r-coding-style-guide/" class="external-link">standard R guidelines</a>. It can help to use packages such as <code>lintr</code>, <code>goodpractice</code> and <code>formatR</code> to ensure these are followed.</p>
-<p>Currently, commits can only be pushed to Bitbucket where they reference an existing issue. If no issue exists for the code you have developed, please add an issue first before pushing. Once the issue exists, you will need to mention the issue number (preceded by a hash symbol: #) in the commit description:</p>
-<p><code>Resolved #31 by adding a new function that does things, also updated documentation</code></p>
-<p>Where the issue hash (i.e. #31) is preceded by <code>resolve</code>, <code>resolves</code>, <code>resolved</code>, <code>close</code>, <code>closes</code>, <code>closed</code>, <code>fix</code>, <code>fixes</code>, or <code>fixed</code> (capitalised or not), Github will automatically updated the status of the issue(s) mentioned.</p>
-<p>Our current syntactical standard is to mention the issue first and then provide a short description of what the committed changes do in relation to that issue. Any ancillary changes can be mentioned after a comma.</p>
+<div class="section level3">
+<h3 id="common-commands">Common commands<a class="anchor" aria-label="anchor" href="#common-commands"></a></h3>
+<p>This is a standard R package developed with <code>devtools</code>/<code>roxygen2</code>. Run these from an R console with the working directory set to the package root (or via <code>Rscript -e</code>).</p>
+<ul><li>Load package for interactive development: <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>
+</li>
+<li>Regenerate docs &amp; NAMESPACE after editing roxygen comments: <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>
+</li>
+<li>Run full test suite: <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code>
+</li>
+<li>Run a single test file: <code>devtools::test(filter = "graphr")</code> (matches <code>test-graphr.R</code>), or <code>testthat::test_file("tests/testthat/test-plot_gof.R")</code>
+</li>
+<li>Full package check (mirrors CI): <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> or <code><a href="http://r-lib.github.io/rcmdcheck/reference/rcmdcheck.html" class="external-link">rcmdcheck::rcmdcheck()</a></code>
+</li>
+<li>Lint: <code><a href="https://lintr.r-lib.org/reference/lint.html" class="external-link">lintr::lint_package()</a></code>
+</li>
+<li>Spell check: <code><a href="https://docs.ropensci.org/spelling//reference/spell_check_package.html" class="external-link">spelling::spell_check_package()</a></code>
+</li>
+<li>Rebuild <code>README.md</code> from <code>README.Rmd</code>: <code><a href="https://devtools.r-lib.org/reference/build_readme.html" class="external-link">devtools::build_readme()</a></code>
+</li>
+<li>Build pkgdown site locally: <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code>
+</li>
+</ul><p>There is no non-R build system — no package.json/Makefile. Roxygen is configured with <code>markdown = TRUE</code>; <code>NAMESPACE</code> and all <code>man/*.Rd</code> files are generated — never hand-edit them.</p>
 </div>
-<div class="section level2">
-<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
-<p>A final way of contributing to the package is in developing the vignettes/articles that illustrate the value added in the package. Please contact me with any proposals here.</p>
-<p>Please note that the <code>autograph</code> project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
+<div class="section level3">
+<h3 id="graph-drawing-pipeline-graphrgraphsgrapht">Graph drawing pipeline (<code>graphr()</code>/<code>graphs()</code>/<code>grapht()</code>)<a class="anchor" aria-label="anchor" href="#graph-drawing-pipeline-graphrgraphsgrapht"></a></h3>
+<p><code><a href="reference/plot_graphr.html">graphr()</a></code> (<a href="../R/graphr.R">R/graphr.R</a>) is the single-network entry point and the core of the package. It accepts any <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>-compatible network object and builds a <code>ggplot2</code>/<code>ggraph</code> plot through an internal pipeline of helper functions, each in its own file:</p>
+<ul><li>
+<code>graph_layout()</code> (<a href="../R/graph_layout.R">R/graph_layout.R</a>) — resolves the layout algorithm (igraph/ggraph/graphlayouts, or autograph’s own layouts), builds the <code>ggraph</code> layout object, and optionally snaps coordinates to a grid.</li>
+<li>
+<code>graph_nodes()</code>, <code>graph_edges()</code>, <code>graph_labels.R</code>, <code>graph_legends.R</code>, <code>graph_aes.R</code>, <code>graph_checks.R</code> — each layer adds/styles one visual component (node aes, edge aes, text labels, legends) onto the <code>ggraph</code> plot, resolving arguments that may be literal values (e.g. <code>node_size = 6</code>) or references to a node/tie attribute name (e.g. <code>node_size = "wealth"</code>).</li>
+<li>Note that users are not expected to call any of these <code>graph_*()</code> functions themselves; exported modularity makes development, debugging, and testing easier.</li>
+</ul><p><code><a href="reference/plot_graphs.html">graphs()</a></code> (<a href="../R/graphs.R">R/graphs.R</a>) calls <code><a href="reference/plot_graphr.html">graphr()</a></code> per network in a list and arranges the results with <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> (deliberately chosen over gridExtra/cowplot/ggpubr because it doesn’t interfere with ggplot2 themes — see the comment in <a href="../R/autograph_utilities.R">R/autograph_utilities.R</a>).</p>
+<p><code><a href="reference/plot_grapht.html">grapht()</a></code> (<a href="../R/grapht.R">R/grapht.R</a>) animates a longitudinal/dynamic network over time using <a href="https://gganimate.com" class="external-link">gganimate</a>/<a href="https://r-rust.r-universe.dev/gifski" class="external-link">gifski</a>.</p>
+<p>Custom layout algorithms not provided by igraph/ggraph/graphlayouts live in their own <code>layout_*.R</code> files (<code>layout_configurational.R</code>, <code>layout_grid.R</code>, <code>layout_layered.R</code>, <code>layout_matching.R</code>, <code>layout_partition.R</code>, <code>layout_valence.R</code>) and follow the <code>layout_tbl_graph_*()</code> naming convention.</p>
+</div>
+<div class="section level3">
+<h3 id="plot-method-dispatch-plot_r">Plot-method dispatch (<code>plot_*.R</code>)<a class="anchor" aria-label="anchor" href="#plot-method-dispatch-plot_r"></a></h3>
+<p>The rest of the package implements <code>plot.&lt;class&gt;</code> S3 methods so that <code>plot(result)</code> “just works” for objects returned by other stocnet/network packages, without the user needing to know which autograph function to call. Methods are grouped by the <em>kind of result object</em>, not by source package:</p>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>File</th>
+<th>Covers</th>
+</tr></thead><tbody><tr><td><code>plot_analysis.R</code></td>
+<td>node/tie/network measures, motifs, memberships (<code>node_measure</code>, <code>tie_measure</code>, <code>network_measures</code>, <code>node_member</code>, <code>node_motif</code>, <code>network_motif</code>, <code>matrix</code>)</td>
+</tr><tr><td><code>plot_summaries.R</code></td>
+<td>diffusion/learning model summaries (<code>diff_model</code>, <code>diffs_model</code>, <code>learn_model</code>, <code>mnet</code>)</td>
+</tr><tr><td><code>plot_gof.R</code></td>
+<td>goodness-of-fit objects (<code>gof.ergm</code>, <code>sienaGOF</code>, <code>gof.stats.monan</code>, autograph’s own <code>ag_gof</code>)</td>
+</tr><tr><td>
+<code>plot_convergence.R</code>, <code>plot_diagnostics.R</code>, <code>plot_tests.R</code>, <code>plot_interp.R</code>
+</td>
+<td>model diagnostics, convergence traces, statistical tests, and interpretation plots for <code>netlm</code>/<code>netlogit</code>/<code>ergm</code> etc.</td>
+</tr><tr><td><code>plot_manydata.R</code></td>
+<td>goldfish <code>changepoints</code>/<code>outliers</code> and other longitudinal data objects</td>
+</tr></tbody></table><p>New <code>plot.*</code> methods must be registered in NAMESPACE via roxygen <code>@method</code>/<code>@export</code> tags — run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> after adding one. Suggestions for new plot methods are welcome.</p>
+</div>
+<div class="section level3">
+<h3 id="theming">Theming<a class="anchor" aria-label="anchor" href="#theming"></a></h3>
+<p><a href="../R/theme_set.R">R/theme_set.R</a> implements <code><a href="reference/theme_set.html">stocnet_theme()</a></code> (alias <code><a href="reference/theme_set.html">set_stocnet_theme()</a></code>), which sets an R option (<code>stocnet_theme</code>, default <code>"default"</code>) read by every plotting function in the package. Institutional and stylistic palettes (<code>default</code>, <code>bw</code>, <code>crisp</code>, <code>neon</code>, <code>iheid</code>, <code>ethz</code>, <code>uzh</code>, <code>rug</code>, <code>unibe</code>, <code>oxf</code>, <code>unige</code>, <code>cmu</code>, <code>iast</code>, <code>hwu</code>, <code>rainbow</code>) are defined in <a href="../R/theme_palettes.R">R/theme_palettes.R</a> and exposed via consistent accessor functions (<code><a href="reference/ag_call.html">ag_base()</a></code>, <code><a href="reference/ag_call.html">ag_highlight()</a></code>, <code><a href="reference/ag_call.html">ag_positive()</a></code>, <code><a href="reference/ag_call.html">ag_negative()</a></code>, <code>ag_qualitative(n)</code>, <code>ag_sequential(n)</code>, <code>ag_divergent(n)</code>, <code><a href="reference/ag_call.html">ag_font()</a></code>) documented together under <code>ag_call</code>. Users can override individual palette colours via <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options()</a></code> (e.g. <code>options(snet_highlight = ...)</code>) rather than editing theme code. <a href="../R/theme_match.R">R/theme_match.R</a> maps a plot/result object to its appropriate theme treatment.</p>
+<p>Because <code>autograph</code> re-exports several <code>ggplot2</code> symbols (see <a href="../R/reexports_ggplot2.R">R/reexports_ggplot2.R</a>), loading <code>autograph</code> last in a session is recommended so its <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> methods take precedence over other packages’.</p>
+</div>
+<div class="section level3">
+<h3 id="precookedvignette-data">Precooked/vignette data<a class="anchor" aria-label="anchor" href="#precookedvignette-data"></a></h3>
+<p><code>data/*.rda</code> holds pre-computed example results (ERGM/SAOM GOF, goldfish changepoints/outliers, MoNAn convergence/GOF, migraph diffs/regressions/tests) used in examples, vignettes, and tests, documented in <a href="../R/data_precooked.R">R/data_precooked.R</a>. <code>inst/extdata</code> holds a serialized <code>ergm_res</code> object loaded via <code><a href="reference/plot_convergence.html">load_ergm_res()</a></code>, deliberately kept out of <code>data/</code> and serialized rather than stored as a live object because namespace references inside <code>ergm</code> model objects don’t survive a plain <code><a href="https://rdrr.io/r/base/save.html" class="external-link">save()</a></code>/reload across package versions.</p>
+</div>
+<div class="section level3">
+<h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a></h3>
+<p><code>autograph</code> <code>Depends</code> on <code>manynet</code> (network data structures and coercion) and <code>Imports</code> <code>ggplot2</code> (&gt;= 4.0.0), <code>ggraph</code>, <code>graphlayouts</code>, <code>igraph</code>, <code>dplyr</code>, and <code>patchwork</code>. <code>ergm</code> and <code>RSiena</code> are listed under <code>Enhances</code> (their <code>plot.*</code> methods are only invoked if those packages are installed and such results are passed in), and <code>gganimate</code>, <code>gifski</code>, <code>ggforce</code>, <code>migraph</code>, and <code>netrics</code> are <code>Suggests</code>-only, so code paths depending on them should guard with <code><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace()</a></code> (see the <code>thisRequires()</code> helper in <a href="../R/autograph_utilities.R">R/autograph_utilities.R</a>) or be skipped gracefully when unavailable.</p>
+</div>
+<div class="section level3">
+<h3 id="tests">Tests<a class="anchor" aria-label="anchor" href="#tests"></a></h3>
+<p><code>tests/testthat/</code> uses testthat edition 3 with parallel execution (<code>Config/testthat/parallel: true</code> in DESCRIPTION). <code>tests/testthat.R</code> sets <code>stocnet_theme("default")</code> before running the suite so theme state doesn’t leak between runs. Test files are organised by the same grouping as the <code>R/</code> source files (e.g. <code>test-graphr.R</code>, <code>test-layout_partition.R</code>, <code>test-theme_match.R</code>).</p>
+<p>In addition, the <code>test-functional_*.R</code> files implement <em>functional</em> (family-enumerating) testing, mirroring the approach in <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>: layout algorithms, <code>plot.&lt;class&gt;</code> methods, palette accessors, and <code><a href="reference/plot_graphr.html">graphr()</a></code>’s aesthetic arguments are enumerated automatically from the namespace and run over a fixture grid, so new layouts/methods/palettes are audited without writing new tests. Helpers live in <a href="../tests/testthat/helper-functional.R">tests/testthat/helper-functional.R</a>. Non-conformant combinations are <em>skipped</em> with a greppable <code>AUDIT [...]</code> message rather than failed, so the audits double as a to-do list locally; CI sets <code>AUTOGRAPH_STRICT_AUDIT: true</code> so the same cases fail there instead. <a href="../tests/testthat/helper-tutorials.R">tests/testthat/helper-tutorials.R</a> extracts and evaluates the code chunks of the learnr tutorials in <code>inst/tutorials/</code>, so tutorial code that errors or raises a deprecation warning fails the suite (rendering the tutorials themselves is deliberately not tested).</p>
+</div>
+<div class="section level3">
+<h3 id="newsmd-conventions">
+<code>NEWS.md</code> conventions<a class="anchor" aria-label="anchor" href="#newsmd-conventions"></a></h3>
+<p><code>NEWS.md</code> groups each version’s changes under <code>##</code> headings that mirror the website function overview (<code>pkgdown/_pkgdown.yml</code> <code>reference:</code> titles). Lead with <code>## Package</code> (package-wide/website/infrastructure changes), then the function families in overview order: <code>## Graphing</code> (graphr/graphs/grapht and internal functions, <code>## Plotting</code> (all plot.* methods), <code>## Layouts</code>, <code>## Theming</code>. Put <code>## Tutorials</code> and <code>## Data</code> near the end. Each heading appears at most once per version.</p>
+<p>Start each bullet with a verb matching the change type:</p>
+<ul><li>
+<code>Added ...</code> — new functionality</li>
+<li>
+<code>Fixed ...</code> — bug fixes; if it relates to a GitHub issue, suffix with <code>(closing #123)</code>
+</li>
+<li>
+<code>Renamed ... to ...</code> — function or data name migrations</li>
+<li>
+<code>Improved ...</code> — functional updates to existing behaviour</li>
+<li>
+<code>Updated ...</code> — documentation changes</li>
+</ul><p>If a cited GitHub issue was <strong>not</strong> authored by @jhollway, thank the author with an <code>@</code>-tag in the bullet. Cluster related changes (e.g. several fixes to the same function, or sub-points of one feature) as indented sub-bullets under a lead bullet, to improve readability.</p>
+</div>
 </div>
 </div>
 

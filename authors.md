@@ -2,12 +2,12 @@
 
 ## Authors
 
-  - **[James Hollway](https://jameshollway.com)**. Maintainer, author,
-    contributor. [](https://orcid.org/0000-0002-8361-9647)  
-    IHEID
+- **[James Hollway](https://jameshollway.com)**. Maintainer, author,
+  contributor. [](https://orcid.org/0000-0002-8361-9647)  
+  IHEID
 
-  - **Henrique Sposito**. Contributor.
-    [](https://orcid.org/0000-0003-3420-6085)
+- **Henrique Sposito**. Contributor.
+  [](https://orcid.org/0000-0003-3420-6085)
 
 ## Citation
 

@@ -31,9 +31,9 @@ ag_font()
 
 ## Arguments
 
-  - number:
-    
-    Integer of how many category colours to return.
+- number:
+
+  Integer of how many category colours to return.
 
 ## Value
 
@@ -53,3 +53,27 @@ ColorBrewer palettes (included in the RColorBrewer package). The default
 palettes in `{autograph}` are designed to be colour-blind friendly, but
 users should always check that their visualisations serve their intended
 audience.
+
+## Examples
+
+``` r
+# Single colours from the currently active theme
+ag_base()
+#> [1] "black"
+ag_highlight()
+#> [1] "red"
+ag_positive()
+#> [1] "#4575b4"
+ag_negative()
+#> [1] "#d73027"
+# Palettes of a requested length
+ag_qualitative(3)
+#> [1] "#1B9E77" "#DF8402" "#666666"
+ag_sequential(5)
+#> [1] "#000000" "#350C09" "#6B1813" "#A1241D" "#D73027"
+ag_divergent(5)
+#> [1] "#D73027" "#EB9793" "#FFFFFF" "#A2BAD9" "#4575B4"
+# The accessors follow whichever theme is set
+ag_font()
+#> [1] "sans"
+```

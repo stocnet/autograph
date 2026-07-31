@@ -3,14 +3,16 @@
 This function provides users with an easy way to graph lists of network
 data for comparison.
 
-It builds upon this package's `graphr()` function, and inherits all the
-same features and arguments. See `graphr()` for more. However, it uses
-the `{patchwork}` package to plot the graphs side by side and, if
-necessary, in successive rows. This is useful for lists of networks that
-represent, for example, ego or component subgraphs of a network, or a
-list of a network's different types of tie or across time. By default
-just the first and last network will be plotted, but this can be
-overridden by the "waves" parameter.
+It builds upon this package's
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+function, and inherits all the same features and arguments. See
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+for more. However, it uses the `{patchwork}` package to plot the graphs
+side by side and, if necessary, in successive rows. This is useful for
+lists of networks that represent, for example, ego or component
+subgraphs of a network, or a list of a network's different types of tie
+or across time. By default just the first and last network will be
+plotted, but this can be overridden by the "waves" parameter.
 
 Where the graphs are of the same network (same nodes), the graphs may
 share a layout to facilitate comparison. By default, successive graphs
@@ -25,42 +27,55 @@ graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 
 ## Arguments
 
-  - netlist:
-    
-    A list of manynet-compatible networks. This can also be a single
-    manynet network object that encodes time, which will be split
-    automatically (as in `grapht()`): longitudinal or changing networks
-    are split into waves via `manynet::to_waves()`; dynamic
-    (time-stamped, event-based) networks such as `manynet::irps_nuclear`
-    into cumulative time slices via `manynet::to_slices()`; and interval
-    (spell) networks that record tie `begin`/`end` lifespans, such as
-    `manynet::irps_wwi`, into one snapshot per change point. It can also
-    be a diffusion model result from e.g. `manynet::play_diffusion()`.
+- netlist:
 
-  - waves:
-    
-    Numeric, the number of plots to be displayed side-by-side. If
-    missing, the number of plots will be reduced to the first and last
-    when there are more than four plots. This argument can also be
-    passed a vector selecting the waves to plot.
+  A list of manynet-compatible networks. This can also be a single
+  manynet network object that encodes time, which will be split
+  automatically (as in
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)):
+  longitudinal or changing networks are split into waves via
+  [`manynet::to_waves()`](https://stocnet.github.io/manynet/reference/modif_split.html);
+  dynamic (time-stamped, event-based) networks such as
+  [`manynet::irps_nuclear`](https://stocnet.github.io/manynet/reference/irps_nuclear.html)
+  into cumulative time slices via
+  [`manynet::to_slices()`](https://stocnet.github.io/manynet/reference/modif_split.html);
+  and interval (spell) networks that record tie `begin`/`end` lifespans,
+  such as
+  [`manynet::irps_wwi`](https://stocnet.github.io/manynet/reference/irps_wwi.html),
+  into one snapshot per change point. It can also be a diffusion model
+  result from e.g.
+  [`manynet::play_diffusion()`](https://stocnet.github.io/manynet/reference/make_play.html).
 
-  - based\_on:
-    
-    Whether the layout of the joint plots should be based on the "first"
-    or the "last" network, or "both".
+- waves:
 
-  - ...:
-    
-    Additional arguments passed to `graphr()`.
+  Numeric, the number of plots to be displayed side-by-side. If missing,
+  the number of plots will be reduced to the first and last when there
+  are more than four plots. This argument can also be passed a vector
+  selecting the waves to plot.
+
+- based_on:
+
+  Whether the layout of the joint plots should be based on the "first"
+  or the "last" network, or "both".
+
+- ...:
+
+  Additional arguments passed to
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md).
 
 ## Value
 
-Multiple `ggplot2::ggplot()` objects displayed side-by-side.
+Multiple
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+objects displayed side-by-side.
 
 ## See also
 
-Other mapping: `layout_configuration()`, `layout_partition`,
-`plot_graphr`, `plot_grapht`
+Other mapping:
+[`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
+[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+[`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 
 ## Examples
 

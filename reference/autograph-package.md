@@ -17,9 +17,9 @@ the package website.
 
 Useful links:
 
-  - <https://stocnet.github.io/autograph/>
+- <https://stocnet.github.io/autograph/>
 
-  - Report bugs at <https://github.com/stocnet/autograph/issues>
+- Report bugs at <https://github.com/stocnet/autograph/issues>
 
 ## Author
 

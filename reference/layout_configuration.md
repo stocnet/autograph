@@ -35,20 +35,41 @@ layout_tbl_graph_hexad(.data, circular = TRUE, times = 1)
 
 ## Arguments
 
-  - .data:
-    
-    Some `{manynet}` compatible network data.
+- .data:
 
-  - circular:
-    
-    Logical, required for `{ggraph}` compatibility, default TRUE.
+  Some `{manynet}` compatible network data.
 
-  - times:
-    
-    Integer, how many times to run the algorithm. Required by for
-    `{ggraph}` compatibility, but not used here, so default = 1.
+- circular:
+
+  Logical, required for `{ggraph}` compatibility, default TRUE.
+
+- times:
+
+  Integer, how many times to run the algorithm. Required by for
+  `{ggraph}` compatibility, but not used here, so default = 1.
 
 ## See also
 
-Other mapping: `layout_partition`, `plot_graphr`, `plot_graphs`,
-`plot_grapht`
+Other mapping:
+[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+[`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+[`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+
+## Examples
+
+``` r
+# "configuration" picks the layout matching the number of nodes
+graphr(manynet::create_ring(4), layout = "configuration")
+
+# or a specific configuration can be named
+graphr(manynet::create_ring(3), layout = "triad")
+
+# the layout functions can also be called directly for their coordinates
+layout_tetrad(manynet::create_ring(4))
+#>   x y
+#> 1 0 0
+#> 2 0 1
+#> 3 1 0
+#> 4 1 1
+```

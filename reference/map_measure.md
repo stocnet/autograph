@@ -18,19 +18,19 @@ plot(x, ...)
 
 ## Arguments
 
-  - x:
-    
-    An object of "node\_measure", "tie\_measure", or "network\_measures"
-    class.
+- x:
 
-  - type:
-    
-    For node and tie measures, whether the plot should be "h" a
-    histogram or "d" a density plot. By default "h".
+  An object of "node_measure", "tie_measure", or "network_measures"
+  class.
 
-  - ...:
-    
-    Other arguments to be passed on.
+- type:
+
+  For node and tie measures, whether the plot should be "h" a histogram
+  or "d" a density plot. By default "h".
+
+- ...:
+
+  Other arguments to be passed on.
 
 ## Value
 

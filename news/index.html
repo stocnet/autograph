@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,12 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Tutorials</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/visualising-networks.html">Visualising Networks</a></li>
+  </ul></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-related-packages" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Related Packages</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-related-packages"><li><a class="external-link dropdown-item" href="https://stocnet.github.io/manynet/">manynet</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/netrics/">netrics</a></li>
+    <li><a class="external-link dropdown-item" href="https://stocnet.github.io/migraph/">migraph</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">News</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -38,29 +44,135 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.1" id="autograph-111">autograph 1.1.1<a class="anchor" aria-label="anchor" href="#autograph-111"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.2" id="autograph-112">autograph 1.1.2<a class="anchor" aria-label="anchor" href="#autograph-112"></a></h2>
+<div class="section level3">
+<h3 id="package-1-1-2">Package<a class="anchor" aria-label="anchor" href="#package-1-1-2"></a></h3>
+<ul><li>Improved the declared dependencies
+<ul><li>Removed <a href="https://yihui.org/knitr/" class="external-link">knitr</a> from Suggests: it was used solely by the tutorial tests, which now extract the tutorials’ <code>{r}</code> chunks with the same small scanner used in <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> and <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> (verified to yield an identical expression set to <code><a href="https://rdrr.io/pkg/knitr/man/knit.html" class="external-link">knitr::purl()</a></code> on the autograph tutorial)</li>
+<li>Removed <a href="https://tidygraph.data-imaginist.com" class="external-link">tidygraph</a> from Imports: its only functional use was reading the edgelist’s target column in <code>.infer_end_cap()</code>, which now uses <code><a href="https://r.igraph.org/reference/as_edgelist.html" class="external-link">igraph::as_edgelist()</a></code> (verified to give identical end caps)</li>
+<li>Promoted <a href="https://github.com/schochastics/graphlayouts" class="external-link">graphlayouts</a> from Suggests to Imports, since it is required for <code><a href="../reference/plot_grapht.html">grapht()</a></code>’s <em>default</em> “stress” layout (without it, wave-to-wave node transitions silently degraded to a static aggregate layout) and is installed regardless as <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a> imports it; its <code><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace()</a></code>/<code>thisRequires()</code> guards have been removed</li>
+<li>Declared a minimum <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> version (<code>&gt;= 2.2.1</code>)</li>
+</ul></li>
+<li>Updated the GitHub Actions workflows
+<ul><li>Updated the actions to their latest major versions (<code>actions/checkout@v7</code>, <code>actions/upload-artifact@v7</code>, <code>actions/download-artifact@v8</code>), replacing some long-outdated <code>@v2</code> pins</li>
+<li>Updated the website deploy job’s <code>r-lib/actions/setup-pandoc</code> from <code>@v1</code> to <code>@v2</code>, matching every other <code>r-lib/actions</code> step</li>
+<li>Added checks that metadata and tutorial vignettes correspond</li>
+</ul></li>
+<li>Improved the test suite while reducing what CRAN has to run
+<ul><li>The functional audits now fail rather than skip when <code>AUTOGRAPH_STRICT_AUDIT=true</code>, which the CI check step now sets, so a broken layout or plot method can no longer pass CI green</li>
+<li>Fixed the layout audit’s fixture and argument maps, which paired several layouts with networks they cannot lay out; because <code>skip()</code> aborts the enclosing <code>test_that()</code>, the first such mismatch had been silently preventing every later layout from being audited at all (the layout audit goes from 21 to 108 assertions)</li>
+<li>Coverage is now measured with <code>NOT_CRAN=true</code>, without which every <code>skip_on_cran()</code> test — most of the suite — was skipped while covr ran, badly under-reporting coverage</li>
+<li>
+<code>release</code> and <code>pkgdown</code> no longer run under <code>if: always()</code>, so a failing <code>R CMD check</code> can no longer tag a release or deploy the website</li>
+<li>Replaced <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s sweep over every bundled <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> dataset with a representative sample, and dropped the <code>plot.*</code> smoke tests now subsumed by the plot-method audit; CRAN-visible test time falls while CRAN-visible assertions rise</li>
+<li>Added an edge-case audit (<code>test-functional_errors.R</code>), an audit of the user-facing <code>layout_*</code> aliases, and examples for the <code>ag_*</code> palette accessors and configurational layouts, none of which were previously covered</li>
+<li>Theme-mutating tests now restore the previous theme with <code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code>, so global theme state cannot leak between parallel test workers</li>
+</ul></li>
+<li>Updated the website and README
+<ul><li>Updated favicons</li>
+<li>Split Graphing from Plotting functions</li>
+<li>Updated README to send visualisation examples to the website</li>
+<li>Fixed README double logoing on pkgdown build, and added alttext</li>
+</ul></li>
+<li>Updated CONTRIBUTING with the package architecture, conventions, and dev commands</li>
+<li>Updated remaining base R <code><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop()</a></code>, <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">warning()</a></code> and <code><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot()</a></code> calls to the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> cli interface</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-1-1-2">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-1-2"></a></h3>
+<ul><li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code>/<code><a href="../reference/plot_grapht.html">grapht()</a></code> erroring (“Can’t combine <code>..1</code> <character> and <code>..2</code> <logical>”) on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical <code>active</code> flag and numeric height/mass in <code>fict_starwars</code>)
+<ul><li>Such networks now split into waves via a guarded <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves()</a></code> that coerces the offending attributes when <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>’s splitter cannot combine them</li>
+</ul></logical></character></li>
+<li>Fixed <code>graphr(..., snap = TRUE)</code> erroring (“‘-’ only defined for equally-sized data frames”) whenever a node sat exactly on a grid point
+<ul><li>
+<code><a href="../reference/depth_first_recursive_search.html">depth_first_recursive_search()</a></code> compared each node against a distance vector that still included its own zero self-distance, so an exact hit selected that entry and yielded an empty grid point; the self-distance is now dropped before the nearest vacant point is chosen</li>
+<li>two-mode networks hit this on their very first node, since their coordinates are exactly 0 or 1</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> to ignore <code>snap = TRUE</code> for layered layouts (“hierarchy”, “railway”, “ladder”, “alluvial”, “multilevel”, “lineage”, “layered”)
+<ul><li>These layouts encode rank, mode, or generation along an axis, which square-grid snapping would collapse</li>
+</ul></li>
+<li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> erroring with “argument "node_color" is missing, with no default” when passed a list of networks; the call is now forwarded to <code><a href="../reference/plot_graphs.html">graphs()</a></code> as written, rather than argument by argument</li>
+<li>Improved how <code><a href="../reference/plot_graphr.html">graphr()</a></code> checks the attribute names given to its aesthetic arguments
+<ul><li>A mistyped node or tie attribute name now errors immediately, naming the argument and offering the closest match: <code>graphr(net, node_color = "welth")</code> reported “Unknown colour name: welth” at draw time, and now reports that “welth” was not found among the node attributes and asks whether “wealth” was meant</li>
+<li>The same applies to <code>node_shape</code> (previously “Shape aesthetic contains invalid value”), <code>node_size</code> and <code>edge_size</code> (previously “Aesthetics must be either length 1 or the same as the data (8)”), <code>node_group</code>, and <code>edge_color</code>
+</li>
+</ul></li>
+<li>Improved the error when the input is not a network, which now names the argument and the class given, rather than reporting a missing method for <code><a href="https://stocnet.github.io/manynet/reference/coerce_graph.html" class="external-link">as_tidygraph()</a></code>
+</li>
+<li>Fixed <code>isolates</code> being validated only when the network happened to contain isolates, so the same typo errored on one network and was ignored on another</li>
+<li>Fixed <code>node_size</code> values between 0 and 1 being silently multiplied by ten; <code>node_size = 0.5</code> now means 0.5, while a <em>vector</em> of proportions is still rescaled to stay visible</li>
+<li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code> producing empty panels by checking <code>waves</code> against the number of networks available</li>
+<li>Added a set of internal argument checks (<code>R/graph_checks.R</code>) shared by <code><a href="../reference/plot_graphr.html">graphr()</a></code>, <code><a href="../reference/plot_graphs.html">graphs()</a></code>, <code><a href="../reference/plot_grapht.html">grapht()</a></code>, the <code>layout_*()</code> functions, and <code><a href="../reference/theme_set.html">stocnet_theme()</a></code>
+<ul><li>An unrecognised value now errors immediately, naming the argument and offering the closest match, rather than falling through to <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, <code>{grid}</code>, or <code><a href="https://rdrr.io/r/base/match.arg.html" class="external-link">match.arg()</a></code> (so <code>isolates = "drop"</code> reports <code>isolates</code>, rather than “‘arg’ should be one of …”)</li>
+<li>A value that differs only in capitalisation is now used as intended, with a note, instead of being rejected: <code>node_color = "Wealth"</code> finds the <code>wealth</code> attribute</li>
+<li>Note that these checks are stricter than before: a mistyped attribute name used to be ignored silently or to fail later, and now stops the call</li>
+</ul></li>
+<li>Updated group-reduction note in <code><a href="../reference/plot_graphr.html">graphr()</a></code> and constant-colour note shared by <code><a href="../reference/plot_graphr.html">graphr()</a></code> and <code><a href="../reference/plot_grapht.html">grapht()</a></code> so that their wording cannot drift</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-1-1-2">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-1-2"></a></h3>
+<ul><li>Improved <code><a href="../reference/map_member.html">plot.node_member()</a></code> to draw its dendrogram with <a href="https://ggraph.data-imaginist.com" class="external-link">ggraph</a>
+<ul><li>Passes <code>hclust</code> object’s own merge heights to the dendrogram layout to reproduce the previous plot’s leaf order, merge heights, cluster label colours, and cutpoint line</li>
+<li>Branches now drawn in <code><a href="../reference/ag_call.html">ag_base()</a></code> rather than black, matching the height axis and so respecting the active <code><a href="../reference/theme_set.html">stocnet_theme()</a></code>
+</li>
+<li>Removed <a href="https://andrie.github.io/ggdendro/" class="external-link">ggdendro</a> from Imports</li>
+</ul></li>
+<li>Updated a stale doc cross-reference in <code><a href="../reference/map_member.html">plot.node_member()</a></code>, which pointed at <code>manynet::node_in_community()</code>; that function moved to <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> in manynet 2.0.0</li>
+<li>Updated terse or dead-end messages to say what to do next, including <code><a href="../reference/map_motifs.html">plot.node_motif()</a></code>/<code><a href="../reference/map_motifs.html">plot.network_motif()</a></code> (“Cannot plot these motifs yet, sorry.”), <code><a href="../reference/theme_match.html">match_color()</a></code>, <code><a href="../reference/plot.diffusion.html">plot.diff_model()</a></code>, and the concentric and hierarchy layouts (“Duplicated nodes in layers!”)</li>
+<li>Updated zero-variance note shared by three GOF plot methods so that their wording cannot drift</li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-1-1-2">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-1-2"></a></h3>
+<ul><li>Improved the error on an unrecognised <code>layout</code>, which now names the argument, suggests the nearest layout, and lists autograph’s own layouts, rather than reporting “object ‘layout_tbl_graph_stresss’ not found”
+<ul><li>Passing a layout <em>function</em> (e.g. <code>layout = igraph::layout_with_fr</code>), rather than its name, now says so instead of erroring with “invalid indexing”</li>
+</ul></li>
+<li>Added checks of the <code>membership</code>/<code>level</code>/<code>rank</code> arguments that the partition layouts require, which name the argument and offer the closest match</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-1-1-2">Theming<a class="anchor" aria-label="anchor" href="#theming-1-1-2"></a></h3>
+<ul><li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to error with the nearest match on an unrecognised theme name, instead of warning and silently leaving the previous theme in place; giving more than one theme name is also caught</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorials-1-1-2">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-2"></a></h3>
+<ul><li>Updated visualization tutorial to use colour/color consistently</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.1" id="autograph-111">autograph 1.1.1<a class="anchor" aria-label="anchor" href="#autograph-111"></a></h2><p class="text-muted">CRAN release: 2026-07-21</p>
 <div class="section level3">
 <h3 id="graphing-1-1-1">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-1-1"></a></h3>
 <ul><li>Fixed <code><a href="../reference/plot_grapht.html">grapht()</a></code> example, which took too long to run, by couching it in <code>\donttest{}</code>
 </li>
-<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> to accept bare longitudinal or dynamic networks<ul><li>Splits it into waves or time slices automatically (consistent with <code><a href="../reference/plot_grapht.html">grapht()</a></code>), instead of erroring with “invalid to use names()&lt;- on an S4 object of class ‘dgCMatrix’”</li></ul></li>
-<li>Fixed various errors and warnings in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed, directed, or changing networks:<ul><li>Fixed recycling warnings (“longer object length is not a multiple of shorter object length”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a complex network<ul><li>arc geom’s <code>strength</code> parameter now excludes loop edges, which are drawn separately by <code><a href="https://ggraph.data-imaginist.com/reference/geom_edge_loop.html" class="external-link">geom_edge_loop0()</a></code>
-</li></ul></li>
-<li>Fixed spurious warning (“no non-missing arguments to max; returning -Inf”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a changing network without any adoption events (e.g. <code>fict_potter</code>)<ul><li>such networks now rendered as standard changing networks rather than routed through the diffusion node-colour mapping</li></ul></li>
-<li>Fixed fails at draw time with “invalid hex digit in ‘color’ or ‘lty’” in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a signed multiplex network (e.g. <code>fict_marvel</code>)<ul><li>ties on non-signed layers (which have a missing sign) are now drawn solid/positive rather than passing <code>NA</code> to grid</li></ul></li>
-<li>Fixed error with “Aesthetics must be either length 1 or the same as the data” in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed longitudinal or directed networks (e.g. <code>to_waves(ison_monks)</code>)<ul><li>per-tie sign linetypes are now mapped through <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code> (with an identity scale) so ggraph’s edge geoms expand and subset them consistently with edge colour and width</li></ul></li>
+<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> to accept bare longitudinal or dynamic networks
+<ul><li>Splits it into waves or time slices automatically (consistent with <code><a href="../reference/plot_grapht.html">grapht()</a></code>), instead of erroring with “invalid to use names()&lt;- on an S4 object of class ‘dgCMatrix’”</li>
+</ul></li>
+<li>Fixed various errors and warnings in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed, directed, or changing networks:
+<ul><li>Fixed recycling warnings (“longer object length is not a multiple of shorter object length”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a complex network
+<ul><li>arc geom’s <code>strength</code> parameter now excludes loop edges, which are drawn separately by <code><a href="https://ggraph.data-imaginist.com/reference/geom_edge_loop.html" class="external-link">geom_edge_loop0()</a></code>
+</li>
+</ul></li>
+<li>Fixed spurious warning (“no non-missing arguments to max; returning -Inf”) in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a changing network without any adoption events (e.g. <code>fict_potter</code>)
+<ul><li>such networks now rendered as standard changing networks rather than routed through the diffusion node-colour mapping</li>
+</ul></li>
+<li>Fixed fails at draw time with “invalid hex digit in ‘color’ or ‘lty’” in <code><a href="../reference/plot_graphr.html">graphr()</a></code> on a signed multiplex network (e.g. <code>fict_marvel</code>)
+<ul><li>ties on non-signed layers (which have a missing sign) are now drawn solid/positive rather than passing <code>NA</code> to grid</li>
+</ul></li>
+<li>Fixed error with “Aesthetics must be either length 1 or the same as the data” in <code><a href="../reference/plot_graphr.html">graphr()</a></code>/<code><a href="../reference/plot_graphs.html">graphs()</a></code> on signed longitudinal or directed networks (e.g. <code>to_waves(ison_monks)</code>)
+<ul><li>per-tie sign linetypes are now mapped through <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code> (with an identity scale) so ggraph’s edge geoms expand and subset them consistently with edge colour and width</li>
+</ul></li>
 <li>Fixed <code>graphr(..., snap = TRUE)</code> erroring on two-mode networks: their default “hierarchy” layout is now left un-snapped (with an informative message) since collapsing its layered coordinates onto a square grid is not meaningful, while snapping a two-mode network under a force-directed layout continues to work; also hardened the grid-snapping search so a coordinate landing exactly on a grid point is no longer mistaken for a node’s zero self-distance</li>
 </ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="tutorials-1-1-1">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-1"></a></h3>
-<ul><li>Updated visualisation tutorial with a bit more structuring of further options</li></ul></div>
+<ul><li>Updated visualisation tutorial with a bit more structuring of further options</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="autograph-110">autograph 1.1.0<a class="anchor" aria-label="anchor" href="#autograph-110"></a></h2>
 <div class="section level3">
 <h3 id="package-1-1-0">Package<a class="anchor" aria-label="anchor" href="#package-1-1-0"></a></h3>
-<ul><li>Test coverage raised by introducing functional testing infrastructure (<code>tests/testthat/helper-functional.R</code> and <code>test-functional_*.R</code>) for:<ul><li>the layout family</li>
+<ul><li>Test coverage raised by introducing functional testing infrastructure (<code>tests/testthat/helper-functional.R</code> and <code>test-functional_*.R</code>) for:
+<ul><li>the layout family</li>
 <li>the <code>plot.*</code> S3 method family</li>
 <li>the <code>ag_*</code> palette accessors across all themes</li>
 <li>
@@ -73,10 +185,12 @@
 </ul></div>
 <div class="section level3">
 <h3 id="graphing-1-1-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-1-0"></a></h3>
-<ul><li>Improved how <code><a href="../reference/plot_graphr.html">graphr()</a></code> treats labels<ul><li>Fixed labels overlapping nodes (closes <a href="https://github.com/stocnet/autograph/issues/13" class="external-link">#13</a>): labels now keep clear of node borders automatically by giving ggrepel each node’s true rendered size, with <code>label_dist</code> adding a further points-based gap (mirroring igraph’s <code>vertex.label.dist</code>) and <code>label_repel = FALSE</code> selecting a fixed offset instead of repulsion.</li>
+<ul><li>Improved how <code><a href="../reference/plot_graphr.html">graphr()</a></code> treats labels
+<ul><li>Fixed labels overlapping nodes (closes <a href="https://github.com/stocnet/autograph/issues/13" class="external-link">#13</a>): labels now keep clear of node borders automatically by giving ggrepel each node’s true rendered size, with <code>label_dist</code> adding a further points-based gap (mirroring igraph’s <code>vertex.label.dist</code>) and <code>label_repel = FALSE</code> selecting a fixed offset instead of repulsion.</li>
 <li>This also fixed a pre-existing bug where non-repelled labels rendered with a fully transparent fill under this package’s theme, making them invisible over nodes.</li>
 </ul></li>
-<li>Improved <code><a href="../reference/plot_grapht.html">grapht()</a></code> has been rewritten for smoother, more consistent animations of dynamic networks<ul><li>Node positions now transition seamlessly between waves using the dynamic stress layout from <a href="https://github.com/schochastics/graphlayouts" class="external-link">graphlayouts</a> (<code>layout_as_dynamic()</code>), with a new <code>alpha</code> argument controlling layout stability; other layouts are computed once on the aggregate network and held fixed</li>
+<li>Improved <code><a href="../reference/plot_grapht.html">grapht()</a></code> has been rewritten for smoother, more consistent animations of dynamic networks
+<ul><li>Node positions now transition seamlessly between waves using the dynamic stress layout from <a href="https://github.com/schochastics/graphlayouts" class="external-link">graphlayouts</a> (<code>layout_as_dynamic()</code>), with a new <code>alpha</code> argument controlling layout stability; other layouts are computed once on the aggregate network and held fixed</li>
 <li>Changing node composition is now handled properly: every node that ever appears gets a stable position and fades in and out in place as it enters and exits the network</li>
 <li>New <code>isolates</code> argument (<code>"keep"</code> or <code>"fade"</code>) controls whether temporarily isolated nodes stay visible or fade out; <code>keep_isolates</code> is deprecated</li>
 <li>Dynamic (time-stamped, event-based) networks such as <code>irps_nuclear</code> are now split automatically into cumulative time slices via <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_slices()</a></code>, so a single dynamic network object passed to <code><a href="../reference/plot_grapht.html">grapht()</a></code> works without manual conversion</li>
@@ -90,7 +204,8 @@
 <li>Added a test suite for <code><a href="../reference/plot_grapht.html">grapht()</a></code> (no gif rendering required)</li>
 <li>Now aborts with a clear message when its input cannot be split into waves or slices, instead of failing much later with a cryptic igraph error (closes <a href="https://github.com/stocnet/autograph/issues/40" class="external-link">#40</a>); the underlying cause — <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves()</a></code> silently ignoring a time attribute not named “wave” — will be fixed in <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> 2.2.2, and the tutorial example now uses a <code>wave</code> attribute, which splits correctly with <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> 2.2.1</li>
 </ul></li>
-<li>Added an <code>edge_bundle</code> argument to <code><a href="../reference/plot_graphr.html">graphr()</a></code> for bundling edges in dense networks (closes <a href="https://github.com/stocnet/autograph/issues/19" class="external-link">#19</a>):<ul><li>
+<li>Added an <code>edge_bundle</code> argument to <code><a href="../reference/plot_graphr.html">graphr()</a></code> for bundling edges in dense networks (closes <a href="https://github.com/stocnet/autograph/issues/19" class="external-link">#19</a>):
+<ul><li>
 <code>TRUE</code>/<code>"force"</code> uses force-directed bundling, with <code>"path"</code> and <code>"minimal"</code> selecting the other non-hierarchical algorithms</li>
 <li>colour/width/linetype mappings are preserved and directed networks keep their arrowheads.</li>
 <li>This wires up ggraph’s non-hierarchical bundling geoms (added in ggraph 2.2.0), which were previously imported but never called, so the ggraph dependency is now <code>(&gt;= 2.2.0)</code>
@@ -106,7 +221,8 @@
 <div class="section level3">
 <h3 id="tutorials-1-1-0">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-0"></a></h3>
 <ul><li>Fixed the “Tying up loose ends” exercise in the visualisation tutorial erroring on <code><a href="https://stocnet.github.io/manynet/reference/defunct.html" class="external-link">tie_closeness()</a></code> (closes <a href="https://github.com/stocnet/autograph/issues/39" class="external-link">#39</a>): the tutorial now loads <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> and uses its measure functions (<code><a href="https://stocnet.github.io/netrics/reference/measure_centralities_close.html" class="external-link">tie_by_closeness()</a></code>, <code><a href="https://stocnet.github.io/netrics/reference/mark_triangles.html" class="external-link">tie_is_triangular()</a></code>), and every tutorial code chunk is now exercised by the functional tests below</li>
-<li>Reworked the “Visualising Networks” tutorial to match the structure and features of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> v2.2 tutorials<ul><li>Rebranded the tutorial in autograph red, with larger, more readable text and matching ‘Run code’ buttons</li>
+<li>Reworked the “Visualising Networks” tutorial to match the structure and features of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> v2.2 tutorials
+<ul><li>Rebranded the tutorial in autograph red, with larger, more readable text and matching ‘Run code’ buttons</li>
 <li>Added a checkbox Aims section, “Catching up”, “Going further”, “Beginner note”, and “In brief” callout boxes, per-page mini-tables of contents, and free play sections with a choose-your-own-data difficulty ladder</li>
 <li>Added hover-over glossary terms throughout and a closing Summary section with a function overview table and glossary</li>
 <li>Added quiz questions with feedback, and hints for the coding exercises</li>
@@ -128,27 +244,31 @@
 </ul></div>
 <div class="section level3">
 <h3 id="plotting-1-1-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-1-0"></a></h3>
-<ul><li>Fixed <code><a href="../reference/map_member.html">plot.matrix()</a></code> erroring when no <code>membership</code> argument was supplied, for both one-mode and two-mode matrices</li></ul></div>
+<ul><li>Fixed <code><a href="../reference/map_member.html">plot.matrix()</a></code> erroring when no <code>membership</code> argument was supplied, for both one-mode and two-mode matrices</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.3" id="autograph-103">autograph 1.0.3<a class="anchor" aria-label="anchor" href="#autograph-103"></a></h2><p class="text-muted">CRAN release: 2026-05-01</p>
 <div class="section level3">
 <h3 id="plotting-1-0-3">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-0-3"></a></h3>
 <ul><li>Fixed the error produced by a namespace reference in a call in <code>ergm_res</code> by serializing it, moving to extdata, and loading it via <code><a href="../reference/plot_convergence.html">load_ergm_res()</a></code>
-</li></ul></div>
+</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.2" id="autograph-102">autograph 1.0.2<a class="anchor" aria-label="anchor" href="#autograph-102"></a></h2>
 <div class="section level3">
 <h3 id="plotting-1-0-2">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-0-2"></a></h3>
 <ul><li>Fixed the error produced by a namespace reference in a call in <code>ergm_res</code>
-</li></ul></div>
+</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.1" id="autograph-101">autograph 1.0.1<a class="anchor" aria-label="anchor" href="#autograph-101"></a></h2>
 <div class="section level3">
 <h3 id="package-1-0-1">Package<a class="anchor" aria-label="anchor" href="#package-1-0-1"></a></h3>
-<ul><li>Updated the logo</li></ul></div>
+<ul><li>Updated the logo</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-1-0-1">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-0-1"></a></h3>
 <ul><li>Fixed the error in some flavours by removing environment references in included objects</li>
@@ -156,13 +276,15 @@
 </ul></div>
 <div class="section level3">
 <h3 id="tutorials-1-0-1">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-0-1"></a></h3>
-<ul><li>Fixed the tutorial to use netrics functions</li></ul></div>
+<ul><li>Fixed the tutorial to use netrics functions</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="autograph-100">autograph 1.0.0<a class="anchor" aria-label="anchor" href="#autograph-100"></a></h2><p class="text-muted">CRAN release: 2026-04-04</p>
 <div class="section level3">
 <h3 id="package-1-0-0">Package<a class="anchor" aria-label="anchor" href="#package-1-0-0"></a></h3>
-<ul><li>Updated startup message to declare the set theme</li></ul></div>
+<ul><li>Updated startup message to declare the set theme</li>
+</ul></div>
 <div class="section level3">
 <h3 id="graphing-1-0-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-0-0"></a></h3>
 <ul><li>Improved <code>node_shape</code> to accept more categories</li>
@@ -187,13 +309,15 @@
 </ul></div>
 <div class="section level3">
 <h3 id="tutorial-1-0-0">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial-1-0-0"></a></h3>
-<ul><li>Fixed <a href="https://github.com/stocnet/autograph/issues/41" class="external-link">#41</a> by updating tutorials to use fill aesthetics (<code>scale_fill_*()</code>) instead of colour aesthetics (<code>scale_colour_*()</code>)</li></ul></div>
+<ul><li>Fixed <a href="https://github.com/stocnet/autograph/issues/41" class="external-link">#41</a> by updating tutorials to use fill aesthetics (<code>scale_fill_*()</code>) instead of colour aesthetics (<code>scale_colour_*()</code>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="autograph-060">autograph 0.6.0<a class="anchor" aria-label="anchor" href="#autograph-060"></a></h2><p class="text-muted">CRAN release: 2026-03-01</p>
 <div class="section level3">
 <h3 id="package-0-6-0">Package<a class="anchor" aria-label="anchor" href="#package-0-6-0"></a></h3>
-<ul><li>Updated logo</li></ul></div>
+<ul><li>Updated logo</li>
+</ul></div>
 <div class="section level3">
 <h3 id="graphing-0-6-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-0-6-0"></a></h3>
 <ul><li>
@@ -202,11 +326,13 @@
 <code><a href="../reference/plot_graphs.html">graphs()</a></code> no longer requires <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a> to be loaded separately</li>
 <li>Closed <a href="https://github.com/stocnet/autograph/issues/12" class="external-link">#12</a> by changing node aesthetics from <code>color</code> to <code>fill</code> using fillable shape codes (21–25) for nodes to support fill-based colour scales</li>
 <li>Consolidated legend modifications into internal <code>graph_legends()</code> helper</li>
-<li>Improved legend labelling:<ul><li>edge sign legend now labelled “Sign”</li>
+<li>Improved legend labelling:
+<ul><li>edge sign legend now labelled “Sign”</li>
 <li>edge weight/width now labelled “Weight”/“Width”</li>
 <li>node mode/shape legend now labelled “Mode”/“Shape”</li>
 </ul></li>
-<li>Closed <a href="https://github.com/stocnet/autograph/issues/8" class="external-link">#8</a> by adding “isolates” argument to <code><a href="../reference/plot_graphr.html">graphr()</a></code>:<ul><li>
+<li>Closed <a href="https://github.com/stocnet/autograph/issues/8" class="external-link">#8</a> by adding “isolates” argument to <code><a href="../reference/plot_graphr.html">graphr()</a></code>:
+<ul><li>
 <code>"legend"</code> (default) removes isolates from the graph but notes them in the legend</li>
 <li>
 <code>"caption"</code> removes isolates from the graph but notes them in the caption</li>
@@ -217,7 +343,8 @@
 <div class="section level3">
 <h3 id="theming-0-6-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-6-0"></a></h3>
 <ul><li>Removed <code>scale_*()</code> functions as redundant with better theme support and <code><a href="../reference/theme_match.html">match_color()</a></code>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="layouts-0-6-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-0-6-0"></a></h3>
 <ul><li>Replaced <code>{Rgraphviz}</code> (Bioconductor) with <code><a href="https://r.igraph.org/reference/layout_with_sugiyama.html" class="external-link">igraph::layout_with_sugiyama</a></code> for Sugiyama/hierarchy layouts, removing the Bioconductor dependency</li>
@@ -229,16 +356,19 @@
 <h2 class="pkg-version" data-toc-text="0.5.1" id="autograph-051">autograph 0.5.1<a class="anchor" aria-label="anchor" href="#autograph-051"></a></h2>
 <div class="section level3">
 <h3 id="plotting-0-5-1">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-5-1"></a></h3>
-<ul><li>Improved <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code> (closes <a href="https://github.com/stocnet/autograph/issues/31" class="external-link">#31</a>)<ul><li>Now works on directed and two-mode networks and dyadwise shared partners</li>
+<ul><li>Improved <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code> (closes <a href="https://github.com/stocnet/autograph/issues/31" class="external-link">#31</a>)
+<ul><li>Now works on directed and two-mode networks and dyadwise shared partners</li>
 <li>Now has more informative error message if statistic not available</li>
 <li>Now accepts more descriptive and gof-formula consistent statistic names</li>
-</ul></li></ul></div>
+</ul></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="autograph-050">autograph 0.5.0<a class="anchor" aria-label="anchor" href="#autograph-050"></a></h2><p class="text-muted">CRAN release: 2025-11-19</p>
 <div class="section level3">
 <h3 id="package-0-5-0">Package<a class="anchor" aria-label="anchor" href="#package-0-5-0"></a></h3>
-<ul><li>Shortened startup messages</li></ul></div>
+<ul><li>Shortened startup messages</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-0-5-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-5-0"></a></h3>
 <ul><li>Added <code>plot.goldfish.changepoints()</code>
@@ -261,7 +391,8 @@
 <h2 class="pkg-version" data-toc-text="0.4.2" id="autograph-042">autograph 0.4.2<a class="anchor" aria-label="anchor" href="#autograph-042"></a></h2>
 <div class="section level3">
 <h3 id="package-0-4-2">Package<a class="anchor" aria-label="anchor" href="#package-0-4-2"></a></h3>
-<ul><li>Added ggpizzas to README</li></ul></div>
+<ul><li>Added ggpizzas to README</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-0-4-2">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-4-2"></a></h3>
 <ul><li>Fixed node overflow issue and restored marginal density plot in <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code> by dropping <code>+.ggplot()</code>
@@ -280,10 +411,12 @@
 <h2 class="pkg-version" data-toc-text="0.4.1" id="autograph-041">autograph 0.4.1<a class="anchor" aria-label="anchor" href="#autograph-041"></a></h2><p class="text-muted">CRAN release: 2025-09-11</p>
 <div class="section level3">
 <h3 id="package-0-4-1">Package<a class="anchor" aria-label="anchor" href="#package-0-4-1"></a></h3>
-<ul><li>Improved startup message to ignore class</li></ul></div>
+<ul><li>Improved startup message to ignore class</li>
+</ul></div>
 <div class="section level3">
 <h3 id="theming-0-4-1">Theming<a class="anchor" aria-label="anchor" href="#theming-0-4-1"></a></h3>
-<ul><li>Added “iast” theme for the Institute of Advanced Studies, Toulouse</li></ul></div>
+<ul><li>Added “iast” theme for the Institute of Advanced Studies, Toulouse</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-0-4-1">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-4-1"></a></h3>
 <ul><li>Improved ergm convergence diagnostic plotting by working on the results object, mostly avoiding startup conflict warning</li>
@@ -302,7 +435,8 @@
 <div class="section level3">
 <h3 id="theming-0-4-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-4-0"></a></h3>
 <ul><li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> documentation</li>
-<li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to register a font family for plots<ul><li>A vector of potential fonts is included for some themes</li>
+<li>Improved <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> to register a font family for plots
+<ul><li>A vector of potential fonts is included for some themes</li>
 <li>The first font found on the system will be used, and user notified</li>
 <li>If no fonts are found, the default R font (“sans”) will be used</li>
 <li>A message is printed to inform the user if the default is used, and how to install missing fonts via <a href="https://github.com/fbertran/extrafont" class="external-link">extrafont</a>
@@ -350,10 +484,12 @@
 <h2 class="pkg-version" data-toc-text="0.3.1" id="autograph-031">autograph 0.3.1<a class="anchor" aria-label="anchor" href="#autograph-031"></a></h2>
 <div class="section level3">
 <h3 id="package-0-3-1">Package<a class="anchor" aria-label="anchor" href="#package-0-3-1"></a></h3>
-<ul><li>Fixed old citation style issue for CRAN</li></ul></div>
+<ul><li>Fixed old citation style issue for CRAN</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-0-3-1">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-3-1"></a></h3>
-<ul><li>Added <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code> as a new plotting method for convergence diagnostics<ul><li>Plots MCMC traces as a line plot with loess smoothing highlighting the trend</li>
+<ul><li>Added <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code> as a new plotting method for convergence diagnostics
+<ul><li>Plots MCMC traces as a line plot with loess smoothing highlighting the trend</li>
 <li>Plots overall density plot of the samples on the right margin</li>
 </ul></li>
 <li>Improved plotting of <code>{MoNAn}</code> trace objects by using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
@@ -363,7 +499,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="data-0-3-1">Data<a class="anchor" aria-label="anchor" href="#data-0-3-1"></a></h3>
-<ul><li>Added <code>ergm_res</code> for testing and illustration of <code>plot.mcmc.list()</code>, use <code>ergm_res$sample</code> to access the MCMC sample</li></ul></div>
+<ul><li>Added <code>ergm_res</code> for testing and illustration of <code>plot.mcmc.list()</code>, use <code>ergm_res$sample</code> to access the MCMC sample</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="autograph-030">autograph 0.3.0<a class="anchor" aria-label="anchor" href="#autograph-030"></a></h2>
@@ -378,10 +515,12 @@
 </ul></div>
 <div class="section level3">
 <h3 id="graphing-0-3-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-0-3-0"></a></h3>
-<ul><li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> not using theme colours for node and edge aesthetics</li></ul></div>
+<ul><li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> not using theme colours for node and edge aesthetics</li>
+</ul></div>
 <div class="section level3">
 <h3 id="plotting-0-3-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-3-0"></a></h3>
-<ul><li>Added new plot class and method for centralising GOF plotting<ul><li>Improved <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code> and <code><a href="../reference/plot_gof.html">plot.gof.stats.monan()</a></code> to use new plotting method</li>
+<ul><li>Added new plot class and method for centralising GOF plotting
+<ul><li>Improved <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code> and <code><a href="../reference/plot_gof.html">plot.gof.stats.monan()</a></code> to use new plotting method</li>
 <li>Added <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code> for plotting ERGM GOF objects</li>
 <li>Improved GOF plotting by adding boxplot within the violins</li>
 <li>Improved GOF plotting by adding crosses for outliers</li>
@@ -402,10 +541,12 @@
 <div class="section level3">
 <h3 id="data-0-3-0">Data<a class="anchor" aria-label="anchor" href="#data-0-3-0"></a></h3>
 <ul><li>Added <code>res_ergm_gof</code> for testing and illustration of <code><a href="../reference/plot_gof.html">plot.gof.ergm()</a></code>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="tutorial-0-3-0">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial-0-3-0"></a></h3>
-<ul><li>Added visualisation tutorial from manynet<ul><li>Improved introduction</li>
+<ul><li>Added visualisation tutorial from manynet
+<ul><li>Improved introduction</li>
 <li>Improved section on titles, labels, and legends</li>
 <li>Improved section explaining base and grid graphics</li>
 <li>Added section demonstrating difference between <code>igraph::plot()</code>, <code><a href="https://ggraph.data-imaginist.com/reference/ggraph.html" class="external-link">ggraph::ggraph()</a></code>, and <code><a href="../reference/plot_graphr.html">graphr()</a></code>
@@ -419,7 +560,8 @@
 <li>Improved section introducing <a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a>, <code><a href="../reference/plot_graphs.html">graphs()</a></code>, and <code><a href="../reference/plot_grapht.html">grapht()</a></code>
 </li>
 <li>Added plotting section to viz tutorial</li>
-</ul></li></ul></div>
+</ul></li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="autograph-020">autograph 0.2.0<a class="anchor" aria-label="anchor" href="#autograph-020"></a></h2><p class="text-muted">CRAN release: 2025-08-22</p>
@@ -453,23 +595,29 @@
 <h2 class="pkg-version" data-toc-text="0.1.2" id="autograph-012">autograph 0.1.2<a class="anchor" aria-label="anchor" href="#autograph-012"></a></h2><p class="text-muted">CRAN release: 2025-07-02</p>
 <div class="section level3">
 <h3 id="package-0-1-2">Package<a class="anchor" aria-label="anchor" href="#package-0-1-2"></a></h3>
-<ul><li>Fixed line break issues in DESCRIPTION</li></ul></div>
+<ul><li>Fixed line break issues in DESCRIPTION</li>
+</ul></div>
 <div class="section level3">
 <h3 id="themes-0-1-2">Themes<a class="anchor" aria-label="anchor" href="#themes-0-1-2"></a></h3>
 <ul><li>Fixed default for <code><a href="../reference/ag_call.html">ag_sequential()</a></code>
-</li></ul></div>
+</li>
+</ul></div>
 <div class="section level3">
 <h3 id="layouts-0-1-2">Layouts<a class="anchor" aria-label="anchor" href="#layouts-0-1-2"></a></h3>
-<ul><li>Fixed “layout_layered” to accept typical ggraph parameters</li></ul></div>
+<ul><li>Fixed “layout_layered” to accept typical ggraph parameters</li>
+</ul></div>
 <div class="section level3">
 <h3 id="manynet-0-1-2">manynet<a class="anchor" aria-label="anchor" href="#manynet-0-1-2"></a></h3>
-<ul><li>Added return value statements</li></ul></div>
+<ul><li>Added return value statements</li>
+</ul></div>
 <div class="section level3">
 <h3 id="migraph-0-1-2">migraph<a class="anchor" aria-label="anchor" href="#migraph-0-1-2"></a></h3>
-<ul><li>Added return value statements</li></ul></div>
+<ul><li>Added return value statements</li>
+</ul></div>
 <div class="section level3">
 <h3 id="rsiena-0-1-2">RSiena<a class="anchor" aria-label="anchor" href="#rsiena-0-1-2"></a></h3>
-<ul><li>Added return value statements</li></ul></div>
+<ul><li>Added return value statements</li>
+</ul></div>
 <div class="section level3">
 <h3 id="monan-0-1-2">MoNAn<a class="anchor" aria-label="anchor" href="#monan-0-1-2"></a></h3>
 <ul><li>Added <code><a href="../reference/plot_convergence.html">plot.traces.monan()</a></code>
@@ -482,23 +630,30 @@
 <h2 class="pkg-version" data-toc-text="0.1.1" id="autograph-011">autograph 0.1.1<a class="anchor" aria-label="anchor" href="#autograph-011"></a></h2>
 <div class="section level3">
 <h3 id="package-0-1-1">Package<a class="anchor" aria-label="anchor" href="#package-0-1-1"></a></h3>
-<ul><li>Fixed DESCRIPTION issues</li></ul></div>
+<ul><li>Fixed DESCRIPTION issues</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="autograph-010">autograph 0.1.0<a class="anchor" aria-label="anchor" href="#autograph-010"></a></h2>
 <div class="section level3">
 <h3 id="package-0-1-0">Package<a class="anchor" aria-label="anchor" href="#package-0-1-0"></a></h3>
-<ul><li>Initial setup, with all the goodies</li></ul></div>
+<ul><li>Initial setup, with all the goodies</li>
+</ul></div>
 <div class="section level3">
 <h3 id="theming-0-1-0">Theming<a class="anchor" aria-label="anchor" href="#theming-0-1-0"></a></h3>
-<ul><li>Added <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> for setting a theme that can then be reused across successive plots (closes <a href="https://github.com/stocnet/autograph/issues/3" class="external-link">#3</a>)<ul><li>For example, <code>stocnet_theme("iheid")</code> for IHEID colour theme</li></ul></li>
-<li>Added <code>ag_*()</code> palettes, for example:<ul><li>
-<code><a href="../reference/ag_call.html">ag_highlight()</a></code> to select the highlight colours of a particular palette</li></ul></li>
+<ul><li>Added <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> for setting a theme that can then be reused across successive plots (closes <a href="https://github.com/stocnet/autograph/issues/3" class="external-link">#3</a>)
+<ul><li>For example, <code>stocnet_theme("iheid")</code> for IHEID colour theme</li>
+</ul></li>
+<li>Added <code>ag_*()</code> palettes, for example:
+<ul><li>
+<code><a href="../reference/ag_call.html">ag_highlight()</a></code> to select the highlight colours of a particular palette</li>
+</ul></li>
 <li>Added <code><a href="../reference/theme_match.html">match_color()</a></code> for matching one or more hexcodes to a palette’s offerings</li>
 </ul></div>
 <div class="section level3">
 <h3 id="plotting-0-1-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-0-1-0"></a></h3>
-<ul><li>Added manynet plot methods<ul><li>Added <code><a href="../reference/plot.diffusion.html">plot.diff_model()</a></code>
+<ul><li>Added manynet plot methods
+<ul><li>Added <code><a href="../reference/plot.diffusion.html">plot.diff_model()</a></code>
 </li>
 <li>Added <code><a href="../reference/map_member.html">plot.matrix()</a></code>
 </li>
@@ -519,7 +674,8 @@
 <li>Added <code><a href="../reference/map_motifs.html">plot.node_motif()</a></code>
 </li>
 </ul></li>
-<li>Added migraph plot methods<ul><li>Added <code><a href="../reference/model_mrqap.html">plot.netlm()</a></code>
+<li>Added migraph plot methods
+<ul><li>Added <code><a href="../reference/model_mrqap.html">plot.netlm()</a></code>
 </li>
 <li>Added <code><a href="../reference/model_mrqap.html">plot.netlogit()</a></code>
 </li>
@@ -528,7 +684,8 @@
 <li>Added <code><a href="../reference/plot.diffusion.html">plot.diffs_model()</a></code>
 </li>
 </ul></li>
-<li>Added RSiena plot methods<ul><li>Added <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code>
+<li>Added RSiena plot methods
+<ul><li>Added <code><a href="../reference/plot_gof.html">plot.sienaGOF()</a></code>
 </li>
 <li>Added <code><a href="../reference/plot_interp.html">plot.influenceTable()</a></code>
 </li>
@@ -543,7 +700,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="data-0-1-0">Data<a class="anchor" aria-label="anchor" href="#data-0-1-0"></a></h3>
-<ul><li>Added some precooked results for testing and illustration</li></ul></div>
+<ul><li>Added some precooked results for testing and illustration</li>
+</ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

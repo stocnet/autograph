@@ -47,143 +47,143 @@ graphr(
 
 ## Arguments
 
-  - .data:
-    
-    A manynet-consistent object.
+- .data:
 
-  - layout:
-    
-    An igraph, ggraph, or manynet layout algorithm. If not declared,
-    defaults to "triad" for networks with 3 nodes, "quad" for networks
-    with 4 nodes, "stress" for all other one mode networks, or
-    "hierarchy" for two mode networks. For "hierarchy" layout, one can
-    further split graph by declaring the "center" argument as the
-    "events", "actors", or by declaring a node name. For "concentric"
-    layout algorithm please declare the "membership" as an extra
-    argument. The "membership" argument expects either a quoted node
-    attribute present in data or vector with the same length as nodes to
-    draw concentric circles. For "multilevel" layout algorithm please
-    declare the "level" as extra argument. The "level" argument expects
-    either a quoted node attribute present in data or vector with the
-    same length as nodes to hierarchically order categories. If "level"
-    is missing, function will look for 'lvl' node attribute in data. The
-    "lineage" layout ranks nodes in Y axis according to values. For
-    "lineage" layout algorithm please declare the "rank" as extra
-    argument. The "rank" argument expects either a quoted node attribute
-    present in data or vector with the same length as nodes.
+  A manynet-consistent object.
 
-  - labels:
-    
-    Logical, whether to print node names as labels if present.
+- layout:
 
-  - node\_color, node\_colour:
-    
-    Node variable to be used for coloring the nodes. It is easiest if
-    this is added as a node attribute to the graph before plotting.
-    Nodes can also be colored by declaring a color instead.
+  An igraph, ggraph, or manynet layout algorithm. If not declared,
+  defaults to "triad" for networks with 3 nodes, "quad" for networks
+  with 4 nodes, "stress" for all other one mode networks, or "hierarchy"
+  for two mode networks. For "hierarchy" layout, one can further split
+  graph by declaring the "center" argument as the "events", "actors", or
+  by declaring a node name. For "concentric" layout algorithm please
+  declare the "membership" as an extra argument. The "membership"
+  argument expects either a quoted node attribute present in data or
+  vector with the same length as nodes to draw concentric circles. For
+  "multilevel" layout algorithm please declare the "level" as extra
+  argument. The "level" argument expects either a quoted node attribute
+  present in data or vector with the same length as nodes to
+  hierarchically order categories. If "level" is missing, function will
+  look for 'lvl' node attribute in data. The "lineage" layout ranks
+  nodes in Y axis according to values. For "lineage" layout algorithm
+  please declare the "rank" as extra argument. The "rank" argument
+  expects either a quoted node attribute present in data or vector with
+  the same length as nodes.
 
-  - node\_shape:
-    
-    Node variable to be used for shaping the nodes. It is easiest if
-    this is added as a node attribute to the graph before plotting.
-    Nodes can also be shaped by declaring a shape instead.
+- labels:
 
-  - node\_size:
-    
-    Node variable to be used for sizing the nodes. This can be any
-    continuous variable on the nodes of the network. Since this function
-    expects this to be an existing variable, it is recommended to
-    calculate all node-related statistics prior to using this function.
-    Nodes can also be sized by declaring a numeric size or vector
-    instead.
+  Logical, whether to print node names as labels if present.
 
-  - node\_group:
-    
-    Node variable to be used for grouping the nodes. It is easiest if
-    this is added as a hull over groups before plotting. Group variables
-    should have a minimum of 3 nodes, if less, number groups will be
-    reduced by merging categories with lower counts into one called
-    "other".
+- node_color, node_colour:
 
-  - edge\_color, edge\_colour:
-    
-    Tie variable to be used for coloring the nodes. It is easiest if
-    this is added as an edge or tie attribute to the graph before
-    plotting. Edges can also be colored by declaring a color instead.
+  Node variable to be used for coloring the nodes. It is easiest if this
+  is added as a node attribute to the graph before plotting. Nodes can
+  also be colored by declaring a color instead.
 
-  - edge\_size:
-    
-    Tie variable to be used for sizing the edges. This can be any
-    continuous variable on the nodes of the network. Since this function
-    expects this to be an existing variable, it is recommended to
-    calculate all edge-related statistics prior to using this function.
-    Edges can also be sized by declaring a numeric size or vector
-    instead.
+- node_shape:
 
-  - isolates:
-    
-    Character scalar, how to treat isolates. "keep" will keep isolates
-    in the graph as they are. "legend" (default) will remove isolates
-    from the graph but note them in the legend. "caption" will remove
-    isolates from the graph but note them in the caption. If there are
-    no isolates, this argument will be ignored. If the default layout
-    ("stress") is used, we recommend that the "legend" option is used to
-    avoid isolates crowding out the giant component.
+  Node variable to be used for shaping the nodes. It is easiest if this
+  is added as a node attribute to the graph before plotting. Nodes can
+  also be shaped by declaring a shape instead.
 
-  - snap:
-    
-    Logical scalar, whether the layout should be snapped to a grid.
+- node_size:
 
-  - label\_dist:
-    
-    Numeric scalar, in points (pt), controlling the extra gap left
-    between labels and node borders – similar to `igraph`'s
-    `vertex.label.dist`. Node size is always accounted for automatically
-    (larger nodes push labels further away without any extra
-    configuration); `label_dist` adds further spacing on top of that,
-    and defaults to a small gap (5pt). Set to `0` for labels right at
-    the node border, or to a larger value (e.g. `15`) for more spacing.
-    Only used when `labels = TRUE` and `label_repel = TRUE` (as the
-    padding passed to the repel algorithm) or `label_repel = FALSE` (as
-    a fixed nudge away from the node, in the layouts where this makes
-    sense, e.g. "circle"/"concentric", "bipartite"/"railway",
-    "alluvial").
+  Node variable to be used for sizing the nodes. This can be any
+  continuous variable on the nodes of the network. Since this function
+  expects this to be an existing variable, it is recommended to
+  calculate all node-related statistics prior to using this function.
+  Nodes can also be sized by declaring a numeric size or vector instead.
 
-  - label\_repel:
-    
-    Logical scalar, whether labels should be repelled away from each
-    other and from nodes using `ggrepel` (via `ggraph`'s `repel`
-    argument). Defaults to `TRUE`. Set to `FALSE` to place labels at a
-    fixed offset (see `label_dist`) without the (sometimes slow, and
-    non-deterministic between runs for some layouts) repelling
-    algorithm.
+- node_group:
 
-  - edge\_bundle:
-    
-    Edge bundling, off by default (`FALSE`). When `TRUE` (or
-    equivalently `"force"`), edges are bundled together using ggraph's
-    force-directed edge bundling (`geom_edge_bundle_force()`), which
-    pulls nearby edges into shared paths to reduce visual clutter in
-    dense networks. Alternative non-hierarchical algorithms can be
-    selected by name: `"path"` (`geom_edge_bundle_path()`) or
-    `"minimal"` (`geom_edge_bundle_minimal()`). Bundling only makes a
-    visible difference when a network has enough edges; for directed
-    networks arrowheads are retained, but the slight reciprocal-tie
-    curvature used for unbundled edges does not apply.
+  Node variable to be used for grouping the nodes. It is easiest if this
+  is added as a hull over groups before plotting. Group variables should
+  have a minimum of 3 nodes, if less, number groups will be reduced by
+  merging categories with lower counts into one called "other".
 
-  - ...:
-    
-    Extra arguments to pass on to the layout algorithm, if necessary.
+- edge_color, edge_colour:
+
+  Tie variable to be used for coloring the nodes. It is easiest if this
+  is added as an edge or tie attribute to the graph before plotting.
+  Edges can also be colored by declaring a color instead.
+
+- edge_size:
+
+  Tie variable to be used for sizing the edges. This can be any
+  continuous variable on the nodes of the network. Since this function
+  expects this to be an existing variable, it is recommended to
+  calculate all edge-related statistics prior to using this function.
+  Edges can also be sized by declaring a numeric size or vector instead.
+
+- isolates:
+
+  Character scalar, how to treat isolates. "keep" will keep isolates in
+  the graph as they are. "legend" (default) will remove isolates from
+  the graph but note them in the legend. "caption" will remove isolates
+  from the graph but note them in the caption. If there are no isolates,
+  this argument will be ignored. If the default layout ("stress") is
+  used, we recommend that the "legend" option is used to avoid isolates
+  crowding out the giant component.
+
+- snap:
+
+  Logical scalar, whether the layout should be snapped to a grid.
+
+- label_dist:
+
+  Numeric scalar, in points (pt), controlling the extra gap left between
+  labels and node borders – similar to `igraph`'s `vertex.label.dist`.
+  Node size is always accounted for automatically (larger nodes push
+  labels further away without any extra configuration); `label_dist`
+  adds further spacing on top of that, and defaults to a small gap
+  (5pt). Set to `0` for labels right at the node border, or to a larger
+  value (e.g. `15`) for more spacing. Only used when `labels = TRUE` and
+  `label_repel = TRUE` (as the padding passed to the repel algorithm) or
+  `label_repel = FALSE` (as a fixed nudge away from the node, in the
+  layouts where this makes sense, e.g. "circle"/"concentric",
+  "bipartite"/"railway", "alluvial").
+
+- label_repel:
+
+  Logical scalar, whether labels should be repelled away from each other
+  and from nodes using `ggrepel` (via `ggraph`'s `repel` argument).
+  Defaults to `TRUE`. Set to `FALSE` to place labels at a fixed offset
+  (see `label_dist`) without the (sometimes slow, and non-deterministic
+  between runs for some layouts) repelling algorithm.
+
+- edge_bundle:
+
+  Edge bundling, off by default (`FALSE`). When `TRUE` (or equivalently
+  `"force"`), edges are bundled together using ggraph's force-directed
+  edge bundling (`geom_edge_bundle_force()`), which pulls nearby edges
+  into shared paths to reduce visual clutter in dense networks.
+  Alternative non-hierarchical algorithms can be selected by name:
+  `"path"` (`geom_edge_bundle_path()`) or `"minimal"`
+  (`geom_edge_bundle_minimal()`). Bundling only makes a visible
+  difference when a network has enough edges; for directed networks
+  arrowheads are retained, but the slight reciprocal-tie curvature used
+  for unbundled edges does not apply.
+
+- ...:
+
+  Extra arguments to pass on to the layout algorithm, if necessary.
 
 ## Value
 
-A `ggplot2::ggplot()` object. The last plot can be saved to the file
-system using `ggplot2::ggsave()`.
+A
+[`ggplot2::ggplot()`](https://ggplot2.tidyverse.org/reference/ggplot.html)
+object. The last plot can be saved to the file system using
+[`ggplot2::ggsave()`](https://ggplot2.tidyverse.org/reference/ggsave.html).
 
 ## See also
 
-Other mapping: `layout_configuration()`, `layout_partition`,
-`plot_graphs`, `plot_grapht`
+Other mapping:
+[`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
+[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+[`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 
 ## Examples
 
