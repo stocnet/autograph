@@ -32,6 +32,30 @@
   `social_evolution` calls, the other two from a relational event model of the
   `fisheries_treaties` layer --- dated events whose covariate updates open
   right-censored intervals, and both margins per actor
+- Added `plot.test_gof()`, drawing each effect's standardized cumulative score
+  process against the Brownian-bridge bands its p-value was read from. The x
+  axis is the object's own process-time axis, labelled by the clock it
+  records: the bands are valid on whichever clock produced the process, so
+  re-deriving an event index would draw the path on one clock and its
+  reference on another. The band inverts the same Kolmogorov distribution the
+  event-clock p-value comes from
+- Added `plot.test_time()`, drawing the scaled Schoenfeld residuals of each
+  tested effect with a smooth and the fitted estimate as the reference. Under
+  `method = "periods"` the scatter is coloured by period, so the regimes the
+  test compared are visible against it
+- Added `plot.diagnose_onset()`, composing the per-coefficient parameter path
+  with the information-accrual curve. Both panels are windowed on the
+  excursion rather than the sequence --- the path returns to the estimate by
+  construction, so the full range is mostly bridge tail --- and each
+  coefficient gets its own window and scales, since a window shared across
+  facets re-creates the squashing the windowing prevents. The accrual panel
+  draws the proportional diagonal, without which a monotone curve from 0 to 1
+  says nothing: the departure from proportional is the finding.
+  `view = c("both", "path", "accrual")` selects a single panel when a model
+  has more coefficients than a composed figure can hold
+- Added the precooked `goldfish_gof`, `goldfish_time` and `goldfish_onset`
+  fixtures, and regenerated the three existing ones against the goldfish
+  version that produced them
 
 # autograph 1.0.3
 
