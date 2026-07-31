@@ -18,10 +18,12 @@
   - Replaced `graphr()`'s sweep over every bundled `{manynet}` dataset with a representative sample, and dropped the `plot.*` smoke tests now subsumed by the plot-method audit; CRAN-visible test time falls while CRAN-visible assertions rise
   - Added an edge-case audit (`test-functional_errors.R`), an audit of the user-facing `layout_*` aliases, and examples for the `ag_*` palette accessors and configurational layouts, none of which were previously covered
   - Theme-mutating tests now restore the previous theme with `on.exit()`, so global theme state cannot leak between parallel test workers
-- Updated favicons
-- Updated README to send viz examples to website
-- Updated CONTRIBUTING
-- Fixed README double logoing on pkgdown build, and added alttext
+- Updated the website and README
+  - Updated favicons
+  - Split Graphing from Plotting functions
+  - Updated README to send visualisation examples to the website
+  - Fixed README double logoing on pkgdown build, and added alttext
+- Updated CONTRIBUTING with the package architecture, conventions, and dev commands
 
 ## Graphing
 

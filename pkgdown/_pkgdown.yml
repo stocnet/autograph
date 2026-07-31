@@ -73,17 +73,20 @@ reference:
       - ends_with("themes")
       - ends_with("scales")
       - ends_with("palettes")
-  - title: "Plotting methods"
+  - title: "Graphing"
     desc: |
-      Functions for graphing networks and plotting results.
+      Functions for graphing networks.
       `graphr()` graphs any manynet-compatible class object automagically.
       `graphs()` and `grapht()` do the same for multiple networks
       and dynamic networks, respectively.
-      `plot()` methods exist for results and other objects for stocnet packages.
     contents:
       - graphr
       - graphs
       - grapht
+  - title: "Plotting"
+    desc: |
+      `plot()` methods exist for results and other objects for stocnet packages.
+    contents:
       - starts_with("plot.")
   - title: "Layouts"
     desc: |
