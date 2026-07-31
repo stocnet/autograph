@@ -2,15 +2,16 @@
 
 ## Package
 
-- Trimmed and tightened declared dependencies
+- Improved the declared dependencies
   - Removed `{knitr}` from Suggests: it was used solely by the tutorial tests, which now extract the tutorials' `{r}` chunks with the same small scanner used in `{manynet}` and `{netrics}` (verified to yield an identical expression set to `knitr::purl()` on the autograph tutorial)
   - Removed `{tidygraph}` from Imports: its only functional use was reading the edgelist's target column in `.infer_end_cap()`, which now uses `igraph::as_edgelist()` (verified to give identical end caps)
   - Promoted `{graphlayouts}` from Suggests to Imports, since it is required for `grapht()`'s *default* "stress" layout (without it, wave-to-wave node transitions silently degraded to a static aggregate layout) and is installed regardless as `{ggraph}` imports it; its `requireNamespace()`/`thisRequires()` guards have been removed
   - Declared a minimum `{manynet}` version (`>= 2.2.1`)
-- Updated the GitHub Actions workflows to the latest major action versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
-- Updated the Github Actions workflows to check metadata and tutorial vignette correspondence
-- Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
-- Strengthened the test suite while reducing what CRAN has to run
+- Updated the GitHub Actions workflows
+  - Updated the actions to their latest major versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
+  - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
+  - Added checks that metadata and tutorial vignettes correspond
+- Improved the test suite while reducing what CRAN has to run
   - The functional audits now fail rather than skip when `AUTOGRAPH_STRICT_AUDIT=true`, which the CI check step now sets, so a broken layout or plot method can no longer pass CI green
   - Fixed the layout audit's fixture and argument maps, which paired several layouts with networks they cannot lay out; because `skip()` aborts the enclosing `test_that()`, the first such mismatch had been silently preventing every later layout from being audited at all (the layout audit goes from 21 to 108 assertions)
   - Coverage is now measured with `NOT_CRAN=true`, without which every `skip_on_cran()` test — most of the suite — was skipped while covr ran, badly under-reporting coverage
@@ -28,12 +29,16 @@
 ## Graphing
 
 - Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
-  - such networks are now split into waves via a guarded `to_waves()` that coerces the offending attributes when {manynet}'s splitter cannot combine them
+  - Such networks now split into waves via a guarded `to_waves()` that coerces the offending attributes when `{manynet}`'s splitter cannot combine them
 - Fixed `graphr(..., snap = TRUE)` erroring ("'-' only defined for equally-sized data frames") whenever a node sat exactly on a grid point
   - `depth_first_recursive_search()` compared each node against a distance vector that still included its own zero self-distance, so an exact hit selected that entry and yielded an empty grid point; the self-distance is now dropped before the nearest vacant point is chosen
   - two-mode networks hit this on their very first node, since their coordinates are exactly 0 or 1
-- `snap = TRUE` is now ignored, with a message, for layered layouts ("hierarchy", "railway", "ladder", "alluvial", "multilevel", "lineage", "layered")
-  - these layouts encode rank, mode, or generation along an axis, which square-grid snapping would collapse; this fallback was described in the tests but had never been implemented
+- Improved `graphr()` to ignore `snap = TRUE` for layered layouts ("hierarchy", "railway", "ladder", "alluvial", "multilevel", "lineage", "layered")
+  - These layouts encode rank, mode, or generation along an axis, which square-grid snapping would collapse
+- Added a set of internal argument checks (`R/graph_checks.R`) shared by `graphr()`, `graphs()`, `grapht()`, the `layout_*()` functions, and `stocnet_theme()`
+  - An unrecognised value now errors immediately, naming the argument and offering the closest match, rather than falling through to `{ggplot2}`, `{grid}`, or `match.arg()` (so `isolates = "drop"` reports `isolates`, rather than "'arg' should be one of ...")
+  - A value that differs only in capitalisation is now used as intended, with a note, instead of being rejected: `node_color = "Wealth"` finds the `wealth` attribute
+  - Note that these checks are stricter than before: a mistyped attribute name used to be ignored silently or to fail later, and now stops the call
 
 ## Plotting
 
