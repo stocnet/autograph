@@ -37,14 +37,15 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
 # Helper functions for .graph_nodes()
 
 .infer_node_mapping <- function(g, node_color, node_size, node_shape) {
-  .check_node_variables(g, node_color, node_size)
   list("nshape" = .infer_nshape(g, node_shape),
        "nsize" = .infer_nsize(g, node_size),
        "ncolor" = .infer_ncolor(g, node_color))
 }
 
-# .infer_nsize/.infer_nshape/.infer_ncolor/.check_node_variables live in
-# R/graph_aes.R, shared with grapht().
+# .infer_nsize/.infer_nshape/.infer_ncolor live in R/graph_aes.R, shared with
+# grapht(). These arguments have already been checked against the network's
+# attributes by graphr()/grapht() (see R/graph_checks.R), so by this point they
+# are known to be either an attribute name or a usable literal.
 
 .map_infected_nodes<- function(p, g, out) {
   # node_color <- as.factor(ifelse(manynet::node_attribute(g, "Exposed"), "Exposed",

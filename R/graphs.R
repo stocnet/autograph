@@ -50,7 +50,7 @@
 #' @export
 graphs <- function(netlist, waves,
                    based_on = c("first", "last", "both"), ...) {
-  based_on <- match.arg(based_on)
+  based_on <- .check_choice(based_on, c("first", "last", "both"), "based_on")
   # A single manynet network that encodes time is split into a list of
   # snapshots, mirroring grapht()'s handling (see .split_time_network()):
   # longitudinal/changing networks (and diffusion results) into waves,
@@ -64,11 +64,27 @@ graphs <- function(netlist, waves,
   }
   if (missing(waves)) {
     if (length(netlist) > 4) {
-      netlist <- netlist[c(1, length(netlist))]
-      manynet::snet_info("Plotting first and last waves side-by-side. \nTo set the waves plotted use the 'waves = ' argument.")
+      n_waves <- length(netlist)
+      netlist <- netlist[c(1, n_waves)]
+      manynet::snet_info(
+        "Plotting the first and last of {n_waves} networks side-by-side.",
+        "To choose which to plot, use the {.arg waves} argument, as in",
+        "{.code waves = 4} for the first four, or {.code waves = c(1, 3, 5)}.")
     }
   } else if (!missing(waves)) {
-    if (length(waves) == 1) netlist <- netlist[c(1:waves)] else 
+    # Out-of-range indices would otherwise give NULL entries here and fail much
+    # later, inside patchwork, with no hint that `waves` was the problem.
+    if (!is.numeric(waves) || any(is.na(waves)))
+      manynet::snet_abort(
+        "{.arg waves} should be the number of networks to plot, or a vector of",
+        "which networks to plot, but a value of class {.cls {class(waves)}}",
+        "was given.")
+    n_waves <- length(netlist)
+    if (any(waves < 1) || any(waves > n_waves))
+      manynet::snet_abort(
+        "{.arg waves} should be between 1 and {n_waves}, the number of networks",
+        "available, but {.val {waves}} was given.")
+    if (length(waves) == 1) netlist <- netlist[c(1:waves)] else
       netlist <- netlist[waves]
   }
   if (is.null(names(netlist))) names(netlist) <- rep("", length(netlist))
@@ -105,7 +121,9 @@ graphs <- function(netlist, waves,
         graphr(netlist[[i]], layout = "star", center = names(netlist)[[i]], ...) + 
           ggtitle(names(netlist)[i]))
     } else {
-      manynet::snet_info("Layouts were not standardised since not all nodes appear across waves.")  
+      manynet::snet_info(
+        "Giving each network its own layout, since not all nodes appear in",
+        "every one of them, so a shared layout would place them differently.")
       gs <- lapply(1:length(netlist), function(i)
         graphr(netlist[[i]], ...) + ggtitle(names(netlist)[i]))
     }

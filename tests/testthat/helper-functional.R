@@ -72,3 +72,4 @@ ag_fixtures <- local({
     tree       = manynet::create_tree(10, directed = TRUE)
   )
 })
+

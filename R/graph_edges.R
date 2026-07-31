@@ -53,7 +53,6 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # Helper functions for .graph_edges()
 
 .infer_directed_edge_mapping <- function(g, edge_color, edge_size, node_size) {
-  .check_edge_variables(g, edge_color, edge_size)
   list("ecolor" = .infer_ecolor(g, edge_color),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g),
@@ -61,14 +60,14 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 }
 
 .infer_edge_mapping <- function(g, edge_color, edge_size) {
-  .check_edge_variables(g, edge_color, edge_size)
   list("ecolor" = .infer_ecolor(g, edge_color),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g))
 }
 
-# .infer_ecolor/.infer_esize/.infer_arrow/.infer_line_type/.check_edge_variables
-# live in R/graph_aes.R, shared with grapht().
+# .infer_ecolor/.infer_esize/.infer_arrow/.infer_line_type live in
+# R/graph_aes.R, shared with grapht(). These arguments have already been checked
+# against the network's attributes by graphr()/grapht() (see R/graph_checks.R).
 
 .infer_end_cap <- function(g, node_size) {
   nsize <- .infer_nsize(g, node_size)/2
@@ -138,7 +137,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   # force-directed default; a string selects a specific algorithm.
   if (is.null(edge_bundle) || isFALSE(edge_bundle)) return(NULL)
   type <- if (isTRUE(edge_bundle)) "force" else tolower(as.character(edge_bundle))
-  type <- match.arg(type, c("force", "path", "minimal"))
+  type <- .check_choice(type, c("force", "path", "minimal"), "edge_bundle")
   switch(type,
          force = ggraph::geom_edge_bundle_force,
          path = ggraph::geom_edge_bundle_path,

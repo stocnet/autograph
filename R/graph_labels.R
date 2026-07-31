@@ -25,7 +25,12 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     ggplot2::aes(label = name)
   }
 
-  if (layout == "circle" | layout == "concentric") {
+  # `layout` may be something other than a single name (a matrix of coordinates,
+  # say), which would make the comparison below error rather than simply not
+  # match, so check its shape first as graph_layout() does.
+  is_radial <- is.character(layout) && length(layout) == 1L &&
+    layout %in% c("circle", "concentric")
+  if (is_radial) {
     angles <- as.data.frame(.cart2pol(as.matrix(p[["data"]][,1:2])))
     angles$degree <- angles$phi * 180/pi
     # Extract x and y as vectors for case_when
@@ -107,7 +112,10 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 # Helper functions for .graph_labels()
 
 .cart2pol <- function(xyz){
-  stopifnot(is.numeric(xyz))
+  if (!is.numeric(xyz))
+    manynet::snet_abort(
+      "Coordinates should be numeric to be converted to polar coordinates,",
+      "but a value of class {.cls {class(xyz)}} was given.")
   if (is.vector(xyz) && (length(xyz) == 2 || length(xyz) == 
                          3)) {
     x <- xyz[1]

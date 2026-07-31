@@ -125,11 +125,12 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   # Check arguments ####
   labels_missing <- missing(labels)
   isolates_missing <- missing(isolates)
-  isolates <- match.arg(isolates)
+  isolates <- .check_choice(isolates, c("keep", "fade"), "isolates")
   if (!is.null(keep_isolates)) {
-    warning("The `keep_isolates` argument of `grapht()` is deprecated; ",
-            "please use `isolates = \"keep\"` or `isolates = \"fade\"` instead.",
-            call. = FALSE)
+    manynet::snet_warn(
+      "The {.arg keep_isolates} argument of {.fn grapht} is deprecated.",
+      "Please use {.code isolates = \"keep\"} to draw isolates throughout,",
+      "or {.code isolates = \"fade\"} to fade them in and out, instead.")
     if (isolates_missing) isolates <- ifelse(isTRUE(keep_isolates), "keep", "fade")
   }
   if (missing(node_color) && missing(node_colour)) {
@@ -167,8 +168,13 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
     labels <- FALSE
     manynet::snet_info("Suppressing node labels for a network with more than 30 nodes; set `labels = TRUE` to show them.")
   }
-  .check_node_variables(g_ref, node_color, node_size)
-  .check_edge_variables(g_ref, edge_color, edge_size)
+  # Checked against the reference wave, which spans the union of nodes and ties,
+  # so an attribute present in only some waves still resolves.
+  node_color <- .check_node_color(g_ref, node_color)
+  node_shape <- .check_node_shape(g_ref, node_shape)
+  node_size <- .check_node_size(g_ref, node_size)
+  edge_color <- .check_edge_color(g_ref, edge_color)
+  edge_size <- .check_edge_size(g_ref, edge_size)
   if (manynet::is_complex(manynet::as_igraph(g_ref)))
     manynet::snet_info("Self-loops are not drawn in animations.")
 
@@ -178,6 +184,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   # not fall back to a static hierarchy for two-mode networks (which collapses
   # many nodes onto a line). The two modes remain distinguishable by shape.
   # An explicitly requested layout is still honoured (via a static fallback).
+  layout <- .check_layout(layout)
   if (is.null(layout)) layout <- "stress"
   layouts <- .grapht_layout(waves, layout, alpha, ...)
 
@@ -446,8 +453,9 @@ print.grapht <- function(x, ...) {
     lapply(xy, function(m)
       data.frame(name = all_names, x = m[, 1], y = m[, 2]))
   } else {
-    manynet::snet_info("Using a static ", layout,
-                       " layout computed on the aggregate network.")
+    manynet::snet_info("Using a static {.val {layout}} layout,",
+                       "computed on the aggregate network,",
+                       "since this layout cannot be animated smoothly.")
     lo <- suppressWarnings(ggraph::create_layout(.grapht_union(waves), layout, ...))
     lapply(seq_along(waves), function(i)
       data.frame(name = all_names, x = lo$x, y = lo$y))
@@ -474,7 +482,7 @@ print.grapht <- function(x, ...) {
       as.character(manynet::node_attribute(w, node_color)),
       character(igraph::vcount(waves[[1]])))
     if (length(unique(stats::na.omit(as.vector(vals)))) == 1) {
-      manynet::snet_info("Please indicate a variable with more than one value or level when mapping node colors.")
+      .inform_constant_color("node_color", node_color, "node")
       return(list(mapped = FALSE, diffusion = FALSE, literal = "black"))
     }
     return(list(mapped = TRUE, diffusion = FALSE, values = vals))
@@ -530,7 +538,7 @@ print.grapht <- function(x, ...) {
   }
   if (length(unique(stats::na.omit(unlist(raw)))) <= 1) {
     if (attr_mapped)
-      manynet::snet_info("Please indicate a variable with more than one value or level when mapping edge colors.")
+      .inform_constant_color("edge_color", edge_color, "tie")
     return(list(mapped = FALSE, literal = "black"))
   }
   list(mapped = TRUE, signed = signed, raw = raw)

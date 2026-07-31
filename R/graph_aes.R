@@ -3,6 +3,17 @@
 # node_size = 6) or the name of a node/tie attribute into the vector or scalar
 # actually mapped in the plot.
 
+# An attribute that takes the same value everywhere cannot distinguish anything,
+# so it is dropped in favour of plain black. Reported the same way wherever it
+# happens, in both graphr() and grapht().
+.inform_constant_color <- function(arg, attribute, what) {
+  manynet::snet_info(
+    "Drawing every {what} black, because {.arg {arg}} was mapped to",
+    "{.val {attribute}}, which holds the same value for every {what}.",
+    "To colour {what}s differently, map {.arg {arg}} to an attribute that",
+    "varies between them.")
+}
+
 # Node aesthetics ----
 
 .infer_nsize <- function(g, node_size) {
@@ -10,11 +21,27 @@
     if (is.character(node_size)) {
       out <- manynet::node_attribute(g, node_size)
     } else out <- node_size
-    if (length(node_size > 1) & all(out <= 1 & out >= 0)) out <- out * 10
+    out <- .check_aes_length(out, g, "node_size", manynet::net_nodes(g), "node")
+    # A vector of proportions (a centrality score, say) would be invisible at
+    # face value, so rescale it into a usable range. A single number is taken
+    # at face value: `node_size = 0.5` means 0.5.
+    if (length(out) > 1 && all(out <= 1 & out >= 0, na.rm = TRUE)) out <- out * 10
   } else {
     out <- min(20, (250 / manynet::net_nodes(g)) / 2)
   }
   as.numeric(out)
+}
+
+# A value mapped to an aesthetic has to be either a single value or one per
+# node/tie; ggplot2 would otherwise report the mismatch in terms of its own
+# internal data frame ("Aesthetics must be either length 1 or the same as the
+# data (8)"), which does not say which argument was wrong.
+.check_aes_length <- function(out, g, arg, n, what) {
+  len <- length(out)
+  if (len == 1L || len == n) return(out)
+  manynet::snet_abort(
+    "{.arg {arg}} should be a single value or one value for each of the",
+    "{n} {what}s in the network, but {len} value{?s} {?was/were} given.")
 }
 
 .infer_nshape <- function(g, node_shape) {
@@ -42,27 +69,13 @@
       } else out <- as.factor(as.character(manynet::node_attribute(g, node_color)))
       if (length(unique(out)) == 1) {
         out <- rep("black", manynet::net_nodes(g))
-        manynet::snet_info("Please indicate a variable with more than one value or level when mapping node colors.")
+        .inform_constant_color("node_color", node_color, "node")
       }
     } else out <- node_color
   } else {
     out <- "black"
   }
   out
-}
-
-.check_node_variables <- function(g, node_color, node_size) {
-  if (!is.null(node_color)) {
-    if (any(!tolower(node_color) %in% tolower(igraph::vertex_attr_names(g))) &
-        any(!node_color %in% grDevices::colors())) {
-      manynet::snet_info("Please make sure you spelled `node_color` variable correctly.")
-    }
-  }
-  if (!is.null(node_size)) {
-    if (!is.numeric(node_size) & any(!tolower(node_size) %in% tolower(igraph::vertex_attr_names(g)))) {
-      manynet::snet_info("Please make sure you spelled `node_size` variable correctly.")
-    }
-  }
 }
 
 # Edge aesthetics ----
@@ -76,7 +89,7 @@
       } else out <- as.factor(as.character(manynet::tie_attribute(g, edge_color)))
       if (length(unique(out)) == 1) {
         out <- rep("black", manynet::net_ties(g))
-        manynet::snet_info("Please indicate a variable with more than one value or level when mapping edge colors.")
+        .inform_constant_color("edge_color", edge_color, "tie")
       }
     } else {
       out <- edge_color
@@ -137,18 +150,4 @@
     if (length(unique(out)) == 1) out <- unique(out)
   } else out <- "solid"
   out
-}
-
-.check_edge_variables <- function(g, edge_color, edge_size) {
-  if (!is.null(edge_color)) {
-    if (any(!tolower(edge_color) %in% tolower(igraph::edge_attr_names(g))) &
-        any(!edge_color %in% grDevices::colors())) {
-      manynet::snet_info("Please make sure you spelled `edge_color` variable correctly.")
-    }
-  }
-  if (!is.null(edge_size)) {
-    if (!is.numeric(edge_size) & any(!tolower(edge_size) %in% tolower(igraph::edge_attr_names(g)))) {
-      manynet::snet_info("Please make sure you spelled `edge_size` variable correctly.")
-    }
-  }
 }

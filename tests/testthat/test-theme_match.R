@@ -25,7 +25,7 @@ test_that("Throws error when input colors exceed palette length", {
   expect_error(
     match_color(c("#4575b4", "#d73027", "#1a9850", "#ffcc00"),
                 c("#006564", "#0094D8", "#622550")),
-    "Not enough unique colors"
+    "palette holds only 3"
   )
 })
 

@@ -29,8 +29,11 @@ test_that("theme setting is case-insensitive and rejects unknown themes", {
   on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
   expect_no_error(suppressMessages(stocnet_theme("UZH")))
   expect_equal(getOption("stocnet_theme"), "uzh")
-  # an unknown theme warns and leaves the current theme in place
-  suppressMessages(suppressWarnings(stocnet_theme("notatheme")))
+  # an unknown theme errors, suggesting the nearest available theme, and
+  # leaves the current theme in place
+  expect_error(stocnet_theme("notatheme"), "themes available")
+  expect_error(stocnet_theme("uzhh"), "Did you mean")
+  expect_error(stocnet_theme(c("uzh", "ethz")), "a single theme")
   expect_equal(getOption("stocnet_theme"), "uzh")
   # querying without arguments reports the current theme
   expect_no_error(suppressMessages(stocnet_theme()))

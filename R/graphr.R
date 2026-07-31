@@ -143,16 +143,27 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                    isolates = c("legend","caption","keep"), snap = FALSE,
                    label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
                    ..., node_colour, edge_colour) {
-  if(manynet::is_list(.data)) return(graphs(.data, layout = layout, labels = labels,
-                             node_color = node_color, node_shape = node_shape, node_size = node_size, node_group = node_group,
-                             edge_color = edge_color, edge_size = edge_size,
-                             isolates = isolates, snap = snap,
-                             edge_bundle = edge_bundle, ...,
-                             node_colour = node_colour, edge_colour = edge_colour))
-  g <- manynet::as_tidygraph(.data)
-  
+  # A list of networks is handed to graphs(). The call is forwarded as written,
+  # rather than argument by argument, because the aesthetic arguments have no
+  # defaults: naming them here would force promises that are still missing.
+  if(manynet::is_list(.data)) {
+    cl <- match.call()
+    # The function itself rather than its name, since the call is evaluated in
+    # the caller's environment, where `graphs` is only visible if the package
+    # happens to be attached (it is not for `autograph::graphr(mylist)`).
+    cl[[1L]] <- graphs
+    names(cl)[names(cl) == ".data"] <- "netlist"
+    return(eval(cl, parent.frame()))
+  }
+  g <- .check_network(.data)
+
   # Separate isolates ----
-  isolates <- .infer_isolates(g, match.arg(isolates))
+  # `isolates` is checked on its own line rather than inside .infer_isolates(),
+  # which does not always force its argument: an unrecognised `isolates` would
+  # otherwise be caught or ignored depending on whether the network happens to
+  # have isolates.
+  isolates <- .check_choice(isolates, c("legend", "caption", "keep"), "isolates")
+  isolates <- .infer_isolates(g, isolates)
   if(isolates != "keep"){
     if(manynet::is_labelled(g)){
       isos <- manynet::node_names(g)[.node_is_isolate(g)]
@@ -162,33 +173,35 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     g <- manynet::to_no_isolates(g)
   } 
   
-  layout <- .infer_layout(g, layout)
+  layout <- .infer_layout(g, .check_layout(layout))
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
-    node_color <- as.character(substitute(node_colour))
+    node_color <- .check_node_color(g, as.character(substitute(node_colour)),
+                                    "node_colour")
   } else {
-    node_color <- as.character(substitute(node_color))
+    node_color <- .check_node_color(g, as.character(substitute(node_color)))
   }
   if (missing(node_shape)) node_shape <- NULL else
-    node_shape <- as.character(substitute(node_shape))
+    node_shape <- .check_node_shape(g, as.character(substitute(node_shape)))
   if (missing(node_size)) node_size <- NULL else if (!is.numeric(node_size)) {
-    node_size <- as.character(substitute(node_size))
+    node_size <- .check_node_size(g, as.character(substitute(node_size)))
   }
   if (missing(node_group)) node_group <- NULL else {
-    node_group <- as.character(substitute(node_group))
-    g <- manynet::mutate_nodes(g, 
+    node_group <- .check_node_group(g, as.character(substitute(node_group)))
+    g <- manynet::mutate_nodes(g,
                                node_group = .reduce_categories(g, node_group))
   }
   if (missing(edge_color) && missing(edge_colour)) {
     edge_color <- NULL
   } else if (missing(edge_color)) {
-    edge_color <- as.character(substitute(edge_colour))
+    edge_color <- .check_edge_color(g, as.character(substitute(edge_colour)),
+                                    "edge_colour")
   } else {
-    edge_color <- as.character(substitute(edge_color))
+    edge_color <- .check_edge_color(g, as.character(substitute(edge_color)))
   }
   if (missing(edge_size)) edge_size <- NULL else if (!is.numeric(edge_size)) {
-    edge_size <- as.character(substitute(edge_size))
+    edge_size <- .check_edge_size(g, as.character(substitute(edge_size)))
   }
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
@@ -265,7 +278,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     toCondense <- names(which(table(manynet::node_attribute(g, node_group)) <= 2))
     out <- ifelse(manynet::node_attribute(g, node_group) %in% toCondense,
                   "Other", manynet::node_attribute(g, node_group))
-    manynet::snet_info("The number of groups was reduced since there were groups with less than 2 nodes.")
+    .inform_groups_reduced(toCondense)
   } else if (sum(table(manynet::node_attribute(g, node_group)) <= 2) == 2 &
              length(unique(manynet::node_attribute(g, node_group))) > 2) {
     limit <- stats::reorder(manynet::node_attribute(g, node_group),
@@ -278,7 +291,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     }
     out <- ifelse(manynet::node_attribute(g, node_group) %in% toCondense, "Other",
                   manynet::node_attribute(g, node_group))
-    manynet::snet_info("The number of groups was reduced since there were groups with less than 2 nodes.")
+    .inform_groups_reduced(toCondense)
   } else if (sum(table(manynet::node_attribute(g, node_group)) <= 2) == 1 &
              length(unique(manynet::node_attribute(g, node_group))) > 2) {
     limit <- stats::reorder(manynet::node_attribute(g, node_group),
@@ -287,13 +300,24 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     toCondense <- utils::tail(levels(limit), 2)
     out <- ifelse(manynet::node_attribute(g, node_group) %in% toCondense, "Other",
                   manynet::node_attribute(g, node_group))
-    manynet::snet_info("The number of groups was reduced since there were groups with less than 2 nodes.")
+    .inform_groups_reduced(toCondense)
   } else if (sum(table(manynet::node_attribute(g, node_group)) <= 2) == 1 &
              length(unique(manynet::node_attribute(g, node_group))) == 2) {
     out <- as.factor(manynet::node_attribute(g, node_group))
-    manynet::snet_info("Node groups with 2 nodes or less can be cause issues for plotting ...")
+    manynet::snet_info(
+      "Groups of two nodes or fewer can be difficult to draw a hull around,",
+      "so this plot may look uneven.")
   } else out <- as.factor(manynet::node_attribute(g, node_group))
   out
+}
+
+# Groups too small to draw a hull around are folded into an "Other" group.
+# Said in one place so the three branches above cannot drift apart.
+.inform_groups_reduced <- function(condensed) {
+  manynet::snet_info(
+    "Grouped {.val {condensed}} together as {.val Other},",
+    "since {?it holds/they hold} two nodes or fewer,",
+    "which is too few to draw a group around.")
 }
 
 
