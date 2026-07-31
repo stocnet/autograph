@@ -165,3 +165,87 @@ test_that("the test plots render without goldfish attached", {
   expect_s3_class(plot(goldfish_gof), "ggplot")
   expect_s3_class(plot(goldfish_time), "ggplot")
 })
+
+# The onset class. Two panels composed with patchwork, both windowed on the
+# excursion rather than the sequence -- the geometry is the substance here, so
+# it is what the tests pin.
+
+test_that("onset plotting composes two panels", {
+  p <- plot(goldfish_onset)
+  expect_s3_class(p, "patchwork")
+  # And each panel is available alone, the escape hatch for a model with too
+  # many coefficients for a composed figure.
+  expect_s3_class(plot(goldfish_onset, view = "path"), "ggplot")
+  expect_s3_class(plot(goldfish_onset, view = "accrual"), "ggplot")
+  expect_error(plot(goldfish_onset, view = "nonesuch"))
+})
+
+test_that("the path panel is windowed on each coefficient's own excursion", {
+  drawn <- plot(goldfish_onset, view = "path")$data
+  summary <- as.data.frame(goldfish_onset$summary)
+  n_events <- attr(goldfish_onset, "context")$n_events
+
+  # Full range is mostly bridge tail: the path returns to the estimate by
+  # construction, so drawing all of it squashes what is being read.
+  expect_lt(max(drawn$dropped_events), n_events)
+
+  for (i in seq_len(nrow(summary))) {
+    at <- summary$stabilized_at[i]
+    window <- max(drawn$dropped_events[drawn$term == summary$term[i]])
+    expected <- if (at == 0) {
+      n_events
+    } else {
+      min(n_events, max(ceiling(1.15 * at), 10))
+    }
+    # `expect_equal`, not identical: the window comes off an integer column
+    # and the formula returns a double from `ceiling()`.
+    expect_equal(window, expected)
+    # The window has to reach past the point it marks, or the marker falls
+    # outside the panel it belongs to.
+    if (at > 0) expect_gte(window, at)
+  }
+})
+
+test_that("the path facets carry free scales, not one shared window", {
+  # A window shared across facets re-creates the squashing the per-coefficient
+  # window exists to prevent.
+  p <- plot(goldfish_onset, view = "path")
+  expect_true(p$facet$params$free$x)
+  expect_true(p$facet$params$free$y)
+})
+
+test_that("the accrual panel is full range with the diagonal drawn", {
+  accrual <- plot(goldfish_onset, view = "accrual")
+  n_events <- attr(goldfish_onset, "context")$n_events
+  # Full range, unlike the path panel: the window is shaded, not cut to.
+  expect_identical(max(accrual$data$dropped_events), n_events)
+  # Without the proportional diagonal a monotone 0-to-1 curve says nothing --
+  # the departure from it is the finding.
+  slopes <- vapply(
+    accrual$layers,
+    function(l) {
+      if (is.null(l$data$slope)) NA_real_ else l$data$slope[[1]]
+    },
+    numeric(1)
+  )
+  expect_true(any(!is.na(slopes) & abs(slopes - 1 / n_events) < 1e-12))
+})
+
+test_that("a fixed coefficient is not drawn", {
+  # An offset is a flat line at its imposed value by construction.
+  held <- goldfish_onset
+  held$summary$fixed[1] <- TRUE
+  drawn <- plot(held, view = "path")$data
+  expect_false(goldfish_onset$summary$term[1] %in% drawn$term)
+
+  # And with every coefficient held there is nothing to trace.
+  all_held <- goldfish_onset
+  all_held$summary$fixed <- TRUE
+  expect_output(p <- plot(all_held), "No estimated coefficient")
+  expect_null(p)
+})
+
+test_that("the onset plot renders without goldfish attached", {
+  expect_false("package:goldfish" %in% search())
+  expect_s3_class(plot(goldfish_onset), "patchwork")
+})

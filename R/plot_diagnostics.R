@@ -20,8 +20,8 @@
 #'   right-censored ones.
 #' @name plot_adequacy
 #' @param x An object of class `diagnose_outliers`, `diagnose_changepoints`,
-#'   `margin_table`, `test_gof` or `test_time`, as returned by the goldfish
-#'   functions of the same names.
+#'   `margin_table`, `test_gof`, `test_time` or `diagnose_onset`, as returned
+#'   by the goldfish functions of the same names.
 #' @param ... Additional plotting parameters, currently unused.
 #' @return A ggplot object.
 NULL
@@ -356,4 +356,169 @@ gf_time_subtitle <- function(params) {
     transform <- "identity"
   }
   paste0("Score test of a ", transform, " time trend")
+}
+
+#' @rdname plot_adequacy
+#' @details
+#'   `plot.diagnose_onset()` composes two panels: each coefficient's
+#'   leave-the-first-`m`-events-out path, and the share of the model's
+#'   information those events delivered.
+#'
+#'   Both panels are **windowed on the excursion rather than the sequence**,
+#'   because the full range is mostly bridge tail --- the path returns to the
+#'   estimate by construction, so drawing all of it squashes the part being
+#'   read into a few percent of the axis. Each coefficient gets its own window
+#'   and its own x scale, since coefficients settle at very different points
+#'   and a window shared across facets re-creates the squashing it exists to
+#'   prevent. A coefficient whose path never left its band takes the full
+#'   range, there being no excursion to window on.
+#'
+#'   The accrual panel is drawn full-range with the onset window shaded, and
+#'   carries the proportional diagonal `y = x / n`. Without the diagonal a
+#'   monotone curve from 0 to 1 says nothing: the signal is the *departure*
+#'   from proportional, which is what makes an opening segment that carries
+#'   little information visible.
+#'
+#'   Coefficients held fixed through `offset()` are not drawn. Their path is a
+#'   flat line at the imposed value by construction.
+#' @param view Which panels to draw: `"both"` (default), or `"path"` or
+#'   `"accrual"` alone, which is the escape hatch when a model has too many
+#'   coefficients for a composed figure to stay readable.
+#' @param tolerance_band Whether to draw each coefficient's stabilization
+#'   band, the `+/- tolerance * std_error` corridor the path had to re-enter.
+#' @examples
+#' plot(goldfish_onset)
+#' @export
+plot.diagnose_onset <- function(
+  x,
+  ...,
+  view = c("both", "path", "accrual"),
+  tolerance_band = TRUE
+) {
+  view <- match.arg(view)
+  context <- gf_meta(x, "context")
+  params <- gf_meta(x, "params")
+  summary <- as.data.frame(x$summary)
+  # An offset never moves, so its path is its imposed value repeated.
+  summary <- summary[!summary$fixed, , drop = FALSE]
+  if (nrow(summary) == 0) {
+    cat("No estimated coefficient to trace.\n")
+    return(invisible(NULL))
+  }
+
+  path <- gf_onset_path_panel(x, summary, params, tolerance_band)
+  if (identical(view, "path")) {
+    return(path)
+  }
+  accrual <- gf_onset_accrual_panel(x, summary, context)
+  if (identical(view, "accrual")) {
+    return(accrual)
+  }
+  patchwork::wrap_plots(path, accrual, ncol = 1, heights = c(2, 1))
+}
+
+# The path panel, windowed per coefficient on its own excursion. The window is
+# `1.15 * stabilized_at`, floored at 10: a proportional floor squashes the
+# coefficients that settle in a handful of events, and an absolute margin
+# (`+ 20`) overshoots the ones whose whole excursion is shorter than that.
+gf_onset_path_panel <- function(x, summary, params, tolerance_band) {
+  path <- as.data.frame(x$path)
+  path <- path[path$index %in% summary$index, , drop = FALSE]
+  n_events <- max(path$dropped_events)
+  windows <- stats::setNames(
+    vapply(
+      summary$stabilized_at,
+      function(at) {
+        if (at == 0) n_events else min(n_events, max(ceiling(1.15 * at), 10))
+      },
+      numeric(1)
+    ),
+    summary$term
+  )
+  path <- path[path$dropped_events <= windows[path$term], , drop = FALSE]
+  # The marker joins `summary` onto `path` by term, which the plot-data
+  # contract permits: the two tables of one object may be read together.
+  markers <- summary[summary$stabilized_at > 0, , drop = FALSE]
+
+  p <- ggplot2::ggplot(
+    path,
+    ggplot2::aes(x = .data$dropped_events, y = .data$estimate)
+  )
+  if (tolerance_band) {
+    tolerance <- params$tolerance
+    if (is.null(tolerance)) tolerance <- 0.1
+    p <- p +
+      ggplot2::geom_ribbon(
+        ggplot2::aes(
+          ymin = .data$reference - tolerance * .data$std_error,
+          ymax = .data$reference + tolerance * .data$std_error
+        ),
+        fill = ag_base(),
+        alpha = 0.2
+      )
+  }
+  p <- p +
+    ggplot2::geom_hline(
+      ggplot2::aes(yintercept = .data$reference),
+      colour = ag_base()
+    ) +
+    ggplot2::geom_line(colour = ag_base(), na.rm = TRUE)
+  if (nrow(markers) > 0) {
+    p <- p +
+      ggplot2::geom_vline(
+        data = markers,
+        ggplot2::aes(xintercept = .data$stabilized_at),
+        colour = ag_highlight(),
+        linetype = "dashed"
+      )
+  }
+  p +
+    ggplot2::facet_wrap(~ .data$term, scales = "free") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = "Initial events dropped",
+      y = "Estimate",
+      subtitle = "Path with the stabilization point marked"
+    )
+}
+
+# The accrual panel: full range with the onset window shaded, and the
+# proportional diagonal drawn. The diagonal is what makes the curve readable —
+# the departure from it is the finding, not the curve's monotonicity.
+gf_onset_accrual_panel <- function(x, summary, context) {
+  accrual <- as.data.frame(x$accrual)
+  onset <- max(summary$stabilized_at)
+  n_events <- context$n_events
+  if (is.null(n_events)) n_events <- max(accrual$dropped_events)
+
+  p <- ggplot2::ggplot(
+    accrual,
+    ggplot2::aes(x = .data$dropped_events, y = .data$share)
+  )
+  if (onset > 0) {
+    p <- p +
+      ggplot2::annotate(
+        "rect",
+        xmin = 0,
+        xmax = onset,
+        ymin = 0,
+        ymax = 1,
+        fill = ag_highlight(),
+        alpha = 0.15
+      )
+  }
+  p +
+    ggplot2::geom_abline(
+      slope = 1 / n_events,
+      intercept = 0,
+      colour = ag_base(),
+      linetype = "dashed"
+    ) +
+    ggplot2::geom_line(colour = ag_base(), na.rm = TRUE) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = "Initial events dropped",
+      y = "Share of information",
+      subtitle = "Accrual against proportional, onset window shaded"
+    )
 }

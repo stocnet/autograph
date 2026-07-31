@@ -99,3 +99,9 @@
 #' @usage data(goldfish_time)
 "goldfish_time"
 
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_onset)
+"goldfish_onset"
+

@@ -7,6 +7,7 @@
 \alias{plot.margin_table}
 \alias{plot.test_gof}
 \alias{plot.test_time}
+\alias{plot.diagnose_onset}
 \title{Plotting adequacy diagnostics}
 \usage{
 \method{plot}{diagnose_outliers}(x, ...)
@@ -18,11 +19,13 @@
 \method{plot}{test_gof}(x, ..., level = 0.95)
 
 \method{plot}{test_time}(x, ...)
+
+\method{plot}{diagnose_onset}(x, ..., view = c("both", "path", "accrual"), tolerance_band = TRUE)
 }
 \arguments{
 \item{x}{An object of class \code{diagnose_outliers}, \code{diagnose_changepoints},
-\code{margin_table}, \code{test_gof} or \code{test_time}, as returned by the goldfish
-functions of the same names.}
+\code{margin_table}, \code{test_gof}, \code{test_time} or \code{diagnose_onset}, as returned
+by the goldfish functions of the same names.}
 
 \item{...}{Additional plotting parameters, currently unused.}
 
@@ -31,6 +34,13 @@ functions of the same names.}
 \item{level}{The confidence level of the reference bands, defaulting to
 0.95. The band is the two-sided Kolmogorov quantile of the supremum of a
 Brownian bridge, which is the reference the event-clock p-value uses.}
+
+\item{view}{Which panels to draw: \code{"both"} (default), or \code{"path"} or
+\code{"accrual"} alone, which is the escape hatch when a model has too many
+coefficients for a composed figure to stay readable.}
+
+\item{tolerance_band}{Whether to draw each coefficient's stabilization
+band, the \verb{+/- tolerance * std_error} corridor the path had to re-enter.}
 }
 \value{
 A ggplot object.
@@ -100,6 +110,28 @@ states formally.
 
 Under \code{method = "periods"} the intervals are coloured by their period, so
 the regimes the test compared are visible against the same scatter.
+
+\code{plot.diagnose_onset()} composes two panels: each coefficient's
+leave-the-first-\code{m}-events-out path, and the share of the model's
+information those events delivered.
+
+Both panels are \strong{windowed on the excursion rather than the sequence},
+because the full range is mostly bridge tail --- the path returns to the
+estimate by construction, so drawing all of it squashes the part being
+read into a few percent of the axis. Each coefficient gets its own window
+and its own x scale, since coefficients settle at very different points
+and a window shared across facets re-creates the squashing it exists to
+prevent. A coefficient whose path never left its band takes the full
+range, there being no excursion to window on.
+
+The accrual panel is drawn full-range with the onset window shaded, and
+carries the proportional diagonal \code{y = x / n}. Without the diagonal a
+monotone curve from 0 to 1 says nothing: the signal is the \emph{departure}
+from proportional, which is what makes an opening segment that carries
+little information visible.
+
+Coefficients held fixed through \code{offset()} are not drawn. Their path is a
+flat line at the imposed value by construction.
 }
 \examples{
 plot(goldfish_outliers)
@@ -107,4 +139,5 @@ plot(goldfish_changepoints)
 plot(goldfish_margins)
 plot(goldfish_gof)
 plot(goldfish_time)
+plot(goldfish_onset)
 }
