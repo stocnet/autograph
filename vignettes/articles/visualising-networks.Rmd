@@ -801,9 +801,9 @@ span multiple lines.
 ```{r legend, fig.width=9}
 fict_lotr |>
   mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>
-  graphr(node_color = "maxbet") +
-  guides(color = "legend") +
-  labs(color = "Maximum\nBetweenness")
+  graphr(node_colour = "maxbet") +
+  guides(colour = "legend") +
+  labs(colour = "Maximum\nBetweenness")
 ```
 
 To change the position of the legend, add the `theme()` function from
