@@ -16,6 +16,8 @@
 \alias{goldfish_outliers}
 \alias{goldfish_changepoints}
 \alias{goldfish_margins}
+\alias{goldfish_gof}
+\alias{goldfish_time}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -43,6 +45,10 @@ An object of class \code{diagnose_outliers} (inherits from \code{tbl_df}, \code{
 An object of class \code{diagnose_changepoints} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 115 rows and 10 columns.
 
 An object of class \code{margin_table} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 308 rows and 5 columns.
+
+An object of class \code{test_gof} (inherits from \code{list}) of length 3.
+
+An object of class \code{test_time} (inherits from \code{list}) of length 3.
 }
 \usage{
 data(res_migraph_reg)
@@ -70,6 +76,10 @@ data(goldfish_outliers)
 data(goldfish_changepoints)
 
 data(goldfish_margins)
+
+data(goldfish_gof)
+
+data(goldfish_time)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

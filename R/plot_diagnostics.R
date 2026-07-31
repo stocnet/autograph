@@ -19,9 +19,9 @@
 #'   intervals that took no part, which on a rate or REM fit are the
 #'   right-censored ones.
 #' @name plot_adequacy
-#' @param x An object of class `diagnose_outliers`, `diagnose_changepoints`
-#'   or `margin_table`, as returned by the goldfish functions of the same
-#'   names.
+#' @param x An object of class `diagnose_outliers`, `diagnose_changepoints`,
+#'   `margin_table`, `test_gof` or `test_time`, as returned by the goldfish
+#'   functions of the same names.
 #' @param ... Additional plotting parameters, currently unused.
 #' @return A ggplot object.
 NULL
@@ -201,4 +201,159 @@ plot.margin_table <- function(x, ..., top = 25) {
       )
   }
   p
+}
+
+#' @rdname plot_adequacy
+#' @details
+#'   `plot.test_gof()` draws each effect's standardized cumulative score
+#'   process against the Brownian-bridge bands its p-value was read from. At
+#'   the maximum the per-event scores sum to zero, so every path starts and
+#'   ends at zero; under a correctly specified model it is a bridge, and a path
+#'   that wanders outside the bands is an effect whose contribution is
+#'   concentrated somewhere in the sequence.
+#'
+#'   The x axis is the object's own process-time axis, taken from its `u`
+#'   column and labelled by the `clock` it records. This is not a
+#'   presentational detail: the bands are valid on whichever clock produced the
+#'   process, and re-deriving an event-index axis here would draw the path on
+#'   one clock and the reference on another. On the information clock the
+#'   spacing of the steps is itself the diagnostic --- a path that crosses most
+#'   of the axis in a few steps is an effect whose information arrives late.
+#' @param level The confidence level of the reference bands, defaulting to
+#'   0.95. The band is the two-sided Kolmogorov quantile of the supremum of a
+#'   Brownian bridge, which is the reference the event-clock p-value uses.
+#' @examples
+#' plot(goldfish_gof)
+#' @export
+plot.test_gof <- function(x, ..., level = 0.95) {
+  process <- as.data.frame(x$process)
+  clock <- gf_meta(x, "params")$clock
+
+  ggplot2::ggplot(
+    process,
+    ggplot2::aes(x = .data$u, y = .data$process)
+  ) +
+    ggplot2::geom_hline(yintercept = 0, colour = ag_base()) +
+    ggplot2::geom_hline(
+      yintercept = c(-1, 1) * gf_bridge_quantile(level),
+      colour = ag_highlight(),
+      linetype = "dashed"
+    ) +
+    ggplot2::geom_step(na.rm = TRUE) +
+    ggplot2::facet_wrap(gf_block_facets(process)) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = gf_clock_label(clock),
+      y = "Standardized cumulative score",
+      subtitle = paste0(
+        "Brownian-bridge band at ",
+        format(100 * level),
+        "%"
+      )
+    )
+}
+
+#' @rdname plot_adequacy
+#' @details
+#'   `plot.test_time()` draws the scaled Schoenfeld residuals of each tested
+#'   effect against time, with a smooth and the fitted estimate as the
+#'   reference. A residual scatter is centred on the coefficient the model
+#'   estimated; a smooth that drifts away from that line over the sequence is
+#'   the coefficient failing to be constant, which is what the test's p-value
+#'   states formally.
+#'
+#'   Under `method = "periods"` the intervals are coloured by their period, so
+#'   the regimes the test compared are visible against the same scatter.
+#' @examples
+#' plot(goldfish_time)
+#' @export
+plot.test_time <- function(x, ...) {
+  residuals <- as.data.frame(x$residuals)
+  params <- gf_meta(x, "params")
+  # `period` is all-NA under the trend method, which has no periods; colouring
+  # by a constant would put a one-level legend on every trend plot.
+  by_period <- !all(is.na(residuals$period))
+
+  p <- ggplot2::ggplot(
+    residuals,
+    ggplot2::aes(x = .data$clock, y = .data$residual)
+  ) +
+    ggplot2::geom_hline(
+      ggplot2::aes(yintercept = .data$reference),
+      colour = ag_base()
+    )
+  p <- if (by_period) {
+    p +
+      ggplot2::geom_point(
+        ggplot2::aes(colour = .data$period),
+        alpha = 0.4,
+        na.rm = TRUE
+      )
+  } else {
+    p + ggplot2::geom_point(alpha = 0.4, na.rm = TRUE, colour = ag_base())
+  }
+  p +
+    ggplot2::geom_smooth(
+      method = "loess",
+      formula = y ~ x,
+      se = FALSE,
+      colour = ag_highlight(),
+      na.rm = TRUE
+    ) +
+    ggplot2::facet_wrap(gf_block_facets(residuals), scales = "free_y") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = "Model time",
+      y = "Scaled Schoenfeld residual",
+      subtitle = gf_time_subtitle(params)
+    )
+}
+
+# The panels a test object facets on: the term always, plus the two identity
+# columns a flavoured (multi-process) result appends. Taking them from the
+# table rather than from the object's class is what lets one method serve both
+# shapes, as `plot.margin_table()` already does.
+gf_block_facets <- function(data) {
+  facets <- c("term", intersect(c("flavor", "family"), names(data)))
+  stats::as.formula(paste("~", paste(facets, collapse = " + ")))
+}
+
+# The two-sided Kolmogorov quantile: the level `q` with
+# P(sup|B| <= q) = level for a Brownian bridge B. Solved by bisection on the
+# series 1 - 2 sum (-1)^{j-1} exp(-2 j^2 q^2), which is the same distribution
+# the event-clock p-value inverts, so band and p-value cannot disagree.
+gf_bridge_quantile <- function(level) {
+  cdf <- function(q) {
+    j <- seq_len(100)
+    1 - 2 * sum((-1)^(j - 1) * exp(-2 * j^2 * q^2))
+  }
+  # `uniroot`'s default tolerance is about 1e-4, which is invisible in a drawn
+  # band but would make the band and the p-value disagree in the last digits.
+  # They invert the same distribution, so solve it to machine precision.
+  stats::uniroot(
+    function(q) cdf(q) - level,
+    interval = c(0.1, 10),
+    tol = .Machine$double.eps^0.75
+  )$root
+}
+
+# The axis label names the clock the process was built on, because the two are
+# different quantities: event-clock steps are equally spaced by construction,
+# information-clock steps are spaced by how much each event contributed.
+gf_clock_label <- function(clock) {
+  if (identical(clock, "information")) {
+    return("Cumulative share of information")
+  }
+  "Share of events"
+}
+
+gf_time_subtitle <- function(params) {
+  if (identical(params$method, "periods")) {
+    return("Score test of a coefficient difference across periods")
+  }
+  transform <- params$transform
+  if (is.null(transform) || is.na(transform)) {
+    transform <- "identity"
+  }
+  paste0("Score test of a ", transform, " time trend")
 }

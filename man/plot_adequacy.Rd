@@ -5,6 +5,8 @@
 \alias{plot.diagnose_outliers}
 \alias{plot.diagnose_changepoints}
 \alias{plot.margin_table}
+\alias{plot.test_gof}
+\alias{plot.test_time}
 \title{Plotting adequacy diagnostics}
 \usage{
 \method{plot}{diagnose_outliers}(x, ...)
@@ -12,15 +14,23 @@
 \method{plot}{diagnose_changepoints}(x, ...)
 
 \method{plot}{margin_table}(x, ..., top = 25)
+
+\method{plot}{test_gof}(x, ..., level = 0.95)
+
+\method{plot}{test_time}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{diagnose_outliers}, \code{diagnose_changepoints}
-or \code{margin_table}, as returned by the goldfish functions of the same
-names.}
+\item{x}{An object of class \code{diagnose_outliers}, \code{diagnose_changepoints},
+\code{margin_table}, \code{test_gof} or \code{test_time}, as returned by the goldfish
+functions of the same names.}
 
 \item{...}{Additional plotting parameters, currently unused.}
 
 \item{top}{The number of actors to draw, those furthest from the reference.}
+
+\item{level}{The confidence level of the reference bands, defaulting to
+0.95. The band is the two-sided Kolmogorov quantile of the supremum of a
+Brownian bridge, which is the reference the event-clock p-value uses.}
 }
 \value{
 A ggplot object.
@@ -65,9 +75,36 @@ drawn, and the subtitle says how many were left out. Actors are ranked by
 their largest deviation over the roles they appear in, so an actor kept
 for one margin keeps the other beside it. Pass \code{top = Inf} for all of
 them.
+
+\code{plot.test_gof()} draws each effect's standardized cumulative score
+process against the Brownian-bridge bands its p-value was read from. At
+the maximum the per-event scores sum to zero, so every path starts and
+ends at zero; under a correctly specified model it is a bridge, and a path
+that wanders outside the bands is an effect whose contribution is
+concentrated somewhere in the sequence.
+
+The x axis is the object's own process-time axis, taken from its \code{u}
+column and labelled by the \code{clock} it records. This is not a
+presentational detail: the bands are valid on whichever clock produced the
+process, and re-deriving an event-index axis here would draw the path on
+one clock and the reference on another. On the information clock the
+spacing of the steps is itself the diagnostic --- a path that crosses most
+of the axis in a few steps is an effect whose information arrives late.
+
+\code{plot.test_time()} draws the scaled Schoenfeld residuals of each tested
+effect against time, with a smooth and the fitted estimate as the
+reference. A residual scatter is centred on the coefficient the model
+estimated; a smooth that drifts away from that line over the sequence is
+the coefficient failing to be constant, which is what the test's p-value
+states formally.
+
+Under \code{method = "periods"} the intervals are coloured by their period, so
+the regimes the test compared are visible against the same scatter.
 }
 \examples{
 plot(goldfish_outliers)
 plot(goldfish_changepoints)
 plot(goldfish_margins)
+plot(goldfish_gof)
+plot(goldfish_time)
 }

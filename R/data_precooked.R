@@ -87,3 +87,15 @@
 #' @rdname made_earlier
 #' @usage data(goldfish_margins)
 "goldfish_margins"
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_gof)
+"goldfish_gof"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_time)
+"goldfish_time"
+
