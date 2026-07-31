@@ -19,6 +19,7 @@
 \alias{goldfish_gof}
 \alias{goldfish_time}
 \alias{goldfish_onset}
+\alias{goldfish_fit}
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netlm} of length 15.
@@ -52,6 +53,8 @@ An object of class \code{test_gof} (inherits from \code{list}) of length 3.
 An object of class \code{test_time} (inherits from \code{list}) of length 3.
 
 An object of class \code{diagnose_onset} (inherits from \code{list}) of length 3.
+
+An object of class \code{result.goldfish} of length 31.
 }
 \usage{
 data(res_migraph_reg)
@@ -85,6 +88,8 @@ data(goldfish_gof)
 data(goldfish_time)
 
 data(goldfish_onset)
+
+data(goldfish_fit)
 }
 \description{
 These are all pre-cooked results objects, saved here to save time in

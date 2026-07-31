@@ -56,6 +56,19 @@
 - Added the precooked `goldfish_gof`, `goldfish_time` and `goldfish_onset`
   fixtures, and regenerated the three existing ones against the goldfish
   version that produced them
+- Added `plot.result.goldfish()`, a one-call overview of a fitted goldfish
+  model: deviance trace with outlying intervals marked, scaled Schoenfeld
+  smooths for the effects most worth looking at, the cumulative score
+  processes, and the waiting times against the unit exponential they follow.
+  Everything is drawn from what the fit already stores --- no evaluation pass
+  and no preprocessed statistics --- so a panel needing a primitive the fit did
+  not store is left out rather than erroring, and which panels appear is itself
+  a readout of what was requested at estimation. The waiting-time panel is
+  exact-time only, an ordinal likelihood having conditioned the timing away
+- goldfish joins `ergm` and `RSiena` under `Enhances`, autograph now plotting
+  its fitted objects as well as its diagnostic ones. It remains absent from
+  `Imports` and `Depends`: dispatch is on class, and the overview gates its
+  goldfish calls the way the other optional-package methods do
 
 # autograph 1.0.3
 

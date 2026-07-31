@@ -522,3 +522,176 @@ gf_onset_accrual_panel <- function(x, summary, context) {
       subtitle = "Accrual against proportional, onset window shaded"
     )
 }
+
+#' Plotting a goldfish model fit at a glance
+#'
+#' @description
+#'   One call, four diagnostic panels: whether any interval is badly fitted,
+#'   whether any coefficient drifts, whether each effect's contribution is
+#'   spread over the sequence, and whether the waiting times are what the model
+#'   says they are.
+#'
+#' @details
+#'   Everything is drawn from what the **fit already stores** --- no evaluation
+#'   pass and no preprocessed statistics --- so the figure costs a plot and not
+#'   a re-fit. The consequence is that a panel needing a primitive the fit did
+#'   not store is **left out** rather than erroring: which panels appear is
+#'   itself a readout of what was requested at estimation.
+#'
+#'   \describe{
+#'     \item{deviance}{the per-interval log-likelihood with outlying intervals
+#'       marked. Needs the `"loglik"` primitive.}
+#'     \item{scaled Schoenfeld}{a smooth per effect against the fitted estimate,
+#'       flat under a constant coefficient. Needs `"scores"` on a multinomial
+#'       sub-model, and `"conditional_scores"` on an exact-time one, where the
+#'       score carries an exposure term the Schoenfeld residual does not.}
+#'     \item{cumulative score}{each effect's standardized process against its
+#'       Brownian-bridge band. Needs `"scores"`.}
+#'     \item{waiting times}{the Cox-Snell residuals against the unit
+#'       exponential they follow under the model. Exact-time sub-models only:
+#'       an ordinal likelihood conditions the timing away, so there is no
+#'       waiting time to check.}
+#'   }
+#'
+#'   The Schoenfeld panel is capped at the `effects` most worth looking at,
+#'   ranked by their cumulative-score statistic, since a model with a dozen
+#'   terms makes a facet grid unreadable at overview size.
+#'
+#' @param x A fitted model of class `result.goldfish`.
+#' @param ... Additional plotting parameters, currently unused.
+#' @param effects The number of effects to draw in the Schoenfeld panel.
+#' @return A patchwork composition of the available panels.
+#' @name plot_goldfish_fit
+#' @examples
+#' plot(goldfish_fit)
+#' @export
+plot.result.goldfish <- function(x, ..., effects = 4) {
+  thisRequires("goldfish")
+  panels <- list(
+    gf_overview_deviance(x),
+    gf_overview_schoenfeld(x, effects),
+    gf_overview_gof(x),
+    gf_overview_waiting(x)
+  )
+  panels <- Filter(Negate(is.null), panels)
+  if (length(panels) == 0) {
+    cat("This fit stores no diagnostic primitive to plot.\n")
+    return(invisible(NULL))
+  }
+  patchwork::wrap_plots(panels, ncol = min(2, length(panels)))
+}
+
+# Each panel is attempted and dropped on failure rather than pre-checked
+# against a primitive list: goldfish already raises a named error when a
+# primitive is missing, and duplicating its availability rules here is how the
+# two would drift apart.
+gf_overview_try <- function(expr) {
+  tryCatch(expr, error = function(e) NULL)
+}
+
+gf_overview_deviance <- function(x) {
+  outliers <- gf_overview_try(goldfish::diagnose_outliers(x))
+  if (is.null(outliers)) {
+    return(NULL)
+  }
+  data <- as.data.frame(outliers)
+  # Unlike the standalone method this draws the trace even with nothing
+  # flagged: in a composed figure a clean panel is a finding, and a panel that
+  # vanished would read as a missing primitive instead.
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$time, y = .data$.series)) +
+    ggplot2::geom_line(colour = ag_base(), na.rm = TRUE) +
+    ggplot2::geom_point(
+      data = data[!is.na(data$outlier) & data$outlier, , drop = FALSE],
+      colour = ag_highlight(),
+      na.rm = TRUE
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(x = "", y = "Interval log likelihood", subtitle = "Deviance")
+}
+
+gf_overview_schoenfeld <- function(x, effects) {
+  rows <- gf_overview_try(
+    stats::residuals(x, type = "scaled_schoenfeld")
+  )
+  if (is.null(rows)) {
+    return(NULL)
+  }
+  keep <- gf_overview_rank(x, colnames(rows), effects)
+  long <- data.frame(
+    interval = rep(seq_len(nrow(rows)), times = length(keep)),
+    term = rep(keep, each = nrow(rows)),
+    value = as.numeric(rows[, keep, drop = FALSE])
+  )
+  estimates <- stats::coef(x)[keep]
+  reference <- data.frame(term = keep, estimate = as.numeric(estimates))
+
+  ggplot2::ggplot(long, ggplot2::aes(x = .data$interval, y = .data$value)) +
+    ggplot2::geom_hline(
+      data = reference,
+      ggplot2::aes(yintercept = .data$estimate),
+      colour = ag_base()
+    ) +
+    ggplot2::geom_smooth(
+      method = "loess",
+      formula = y ~ x,
+      se = FALSE,
+      colour = ag_highlight(),
+      na.rm = TRUE
+    ) +
+    ggplot2::facet_wrap(~ .data$term, scales = "free_y") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(x = "", y = "", subtitle = "Scaled Schoenfeld")
+}
+
+# Which effects the Schoenfeld panel draws. Ranked by the cumulative-score
+# statistic where it is available, so the panel shows what is worth looking at
+# rather than whichever terms the formula happened to name first.
+gf_overview_rank <- function(x, terms, effects) {
+  if (length(terms) <= effects) {
+    return(terms)
+  }
+  gof <- gf_overview_try(goldfish::test_gof(x))
+  if (is.null(gof)) {
+    return(terms[seq_len(effects)])
+  }
+  ranked <- gof$effects$coefficient[order(gof$effects$statistic, decreasing = TRUE)]
+  ranked <- ranked[ranked %in% terms]
+  if (length(ranked) == 0) terms[seq_len(effects)] else utils::head(ranked, effects)
+}
+
+gf_overview_gof <- function(x) {
+  gof <- gf_overview_try(goldfish::test_gof(x))
+  if (is.null(gof)) {
+    return(NULL)
+  }
+  plot(gof) +
+    ggplot2::labs(subtitle = "Cumulative score", x = "", y = "") +
+    ggplot2::theme(strip.text = ggplot2::element_text(size = 7))
+}
+
+gf_overview_waiting <- function(x) {
+  # Exact-time only, and the error goldfish raises on an ordinal fit is what
+  # decides that -- the panel does not re-derive which families have a
+  # compensator.
+  residuals <- gf_overview_try(stats::residuals(x, type = "cox_snell"))
+  if (is.null(residuals)) {
+    return(NULL)
+  }
+  observed <- sort(as.numeric(residuals))
+  data <- data.frame(
+    theoretical = stats::qexp(stats::ppoints(length(observed))),
+    observed = observed
+  )
+  ggplot2::ggplot(
+    data,
+    ggplot2::aes(x = .data$theoretical, y = .data$observed)
+  ) +
+    ggplot2::geom_abline(slope = 1, intercept = 0, colour = ag_base()) +
+    ggplot2::geom_point(colour = ag_highlight(), alpha = 0.5) +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = "Unit exponential",
+      y = "Cox-Snell residual",
+      subtitle = "Waiting times"
+    )
+}

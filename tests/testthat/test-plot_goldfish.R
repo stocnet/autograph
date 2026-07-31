@@ -249,3 +249,69 @@ test_that("the onset plot renders without goldfish attached", {
   expect_false("package:goldfish" %in% search())
   expect_s3_class(plot(goldfish_onset), "patchwork")
 })
+
+# The one-call overview. It plots a FIT rather than a diagnostic object, and
+# everything it draws comes from what the fit already stores -- so which panels
+# appear is itself a readout of what was requested at estimation.
+
+test_that("the overview composes the panels the fit can supply", {
+  p <- plot(goldfish_fit)
+  expect_s3_class(p, "patchwork")
+  # The fixture stores loglik, scores and conditional_scores and is
+  # exact-time, so all four panels are available.
+  expect_length(p$patches$plots, 3L)
+})
+
+test_that("the overview costs no evaluation pass", {
+  # Stored primitives only: the fixture carries no preprocessed statistics, so
+  # anything reaching for a replay would abort rather than draw.
+  expect_null(goldfish_fit$preprocessed)
+  expect_s3_class(plot(goldfish_fit), "patchwork")
+})
+
+test_that("a panel whose primitive is missing is left out, not an error", {
+  stripped <- goldfish_fit
+  stripped$event_scores <- NULL
+  stripped$conditional_scores <- NULL
+  p <- plot(stripped)
+  # Deviance and waiting times survive on "loglik" alone; the two score-based
+  # panels drop.
+  expect_s3_class(p, "patchwork")
+  expect_length(p$patches$plots, 1L)
+})
+
+test_that("an ordinal fit has no waiting-time panel", {
+  # An ordinal likelihood conditions the timing away, so there is no
+  # compensator and no waiting time to check.
+  ordinal <- goldfish_fit
+  ordinal$total_rate <- NULL
+  ordinal$intervals <- NULL
+  drawn <- plot(ordinal)
+  expect_s3_class(drawn, "patchwork")
+  expect_lt(length(drawn$patches$plots), 3L)
+})
+
+test_that("a fit with nothing stored says so instead of drawing", {
+  bare <- goldfish_fit
+  for (component in c(
+    "interval_log_lik", "event_scores", "conditional_scores",
+    "total_rate", "intervals"
+  )) {
+    bare[[component]] <- NULL
+  }
+  expect_output(p <- plot(bare), "no diagnostic primitive")
+  expect_null(p)
+})
+
+test_that("the Schoenfeld panel caps the effects it draws", {
+  # A model with a dozen terms makes a facet grid unreadable at overview size,
+  # so the panel is capped and ranked by the cumulative-score statistic.
+  wide <- plot(goldfish_fit, effects = 2)
+  # patchwork keeps the last plot at the top level and the rest under
+  # `$patches$plots`, so the panels are found by their subtitle rather than by
+  # a position that shifts whenever one drops out.
+  panels <- c(wide$patches$plots, list(wide))
+  subtitles <- vapply(panels, function(p) p$labels$subtitle %||% "", character(1))
+  schoenfeld <- panels[[match("Scaled Schoenfeld", subtitles)]]
+  expect_length(unique(schoenfeld$data$term), 2L)
+})
