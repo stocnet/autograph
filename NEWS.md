@@ -41,6 +41,10 @@
   - Removed `{ggdendro}` from Imports
 - Fixed a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
 
+## Theming
+
+- Improved `stocnet_theme()` to error with the nearest match on an unrecognised theme name, instead of warning and silently leaving the previous theme in place; giving more than one theme name is also caught
+
 ## Tutorials
 
 - Updated visualization tutorial to use colour/color consistently
