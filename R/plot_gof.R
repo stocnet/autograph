@@ -147,7 +147,7 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
     statkeys <- as.character(which(no_vary))
     simsMat <- simsMat[,!no_vary]
     obs <- obs[!no_vary, ]
-    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    .inform_no_variance(statkeys)
   }
   colnames(simsMat) <- obs$name
   rownames(simsMat) <- 1:nrow(simsMat)
@@ -204,7 +204,7 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   no_vary <- sims.min == obs & sims.min == sims.max
   if (any((diag(stats::var(rbind(sims, obs))) == 0))) {
     statkeys <- attr(x, "key")[which(diag(stats::var(rbind(sims, obs))) == 0)]
-    snet_info("Note: statistic{?s} {statkeys} not plotted because the{?ir} variance is 0.")
+    .inform_no_variance(statkeys)
   }
   
   itns <- nrow(sims)
@@ -311,7 +311,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     statkeys <- names(no_vary)[which(no_vary)]
     simsMat <- simsMat[,!no_vary]
     obs <- obs[!no_vary, ]
-    snet_info("Note: statistic{?s} {statkeys} not plotted because their variance is 0.")
+    .inform_no_variance(statkeys)
   }
   obs <- obs %>% dplyr::mutate(name = .to_factor(name))
   sims <- as.data.frame(simsMat, check.names = FALSE)
@@ -356,4 +356,13 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     # Otherwise, convert directly to factor
     factor(x)
   }
+}
+
+# Statistics that never vary across the simulations produce a degenerate violin,
+# so they are dropped from the plot. Said in one place because three of the GOF
+# plot methods have to report it.
+.inform_no_variance <- function(statkeys) {
+  snet_info("Not plotting the statistic{?s} {.val {statkeys}},",
+            "because {?it does/they do} not vary across the simulations,",
+            "so there is no distribution to show.")
 }

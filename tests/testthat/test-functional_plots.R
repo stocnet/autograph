@@ -168,7 +168,7 @@ test_that("motif plots draw the corresponding motif panels", {
                      class = "network_motif")
   expect_buildable(plot(dyads))
   unknown <- structure(c(Z9 = 1), class = "network_motif")
-  expect_error(plot(unknown), "Cannot plot")
+  expect_error(plot(unknown), "cannot be illustrated yet")
 })
 
 # graphs() variants: shared layouts, wave selection, and fallbacks

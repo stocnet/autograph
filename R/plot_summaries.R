@@ -16,8 +16,12 @@
 #' plot(res_manynet_diff)
 #' @export
 plot.diff_model <- function(x, ..., all_steps = TRUE){
-  # if(nrow(x)==1) snet_warn("No diffusion observed.") else {
-  if(nrow(x)==1) warning("No diffusion observed.") else {
+  if(nrow(x)==1) manynet::snet_warn(
+    "No diffusion was observed, so there is nothing to plot.",
+    "The diffusion ran for a single step, which happens when no node was",
+    "seeded or when the seeds had no one to infect.",
+    "Check the {.arg seeds} given to {.fn manynet::play_diffusion},",
+    "and that the network has ties.") else {
     data <- x
     if(!all_steps) data <- data %>% 
         dplyr::filter(!(data$I==data$I[length(data$I)] *

@@ -39,7 +39,10 @@
   - Passes `hclust` object's own merge heights to the dendrogram layout to reproduce the previous plot's leaf order, merge heights, cluster label colours, and cutpoint line
   - Branches now drawn in `ag_base()` rather than black, matching the height axis and so respecting the active `stocnet_theme()`
   - Removed `{ggdendro}` from Imports
-- Fixed a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
+- Updated a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
+- Updated terse or dead-end messages to say what to do next, including `plot.node_motif()`/`plot.network_motif()` ("Cannot plot these motifs yet, sorry."), `match_color()`, `plot.diff_model()`, and the concentric and hierarchy layouts ("Duplicated nodes in layers!")
+- Updated zero-variance note shared by three GOF plot methods so that their wording cannot drift
+
 
 ## Theming
 

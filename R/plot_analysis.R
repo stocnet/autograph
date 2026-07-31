@@ -370,7 +370,13 @@ plot.node_motif <- function(x, ...) {
     graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     graphs(manynet::create_motifs(2), waves = 1:2)
-  } else stop("Cannot plot these motifs yet, sorry.")
+  } else manynet::snet_abort(
+    "These motifs, {.val {motifs}}, cannot be illustrated yet.",
+    "Dyad, triad, and undirected tetrad censuses can be plotted,",
+    "for example the results of {.fn manynet::node_by_triad} or",
+    "{.fn manynet::net_by_dyad}.",
+    "If you would like these motifs illustrated too, please raise an issue at",
+    "{.url https://github.com/stocnet/autograph/issues}.")
 }
 
 #' @rdname map_motifs
@@ -389,5 +395,11 @@ plot.network_motif <- function(x, ...) {
     graphs(manynet::create_motifs(2, directed = TRUE), waves = 1:3)
   } else if("Mutual" %in% motifs){
     graphs(manynet::create_motifs(2), waves = 1:2)
-  } else stop("Cannot plot these motifs yet, sorry.")
+  } else manynet::snet_abort(
+    "These motifs, {.val {motifs}}, cannot be illustrated yet.",
+    "Dyad, triad, and undirected tetrad censuses can be plotted,",
+    "for example the results of {.fn manynet::node_by_triad} or",
+    "{.fn manynet::net_by_dyad}.",
+    "If you would like these motifs illustrated too, please raise an issue at",
+    "{.url https://github.com/stocnet/autograph/issues}.")
 }
