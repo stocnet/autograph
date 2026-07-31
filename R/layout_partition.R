@@ -65,20 +65,28 @@ layout_concentric <- function(.data, membership,
     }))
     .data <- igraph::set_vertex_attr(.data, "name", value = ll)
   }
-  if (missing(membership)) { 
-    if (manynet::is_twomode(.data)) membership <- manynet::node_is_mode(.data) else 
-      manynet::snet_abort("Please pass the function a `membership` node attribute or a vector.")
+  if (missing(membership)) {
+    if (manynet::is_twomode(.data)) membership <- manynet::node_is_mode(.data) else
+      .abort_layout_arg("membership", "concentric", length(.data))
   } else {
     if (length(membership) > 1 & length(membership) != length(.data)) {
-      manynet::snet_abort("Please pass the function a `membership` node attribute or a vector.")
+      .abort_layout_arg("membership", "concentric", length(.data))
     } else if (length(membership) != length(.data)) {
+      membership <- .match_name(membership, igraph::vertex_attr_names(.data),
+                                "membership", what = "node attribute")
       membership <- manynet::node_attribute(.data, membership)
     }
   }
   names(membership) <- manynet::node_names(.data)
   membership <- to_list(membership)
   all_c  <- unlist(membership, use.names = FALSE)
-  if (any(table(all_c) > 1)) manynet::snet_abort("Duplicated nodes in layers!")
+  if (any(table(all_c) > 1)) {
+    duplicated_nodes <- names(which(table(all_c) > 1))
+    manynet::snet_abort(
+      "The {.val concentric} layout draws each node in one circle only,",
+      "but {.val {duplicated_nodes}} appear{?s} in more than one.",
+      "Please check that {.arg membership} gives each node a single group.")
+  }
   if (manynet::is_labelled(.data)) all_n <- manynet::node_names(.data) else 
     all_n <- 1:manynet::net_nodes(.data)
   sel_other  <- all_n[!all_n %in% all_c]
@@ -129,12 +137,14 @@ layout_multilevel <- function(.data, level, circular = FALSE) {
     if (any(grepl("lvl", names(manynet::node_attribute(.data))))) {
       manynet::snet_info("Level attribute 'lvl' found in data.")
     } else {
-      manynet::snet_abort("Please pass the function a `level` node attribute or a vector.")
+      .abort_layout_arg("level", "multilevel", length(.data))
     }
   } else {
     if (length(level) > 1 & length(level) != length(.data)) {
-      manynet::snet_abort("Please pass the function a `level` node attribute or a vector.")
+      .abort_layout_arg("level", "multilevel", length(.data))
     } else if (length(level) != length(.data)) {
+      level <- .match_name(level, igraph::vertex_attr_names(.data),
+                           "level", what = "node attribute")
       level <- as.factor(manynet::node_attribute(.data, level))
     }
   }
@@ -156,9 +166,14 @@ layout_tbl_graph_multilevel <- layout_multilevel
 #' #              node_size = migraph::node_degree(ison_adolescents)*10)
 #' @export
 layout_lineage <- function(.data, rank, circular = FALSE) {
+  # Without this the missing argument surfaces further down as R's own
+  # "argument "rank" is missing, with no default".
+  if (missing(rank)) .abort_layout_arg("rank", "lineage", length(.data))
   if (length(rank) > 1 & length(rank) != length(.data)) {
-    manynet::snet_abort("Please pass the function a `rank` node attribute or a vector.")
+    .abort_layout_arg("rank", "lineage", length(.data))
   } else if (length(rank) != length(.data)) {
+    rank <- .match_name(rank, igraph::vertex_attr_names(.data),
+                        "rank", what = "node attribute")
     rank <- as.numeric(manynet::node_attribute(.data, rank))
   }
   out <- layout_tbl_graph_alluvial(
@@ -317,7 +332,10 @@ layout_hierarchy <- function(.data, center = NULL,
     }
     out <- .to_lo(cbind(nodeX, nodeY))
   } else {
-    if (!manynet::is_twomode(.data)) manynet::snet_abort("Please declare a two-mode network.")
+    if (!manynet::is_twomode(.data)) manynet::snet_abort(
+      "The {.val hierarchy} layout can only centre on a mode of a two-mode",
+      "network, but a one-mode network was given.",
+      "Either drop the {.arg center} argument, or use a two-mode network.")
     net <- manynet::as_matrix(.data)
     nn <- dim(net)[1]
     mm <- dim(net)[2]
@@ -349,7 +367,11 @@ layout_hierarchy <- function(.data, center = NULL,
         crd <- rbind(side1, side2)
         crd[which(is.nan(crd))] <- 0.5
         rownames(crd) <- c(dimnames(net)[[1]], dimnames(net)[[2]])
-      } else manynet::snet_abort("Please declare actors, events, or a node name as center.")
+      } else .abort_no_match(center, manynet::node_names(.data), "center",
+                             what = "node name",
+                             extra_desc = paste("{.val actors} or {.val events}",
+                                                "can also be given here,",
+                                                "to centre on a whole mode."))
     }
     out <- .to_lo(crd)
   }
@@ -489,7 +511,8 @@ rng <- function(r) {
     x <- append(x, (-1))
     for (i in 1:(r - 1)) x <- append(x, ((-1) + (2L/(r - 1L)) * i))
     return(x * (r/50L))
-  } else manynet::snet_abort("no negative values")
+  } else manynet::snet_abort(
+    "A layout cannot be built for a negative number of nodes, but {r} was given.")
 }
 
 nrm <- function(x, digits = 3) {

@@ -50,6 +50,11 @@
 - Updated terse or dead-end messages to say what to do next, including `plot.node_motif()`/`plot.network_motif()` ("Cannot plot these motifs yet, sorry."), `match_color()`, `plot.diff_model()`, and the concentric and hierarchy layouts ("Duplicated nodes in layers!")
 - Updated zero-variance note shared by three GOF plot methods so that their wording cannot drift
 
+## Layouts
+
+- Improved the error on an unrecognised `layout`, which now names the argument, suggests the nearest layout, and lists autograph's own layouts, rather than reporting "object 'layout_tbl_graph_stresss' not found"
+  - Passing a layout *function* (e.g. `layout = igraph::layout_with_fr`), rather than its name, now says so instead of erroring with "invalid indexing"
+- Added checks of the `membership`/`level`/`rank` arguments that the partition layouts require, which name the argument and offer the closest match
 
 ## Theming
 
