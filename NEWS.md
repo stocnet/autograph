@@ -20,6 +20,7 @@
   - Theme-mutating tests now restore the previous theme with `on.exit()`, so global theme state cannot leak between parallel test workers
 - Updated favicons
 - Updated README to send viz examples to website
+- Updated CONTRIBUTING
 - Fixed README double logoing on pkgdown build, and added alttext
 
 ## Graphing
