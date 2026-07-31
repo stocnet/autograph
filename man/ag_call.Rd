@@ -61,3 +61,16 @@ friendly, but users should always check that their visualisations serve
 their intended audience.
 }
 
+\examples{
+# Single colours from the currently active theme
+ag_base()
+ag_highlight()
+ag_positive()
+ag_negative()
+# Palettes of a requested length
+ag_qualitative(3)
+ag_sequential(5)
+ag_divergent(5)
+# The accessors follow whichever theme is set
+ag_font()
+}

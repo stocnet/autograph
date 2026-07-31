@@ -5,6 +5,8 @@ inst/doc
 .Ruserdata
 .DS_Store
 data-raw/*
+# tracked so the articles-in-sync CI job can regenerate the tutorial articles
+!data-raw/build_tutorial_articles.R
 docs/
 working/*
 /doc/

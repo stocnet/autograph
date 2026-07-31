@@ -54,6 +54,14 @@ Currently configurational layouts are available for 2-6 nodes.
 The "configuration" layout will choose the appropriate configurational
 layout automatically.
 }
+\examples{
+# "configuration" picks the layout matching the number of nodes
+graphr(manynet::create_ring(4), layout = "configuration")
+# or a specific configuration can be named
+graphr(manynet::create_ring(3), layout = "triad")
+# the layout functions can also be called directly for their coordinates
+layout_tetrad(manynet::create_ring(4))
+}
 \seealso{
 Other mapping:
 \code{\link{layout_partition}},

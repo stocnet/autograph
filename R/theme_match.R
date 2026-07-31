@@ -35,7 +35,13 @@
 match_color <- function(colors, pal) {
   if (missing(pal)) pal <- ag_qualitative()
   if (length(colors) > length(pal)) {
-    stop("Not enough unique colors in the palette for the input colors.")
+    n_colors <- length(colors)
+    n_pal <- length(pal)
+    manynet::snet_abort(
+      "{n_colors} colours were given to match, but the palette holds only",
+      "{n_pal}, so they cannot each be matched to a different one.",
+      "Either pass fewer colours, or give a larger palette to {.arg pal},",
+      "for example {.code ag_qualitative({n_colors})}.")
   }
   
   # Force colors to be a character vector

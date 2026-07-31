@@ -56,6 +56,22 @@ test_that("grapht() accepts an unsplit longitudinal network", {
   expect_gt(attr(p, "nwaves"), 1)
 })
 
+test_that("grapht() splits a longitudinal network with a logical changing attribute", {
+  # fict_starwars is a changing+longitudinal network with a logical `active`
+  # node attribute (and numeric height/mass) that change over time. manynet's
+  # to_waves() aborts splitting these ("Can't combine <character> and
+  # <logical>"); .to_waves_safe() coerces the offending attributes and retries.
+  skip_if_not(manynet::is_changing(manynet::fict_starwars))
+  expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
+  # .to_waves_safe() returns the same waves manynet would, without erroring
+  waves <- autograph:::.to_waves_safe(manynet::fict_starwars)
+  expect_type(waves, "list")
+  expect_gt(length(waves), 1)
+  p <- grapht(manynet::fict_starwars)
+  expect_s3_class(p, "grapht")
+  expect_equal(attr(p, "nwaves"), length(waves))
+})
+
 test_that("grapht() accepts an unsplit dynamic network", {
   # Dynamic (time-stamped, event-based) networks are split into cumulative
   # time slices via manynet::to_slices(), which needs an increment/weight.
@@ -73,7 +89,6 @@ test_that("grapht() accepts an unsplit dynamic network", {
 # Layout and label defaults ----
 
 test_that("two-mode networks default to the dynamic stress layout, not hierarchy", {
-  skip_if_not_installed("graphlayouts")
   w1 <- manynet::as_tidygraph(igraph::make_bipartite_graph(
     c(TRUE, TRUE, FALSE, FALSE, FALSE),
     c(1, 3, 1, 4, 2, 5)))
@@ -130,7 +145,6 @@ test_that("dense frames fade present edges below the sparse-network default", {
 })
 
 test_that("alpha = 1 anchors every node across frames", {
-  skip_if_not_installed("graphlayouts")
   p <- grapht(.wave_fixture(), alpha = 1)
   nd <- .node_layer(p)$data
   stable <- vapply(split(nd[, c("x", "y")], nd$name),
@@ -199,7 +213,11 @@ test_that("keep_isolates is deprecated but still honoured", {
   tied <- manynet::as_tidygraph(igraph::graph_from_data_frame(
     data.frame(from = "A", to = "B"),
     directed = FALSE, vertices = data.frame(name = c("A", "B", "C"))))
-  expect_warning(p <- grapht(list(t1 = tied, t2 = tied), keep_isolates = FALSE),
+  # The deprecation notice comes through the stocnet cli interface (snet_warn),
+  # so it is a message rather than a base R warning.
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  expect_message(p <- grapht(list(t1 = tied, t2 = tied), keep_isolates = FALSE),
                  "deprecated")
   nd <- .node_layer(p)$data
   expect_true(all(nd$nalpha[nd$name == "C"] == 0))

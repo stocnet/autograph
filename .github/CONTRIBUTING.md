@@ -4,7 +4,11 @@ Contributions to `autograph`,
 whether in the form of issue identification, bug fixes, new code or documentation 
 are encouraged and welcome.
 
-## Git and Bitbucket
+Please note that the `autograph` project is released with a 
+[Contributor Code of Conduct](CODE_OF_CONDUCT.md). 
+By contributing to this project, you agree to abide by its terms.
+
+## Git
 
 `stocnet` projects are maintained using the git version control system.
 A plain-English introduction to git can be found [here](https://blog.red-badger.com/2016/11/29/gitgithub-in-plain-english).
@@ -12,6 +16,8 @@ I recommend you read this before continuing.
 A more recent motivation can be found [here](https://www.r-bloggers.com/2024/04/git-gud-version-control-best-practices/).
 It will explain the basics of git version control, committing and repos, pulling and pushing,
 branching and merging.
+
+### Fork
 
 Using git from the command line on your lap- or desktop can be intimidating,
 but I recommend [Fork](https://git-fork.com) software for Mac and Windows.
@@ -21,13 +27,6 @@ There are various other git software packages available, but this one is fairly 
 The Github page allows to access the issues assigned to you and check the commits.
 You can also access the documents in the repository, 
 although this won't be necessary after you have cloned it on your computer via Fork.
-
-## Style
-
-In terms of style, we are aiming for pleasant predictability in terms of user experience.
-To that end, we have a regular syntax that users can rely on producing expected effects.
-
-## Fork
 
 ### Cloning
 Once you have downloaded Fork, the first thing you have to do is to 
@@ -56,50 +55,167 @@ if you don't want to do it in two steps.
 If you are working on a separate branch, 
 it is important to select this branch when pushing to origin/main.
 
-## Issues and tests
+### Branching and CI
 
-Please use the issues tracker on Github to identify any function-related issues.
-You can use these issues to track progress on the issue and 
-to comment or continue a conversation on that issue.
-Currently issue tracking is only open to those involved in the project.
+- `main` is the release branch; `develop` is the working branch (clone/work on `develop`).
+- PRs into `main` trigger [prchecks.yml](workflows/prchecks.yml): R CMD check (macOS/Windows/Linux), binary build, codecov, lintr, spell check, a check that vignette articles and tutorials stay in sync, and PR metadata checks (DESCRIPTION version bump, PR title/description conventions).
+- Merges/pushes to `main` trigger [pushrelease.yml](workflows/pushrelease.yml): check, auto-bump version tag, GitHub release with binaries, then pkgdown site deploy.
 
-The most useful issues are ones that precisely identify an error,
-or propose a test that should pass but instead fails.
-This package uses the `testthat` package for testing functions.
-Please see the [testthat website](https://testthat.r-lib.org) for more details.
+## Package architecture
 
-## Bug fixing or adding new code
+### Project overview
 
-Independent or assigned code contributions are most welcome.
-When writing new code, please follow 
-[standard R guidelines](https://www.r-bloggers.com/🖊-r-coding-style-guide/). 
-It can help to use packages such as `lintr`, `goodpractice` and `formatR` 
-to ensure these are followed.
+`autograph` is an R package (part of the [stocnet](https://github.com/stocnet) ecosystem) providing the *visual layer* for network analysis:
+automatic `ggplot2`/`ggraph`-based plotting and consistent theming for network data and network-analytic results.
+It offers three graph-drawing entry points (`graphr()`, `graphs()`, `grapht()`)
+plus a large family of `plot()` S3 methods dispatched on result objects from other packages
+(`migraph`, `netrics`, `RSiena`, `ergm`, `MoNAn`, `goldfish`).
+Division of labour to keep in mind when adding functions:
 
-Currently, commits can only be pushed to Bitbucket where they reference an existing issue.
-If no issue exists for the code you have developed, please add an issue first before pushing.
-Once the issue exists, you will need to mention the issue number (preceded by a hash symbol: #)
-in the commit description:
+- `{manynet}`: network classes/coercion (`as_*()`) and network-level logical tests (e.g. `is_directed()`, `is_twomode()`).
+- `{netrics}`: everything analytic — marks, measures, memberships, motifs — at the node, tie, and network level.
+- `{autograph}` (this package): drawing graphs and plotting analytic, modelling, or diagnostic results, along with deep (often institutional) theming. *All* plot methods should live here.
+- `{migraph}`: testing and modelling, e.g. QAP/MRQAP and diffusion models.
 
-``` Resolved #31 by adding a new function that does things, also updated documentation ```
+In terms of style, we are aiming for sensible defaults in terms of user experience.
+As a ggplot2 object, most everything can be tweaked before or afterwards,
+but the default presentation should already be aesthetically pleasing,
+informative, and consistent.
 
-Where the issue hash (i.e. #31) is preceded by
-`resolve`, `resolves`, `resolved`, `close`, `closes`, `closed`, `fix`, `fixes`, or `fixed`
-(capitalised or not),
-Github will automatically updated the status of the issue(s) mentioned.
+### Common commands
 
-Our current syntactical standard is to mention the issue first and then 
-provide a short description of what the committed changes do 
-in relation to that issue.
-Any ancillary changes can be mentioned after a comma.
+This is a standard R package developed with `devtools`/`roxygen2`.
+Run these from an R console with the working directory set to the package root (or via `Rscript -e`).
 
-## Documentation
+- Load package for interactive development: `devtools::load_all()`
+- Regenerate docs & NAMESPACE after editing roxygen comments: `devtools::document()`
+- Run full test suite: `devtools::test()`
+- Run a single test file: `devtools::test(filter = "graphr")` (matches `test-graphr.R`), or `testthat::test_file("tests/testthat/test-plot_gof.R")`
+- Full package check (mirrors CI): `devtools::check()` or `rcmdcheck::rcmdcheck()`
+- Lint: `lintr::lint_package()`
+- Spell check: `spelling::spell_check_package()`
+- Rebuild `README.md` from `README.Rmd`: `devtools::build_readme()`
+- Build pkgdown site locally: `pkgdown::build_site()`
 
-A final way of contributing to the package is in developing the 
-vignettes/articles that illustrate the value added in the package. 
-Please contact me with any proposals here.
+There is no non-R build system — no package.json/Makefile.
+Roxygen is configured with `markdown = TRUE`; `NAMESPACE` and all `man/*.Rd` files are generated — never hand-edit them.
 
-Please note that the `autograph` project is released with a 
-[Contributor Code of Conduct](CODE_OF_CONDUCT.md). 
-By contributing to this project, you agree to abide by its terms.
+### Graph drawing pipeline (`graphr()`/`graphs()`/`grapht()`)
+
+`graphr()` ([R/graphr.R](../R/graphr.R)) is the single-network entry point and the core of the package.
+It accepts any `{manynet}`-compatible network object and builds a `ggplot2`/`ggraph` plot
+through an internal pipeline of helper functions, each in its own file:
+
+- `graph_layout()` ([R/graph_layout.R](../R/graph_layout.R)) — resolves the layout algorithm (igraph/ggraph/graphlayouts, or autograph's own layouts), builds the `ggraph` layout object, and optionally snaps coordinates to a grid.
+- `graph_nodes()`, `graph_edges()`, `graph_labels.R`, `graph_legends.R`, `graph_aes.R`, `graph_checks.R` — each layer adds/styles one visual component (node aes, edge aes, text labels, legends) onto the `ggraph` plot, resolving arguments that may be literal values (e.g. `node_size = 6`) or references to a node/tie attribute name (e.g. `node_size = "wealth"`).
+- Note that users are not expected to call any of these `graph_*()` functions themselves; exported modularity makes development, debugging, and testing easier.
+
+`graphs()` ([R/graphs.R](../R/graphs.R)) calls `graphr()` per network in a list and arranges the results with `{patchwork}`
+(deliberately chosen over gridExtra/cowplot/ggpubr because it doesn't interfere with ggplot2 themes —
+see the comment in [R/autograph_utilities.R](../R/autograph_utilities.R)).
+
+`grapht()` ([R/grapht.R](../R/grapht.R)) animates a longitudinal/dynamic network over time using `{gganimate}`/`{gifski}`.
+
+Custom layout algorithms not provided by igraph/ggraph/graphlayouts live in their own `layout_*.R` files
+(`layout_configurational.R`, `layout_grid.R`, `layout_layered.R`, `layout_matching.R`,
+`layout_partition.R`, `layout_valence.R`) and follow the `layout_tbl_graph_*()` naming convention.
+
+### Plot-method dispatch (`plot_*.R`)
+
+The rest of the package implements `plot.<class>` S3 methods so that `plot(result)` "just works"
+for objects returned by other stocnet/network packages,
+without the user needing to know which autograph function to call.
+Methods are grouped by the *kind of result object*, not by source package:
+
+| File | Covers |
+|---|---|
+| `plot_analysis.R` | node/tie/network measures, motifs, memberships (`node_measure`, `tie_measure`, `network_measures`, `node_member`, `node_motif`, `network_motif`, `matrix`) |
+| `plot_summaries.R` | diffusion/learning model summaries (`diff_model`, `diffs_model`, `learn_model`, `mnet`) |
+| `plot_gof.R` | goodness-of-fit objects (`gof.ergm`, `sienaGOF`, `gof.stats.monan`, autograph's own `ag_gof`) |
+| `plot_convergence.R`, `plot_diagnostics.R`, `plot_tests.R`, `plot_interp.R` | model diagnostics, convergence traces, statistical tests, and interpretation plots for `netlm`/`netlogit`/`ergm` etc. |
+| `plot_manydata.R` | goldfish `changepoints`/`outliers` and other longitudinal data objects |
+
+New `plot.*` methods must be registered in NAMESPACE via roxygen `@method`/`@export` tags — run `devtools::document()` after adding one.
+Suggestions for new plot methods are welcome.
+
+### Theming
+
+[R/theme_set.R](../R/theme_set.R) implements `stocnet_theme()` (alias `set_stocnet_theme()`),
+which sets an R option (`stocnet_theme`, default `"default"`) read by every plotting function in the package.
+Institutional and stylistic palettes (`default`, `bw`, `crisp`, `neon`, `iheid`, `ethz`, `uzh`, `rug`,
+`unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are defined in [R/theme_palettes.R](../R/theme_palettes.R)
+and exposed via consistent accessor functions
+(`ag_base()`, `ag_highlight()`, `ag_positive()`, `ag_negative()`, `ag_qualitative(n)`,
+`ag_sequential(n)`, `ag_divergent(n)`, `ag_font()`) documented together under `ag_call`.
+Users can override individual palette colours via `options()` (e.g. `options(snet_highlight = ...)`)
+rather than editing theme code.
+[R/theme_match.R](../R/theme_match.R) maps a plot/result object to its appropriate theme treatment.
+
+Because `autograph` re-exports several `ggplot2` symbols (see [R/reexports_ggplot2.R](../R/reexports_ggplot2.R)),
+loading `autograph` last in a session is recommended so its `plot()` methods take precedence over other packages'.
+
+### Precooked/vignette data
+
+`data/*.rda` holds pre-computed example results (ERGM/SAOM GOF, goldfish changepoints/outliers,
+MoNAn convergence/GOF, migraph diffs/regressions/tests) used in examples, vignettes, and tests,
+documented in [R/data_precooked.R](../R/data_precooked.R).
+`inst/extdata` holds a serialized `ergm_res` object loaded via `load_ergm_res()`,
+deliberately kept out of `data/` and serialized rather than stored as a live object
+because namespace references inside `ergm` model objects don't survive a plain `save()`/reload across package versions.
+
+### Dependencies
+
+`autograph` `Depends` on `manynet` (network data structures and coercion) and
+`Imports` `ggplot2` (>= 4.0.0), `ggraph`, `graphlayouts`, `igraph`, `dplyr`, and `patchwork`.
+`ergm` and `RSiena` are listed under `Enhances` (their `plot.*` methods are only invoked if those
+packages are installed and such results are passed in), and `gganimate`, `gifski`, `ggforce`,
+`migraph`, and `netrics` are `Suggests`-only,
+so code paths depending on them should guard with `requireNamespace()`
+(see the `thisRequires()` helper in [R/autograph_utilities.R](../R/autograph_utilities.R))
+or be skipped gracefully when unavailable.
+
+### Tests
+
+`tests/testthat/` uses testthat edition 3 with parallel execution
+(`Config/testthat/parallel: true` in DESCRIPTION).
+`tests/testthat.R` sets `stocnet_theme("default")` before running the suite so theme state doesn't leak between runs.
+Test files are organised by the same grouping as the `R/` source files
+(e.g. `test-graphr.R`, `test-layout_partition.R`, `test-theme_match.R`).
+
+In addition, the `test-functional_*.R` files implement *functional* (family-enumerating) testing,
+mirroring the approach in `{manynet}`: layout algorithms, `plot.<class>` methods, palette accessors,
+and `graphr()`'s aesthetic arguments are enumerated automatically from the namespace and run over a
+fixture grid, so new layouts/methods/palettes are audited without writing new tests.
+Helpers live in [tests/testthat/helper-functional.R](../tests/testthat/helper-functional.R).
+Non-conformant combinations are *skipped* with a greppable `AUDIT [...]` message rather than failed,
+so the audits double as a to-do list locally;
+CI sets `AUTOGRAPH_STRICT_AUDIT: true` so the same cases fail there instead.
+[tests/testthat/helper-tutorials.R](../tests/testthat/helper-tutorials.R) extracts and evaluates the
+code chunks of the learnr tutorials in `inst/tutorials/`, so tutorial code that errors or raises a
+deprecation warning fails the suite (rendering the tutorials themselves is deliberately not tested).
+
+### `NEWS.md` conventions
+
+`NEWS.md` groups each version's changes under `##` headings that mirror the website
+function overview (`pkgdown/_pkgdown.yml` `reference:` titles).
+Lead with `## Package` (package-wide/website/infrastructure changes),
+then the function families in overview order:
+`## Graphing` (graphr/graphs/grapht and internal functions, `## Plotting` (all plot.* methods), `## Layouts`, `## Theming`.
+Put `## Tutorials` and `## Data` near the end.
+Each heading appears at most once per version.
+
+Start each bullet with a verb matching the change type:
+
+- `Added ...` — new functionality
+- `Fixed ...` — bug fixes; if it relates to a GitHub issue, suffix with `(closing #123)`
+- `Renamed ... to ...` — function or data name migrations
+- `Improved ...` — functional updates to existing behaviour
+- `Updated ...` — documentation changes
+
+If a cited GitHub issue was **not** authored by @jhollway, thank the author with an
+`@`-tag in the bullet.
+Cluster related changes (e.g. several fixes to the same function, or sub-points of one
+feature) as indented sub-bullets under a lead bullet, to improve readability.
+
+
 

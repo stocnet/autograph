@@ -25,6 +25,18 @@
 #' @name ag_call
 #' @param number Integer of how many category colours to return.
 #' @returns One or more hexcodes as strings.
+#' @examples
+#' # Single colours from the currently active theme
+#' ag_base()
+#' ag_highlight()
+#' ag_positive()
+#' ag_negative()
+#' # Palettes of a requested length
+#' ag_qualitative(3)
+#' ag_sequential(5)
+#' ag_divergent(5)
+#' # The accessors follow whichever theme is set
+#' ag_font()
 #' @importFrom grDevices colorRampPalette
 #' @export
 ag_base <- function(){
@@ -70,7 +82,13 @@ ag_sequential <- function(number){
 #' @rdname ag_call
 #' @export
 ag_divergent <- function(number){
-  snet_colors <- getOption("snet_div", default = "default")
+  # The default must be a real pair of colours, matching ag_negative()'s and
+  # ag_positive()'s defaults (which read the head and tail of this same
+  # option). It was the literal string "default", so ag_divergent() errored
+  # with "invalid color name 'default'" in any session where stocnet_theme()
+  # had not yet been called -- which the test suite never saw, because
+  # tests/testthat.R sets the theme before running.
+  snet_colors <- getOption("snet_div", default = c("#d73027", "#4575b4"))
   if(length(snet_colors)==2) 
     snet_colors <- c(snet_colors[1], "white", snet_colors[2])
   colorRampPalette(snet_colors)(number)

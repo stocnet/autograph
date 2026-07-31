@@ -1,9 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# autograph
-
-<img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
+# autograph <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
 
 <!-- badges: start -->
 
@@ -77,6 +75,9 @@ Compare the output from `{autograph}` with a similar default from
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
+    #> quartz_off_screen 
+    #>                 2
+
 `{igraph}` requires the bipartite layout to be specified, has cumbersome
 node size defaults for all but the smallest graphs, and labels also very
 often need resizing and adjustment to avoid overlap. Getting this
@@ -129,8 +130,8 @@ together informatively.
 The third graph drawing function, `grapht()`, is used to visualise
 dynamic networks. It uses `{gganimate}` and `{gifski}` to create a gif
 that visualises network changes over time, with node positions
-transitioning smoothly between waves and nodes fading in and out as
-they enter and exit the network. It really couldn’t be easier.
+transitioning smoothly between waves and nodes fading in and out as they
+enter and exit the network. It really couldn’t be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
@@ -166,7 +167,7 @@ results from fitting a SAOM in `{RSiena}` and an ERGM in `{ergm}`. (Note
 that neither the data nor the model are similar; this is just for
 illustrative purposes.)
 
-<img src="man/figures/README-siena-ergm-gof-1.png" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" width="100%" />
+<img src="man/figures/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" />
 
 ### Setting a theme
 
@@ -181,22 +182,22 @@ you change it again.
 
 ``` r
 stocnet_theme()
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
 <img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
 
 ``` r
 stocnet_theme("ethz")
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
 <img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />

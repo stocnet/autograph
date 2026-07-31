@@ -45,7 +45,7 @@ html { font-size: 115%; }
 
 
 ::: {.callout}
-<span class="callout-label">**Static preview**:</span> This is a static, read-only preview of the "Visualising Networks" tutorial, so the plots that the code produces and the exercise solutions are not shown here, and the quizzes are replaced with notes like this one. Install the package and run `run_tute()` at the R console to work through the tutorial interactively — running the code, seeing the graphs, and getting hints, solutions, and quizzes.
+<span class="callout-label">**Static preview**:</span> This is a static, read-only preview of the "Visualising Networks" tutorial. To keep it a preview, the code output and exercise solutions are not shown here, and the quizzes are replaced with notes like this one. Install the package and run `run_tute()` at the R console to work through the tutorial interactively — running the code, seeing the results, and getting hints, solutions, and quizzes.
 :::
 
 ## Why graph
@@ -226,10 +226,10 @@ ggraph::ggraph(as_tidygraph(fict_lotr)) +
 We can see here that `{igraph}` plots the network in a fairly basic way,
 straight to the plotting device (window).
 By default, it uses a force-directed layout (see the Layouts section below),^[Which incidentally returns a different layout each time it is run.]
-colors the nodes orange, and prints node labels if they have them.
+colours the nodes orange, and prints node labels if they have them.
 However, the layout is not optimised for the size of the plotting window,
 the node labels are regularly overlapping,
-and the orange color with black borders is not particularly appealing
+and the orange colour with black borders is not particularly appealing
 or helpful for label legibility.
 It only works with 'igraph' objects.
 
@@ -323,11 +323,21 @@ Katya Ognyanova outlines some of these dimensions:
 
 | Nodes    |     | Ties  |     |
 | :--------|:-------------|:-------------|:-------------|
-| Position | `layout=`   | Arrows |  _automatic_ (directed ties)  |
-| Labels   | `labels=`, `node_group=`   | Type      |  _automatic_ (signed ties)  |
-| Shape    | `node_shape=`   | Shape      | _automatic_ (reciprocated ties)   |
-| Size     | `node_size=`   | Size      | `edge_size=`   |
-| Color    | `node_color=`, `node_colour=`   | Color      | `edge_color=`, `edge_colour=`   |
+| Position | `layout=`, `isolates=`, `snap=`   | Arrows |  _automatic_ (directed ties)  |
+| Labels   | `labels=`, `label_repel=`, `label_dist=`, `node_group=`   | Type      |  _automatic_ (signed ties)  |
+| Shape    | `node_shape=`   | Shape (curve)      | _automatic_ (reciprocated ties), `edge_bundle=`   |
+| Size     | `node_size=`   | Size (width)      | `edge_size=`   |
+| Colour   | `node_colour=`/`node_color=`   | Colour     | `edge_colour=`/`edge_color=`   |
+
+::: {.callout}
+<span class="callout-label">**Beginner note**:</span> As the table shows, both spellings work:
+`node_colour=` and `node_color=` are the same argument,
+as are `edge_colour=` and `edge_color=`,
+and the same goes for `{ggplot2}`'s `colour`/`color` aesthetics and
+`scale_colour_*()`/`scale_color_*()` functions.
+This tutorial is written in British English and so says 'colour' throughout,
+but you should use whichever spelling comes naturally to you.
+:::
 
 The named arguments in the table above cover the aesthetics you will reach
 for most often. Several other visual features are not arguments at all:
@@ -346,15 +356,14 @@ negative, and solid where positive;
 You do not set these by hand — but because every graph is a `{ggplot2}`
 object, you can always override them by dropping down to `{ggraph}`
 (see the _Going further with ggraph_ section near the end of this tutorial).
-A handful of further arguments — `node_group`, `label_repel`/`label_dist`,
-`edge_bundle`, `isolates`, and `snap` — tune grouping, labelling, and how
-dense or disconnected networks are drawn; we meet each in its own section
-below.
+Further arguments tune grouping, labelling, and how
+dense or disconnected networks are drawn; 
+we meet each in its own section below.
 
 Each of the mapping arguments can be given either a literal value
 (e.g. `node_size = 6`) or, more interestingly,
 the name of a node or tie attribute in the data
-(e.g. `node_color = "Race"`),
+(e.g. `node_colour = "Race"`),
 in which case `graphr()` maps the attribute to that aesthetic
 and adds a legend where appropriate.
 Let's go through some of these options in more detail.
@@ -406,6 +415,7 @@ Let's try instead colouring the nodes by this "Race" variable.
 It is very similar to the shape example above.
 **Can you complete the code yourself?**
 
+
 That's much easier to read.
 Note how a legend has been added automatically,
 using the colours of whatever theme is currently set (more on themes soon).
@@ -432,7 +442,7 @@ the shaded areas can overlap and make the graph harder to read.
 graphr(fict_lotr, node_group = "Race")
 ```
 
-Note that `node_color` and `node_group` can be used together,
+Note that `node_colour` and `node_group` can be used together,
 either to highlight different groupings,
 or to emphasise group assignment where the groups interpenetrate,
 as described above.
@@ -476,7 +486,7 @@ Who turns out to be the most connected character in the fellowship?
 
 All this works similarly with ties/edges.
 Just replace `node_` with `edge_` in the arguments above,
-and you can control edges' size and color.
+and you can control edges' size and colour.
 In the following example, we add two tie attributes:
 a continuous variable measuring how 'close' each tie is to others,
 and a binary variable indicating whether the tie is part of a
@@ -487,7 +497,7 @@ and a binary variable indicating whether the tie is part of a
 fict_lotr |>
   mutate_ties(weight = tie_by_closeness(fict_lotr),
               is_tri = tie_is_triangular(fict_lotr)) |>
-  graphr(edge_color = "is_tri")
+  graphr(edge_colour = "is_tri")
 ```
 
 Note also that some tie attributes are recognised automatically:
@@ -571,10 +581,11 @@ here is one suggestion per flavour:
 Print the network first to see which attributes are available,
 then map one or two of them to colour, shape, size, or groups.
 
+
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `graphr()` maps node and tie attributes to visual aesthetics
-by name: `node_color`, `node_shape`, `node_size`, and `node_group`
-for nodes, `edge_color` and `edge_size` for ties.
+by name: `node_colour`, `node_shape`, `node_size`, and `node_group`
+for nodes, `edge_colour` and `edge_size` for ties.
 Use colour or shape for categorical attributes (colour scales better),
 size for continuous ones,
 and `node_group` to shade spatially clustered memberships.
@@ -587,14 +598,14 @@ For dense or disconnected networks, `edge_bundle` and `isolates`
 <span class="page-toc">On this page:
 <span class="page-toc-link" onclick="document.getElementById('section-setting-a-theme').scrollIntoView({behavior:'auto',block:'start'});">Setting a theme</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-whos-hue').scrollIntoView({behavior:'auto',block:'start'});">Hues</span> ·
-<span class="page-toc-link" onclick="document.getElementById('section-grayscale').scrollIntoView({behavior:'auto',block:'start'});">Grayscale</span> ·
+<span class="page-toc-link" onclick="document.getElementById('section-greyscale').scrollIntoView({behavior:'auto',block:'start'});">Greyscale</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-manual-override').scrollIntoView({behavior:'auto',block:'start'});">Manual override</span></span>
 
 ### Setting a theme {#setting-a-theme}
 
 Perhaps you are preparing a presentation,
 representing your institution, department, or research centre at home or abroad.
-In this case, you may wish to theme the whole network with institutional colors
+In this case, you may wish to theme the whole network with institutional colours
 and fonts.
 Indeed, you may even want to set a theme that is then reused across
 all your graphs and plots.
@@ -605,9 +616,9 @@ in your session — no need to repeat yourself.
 
 ```{r theming, fig.width=9}
 stocnet_theme("default")
-graphr(fict_lotr, node_color = "Race")
+graphr(fict_lotr, node_colour = "Race")
 stocnet_theme("iheid")
-graphr(fict_lotr, node_color = "Race")
+graphr(fict_lotr, node_colour = "Race")
 stocnet_theme("default")
 ```
 
@@ -623,25 +634,25 @@ More institutional scales and themes can be implemented upon pull request.
 
 <img src="https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif" alt="gif from The Devil Wears Prada: that is not just blue, that is cerulean"/>
 
-By default, `graphr()` will use a color palette that offers fairly good contrast
+By default, `graphr()` will use a colour palette that offers fairly good contrast
 and better accessibility.
 However, a different hue might offer a better aesthetic or
 identifiability for some nodes.
 Because the `graphr()` function is based on the grammar of graphics,
 it's easy to extend or alter aesthetic aspects.
-Here let's try and change the colors
+Here let's try and change the colours
 assigned to the different races in the `fict_lotr` dataset.
-Note that despite the argument being `node_color`,
-when overwriting the colors please use functions of the type
+Note that despite the argument being `node_colour`,
+when overwriting the colours please use functions of the type
 `ggplot2::scale_fill_*()`,
 as it is the "fill" aesthetic that is being mapped to the variable in this case.
 
-```{r colorch, fig.width=9}
+```{r colourch, fig.width=9}
 graphr(fict_lotr,
-           node_color = "Race")
+           node_colour = "Race")
 
 graphr(fict_lotr,
-           node_color = "Race") +
+           node_colour = "Race") +
   ggplot2::scale_fill_hue()
 ```
 
@@ -660,36 +671,36 @@ The old trope is that males are less sensitive to colour distinctions:^[Though s
 
 <img src="http://thedoghousediaries.com/dhdcomics/2010-03-01-12bf011.png" alt="comic strip about perceived colour vocabulary differences" height="500px"/>
 
-### Grayscale {#grayscale}
+### Greyscale {#greyscale}
 
-Other times color may not be desired.
-Some publications require grayscale images.
-To use a grayscale color palette,
+Other times colour may not be desired.
+Some publications require greyscale images.
+To use a greyscale colour palette,
 replace `_hue` from above with `_grey` (note the 'e' spelling):
 
 ```{r greyscale, fig.width=9}
 graphr(fict_lotr,
-           node_color = "Race") +
+           node_colour = "Race") +
   ggplot2::scale_fill_grey()
 ```
 
-As you can see, grayscale is more effective for continuous variables
+As you can see, greyscale is more effective for continuous variables
 or for very few discrete categories than for the six categories used here.
 If you need to distinguish several categories in print,
-consider combining grayscale with `node_shape`,
+consider combining greyscale with `node_shape`,
 or use the `"bw"` theme, which is designed for this purpose.
 
 ### Manual override {#manual-override}
 
-Or we may want to choose particular colors for each category.
+Or we may want to choose particular colours for each category.
 This is pretty straightforward to do with `ggplot2::scale_fill_manual()`.
-Some common color names are available,
-but otherwise hex color codes can be used for more specific colors.
+Some common colour names are available,
+but otherwise hex colour codes can be used for more specific colours.
 Unspecified categories are coloured (dark) grey.
 
-```{r mancolor, fig.width=9}
+```{r mancolour, fig.width=9}
 graphr(fict_lotr,
-           node_color = "Race") +
+           node_colour = "Race") +
   ggplot2::scale_fill_manual(
     values = c("Dwarf" = "red",
                "Hobbit" = "orange",
@@ -697,7 +708,7 @@ graphr(fict_lotr,
                "Human" = "lightblue",
                "Elf" = "lightgreen",
                "Ent" = "darkgreen")) +
-  labs(fill = "Color")
+  labs(fill = "Colour")
 ```
 
 ::: {.callout}
@@ -759,6 +770,7 @@ say "My graph",
 and then add also a subtitle (an argument to that function),
 say "I did this".**
 
+
 Note that you can also use `ggtitle()` to do the same thing,
 but if you just remember `labs()` you can also use it to add labels
 for _x_ and _y_ axes, and legends (see below).
@@ -774,7 +786,7 @@ where we highlight the node with the highest
 ```{r maxbet, fig.width=9}
 fict_lotr |>
   mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>
-  graphr(node_color = "maxbet")
+  graphr(node_colour = "maxbet")
 ```
 
 Which node is highlighted here, and why might that be?
@@ -789,9 +801,9 @@ span multiple lines.
 ```{r legend, fig.width=9}
 fict_lotr |>
   mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>
-  graphr(node_color = "maxbet") +
-  guides(color = "legend") +
-  labs(color = "Maximum\nBetweenness")
+  graphr(node_colour = "maxbet") +
+  guides(colour = "legend") +
+  labs(colour = "Maximum\nBetweenness")
 ```
 
 To change the position of the legend, add the `theme()` function from
@@ -1092,6 +1104,7 @@ Parentheses can be used to group graphs together.
 **Try graphing `fict_lotr` and `ison_algebra` side-by-side,
 and then one above the other.**
 
+
 ### Sets {#sets}
 
 `graphr()` is not the only graphing function included in `{autograph}`.
@@ -1310,7 +1323,7 @@ After running the (gg-based) plot you want to save,
 use `ggsave()` to save it to disk:
 
 ```{r ggsave-eg, echo=TRUE, eval=FALSE, purl=FALSE}
-graphr(fict_lotr, node_color = "Race")
+graphr(fict_lotr, node_colour = "Race")
 ggsave("lotr_race.pdf")
 ggsave("lotr_race.png", width = 9, height = 6, dpi = 300)
 ```
@@ -1337,8 +1350,8 @@ Along the way, you have learned to use these functions:
 | Function | What it does |
 |---|---|
 | `graphr()` | graphs any manynet-compatible network with sensible defaults |
-| `graphr(..., node_color/node_shape/node_size/node_group)` | maps node attributes to aesthetics |
-| `graphr(..., edge_color/edge_size)` | maps tie attributes to aesthetics |
+| `graphr(..., node_colour/node_shape/node_size/node_group)` | maps node attributes to aesthetics |
+| `graphr(..., edge_colour/edge_size)` | maps tie attributes to aesthetics |
 | `graphr(..., labels, label_repel, label_dist)` | controls node labelling |
 | `graphr(..., layout, snap)` | chooses and adjusts the layout algorithm |
 | `graphr(..., x, y)` | places nodes at manually supplied coordinates |

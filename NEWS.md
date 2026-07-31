@@ -1,3 +1,79 @@
+# autograph 1.1.2
+
+## Package
+
+- Improved the declared dependencies
+  - Removed `{knitr}` from Suggests: it was used solely by the tutorial tests, which now extract the tutorials' `{r}` chunks with the same small scanner used in `{manynet}` and `{netrics}` (verified to yield an identical expression set to `knitr::purl()` on the autograph tutorial)
+  - Removed `{tidygraph}` from Imports: its only functional use was reading the edgelist's target column in `.infer_end_cap()`, which now uses `igraph::as_edgelist()` (verified to give identical end caps)
+  - Promoted `{graphlayouts}` from Suggests to Imports, since it is required for `grapht()`'s *default* "stress" layout (without it, wave-to-wave node transitions silently degraded to a static aggregate layout) and is installed regardless as `{ggraph}` imports it; its `requireNamespace()`/`thisRequires()` guards have been removed
+  - Declared a minimum `{manynet}` version (`>= 2.2.1`)
+- Updated the GitHub Actions workflows
+  - Updated the actions to their latest major versions (`actions/checkout@v7`, `actions/upload-artifact@v7`, `actions/download-artifact@v8`), replacing some long-outdated `@v2` pins
+  - Updated the website deploy job's `r-lib/actions/setup-pandoc` from `@v1` to `@v2`, matching every other `r-lib/actions` step
+  - Added checks that metadata and tutorial vignettes correspond
+- Improved the test suite while reducing what CRAN has to run
+  - The functional audits now fail rather than skip when `AUTOGRAPH_STRICT_AUDIT=true`, which the CI check step now sets, so a broken layout or plot method can no longer pass CI green
+  - Fixed the layout audit's fixture and argument maps, which paired several layouts with networks they cannot lay out; because `skip()` aborts the enclosing `test_that()`, the first such mismatch had been silently preventing every later layout from being audited at all (the layout audit goes from 21 to 108 assertions)
+  - Coverage is now measured with `NOT_CRAN=true`, without which every `skip_on_cran()` test — most of the suite — was skipped while covr ran, badly under-reporting coverage
+  - `release` and `pkgdown` no longer run under `if: always()`, so a failing `R CMD check` can no longer tag a release or deploy the website
+  - Replaced `graphr()`'s sweep over every bundled `{manynet}` dataset with a representative sample, and dropped the `plot.*` smoke tests now subsumed by the plot-method audit; CRAN-visible test time falls while CRAN-visible assertions rise
+  - Added an edge-case audit (`test-functional_errors.R`), an audit of the user-facing `layout_*` aliases, and examples for the `ag_*` palette accessors and configurational layouts, none of which were previously covered
+  - Theme-mutating tests now restore the previous theme with `on.exit()`, so global theme state cannot leak between parallel test workers
+- Updated the website and README
+  - Updated favicons
+  - Split Graphing from Plotting functions
+  - Updated README to send visualisation examples to the website
+  - Fixed README double logoing on pkgdown build, and added alttext
+- Updated CONTRIBUTING with the package architecture, conventions, and dev commands
+- Updated remaining base R `stop()`, `warning()` and `stopifnot()` calls to the `{manynet}` cli interface
+
+## Graphing
+
+- Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
+  - Such networks now split into waves via a guarded `to_waves()` that coerces the offending attributes when `{manynet}`'s splitter cannot combine them
+- Fixed `graphr(..., snap = TRUE)` erroring ("'-' only defined for equally-sized data frames") whenever a node sat exactly on a grid point
+  - `depth_first_recursive_search()` compared each node against a distance vector that still included its own zero self-distance, so an exact hit selected that entry and yielded an empty grid point; the self-distance is now dropped before the nearest vacant point is chosen
+  - two-mode networks hit this on their very first node, since their coordinates are exactly 0 or 1
+- Improved `graphr()` to ignore `snap = TRUE` for layered layouts ("hierarchy", "railway", "ladder", "alluvial", "multilevel", "lineage", "layered")
+  - These layouts encode rank, mode, or generation along an axis, which square-grid snapping would collapse
+- Fixed `graphr()` erroring with "argument \"node_color\" is missing, with no default" when passed a list of networks; the call is now forwarded to `graphs()` as written, rather than argument by argument
+- Improved how `graphr()` checks the attribute names given to its aesthetic arguments
+  - A mistyped node or tie attribute name now errors immediately, naming the argument and offering the closest match: `graphr(net, node_color = "welth")` reported "Unknown colour name: welth" at draw time, and now reports that "welth" was not found among the node attributes and asks whether "wealth" was meant
+  - The same applies to `node_shape` (previously "Shape aesthetic contains invalid value"), `node_size` and `edge_size` (previously "Aesthetics must be either length 1 or the same as the data (8)"), `node_group`, and `edge_color`
+- Improved the error when the input is not a network, which now names the argument and the class given, rather than reporting a missing method for `as_tidygraph()`
+- Fixed `isolates` being validated only when the network happened to contain isolates, so the same typo errored on one network and was ignored on another
+- Fixed `node_size` values between 0 and 1 being silently multiplied by ten; `node_size = 0.5` now means 0.5, while a *vector* of proportions is still rescaled to stay visible
+- Fixed `graphs()` producing empty panels by checking `waves` against the number of networks available
+- Added a set of internal argument checks (`R/graph_checks.R`) shared by `graphr()`, `graphs()`, `grapht()`, the `layout_*()` functions, and `stocnet_theme()`
+  - An unrecognised value now errors immediately, naming the argument and offering the closest match, rather than falling through to `{ggplot2}`, `{grid}`, or `match.arg()` (so `isolates = "drop"` reports `isolates`, rather than "'arg' should be one of ...")
+  - A value that differs only in capitalisation is now used as intended, with a note, instead of being rejected: `node_color = "Wealth"` finds the `wealth` attribute
+  - Note that these checks are stricter than before: a mistyped attribute name used to be ignored silently or to fail later, and now stops the call
+- Updated group-reduction note in `graphr()` and constant-colour note shared by `graphr()` and `grapht()` so that their wording cannot drift
+
+## Plotting
+
+- Improved `plot.node_member()` to draw its dendrogram with `{ggraph}`
+  - Passes `hclust` object's own merge heights to the dendrogram layout to reproduce the previous plot's leaf order, merge heights, cluster label colours, and cutpoint line
+  - Branches now drawn in `ag_base()` rather than black, matching the height axis and so respecting the active `stocnet_theme()`
+  - Removed `{ggdendro}` from Imports
+- Updated a stale doc cross-reference in `plot.node_member()`, which pointed at `manynet::node_in_community()`; that function moved to `{netrics}` in manynet 2.0.0
+- Updated terse or dead-end messages to say what to do next, including `plot.node_motif()`/`plot.network_motif()` ("Cannot plot these motifs yet, sorry."), `match_color()`, `plot.diff_model()`, and the concentric and hierarchy layouts ("Duplicated nodes in layers!")
+- Updated zero-variance note shared by three GOF plot methods so that their wording cannot drift
+
+## Layouts
+
+- Improved the error on an unrecognised `layout`, which now names the argument, suggests the nearest layout, and lists autograph's own layouts, rather than reporting "object 'layout_tbl_graph_stresss' not found"
+  - Passing a layout *function* (e.g. `layout = igraph::layout_with_fr`), rather than its name, now says so instead of erroring with "invalid indexing"
+- Added checks of the `membership`/`level`/`rank` arguments that the partition layouts require, which name the argument and offer the closest match
+
+## Theming
+
+- Improved `stocnet_theme()` to error with the nearest match on an unrecognised theme name, instead of warning and silently leaving the previous theme in place; giving more than one theme name is also caught
+
+## Tutorials
+
+- Updated visualization tutorial to use colour/color consistently
+
 # autograph 1.1.1
 
 ## Graphing

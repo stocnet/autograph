@@ -104,6 +104,19 @@ test_that("measure plots support histogram and density types", {
   expect_buildable(plot(tb, type = "d"))
 })
 
+test_that("ergm gof plot obs and sims factor levels are aligned", {
+  # Regression test: the observed and simulated statistics are joined by name,
+  # so R's check.names must not rewrite the numeric column names to "X0" etc.,
+  # and the resulting factor levels must sort numerically rather than
+  # lexically ("10" before "2").
+  p <- plot(ergm_gof)
+  sims_levels <- levels(p$data$name)
+  numeric_vals <- suppressWarnings(as.numeric(sims_levels))
+  expect_true(!any(is.na(numeric_vals)),
+              info = "Factor levels should be numeric, not R-modified names (e.g. 'X0')")
+  expect_equal(numeric_vals, sort(numeric_vals))
+})
+
 test_that("network measures over time plot as a trace", {
   meas <- data.frame(time = 1:10, value = cumsum(stats::rnorm(10)))
   class(meas) <- c("network_measures", class(meas))
@@ -155,7 +168,7 @@ test_that("motif plots draw the corresponding motif panels", {
                      class = "network_motif")
   expect_buildable(plot(dyads))
   unknown <- structure(c(Z9 = 1), class = "network_motif")
-  expect_error(plot(unknown), "Cannot plot")
+  expect_error(plot(unknown), "cannot be illustrated yet")
 })
 
 # graphs() variants: shared layouts, wave selection, and fallbacks
@@ -209,4 +222,17 @@ test_that("graphs() splits a bare longitudinal or dynamic network", {
   expect_s3_class(suppressMessages(graphs(manynet::irps_nuclear)), "patchwork")
   # An interval (spell) network is split into per-period snapshots.
   expect_s3_class(suppressMessages(graphs(manynet::irps_wwi)), "patchwork")
+})
+
+test_that("graphs() splits a longitudinal network with non-character changing attributes", {
+  skip_on_cran()
+  # fict_starwars is a changing+longitudinal network whose changing node
+  # attributes include a logical `active` flag and numeric height/mass.
+  # manynet::to_waves() (through >= 2.2.2) aborts splitting these with a vctrs
+  # "Can't combine <character> and <logical>" error; .to_waves_safe() coerces
+  # them and retries. See .split_time_network()/.to_waves_safe() in R/grapht.R.
+  expect_true(manynet::is_changing(manynet::fict_starwars))
+  expect_true("active" %in% names(manynet::node_attribute(manynet::fict_starwars)))
+  expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
+  expect_s3_class(suppressMessages(graphs(manynet::fict_starwars)), "patchwork")
 })

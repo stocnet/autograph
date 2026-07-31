@@ -19,10 +19,15 @@ list_functions <- function(string){
 list_data <- function(string){
   paste0("`", paste(paste0(ls("package:autograph")[grepl(string, ls("package:autograph"))]), collapse = "`, `"), "`")
 }
+# Several README figures are hosted on jameshollway.com rather than in man/figures,
+# to keep the package tarball small. The chunks below regenerate them in place,
+# but only where that site's checkout is present (i.e. not on CI or CRAN).
+site_dir <- path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/manynet")
+site_figure <- function(name) file.path(site_dir, name)
+have_site <- dir.exists(site_dir)
 ```
 
-# autograph 
-<img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
+# autograph <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://lifecycle.r-lib.org/articles/stages.html#maturing)
@@ -89,11 +94,15 @@ Compare the output from `{autograph}` with a similar default from `{igraph}`:
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-```{r layout-comparison, echo = FALSE, message=FALSE, dpi = 250, fig.height=4, fig.width=12, eval=FALSE}
+```{r layout-comparison, echo = FALSE, message=FALSE, eval = have_site, fig.show="hide"}
 library(autograph)
 library(igraph)
 library(gridBase)
 library(grid)
+
+# base graphics, so written with an explicit device rather than ggsave()
+png(site_figure("README-layout-comparison-1.png"),
+    width = 12, height = 4, units = "in", res = 250)
 
 par(mfrow=c(1, 2), mai = c(0,0,0.5,0))
 plot(as_igraph(ison_southern_women), layout = layout_as_bipartite, main = "{igraph} bipartite")
@@ -101,9 +110,11 @@ plot(as_igraph(ison_southern_women), layout = layout_as_bipartite, main = "{igra
 plot.new()              ## suggested by @Josh
 vps <- baseViewports()
 pushViewport(vps$figure) ##   I am in the space of the autocorrelation plot
-vp1 <-plotViewport(c(1.8,1,0,1)) ## create new vp with margins, you play with this values 
+vp1 <-plotViewport(c(1.8,1,0,1)) ## create new vp with margins, you play with this values
 p <- graphr(ison_southern_women) + ggtitle("{autograph} twomode") + guides(shape = "none")
-print(p,vp = vp1) 
+print(p,vp = vp1)
+
+dev.off()
 ```
 
 `{igraph}` requires the bipartite layout to be specified, 
@@ -127,14 +138,15 @@ e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
-```{r more-options, echo = FALSE, message=FALSE, dpi = 300, fig.height=3, eval=FALSE}
-graphr(ison_lawfirm, node_color = "darkblue", node_size = 6) + 
-  ggtitle("Manual options", 
+```{r more-options, echo = FALSE, message=FALSE, eval = have_site}
+p <- graphr(ison_lawfirm, node_color = "darkblue", node_size = 6) +
+  ggtitle("Manual options",
           subtitle = "graphr(ison_lawfirm, node_color = 'darkblue', node_size = 6)") +
-graphr(mutate(ison_lawfirm, Seniority = Seniority/3), node_color = "Office", node_size = "Seniority") + 
-  ggtitle("Automatic options", 
-          subtitle = "graphr(ison_lawfirm, node_color = 'Office', node_size = 'Seniority')") & 
+graphr(mutate(ison_lawfirm, seniority = seniority/3), node_color = "office", node_size = "seniority") +
+  ggtitle("Automatic options",
+          subtitle = "graphr(ison_lawfirm, node_color = 'office', node_size = 'seniority')") &
   theme(plot.subtitle = element_text(size = 8))
+ggsave(site_figure("README-more-options-1.png"), p, width = 7, height = 3, dpi = 300)
 ```
 
 Legends are added by default when node or tie aesthetics are mapped to attributes,
@@ -152,10 +164,11 @@ or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
-```{r more-layouts, echo = FALSE, message=FALSE, dpi = 250, eval=FALSE}
-(graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric layout")) /
+```{r more-layouts, echo = FALSE, message=FALSE, eval = have_site}
+p <- (graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric layout")) /
   ((graphr(to_unnamed(create_explicit(A-+B-+C, A-+C))) + ggtitle("Triad layout")) |
   (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Quad layout")))
+ggsave(site_figure("README-more-layouts-1.png"), p, width = 7, height = 5, dpi = 250)
 ```
 
 ### More networks
@@ -168,11 +181,12 @@ and is used throughout the package to help arrange plots together informatively.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
-```{r autographs, echo = FALSE, dpi = 250, fig.height=3, eval=FALSE}
-ison_adolescents %>%
+```{r autographs, echo = FALSE, eval = have_site}
+p <- ison_adolescents %>%
   mutate_ties(wave = c(rep(1995, 5), rep(1998, 5))) %>%
   to_waves(attribute = "wave", panels = c(1995, 1998)) %>%
   graphs()
+ggsave(site_figure("README-autographs-1.png"), p, width = 7, height = 3, dpi = 250)
 ```
 
 ### More time
@@ -187,10 +201,16 @@ It really couldn't be easier.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
-```{r autographd, echo = FALSE, dpi = 250, fig.height=3.5, eval=FALSE}
-ison_adolescents %>%
+```{r autographd, echo = FALSE, eval = have_site}
+p <- ison_adolescents %>%
   mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) %>%
   grapht()
+# a gif, so rendered with gganimate rather than ggsave(); the animate() arguments
+# mirror those in print.grapht() so the saved file matches what users see
+anim <- gganimate::animate(p, duration = 2 * attr(p, "nwaves"),
+                           start_pause = 5, end_pause = 10,
+                           renderer = gganimate::gifski_renderer())
+gganimate::anim_save(site_figure("README-autographd-1.gif"), anim)
 ```
 
 <!-- provide a common set of tools that can be used to import, export, create, and manipulate network data in a wide variety of formats, -->
@@ -220,7 +240,7 @@ in `{RSiena}` and an ERGM in `{ergm}`.
 (Note that neither the data nor the model are similar;
 this is just for illustrative purposes.)
 
-```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE}
+```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"}
 plot(siena_gof) + ggtitle("SAOM goodness-of-fit")
 plot(ergm_gof) + ggtitle("ERGM goodness-of-fit")
 ```
@@ -239,17 +259,17 @@ until you change it again.
 
 ```{r themeset, dpi = 300, fig.height=5, fig.alt="Themed figures"}
 stocnet_theme()
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 stocnet_theme("ethz")
-(plot(node_degree(ison_karateka)) + 
-plot(tie_betweenness(ison_karateka)))/
-(plot(node_in_regular(ison_southern_women, "e")) + 
+(plot(netrics::node_by_degree(ison_karateka)) + 
+plot(netrics::tie_by_betweenness(ison_karateka)))/
+(plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
-     membership = node_in_regular(ison_southern_women, "e")))
+     membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
 There are a range of institutional and topical themes available,

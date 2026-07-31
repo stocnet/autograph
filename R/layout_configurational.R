@@ -13,6 +13,13 @@
 #' @param circular Logical, required for `{ggraph}` compatibility, default TRUE.
 #' @param times Integer, how many times to run the algorithm.
 #'   Required by for `{ggraph}` compatibility, but not used here, so default = 1.
+#' @examples
+#' # "configuration" picks the layout matching the number of nodes
+#' graphr(manynet::create_ring(4), layout = "configuration")
+#' # or a specific configuration can be named
+#' graphr(manynet::create_ring(3), layout = "triad")
+#' # the layout functions can also be called directly for their coordinates
+#' layout_tetrad(manynet::create_ring(4))
 NULL
 
 #' @rdname layout_configuration

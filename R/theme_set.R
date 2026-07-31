@@ -62,7 +62,7 @@ theme_opts <- c("default", "bw", "crisp", "neon",
 #'   The following themes are currently available:
 #'   `r autograph:::theme_opts`.
 #'   This string can be capitalised or not.
-#' @importFrom manynet snet_info snet_success snet_warn
+#' @importFrom manynet snet_info snet_success
 #' @export
 stocnet_theme <- function(theme = NULL){
   if(is.null(theme)){
@@ -70,18 +70,20 @@ stocnet_theme <- function(theme = NULL){
     snet_info("Theme is currently set to {.emph {theme}}.",
               "The following themes are available: {.emph {theme_opts}}.")
   } else {
-    theme <- tolower(theme)
-    if(theme %in% theme_opts){
-      options(stocnet_theme = theme)
-      set_highlight_theme(theme)
-      set_divergent_theme(theme)
-      set_background_theme(theme)
-      set_categorical_theme(theme)
-      set_font_theme(theme)
-      snet_success("Theme set to {.emph {theme}}.")
-    } else {
-      snet_warn("Please choose one of the available themes: {.emph {theme_opts}}.")
-    }
+    if(!is.character(theme) || length(theme) != 1L)
+      manynet::snet_abort(
+        "{.arg theme} should be the name of a single theme, given as a string.",
+        "The themes available are {.val {theme_opts}}.")
+    # An unrecognised theme used to warn and leave the theme unchanged, which
+    # was easy to miss and left plots looking wrong for no visible reason.
+    theme <- .match_name(tolower(theme), theme_opts, "theme", what = "theme")
+    options(stocnet_theme = theme)
+    set_highlight_theme(theme)
+    set_divergent_theme(theme)
+    set_background_theme(theme)
+    set_categorical_theme(theme)
+    set_font_theme(theme)
+    snet_success("Theme set to {.emph {theme}}.")
   }
 }
 
