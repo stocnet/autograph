@@ -57,7 +57,7 @@ plot.diagnose_outliers <- function(x, ...) {
     return(invisible(NULL))
   }
 
-  ggplot2::ggplot(x, ggplot2::aes(x = .data$time, y = .data$.series)) +
+  p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$time, y = .data$.series)) +
     ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::geom_point(ggplot2::aes(colour = .data$outlier), na.rm = TRUE) +
     ggplot2::geom_text(
@@ -78,6 +78,26 @@ plot.diagnose_outliers <- function(x, ...) {
       y = gf_series_label(params),
       subtitle = gf_term_subtitle(params)
     )
+  gf_facet_processes(p, x)
+}
+
+# Split a row-bound flavoured table into one panel per process.
+#
+# Not cosmetic on these two plots: the series is drawn with `geom_line()`, and a
+# flavoured table arrives as several processes' series stacked, so without the
+# split the line is drawn straight across the boundary between one process's
+# last event and the next process's first. The panels are what make it a series
+# per process rather than one line through all of them.
+gf_facet_processes <- function(p, data) {
+  facets <- intersect(c("flavor", "family"), names(data))
+  if (length(facets) == 0) {
+    return(p)
+  }
+  p +
+    ggplot2::facet_wrap(
+      stats::as.formula(paste("~", paste(facets, collapse = " + "))),
+      scales = "free"
+    )
 }
 
 #' @rdname plot_adequacy
@@ -92,10 +112,19 @@ plot.diagnose_changepoints <- function(x, ...) {
     return(invisible(NULL))
   }
 
+  # Carried as a data frame rather than a bare `xintercept` vector: on a
+  # flavoured table the breaks belong to the process they were detected in, and
+  # a plain vector would draw every process's breaks onto every panel.
+  marked <- x[!is.na(x$cpt) & x$cpt, , drop = FALSE]
+
   p <- ggplot2::ggplot(x, ggplot2::aes(x = .data$time, y = .data$.series)) +
     ggplot2::geom_line(na.rm = TRUE) +
     ggplot2::geom_point(na.rm = TRUE) +
-    ggplot2::geom_vline(xintercept = breaks, colour = ag_highlight()) +
+    ggplot2::geom_vline(
+      data = marked,
+      mapping = ggplot2::aes(xintercept = .data$time),
+      colour = ag_highlight()
+    ) +
     ggplot2::theme_minimal() +
     ggplot2::labs(
       x = "",
@@ -109,7 +138,7 @@ plot.diagnose_changepoints <- function(x, ...) {
   if (is.numeric(x$time)) {
     p <- p + ggplot2::scale_x_continuous(breaks = breaks, labels = breaks)
   }
-  p
+  gf_facet_processes(p, x)
 }
 
 #' @rdname plot_adequacy
@@ -446,7 +475,9 @@ gf_onset_path_panel <- function(x, summary, params, tolerance_band) {
   )
   if (tolerance_band) {
     tolerance <- params$tolerance
-    if (is.null(tolerance)) tolerance <- 0.1
+    if (is.null(tolerance)) {
+      tolerance <- 0.1
+    }
     p <- p +
       ggplot2::geom_ribbon(
         ggplot2::aes(
@@ -489,7 +520,9 @@ gf_onset_accrual_panel <- function(x, summary, context) {
   accrual <- as.data.frame(x$accrual)
   onset <- max(summary$stabilized_at)
   n_events <- context$n_events
-  if (is.null(n_events)) n_events <- max(accrual$dropped_events)
+  if (is.null(n_events)) {
+    n_events <- max(accrual$dropped_events)
+  }
 
   p <- ggplot2::ggplot(
     accrual,
@@ -654,9 +687,16 @@ gf_overview_rank <- function(x, terms, effects) {
   if (is.null(gof)) {
     return(terms[seq_len(effects)])
   }
-  ranked <- gof$effects$coefficient[order(gof$effects$statistic, decreasing = TRUE)]
+  ranked <- gof$effects$coefficient[order(
+    gof$effects$statistic,
+    decreasing = TRUE
+  )]
   ranked <- ranked[ranked %in% terms]
-  if (length(ranked) == 0) terms[seq_len(effects)] else utils::head(ranked, effects)
+  if (length(ranked) == 0) {
+    terms[seq_len(effects)]
+  } else {
+    utils::head(ranked, effects)
+  }
 }
 
 gf_overview_gof <- function(x) {

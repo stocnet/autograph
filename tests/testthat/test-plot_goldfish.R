@@ -315,3 +315,65 @@ test_that("the Schoenfeld panel caps the effects it draws", {
   schoenfeld <- panels[[match("Scaled Schoenfeld", subtitles)]]
   expect_length(unique(schoenfeld$data$term), 2L)
 })
+
+# A multi-process fit arrives row-bound, with `flavor` and `family` naming the
+# process each row came from. The series plots draw with `geom_line()`, so
+# without a panel per process the line runs straight from one process's last
+# event to the next process's first -- a segment joining two unrelated series.
+
+flavor_stack <- function(object) {
+  block <- function(flavor, family) {
+    out <- tibble::as_tibble(object)
+    out$flavor <- flavor
+    out$family <- family
+    out
+  }
+  stacked <- rbind(
+    block("creation", "rate"),
+    block("dissolution", "rate")
+  )
+  attributes(stacked) <- c(
+    attributes(stacked),
+    attributes(object)[setdiff(names(attributes(object)), names(attributes(stacked)))]
+  )
+  class(stacked) <- class(object)
+  stacked
+}
+
+facet_vars <- function(p) {
+  params <- p$facet$params
+  names(c(params$facets, params$rows, params$cols))
+}
+
+test_that("a row-bound flavoured table gets a panel per process", {
+  for (object in list(goldfish_outliers, goldfish_changepoints)) {
+    p <- plot(flavor_stack(object))
+    expect_s3_class(p, "ggplot")
+    expect_identical(facet_vars(p), c("flavor", "family"))
+  }
+})
+
+test_that("a single-process table is not faceted", {
+  # The identity columns are absent there, so the panel split has nothing to
+  # split on and the plot is the one it always was.
+  for (object in list(goldfish_outliers, goldfish_changepoints)) {
+    p <- plot(object)
+    expect_s3_class(p, "ggplot")
+    expect_length(facet_vars(p), 0L)
+  }
+})
+
+test_that("changepoint breaks stay in the process they were found in", {
+  # Drawn from a data frame rather than a bare `xintercept` vector: a vector
+  # would put every process's breaks onto every panel.
+  stacked <- flavor_stack(goldfish_changepoints)
+  p <- plot(stacked)
+  vline <- Filter(
+    function(l) inherits(l$geom, "GeomVline"),
+    p$layers
+  )
+  expect_length(vline, 1L)
+  marked <- vline[[1]]$data
+  expect_true(all(c("flavor", "family") %in% names(marked)))
+  expect_true(all(marked$cpt))
+})
