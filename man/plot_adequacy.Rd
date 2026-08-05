@@ -16,11 +16,19 @@
 
 \method{plot}{margin_table}(x, ..., top = 25)
 
-\method{plot}{test_gof}(x, ..., level = 0.95)
+\method{plot}{test_gof}(x, ..., level = 0.95, page = NULL, nrow = 2, ncol = 2)
 
-\method{plot}{test_time}(x, ...)
+\method{plot}{test_time}(x, ..., page = NULL, nrow = 2, ncol = 2)
 
-\method{plot}{diagnose_onset}(x, ..., view = c("both", "path", "accrual"), tolerance_band = TRUE)
+\method{plot}{diagnose_onset}(
+  x,
+  ...,
+  view = c("both", "path", "accrual"),
+  tolerance_band = TRUE,
+  page = NULL,
+  nrow = 2,
+  ncol = 2
+)
 }
 \arguments{
 \item{x}{An object of class \code{diagnose_outliers}, \code{diagnose_changepoints},
@@ -34,6 +42,14 @@ by the goldfish functions of the same names.}
 \item{level}{The confidence level of the reference bands, defaulting to
 0.95. The band is the two-sided Kolmogorov quantile of the supremum of a
 Brownian bridge, which is the reference the event-clock p-value uses.}
+
+\item{page}{Which page to draw, for the per-term figures. \code{NULL} (the
+default) draws every panel in one figure, exactly as before. A number
+draws that page alone; a number past the last is an error naming the
+count. Use \code{\link[=ag_pages]{ag_pages()}} to learn the count without rendering, so a loop
+can write every page with nobody at a screen.}
+
+\item{nrow, ncol}{Panels per page when \code{page} is given.}
 
 \item{view}{Which panels to draw: \code{"both"} (default), or \code{"path"} or
 \code{"accrual"} alone, which is the escape hatch when a model has too many

@@ -23,6 +23,12 @@
 #'   `margin_table`, `test_gof`, `test_time` or `diagnose_onset`, as returned
 #'   by the goldfish functions of the same names.
 #' @param ... Additional plotting parameters, currently unused.
+#' @param page Which page to draw, for the per-term figures. `NULL` (the
+#'   default) draws every panel in one figure, exactly as before. A number
+#'   draws that page alone; a number past the last is an error naming the
+#'   count. Use [ag_pages()] to learn the count without rendering, so a loop
+#'   can write every page with nobody at a screen.
+#' @param nrow,ncol Panels per page when `page` is given.
 #' @return A ggplot object.
 NULL
 
@@ -170,6 +176,14 @@ plot.margin_table <- function(x, ..., top = 25) {
   scales <- gf_meta(x, "context")$defined_scales
   martingale <- "expected_count" %in% scales
   data <- as.data.frame(x)
+  # `margin_table(dispersion = TRUE)` carries a second reading, and where both
+  # are present the informative figure is the two against each other rather
+  # than either alone: level says whether an actor acted often enough, shape
+  # whether its events were spaced the way the model implies, and an actor can
+  # fail one while passing the other.
+  if ("dispersion" %in% names(data) && !all(is.na(data$dispersion))) {
+    return(gf_margin_scatter(data, martingale, top))
+  }
   data$value <- if (martingale) {
     data$observed - data$expected_count
   } else {
@@ -254,11 +268,18 @@ plot.margin_table <- function(x, ..., top = 25) {
 #' @examples
 #' plot(goldfish_gof)
 #' @export
-plot.test_gof <- function(x, ..., level = 0.95) {
+plot.test_gof <- function(
+  x,
+  ...,
+  level = 0.95,
+  page = NULL,
+  nrow = 2,
+  ncol = 2
+) {
   process <- as.data.frame(x$process)
   clock <- gf_meta(x, "params")$clock
 
-  ggplot2::ggplot(
+  p <- ggplot2::ggplot(
     process,
     ggplot2::aes(x = .data$u, y = .data$process)
   ) +
@@ -269,7 +290,6 @@ plot.test_gof <- function(x, ..., level = 0.95) {
       linetype = "dashed"
     ) +
     ggplot2::geom_step(na.rm = TRUE) +
-    ggplot2::facet_wrap(gf_block_facets(process)) +
     ggplot2::theme_minimal() +
     ggplot2::labs(
       x = gf_clock_label(clock),
@@ -280,6 +300,15 @@ plot.test_gof <- function(x, ..., level = 0.95) {
         "%"
       )
     )
+  gf_facet_paged(
+    p,
+    gf_block_facets(process),
+    page,
+    nrow,
+    ncol,
+    ag_pages(x, nrow, ncol),
+    scales = "fixed"
+  )
 }
 
 #' @rdname plot_adequacy
@@ -296,7 +325,7 @@ plot.test_gof <- function(x, ..., level = 0.95) {
 #' @examples
 #' plot(goldfish_time)
 #' @export
-plot.test_time <- function(x, ...) {
+plot.test_time <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
   residuals <- as.data.frame(x$residuals)
   params <- gf_meta(x, "params")
   # `period` is all-NA under the trend method, which has no periods; colouring
@@ -321,7 +350,7 @@ plot.test_time <- function(x, ...) {
   } else {
     p + ggplot2::geom_point(alpha = 0.4, na.rm = TRUE, colour = ag_base())
   }
-  p +
+  p <- p +
     ggplot2::geom_smooth(
       method = "loess",
       formula = y ~ x,
@@ -329,13 +358,21 @@ plot.test_time <- function(x, ...) {
       colour = ag_highlight(),
       na.rm = TRUE
     ) +
-    ggplot2::facet_wrap(gf_block_facets(residuals), scales = "free_y") +
     ggplot2::theme_minimal() +
     ggplot2::labs(
       x = "Model time",
       y = "Scaled Schoenfeld residual",
       subtitle = gf_time_subtitle(params)
     )
+  gf_facet_paged(
+    p,
+    gf_block_facets(residuals),
+    page,
+    nrow,
+    ncol,
+    ag_pages(x, nrow, ncol),
+    scales = "free_y"
+  )
 }
 
 # The panels a test object facets on: the term always, plus the two identity
@@ -422,7 +459,10 @@ plot.diagnose_onset <- function(
   x,
   ...,
   view = c("both", "path", "accrual"),
-  tolerance_band = TRUE
+  tolerance_band = TRUE,
+  page = NULL,
+  nrow = 2,
+  ncol = 2
 ) {
   view <- match.arg(view)
   context <- gf_meta(x, "context")
@@ -435,7 +475,16 @@ plot.diagnose_onset <- function(
     return(invisible(NULL))
   }
 
-  path <- gf_onset_path_panel(x, summary, params, tolerance_band)
+  path <- gf_onset_path_panel(
+    x,
+    summary,
+    params,
+    tolerance_band,
+    page = page,
+    nrow = nrow,
+    ncol = ncol,
+    n_pages = ag_pages(x, nrow, ncol)
+  )
   if (identical(view, "path")) {
     return(path)
   }
@@ -450,7 +499,16 @@ plot.diagnose_onset <- function(
 # `1.15 * stabilized_at`, floored at 10: a proportional floor squashes the
 # coefficients that settle in a handful of events, and an absolute margin
 # (`+ 20`) overshoots the ones whose whole excursion is shorter than that.
-gf_onset_path_panel <- function(x, summary, params, tolerance_band) {
+gf_onset_path_panel <- function(
+  x,
+  summary,
+  params,
+  tolerance_band,
+  page = NULL,
+  nrow = 2,
+  ncol = 2,
+  n_pages = 1L
+) {
   path <- as.data.frame(x$path)
   path <- path[path$index %in% summary$index, , drop = FALSE]
   n_events <- max(path$dropped_events)
@@ -503,14 +561,22 @@ gf_onset_path_panel <- function(x, summary, params, tolerance_band) {
         linetype = "dashed"
       )
   }
-  p +
-    ggplot2::facet_wrap(~ .data$term, scales = "free") +
+  p <- p +
     ggplot2::theme_minimal() +
     ggplot2::labs(
       x = "Initial events dropped",
       y = "Estimate",
       subtitle = "Path with the stabilization point marked"
     )
+  gf_facet_paged(
+    p,
+    stats::as.formula("~ term"),
+    page,
+    nrow,
+    ncol,
+    n_pages,
+    scales = "free"
+  )
 }
 
 # The accrual panel: full range with the onset window shaded, and the
@@ -649,14 +715,17 @@ gf_overview_schoenfeld <- function(x, effects) {
   if (is.null(rows)) {
     return(NULL)
   }
-  keep <- gf_overview_rank(x, colnames(rows), effects)
+  available <- colnames(rows)
+  keep <- gf_overview_rank(x, available, effects)
+  omitted <- length(available) - length(keep)
+  labels <- gf_overview_labels(x, keep, available)
   long <- data.frame(
     interval = rep(seq_len(nrow(rows)), times = length(keep)),
-    term = rep(keep, each = nrow(rows)),
+    term = rep(labels, each = nrow(rows)),
     value = as.numeric(rows[, keep, drop = FALSE])
   )
   estimates <- stats::coef(x)[keep]
-  reference <- data.frame(term = keep, estimate = as.numeric(estimates))
+  reference <- data.frame(term = labels, estimate = as.numeric(estimates))
 
   ggplot2::ggplot(long, ggplot2::aes(x = .data$interval, y = .data$value)) +
     ggplot2::geom_hline(
@@ -673,7 +742,26 @@ gf_overview_schoenfeld <- function(x, effects) {
     ) +
     ggplot2::facet_wrap(~ .data$term, scales = "free_y") +
     ggplot2::theme_minimal() +
-    ggplot2::labs(x = "", y = "", subtitle = "Scaled Schoenfeld")
+    ggplot2::labs(
+      x = "",
+      y = "",
+      # A reduced figure says so. Drawing four of fifty-six without a word is
+      # the same failure as a diagnostic reporting nothing because it could not
+      # see anything: the output looks like an answer about the whole model.
+      subtitle = if (omitted > 0) {
+        paste0(
+          "Scaled Schoenfeld — ",
+          length(keep),
+          " of ",
+          length(available),
+          " terms, ranked; ",
+          omitted,
+          " not shown"
+        )
+      } else {
+        "Scaled Schoenfeld"
+      }
+    )
 }
 
 # Which effects the Schoenfeld panel draws. Ranked by the cumulative-score
@@ -681,22 +769,39 @@ gf_overview_schoenfeld <- function(x, effects) {
 # rather than whichever terms the formula happened to name first.
 gf_overview_rank <- function(x, terms, effects) {
   if (length(terms) <= effects) {
-    return(terms)
+    return(seq_along(terms))
   }
   gof <- gf_overview_try(goldfish::test_gof(x))
   if (is.null(gof)) {
-    return(terms[seq_len(effects)])
+    return(seq_len(effects))
   }
-  ranked <- gof$effects$coefficient[order(
-    gof$effects$statistic,
-    decreasing = TRUE
-  )]
-  ranked <- ranked[ranked %in% terms]
+  # Selected by COLUMN POSITION, not by name. The residual matrix is named by
+  # effect (`indeg`, `outdeg`), which repeats when one effect appears over two
+  # networks, while the test names coefficients (`ideg_cal`, `ideg_fri`). The
+  # two vocabularies intersect only on the intercept, so matching them by name
+  # silently kept one term where several were asked for -- and with duplicated
+  # names, `rows[, "indeg"]` would have drawn the first of them either way.
+  ranked <- gof$effects$index[order(gof$effects$statistic, decreasing = TRUE)]
+  ranked <- ranked[ranked >= 1 & ranked <= length(terms)]
   if (length(ranked) == 0) {
-    terms[seq_len(effects)]
+    seq_len(effects)
   } else {
     utils::head(ranked, effects)
   }
+}
+
+# Panel labels for the selected columns. The test's own compact term strings
+# where they are available, since those distinguish an effect appearing over
+# two networks; otherwise the residual names made unique, which is ugly but
+# never ambiguous.
+gf_overview_labels <- function(x, keep, terms) {
+  gof <- gf_overview_try(goldfish::test_gof(x))
+  labels <- make.unique(terms)[keep]
+  if (!is.null(gof)) {
+    matched <- match(keep, gof$effects$index)
+    labels <- ifelse(is.na(matched), labels, gof$effects$term[matched])
+  }
+  labels
 }
 
 gf_overview_gof <- function(x) {
@@ -734,4 +839,174 @@ gf_overview_waiting <- function(x) {
       y = "Cox-Snell residual",
       subtitle = "Waiting times"
     )
+}
+
+# Pagination --------------------------------------------------------------
+
+#' How many pages a paged diagnostic figure has
+#'
+#' @description
+#' The page count of [plot()] on a per-term diagnostic, derivable **without
+#' rendering** so a loop can write every page.
+#'
+#' A method that only discovers it is on the last page once it gets there
+#' cannot be scripted, and scripting is the case this exists for: fits go to a
+#' cluster, so a figure has to be producible with nobody at a screen to press
+#' return.
+#'
+#' @param x a diagnostic object with one panel per term — as returned by
+#'   `test_gof()`, `test_time()`, `diagnose_onset()`, or a fitted goldfish
+#'   model.
+#' @param nrow,ncol panels per page, matching what will be passed to `plot()`.
+#'
+#' @return A single integer, at least 1.
+#' @examples
+#' ag_pages(goldfish_gof)
+#' @export
+ag_pages <- function(x, nrow = 2, ncol = 2) {
+  panels <- gf_panel_count(x)
+  if (is.na(panels) || panels < 1) {
+    return(1L)
+  }
+  as.integer(max(1L, ceiling(panels / (nrow * ncol))))
+}
+
+# How many panels a per-term figure would draw. Read off the same component and
+# the same facet columns the plot method facets by, so the two cannot disagree
+# about what a page holds.
+gf_panel_count <- function(x) {
+  data <- gf_panel_data(x)
+  if (is.null(data)) {
+    return(NA_integer_)
+  }
+  keys <- intersect(c("term", "flavor", "family"), names(data))
+  if (length(keys) == 0) {
+    return(NA_integer_)
+  }
+  nrow(unique(data[keys]))
+}
+
+gf_panel_data <- function(x) {
+  if (inherits(x, "test_gof")) {
+    return(as.data.frame(x$process))
+  }
+  if (inherits(x, "test_time")) {
+    return(as.data.frame(x$residuals))
+  }
+  if (inherits(x, "diagnose_onset")) {
+    return(as.data.frame(x$path))
+  }
+  if (inherits(x, "result.goldfish")) {
+    return(NULL)
+  }
+  NULL
+}
+
+# One page of a faceted figure, or all of it.
+#
+# `page = NULL` keeps the ordinary `facet_wrap()`, so nothing about the
+# unpaged figure changes. A page beyond the last is an error naming the count
+# rather than an empty panel, which is what a loop with an off-by-one would
+# otherwise produce and not notice.
+gf_facet_paged <- function(p, facets, page, nrow, ncol, n_pages, scales) {
+  if (is.null(page)) {
+    return(p + ggplot2::facet_wrap(facets, scales = scales))
+  }
+  if (!is.numeric(page) || length(page) != 1L || is.na(page) || page < 1) {
+    cli::cli_abort("{.arg page} must be a single positive number.")
+  }
+  page <- as.integer(page)
+  if (page > n_pages) {
+    cli::cli_abort(c(
+      "{.arg page} {.val {page}} is past the last page.",
+      "i" = "This figure has {n_pages} page{?s} at
+             {.code nrow = {nrow}, ncol = {ncol}}.",
+      "i" = "{.fn ag_pages} reports the count without rendering."
+    ))
+  }
+  p +
+    ggforce::facet_wrap_paginate(
+      facets,
+      nrow = nrow,
+      ncol = ncol,
+      page = page,
+      scales = scales
+    )
+}
+
+# Level against shape, one point per actor.
+#
+# The quadrants are the reading. An actor is calibrated on level near the
+# vertical reference and on shape near a dispersion of one, so the four corners
+# are four distinct misfits: too many events and bursty, too few and bursty,
+# and so on. Sized by the event count because the shape reading is undefined
+# below two completed spans and noisy just above it -- a large point is one
+# worth believing.
+gf_margin_scatter <- function(data, martingale, top) {
+  data$value <- if (martingale) {
+    data$observed - data$expected_count
+  } else {
+    data$observed / data$expected_probability
+  }
+  reference <- if (martingale) 0 else 1
+  usable <- data[!is.na(data$dispersion), , drop = FALSE]
+  omitted_shape <- nrow(data) - nrow(usable)
+
+  deviation <- abs(usable$value - reference)
+  ranked <- names(sort(
+    tapply(deviation, usable$actor, max, na.rm = TRUE),
+    decreasing = TRUE
+  ))
+  omitted_top <- max(0, length(ranked) - top)
+  if (omitted_top > 0) {
+    usable <- usable[usable$actor %in% ranked[seq_len(top)], ]
+  }
+
+  p <- ggplot2::ggplot(
+    usable,
+    ggplot2::aes(x = .data$value, y = .data$dispersion)
+  ) +
+    ggplot2::geom_vline(xintercept = reference, colour = ag_base()) +
+    # One is the dispersion of a unit exponential, which each span is under a
+    # correct model -- the same reference the level axis reads against.
+    ggplot2::geom_hline(yintercept = 1, colour = ag_base()) +
+    ggplot2::geom_point(
+      ggplot2::aes(size = .data$observed),
+      alpha = 0.6,
+      colour = ag_highlight(),
+      na.rm = TRUE
+    ) +
+    ggplot2::scale_size_continuous(name = "Events") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(
+      x = if (martingale) {
+        "Observed minus expected events"
+      } else {
+        "Observed over expected events"
+      },
+      y = "Dispersion of the actor's own spans",
+      subtitle = gf_scatter_subtitle(omitted_shape, omitted_top)
+    )
+  facets <- intersect(c("flavor", "family", "role"), names(usable))
+  if (length(facets) > 0) {
+    p <- p +
+      ggplot2::facet_wrap(
+        stats::as.formula(paste("~", paste(facets, collapse = " + ")))
+      )
+  }
+  p
+}
+
+# Both kinds of omission are named. An actor can be missing because it has too
+# few events for a shape reading, or because it is not among the `top` furthest
+# from the reference, and a figure that drew a subset without saying which
+# would look like the whole node set.
+gf_scatter_subtitle <- function(omitted_shape, omitted_top) {
+  parts <- c(
+    if (omitted_shape > 0) {
+      paste(omitted_shape, "actors below two completed spans")
+    },
+    if (omitted_top > 0) paste(omitted_top, "further actors not shown")
+  )
+  if (length(parts) == 0) NULL else paste(parts, collapse = "; ")
 }

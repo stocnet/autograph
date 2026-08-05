@@ -312,8 +312,13 @@ test_that("the Schoenfeld panel caps the effects it draws", {
   # a position that shifts whenever one drops out.
   panels <- c(wide$patches$plots, list(wide))
   subtitles <- vapply(panels, function(p) p$labels$subtitle %||% "", character(1))
-  schoenfeld <- panels[[match("Scaled Schoenfeld", subtitles)]]
+  # Matched on the prefix: a reduced panel now names what it dropped, so the
+  # subtitle carries a count after it.
+  schoenfeld <- panels[[which(startsWith(subtitles, "Scaled Schoenfeld"))[1]]]
   expect_length(unique(schoenfeld$data$term), 2L)
+  # And says so, rather than drawing two of several as though that were the
+  # model.
+  expect_match(schoenfeld$labels$subtitle, "not shown")
 })
 
 # A multi-process fit arrives row-bound, with `flavor` and `family` naming the
@@ -334,7 +339,9 @@ flavor_stack <- function(object) {
   )
   attributes(stacked) <- c(
     attributes(stacked),
-    attributes(object)[setdiff(names(attributes(object)), names(attributes(stacked)))]
+    attributes(object)[
+      setdiff(names(attributes(object)), names(attributes(stacked)))
+    ]
   )
   class(stacked) <- class(object)
   stacked
@@ -376,4 +383,94 @@ test_that("changepoint breaks stay in the process they were found in", {
   marked <- vline[[1]]$data
   expect_true(all(c("flavor", "family") %in% names(marked)))
   expect_true(all(marked$cpt))
+})
+
+# Pagination. A model with many terms breaks a one-panel-per-term figure, and
+# the remedy cannot assume someone is at a screen: fits go to a cluster, so the
+# page count has to be knowable before rendering and every page has to render
+# with nobody there to press return.
+
+# A paginate facet lays out EVERY panel and marks each with the page it belongs
+# to, so the page's own panels are the rows carrying it -- not the whole layout,
+# which is what makes a naive reading show every term on every page.
+page_terms <- function(p) {
+  layout <- ggplot2::ggplot_build(p)$layout$layout
+  if (!is.null(layout$page)) {
+    page <- attr(p$facet$params, "page") %||% p$facet$params$page
+    layout <- layout[layout$page == page, , drop = FALSE]
+  }
+  keys <- intersect(c("term", "flavor", "family"), names(layout))
+  unique(do.call(paste, c(layout[keys], sep = " | ")))
+}
+
+test_that("the page count is known without rendering", {
+  # Read off the object, so a loop can size itself before anything is drawn.
+  for (object in list(goldfish_gof, goldfish_time, goldfish_onset)) {
+    panels <- gf_panel_count(object)
+    expect_gt(panels, 0L)
+    expect_identical(ag_pages(object, nrow = 1, ncol = 1), as.integer(panels))
+    expect_identical(ag_pages(object, nrow = panels, ncol = panels), 1L)
+    # Never zero: a figure with nothing to facet is still one page.
+    expect_gte(ag_pages(object), 1L)
+  }
+})
+
+test_that("the count matches the panels actually drawn", {
+  # `goldfish_onset` is excluded on purpose: its plot is a patchwork of two
+  # panels rather than one faceted ggplot, so it has no single layout to count.
+  for (object in list(goldfish_gof, goldfish_time)) {
+    expect_identical(
+      gf_panel_count(object),
+      length(page_terms(plot(object)))
+    )
+  }
+})
+
+test_that("the pages cover every term exactly once", {
+  for (object in list(goldfish_gof, goldfish_time)) {
+    all_terms <- page_terms(plot(object))
+    n_pages <- ag_pages(object, nrow = 1, ncol = 1)
+
+    seen <- unlist(lapply(seq_len(n_pages), function(k) {
+      page_terms(plot(object, page = k, nrow = 1, ncol = 1))
+    }))
+    expect_setequal(seen, all_terms)
+    expect_identical(anyDuplicated(seen), 0L)
+  }
+})
+
+test_that("every page renders without prompting", {
+  # `devAskNewPage()` is what a base-graphics multi-page walk uses, and it is
+  # exactly what cannot be scripted. Asserted rather than assumed: the flag is
+  # read back after rendering every page.
+  expect_false(interactive())
+  before <- grDevices::devAskNewPage()
+
+  n_pages <- ag_pages(goldfish_gof, nrow = 1, ncol = 1)
+  for (k in seq_len(n_pages)) {
+    p <- plot(goldfish_gof, page = k, nrow = 1, ncol = 1)
+    expect_s3_class(p, "ggplot")
+    # Rendering, not merely constructing: a paginate facet that cannot resolve
+    # its page fails here rather than at print time.
+    expect_no_error(ggplot2::ggplot_build(p))
+  }
+  expect_identical(grDevices::devAskNewPage(), before)
+})
+
+test_that("a page past the last one is an error naming the count", {
+  n_pages <- ag_pages(goldfish_gof, nrow = 1, ncol = 1)
+  expect_error(
+    plot(goldfish_gof, page = n_pages + 1L, nrow = 1, ncol = 1),
+    "past the last page"
+  )
+  expect_error(plot(goldfish_gof, page = 0), "positive")
+  expect_error(plot(goldfish_gof, page = c(1, 2)), "single positive")
+})
+
+test_that("an unpaged figure is untouched by pagination existing", {
+  for (object in list(goldfish_gof, goldfish_time)) {
+    facet <- plot(object)$facet
+    expect_s3_class(facet, "FacetWrap")
+    expect_false(inherits(facet, "FacetWrapPaginate"))
+  }
 })
