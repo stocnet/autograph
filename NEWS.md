@@ -1,3 +1,33 @@
+# autograph 1.0.5
+
+## Plotting
+
+- The per-term diagnostic figures paginate. `plot()` on `test_gof`,
+  `test_time` and `diagnose_onset` takes `page`, and the new `ag_pages()`
+  reports the page count **without rendering**, so a loop can write every page
+  with nobody at a screen --- the case that motivates it, fits being run on a
+  cluster. A page past the last is an error naming the count rather than an
+  empty panel. Omitting `page` leaves each figure exactly as it was.
+- `plot.margin_table()` draws level against shape when goldfish supplies the
+  `dispersion` column (goldfish >= 1.9.28): the observed-minus-expected
+  difference on one axis, the dispersion of that actor's own waiting times on
+  the other, sized by event count. The quadrants separate an actor that acted
+  too often from one whose events were merely bunched. Both kinds of omission
+  are named --- actors below two completed spans, and actors beyond `top`.
+- The flavoured diagnostic tables get one panel per process.
+  `plot.diagnose_outliers()` and `plot.diagnose_changepoints()` faceted on
+  nothing, so a multi-process table had its `geom_line()` drawn straight across
+  the boundary between one process's last event and the next process's first.
+  `plot.diagnose_changepoints()` also drew every process's breaks onto every
+  panel.
+- The overview's Schoenfeld panel says how many terms it dropped. **It also
+  drew the wrong number of them**: the ranking matched the test's coefficient
+  labels against the residual matrix's effect names, which intersect only on the
+  intercept, so asking for four terms drew one. Those names also repeat when an
+  effect appears over two networks, so a matching name would have drawn the
+  first of them under an ambiguous label. Selection is now by column position,
+  with panels labelled by the test's own compact term strings.
+
 # autograph 1.0.4
 
 ## Plotting
