@@ -312,6 +312,119 @@ test_that("labels stay clear of larger nodes (#13)", {
   expect_gt(mean(built_big$data[[n]]$point.size), mean(built_small$data[[n]]$point.size))
 })
 
+# Which nodes get labelled. The label layer now carries its own `data` (the
+# selected rows) rather than inheriting the plot's, so the selection can be
+# read straight off it. Found by its geom rather than by position, since an
+# isolates legend can be added after it.
+label_layer_of <- function(p) {
+  geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
+  at <- which(geoms %in% c("GeomLabelRepel", "GeomLabel",
+                           "GeomTextRepel", "GeomText"))
+  if (!length(at)) return(NULL)
+  p[["layers"]][[at[1]]]
+}
+label_names <- function(p) sort(as.character(label_layer_of(p)[["data"]][["name"]]))
+
+test_that("labels selects nodes by rank on a measure", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  net <- ison_adolescents
+  nms <- manynet::node_names(net)
+  expect_length(label_names(graphr(net)), length(nms))
+  # A rank depth labels fewer than all of them, and a bare criterion (one rank)
+  # fewer still, nested within the deeper selection.
+  top <- label_names(graphr(net, labels = 3))
+  most <- label_names(graphr(net, labels = "degree"))
+  expect_lt(length(top), length(nms))
+  expect_lte(length(most), length(top))
+  expect_true(all(most %in% top))
+  # Each criterion selects what netrics itself says is maximal
+  expect_setequal(most, nms[as.logical(netrics::node_is_max(
+    netrics::node_by_degree(net, normalized = FALSE)))])
+  expect_setequal(label_names(graphr(net, labels = c(betweenness = 1))),
+                  nms[as.logical(netrics::node_is_max(
+                    netrics::node_by_betweenness(net)))])
+  expect_setequal(label_names(graphr(net, labels = "cutpoints")),
+                  nms[as.logical(netrics::node_is_cutpoint(net))])
+})
+
+test_that("labels accepts an explicit selection of nodes", {
+  skip_on_cran()
+  net <- ison_adolescents
+  nms <- manynet::node_names(net)
+  expect_setequal(label_names(graphr(net, labels = c("Alice", "Betty"))),
+                  c("Alice", "Betty"))
+  expect_setequal(label_names(graphr(net, labels = nms %in% c("Betty", "Carol"))),
+                  c("Betty", "Carol"))
+  expect_setequal(label_names(graphr(net, labels = c(2, 5))), nms[c(2, 5)])
+  # A logical attribute, e.g. a netrics node_mark stored on the network
+  marked <- manynet::add_node_attribute(net, "mark",
+                                        nms %in% c("Alice", "Tina"))
+  expect_setequal(label_names(graphr(marked, labels = "mark")),
+                  c("Alice", "Tina"))
+})
+
+test_that("an empty selection draws no label layer at all", {
+  skip_on_cran()
+  net <- ison_adolescents
+  expect_null(label_layer_of(graphr(net, labels = FALSE)))
+  expect_null(label_layer_of(graphr(net, labels = rep(FALSE, 8))))
+  expect_false(is.null(label_layer_of(graphr(net))))
+})
+
+test_that("a selection is measured against the network as given, isolates and all", {
+  skip_on_cran()
+  # Isolates are dropped before the plot is laid out, which shifts every later
+  # node's position, so a selection has to be resolved before that happens.
+  net <- manynet::add_nodes(ison_adolescents, 2, list(name = c("Ivy", "Jo")))
+  nms <- manynet::node_names(net)
+  expect_setequal(label_names(graphr(net, labels = nms %in% c("Carol", "Tina"))),
+                  c("Carol", "Tina"))
+  expect_setequal(label_names(graphr(net, labels = which(nms %in% c("Carol", "Tina")))),
+                  c("Carol", "Tina"))
+  # A single number is a depth of ranks, never one node's position, so a lone
+  # node has to be named (or marked) rather than numbered
+  expect_gt(length(label_names(graphr(net, labels = 8))), 1)
+  expect_setequal(label_names(graphr(net, labels = "Tina")), "Tina")
+})
+
+test_that("a selection keeps node sizes aligned with the labelled nodes", {
+  skip_on_cran()
+  net <- manynet::add_node_attribute(ison_adolescents, "num",
+                                     c(1, 20, rep(1, 6)))
+  p <- graphr(net, node_size = "num", labels = "Sue")
+  geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
+  built <- ggplot2::ggplot_build(p)
+  point_size <- built[["data"]][[which(geoms == "GeomLabelRepel")]][["point.size"]]
+  # Sue is the second node, so hers is the size that should have come through
+  expect_length(point_size, 1)
+  expect_equal(point_size, 20 * ggplot2::.pt)
+})
+
+test_that("large networks label only their most central nodes by default", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  set.seed(123)
+  net <- manynet::to_named(manynet::generate_random(60, 0.08))
+  auto <- label_names(graphr(net, isolates = "keep"))
+  expect_gt(length(auto), 0)
+  expect_lt(length(auto), 60)
+  # Asking for labels outright still labels every node
+  expect_length(label_names(graphr(net, labels = TRUE, isolates = "keep")), 60)
+})
+
+test_that("selections on a two-mode network span both modes", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  net <- ison_southern_women
+  nms <- manynet::node_names(net)
+  modes <- igraph::V(manynet::as_igraph(net))$type
+  sel <- label_names(graphr(net, labels = 3))
+  expect_lt(length(sel), length(nms))
+  expect_true(any(sel %in% nms[!modes]))
+  expect_true(any(sel %in% nms[modes]))
+})
+
 test_that("graphr() works on a stocnet-class object", {
   skip_on_cran()
   sn <- manynet::as_stocnet(ison_adolescents)

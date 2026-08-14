@@ -102,6 +102,13 @@
 
 ## Graphing
 
+- Improved `graphr()`'s `labels` argument to label a *selection* of the nodes, where previously the only alternative to labelling every node was labelling none
+  - `labels` now also accepts a depth of ranks (`labels = 5`), a measure to rank by (`labels = "betweenness"`, or `labels = c(betweenness = 5)` for both), the name of a logical node attribute, or a logical/name/position vector of the nodes to label
+  - Selection is by rank rather than by headcount, so nodes tied at the cut are labelled together, using `netrics::node_is_max()`; a two-mode or multilevel network is ranked within each mode or level, so a dense level cannot crowd the others out of the labelling
+  - Networks of more than 30 nodes now label only their most central nodes by default, reporting how many; `labels = TRUE` still labels every node. `manynet::fict_marvel` went from 194 overlapping labels to 10
+  - Labels are drawn from the selected rows rather than by blanking the rest, so no space is reserved (and nothing is repelled away from) labels that are not drawn
+  - `grapht()` resolves the selection once across all waves, so the same nodes stay labelled from frame to frame, and `graphs()` resolves it once for all its panels; `grapht()`'s own default above 30 nodes remains no labels at all
+  - `{netrics}` is only suggested, so an automatic selection falls back to a random sample when it is not installed, and a measure asked for by name says what to install
 - Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
   - Such networks now split into waves via a guarded `to_waves()` that coerces the offending attributes when `{manynet}`'s splitter cannot combine them
 - Fixed `graphr(..., snap = TRUE)` erroring ("'-' only defined for equally-sized data frames") whenever a node sat exactly on a grid point
@@ -146,6 +153,9 @@
 ## Tutorials
 
 - Updated visualization tutorial to use colour/color consistently
+- Updated the Labels section of the visualisation tutorial to cover selecting which nodes to label, replacing the `mutate(name = ifelse(...))` workaround it used to recommend
+  - `fict_lotr`, the tutorial's running example, has 36 nodes, so its graphs now name only its most central characters; the surrounding prose says so and shows how to choose otherwise
+  - Regenerated `vignettes/articles/visualising-networks.Rmd` and the pre-rendered tutorial HTML to match
 
 # autograph 1.1.1
 

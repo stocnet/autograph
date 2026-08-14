@@ -97,6 +97,41 @@ test_that("graphr() accepts out-of-range numeric aesthetics without erroring", {
   expect_buildable(graphr(net, edge_size = -1))
 })
 
+test_that("graphr() rejects an unusable labels selection", {
+  net <- manynet::add_node_attribute(manynet::ison_adolescents,
+                                     "wealth", seq_len(8))
+  # A name that is neither an attribute, a measure, nor a node
+  expect_error(graphr(net, labels = "nosuchthing"), "labels")
+  expect_error(graphr(net, labels = "wealthh"), "Did you mean")
+  # A selection has to be the right length, or within range
+  expect_error(graphr(net, labels = c(TRUE, FALSE, TRUE)), "8 nodes")
+  expect_error(graphr(net, labels = c(2, 99)), "between 1 and 8")
+  # Ranks are counted, not measured
+  expect_error(graphr(net, labels = -2), "positive whole number")
+  expect_error(graphr(net, labels = c(nosuchmeasure = 5)), "labels")
+  # An attribute can mark which nodes to label, but only a logical one can
+  expect_error(graphr(net, labels = "wealth"), "logical")
+  # Named nodes must exist
+  expect_error(graphr(net, labels = c("Alice", "Nobody")), "Nobody")
+  expect_error(graphr(net, labels = c("Nobody", "NoOne")), "were not found")
+})
+
+test_that("graphr() labels without netrics installed to rank nodes by", {
+  # netrics is only suggested, and labelling is too incidental to a plot to
+  # stop it: the selection graphr() makes on its own falls back to a random
+  # sample, while one asked for by name says what is missing.
+  testthat::local_mocked_bindings(.has_netrics = function() FALSE)
+  set.seed(123)
+  big <- manynet::to_named(manynet::generate_random(60, 0.08))
+  p <- graphr(big, isolates = "keep")
+  labelled <- p[["layers"]][[length(p[["layers"]])]][["data"]][["name"]]
+  expect_gt(length(labelled), 0)
+  expect_lt(length(labelled), 60)
+  expect_error(graphr(big, labels = "betweenness"), "netrics")
+  # A selection that needs no ranking is unaffected
+  expect_buildable(graphr(big, labels = "random", isolates = "keep"))
+})
+
 test_that("graphr() rejects an unknown layout by name", {
   net <- manynet::ison_adolescents
   expect_error(graphr(net, layout = "notalayout"), "layout")

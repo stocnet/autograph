@@ -93,6 +93,28 @@ graphs <- function(netlist, waves,
     # are kept unless the user explicitly asks otherwise
     dots <- list(...)
     if (!"isolates" %in% names(dots)) dots$isolates <- "keep"
+    # Every panel draws the same nodes, so which of them to label is settled
+    # once here, against the network the layout is based on, and passed down as
+    # names. Left to each panel, `graphr()` would rank the nodes of each network
+    # separately and the labels would jump from panel to panel.
+    ref <- manynet::as_tidygraph(
+      netlist[[if (based_on == "last") length(netlist) else 1]])
+    if (manynet::is_labelled(ref)) {
+      labels_given <- "labels" %in% names(dots)
+      lab <- .check_labels(ref, if (labels_given) dots$labels else TRUE)
+      n_ref <- as.numeric(manynet::net_nodes(ref))
+      if (isTRUE(lab) && !labels_given && n_ref > 30)
+        lab <- structure(5L, criterion = "degree", automatic = TRUE)
+      if (!isTRUE(lab) && !isFALSE(lab)) {
+        dots$labels <- manynet::node_names(ref)[.infer_labels(ref, lab)]
+        n_lab <- length(dots$labels)
+        if (!labels_given) manynet::snet_info(
+          "Labelling the {n_lab} most central of {n_ref} nodes in each panel.",
+          "Use {.code labels = TRUE} to label all of them,",
+          "{.code labels = 25} to label more,",
+          "or {.code labels = FALSE} for none.")
+      }
+    }
     shared_graphr <- function(net, extra = NULL)
       do.call(graphr, c(list(net), dots, extra))
     if (based_on == "first") {

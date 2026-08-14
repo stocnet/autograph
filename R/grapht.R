@@ -86,6 +86,11 @@
 #'   offset nudging labels away from their nodes, and `label_dist` scales the
 #'   size of that nudge rather than being used as repel padding.
 #'
+#'   `labels` can select which nodes to label here too, and the selection is
+#'   resolved once over all the waves so that the same nodes stay labelled from
+#'   frame to frame. Unlike `graphr()`, though, animations of more than 30 nodes
+#'   default to no labels at all rather than to a selection of them.
+#'
 #'   Some further `graphr()` features are not available in animations:
 #'   `node_group` hulls, edge bundling, curved arcs for reciprocated ties,
 #'   and self-loops (loops are not drawn; a note is printed if present).
@@ -173,6 +178,12 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
     labels <- FALSE
     manynet::snet_info("Suppressing node labels for a network with more than 30 nodes; set `labels = TRUE` to show them.")
   }
+  # Resolved once, against the reference wave, so that the same nodes stay
+  # labelled from frame to frame rather than the selection shifting as ties
+  # come and go. Kept as node names, which is what the frame data is keyed by.
+  labels <- .check_labels(g_ref, labels)
+  if (!isFALSE(labels))
+    labels <- manynet::node_names(g_ref)[.infer_labels(g_ref, labels)]
   # Checked against the reference wave, which spans the union of nodes and ties,
   # so an attribute present in only some waves still resolves.
   node_color <- .check_node_color(g_ref, node_color)
@@ -751,7 +762,9 @@ print.grapht <- function(x, ...) {
                                            1 / n_union * 100))
 
   # --- Labels (drawn above nodes, as in graphr) ----
-  if (isTRUE(labels)) {
+  # `labels` arrives as the names of the nodes to label (or FALSE for none),
+  # already resolved against the reference wave by grapht().
+  if (!isFALSE(labels) && length(labels) > 0) {
     # No ggrepel-based repelling here (see @details in grapht()'s docs);
     # `label_repel` toggles a fixed offset instead, scaled by `label_dist`
     # when supplied (calibrated so graphr()'s default `label_dist` of 10
@@ -766,7 +779,8 @@ print.grapht <- function(x, ...) {
     p <- p + ggplot2::geom_text(
       ggplot2::aes(x = .data$x, y = .data$y, label = .data$name,
                    group = .data$name, alpha = .data$nalpha),
-      data = nodes_out, colour = ag_base(), family = ag_font(),
+      data = nodes_out[nodes_out$name %in% labels, , drop = FALSE],
+      colour = ag_base(), family = ag_font(),
       nudge_y = nudge, show.legend = FALSE)
   }
 

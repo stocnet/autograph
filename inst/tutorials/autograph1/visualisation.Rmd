@@ -284,7 +284,9 @@ graphr(fict_lotr)
 
 Note everything that happened without being asked:
 `graphr()` recognised that the network is `r gloss("labelled","label")`
-and printed the node labels,
+and printed node labels — but only for the most central characters,
+since 36 labels at once would hide the network behind them
+(the Labels section below shows how to choose differently),
 chose a deterministic layout (so you get the same picture every time),
 sized and spaced the labels to minimise overlap,
 and dropped the axes and grey background that mean nothing for networks.
@@ -322,7 +324,8 @@ Click 'Next Topic' to continue.
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `graphr()` graphs any manynet-compatible network object
 with sensible defaults inferred from the data:
-labels where the network is labelled, arrowheads where it is directed,
+labels where the network is labelled (and, where it is large,
+only for the nodes that stand out), arrowheads where it is directed,
 a deterministic layout, and no chart junk.
 It returns a `{ggplot2}` object, so anything you can do to a ggplot
 — adding layers, titles, scales with `+` — you can do to a graph.
@@ -794,8 +797,8 @@ In this section, we will learn how to add titles, labels, and legends to graphs.
 ### Labels {#labels}
 
 With our `fict_lotr` example above, because the network is itself labelled,
-`graphr()` automatically adds the node labels.
-If you do not want these labels, you can remove them from the network before
+`graphr()` adds node labels.
+If you do not want any labels, you can remove the names from the network before
 passing it on to `graphr()`, or more simply use the argument `labels = FALSE`.
 
 ```{r nodelab, exercise=TRUE, fig.width=9}
@@ -807,6 +810,46 @@ interpret, though we lose the information about which node is which character.
 Which you prefer depends on what the graph is _for_:
 exploring who-is-who, or communicating overall structure.
 
+But this is not really a choice between all and nothing.
+`fict_lotr` has 36 nodes, and 36 labels would cover the very network they
+describe, so `graphr()` labelled only the handful of most central characters
+and told you so.
+**Ask for all of them with `labels = TRUE` and compare.**
+
+```{r nodelaball, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, labels = TRUE)
+```
+
+You can decide how many to label by passing a number.
+This is a depth of _ranks_ rather than a count of nodes,
+so characters tied at the cut are labelled together —
+ask for the top three and you may get four names.
+
+```{r nodelabn, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, labels = 3)
+```
+
+`r gloss("Degree","degree")` is only one reason a node might be worth naming.
+Passing the name of a measure labels whichever node or nodes it singles out:
+`"betweenness"` for the characters who sit between others,
+`"cutpoints"` for those holding the network together,
+or `"random"` for a small unbiased sample.
+
+```{r nodelabmeasure, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, labels = "betweenness")
+```
+
+To combine the two, name the number: `labels = c(betweenness = 5)`.
+And when you know exactly who matters to your argument,
+you can just say so — by name, or with any logical vector of the nodes.
+
+```{r nodelabwho, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, labels = c("Frodo", "Gandalf")) +
+  ggtitle("Named outright") |
+  graphr(fict_lotr, labels = node_is_cutpoint(fict_lotr)) +
+  ggtitle("Every cutpoint")
+```
+
 ::: {.callout}
 <span class="callout-label">**Going further**:</span>
 By default `graphr()` repels labels away from each other and from nodes
@@ -814,8 +857,9 @@ so that they do not overlap.
 Two further arguments offer finer control:
 `label_repel = FALSE` places labels at a fixed offset instead,
 and `label_dist` controls how far labels sit from their nodes (in points).
-For crowded graphs, also consider labelling only some nodes,
-e.g. `mutate(name = ifelse(node_is_max(node_by_deg(.)), name, ""))`.
+On a `r gloss("two-mode","twomode")` or multilevel network, a selection is ranked
+within each mode or level, so that a dense level cannot crowd the others
+out of the labelling.
 :::
 
 ### Titles {#titles}
@@ -887,7 +931,8 @@ or removed using "none".
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `labs()` adds titles, subtitles, and legend titles;
 `guides()` forces or removes legends;
-`labels = FALSE` hides node labels,
+`labels` chooses which nodes to name — all of them, none,
+the top few by a measure, or the ones you name yourself —
 and `label_repel`/`label_dist` fine-tune their placement.
 A graph that leaves your hands should be readable without you
 standing next to it explaining.
@@ -1305,7 +1350,8 @@ And because they do not translate cleanly from frame to frame,
 and self-loops are not drawn in animations.
 Labels, too, are placed at a fixed offset rather than repelled,
 and are hidden by default once a network has more than 30 nodes
-(pass `labels = TRUE` to force them).
+(pass `labels = TRUE` to force them, or select a few as in `graphr()`,
+which is resolved once so the same nodes stay named in every frame).
 :::
 
 ::: {.callout}
@@ -1505,7 +1551,7 @@ Along the way, you have learned to use these functions:
 | `graphr()` | graphs any manynet-compatible network with sensible defaults |
 | `graphr(..., node_colour/node_shape/node_size/node_group)` | maps node attributes to aesthetics |
 | `graphr(..., edge_colour/edge_size)` | maps tie attributes to aesthetics |
-| `graphr(..., labels, label_repel, label_dist)` | controls node labelling |
+| `graphr(..., labels, label_repel, label_dist)` | chooses which nodes to label, and places the labels |
 | `graphr(..., layout, snap)` | chooses and adjusts the layout algorithm |
 | `graphr(..., x, y)` | places nodes at manually supplied coordinates |
 | `ggraph::create_layout()` | returns a layout's table of node coordinates for tweaking |

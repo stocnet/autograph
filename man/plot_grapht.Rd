@@ -69,8 +69,40 @@ as extra argument.
 The "rank" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes.}
 
-\item{labels}{Logical, whether to print node names
-as labels if present.}
+\item{labels}{Which nodes to label, if the network is labelled.
+\code{TRUE} (the default) labels every node and \code{FALSE} none of them,
+but a label for every node of a large network hides the network behind
+them, so a \emph{selection} of the nodes can be given instead:
+\itemize{
+\item a number, e.g. \code{labels = 5}, labels the nodes within the top five ranks
+by degree. Note that this is a depth of ranks rather than a count of
+nodes: nodes tied at the cut are labelled together, so more than five
+labels may appear.
+\item a measure to rank by, e.g. \code{labels = "betweenness"}, labels just the
+node or nodes that measure singles out. \code{"degree"}, \code{"betweenness"},
+\code{"cutpoints"} (every node the mark flags) and \code{"random"}
+(a small random sample) are available.
+The two can be combined by naming the number,
+as in \code{labels = c(betweenness = 5)}.
+\item the name of a logical node attribute, e.g. \code{labels = "is_broker"},
+labels the nodes it marks.
+\item a logical vector, one value per node, e.g.
+\code{labels = netrics::node_is_cutpoint(net)};
+or the names or positions of the nodes to label,
+e.g. \code{labels = c("Alice", "Betty")}.
+}
+
+Where a length-one string could mean more than one of these,
+a node attribute is preferred to a measure, and a measure to a node name.
+A single number is always read as a depth of ranks rather than as one
+node's position, so a lone node is best named, as in \code{labels = "Alice"}.
+For networks of more than 30 nodes, \code{labels} defaults to a selection
+rather than to every node; pass \code{labels = TRUE} for all of them.
+Ranking nodes uses the \code{{netrics}} package, which is suggested rather than
+required: without it installed, an automatic selection falls back to a
+random sample.
+Two-mode and multilevel networks are ranked within each mode or level,
+so that every level is labelled and not just the densest.}
 
 \item{node_color, node_colour}{Node variable to be used for coloring the nodes.
 It is easiest if this is added as a node attribute to
@@ -206,6 +238,11 @@ repelling (there is no straightforward way to repel labels consistently
 across animation frames), so \code{label_repel} here instead toggles a fixed
 offset nudging labels away from their nodes, and \code{label_dist} scales the
 size of that nudge rather than being used as repel padding.
+
+\code{labels} can select which nodes to label here too, and the selection is
+resolved once over all the waves so that the same nodes stay labelled from
+frame to frame. Unlike \code{graphr()}, though, animations of more than 30 nodes
+default to no labels at all rather than to a selection of them.
 
 Some further \code{graphr()} features are not available in animations:
 \code{node_group} hulls, edge bundling, curved arcs for reciprocated ties,

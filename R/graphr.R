@@ -50,8 +50,39 @@
 #'   as extra argument.
 #'   The "rank" argument expects either a quoted node attribute present
 #'   in data or vector with the same length as nodes.
-#' @param labels Logical, whether to print node names
-#'   as labels if present.
+#' @param labels Which nodes to label, if the network is labelled.
+#'   `TRUE` (the default) labels every node and `FALSE` none of them,
+#'   but a label for every node of a large network hides the network behind
+#'   them, so a *selection* of the nodes can be given instead:
+#'
+#'   - a number, e.g. `labels = 5`, labels the nodes within the top five ranks
+#'     by degree. Note that this is a depth of ranks rather than a count of
+#'     nodes: nodes tied at the cut are labelled together, so more than five
+#'     labels may appear.
+#'   - a measure to rank by, e.g. `labels = "betweenness"`, labels just the
+#'     node or nodes that measure singles out. `"degree"`, `"betweenness"`,
+#'     `"cutpoints"` (every node the mark flags) and `"random"`
+#'     (a small random sample) are available.
+#'     The two can be combined by naming the number,
+#'     as in `labels = c(betweenness = 5)`.
+#'   - the name of a logical node attribute, e.g. `labels = "is_broker"`,
+#'     labels the nodes it marks.
+#'   - a logical vector, one value per node, e.g.
+#'     `labels = netrics::node_is_cutpoint(net)`;
+#'     or the names or positions of the nodes to label,
+#'     e.g. `labels = c("Alice", "Betty")`.
+#'
+#'   Where a length-one string could mean more than one of these,
+#'   a node attribute is preferred to a measure, and a measure to a node name.
+#'   A single number is always read as a depth of ranks rather than as one
+#'   node's position, so a lone node is best named, as in `labels = "Alice"`.
+#'   For networks of more than 30 nodes, `labels` defaults to a selection
+#'   rather than to every node; pass `labels = TRUE` for all of them.
+#'   Ranking nodes uses the `{netrics}` package, which is suggested rather than
+#'   required: without it installed, an automatic selection falls back to a
+#'   random sample.
+#'   Two-mode and multilevel networks are ranked within each mode or level,
+#'   so that every level is labelled and not just the densest.
 #' @param node_shape Node variable to be used for shaping the nodes.
 #'   It is easiest if this is added as a node attribute to
 #'   the graph before plotting.
@@ -136,6 +167,10 @@
 #'          edge_size = 1.5, edge_color = "ecolor")
 #' graphr(ison_southern_women, labels = TRUE, label_dist = 10)
 #' graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+#' # Label a selection of the nodes rather than all of them
+#' graphr(ison_southern_women, labels = 2)
+#' graphr(ison_southern_women, labels = "betweenness")
+#' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
@@ -156,7 +191,12 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     names(cl)[names(cl) == ".data"] <- "netlist"
     return(eval(cl, parent.frame()))
   }
+  labels_missing <- missing(labels)
   g <- .check_network(.data)
+  # Checked here, before isolates are dropped below, so that a vector selecting
+  # which nodes to label is measured against the network as the user gave it.
+  # It comes back as node names, which survive that change of node positions.
+  labels <- .check_labels(g, labels)
 
   # Separate isolates ----
   # `isolates` is checked on its own line rather than inside .infer_isolates(),
@@ -172,8 +212,21 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       isos <- which(.node_is_isolate(g))
     }
     g <- .ag_delete_isolates(g)
-  } 
-  
+  }
+  # A label for every node of a large network hides the network behind them,
+  # so unless labelling was asked for outright, fall back to labelling the
+  # nodes that stand out. Decided here rather than above so that the count
+  # reflects the nodes actually drawn, once any isolates have been dropped.
+  n <- as.numeric(manynet::net_nodes(g))
+  if (labels_missing && isTRUE(labels) && n > 30) {
+    labels <- structure(5L, criterion = "degree", automatic = TRUE)
+    n_lab <- sum(.infer_labels(g, labels))
+    manynet::snet_info(
+      "Labelling the {n_lab} most central of {n} nodes.",
+      "Use {.code labels = TRUE} to label all of them,",
+      "{.code labels = 25} to label more, or {.code labels = FALSE} for none.")
+  }
+
   layout <- .infer_layout(g, .check_layout(layout))
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
@@ -211,9 +264,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size, layout)
   # Add labels ----
-  if (isTRUE(labels) & manynet::is_labelled(g)) {
+  if (!isFALSE(labels) && manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout, label_dist, label_repel,
-                      node_size = .infer_nsize(g, node_size, layout))
+                      node_size = .infer_nsize(g, node_size, layout),
+                      labels = labels)
   }
   
   # Note isolates ----

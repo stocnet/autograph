@@ -19,7 +19,7 @@ aes_fixture <- local({
 graphr_arg_values <- list(
   .data       = NULL, # the fixture itself
   layout      = NULL, # audited exhaustively in test-functional_layouts.R
-  labels      = list(TRUE, FALSE),
+  labels      = list(TRUE, FALSE, 3, "degree", "random"),
   node_color  = list("grp", "num", "darkred"),
   node_colour = NULL, # alias of node_color
   node_shape  = list("grp", "square"),

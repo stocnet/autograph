@@ -172,6 +172,118 @@
               what = "node attribute")
 }
 
+# Labels ----
+
+# `labels` is more than a switch: it can also select *which* nodes to label,
+# by rank on a measure, by a mark or logical attribute, or by naming nodes
+# outright. This resolves any of those into one of four normalised forms --
+# FALSE, TRUE, a rank depth carrying the criterion to rank by, or a character
+# vector of node names -- which .infer_labels() then turns into a selection.
+# Node names are the normal form for an explicit selection because graphr()
+# drops isolates after this check, which would shift every node's position.
+
+.label_criteria <- function() c("degree", "betweenness", "cutpoints", "random")
+
+.label_desc <- paste(
+  "A number of ranks to label, such as {.code labels = 5},",
+  "a measure to rank nodes by ({.val degree}, {.val betweenness},",
+  "{.val cutpoints} or {.val random}), or the names of the nodes to label,",
+  "can also be given here.")
+
+.check_labels <- function(g, labels, arg = "labels") {
+  # Without node names there is nothing to draw, whatever was asked for.
+  if (!manynet::is_labelled(g)) return(FALSE)
+  if (is.null(labels)) return(FALSE)
+  n <- as.numeric(manynet::net_nodes(g))
+  nms <- manynet::node_names(g)
+  len <- length(labels)
+  if (is.logical(labels)) {
+    if (len == 1L) {
+      if (is.na(labels)) .abort_labels_type(labels, arg)
+      return(labels)
+    }
+    if (len != n)
+      manynet::snet_abort(
+        "{.arg {arg}} should be a single value or one value for each of the",
+        "{n} nodes in the network, but {len} value{?s} {?was/were} given.")
+    return(nms[!is.na(labels) & labels])
+  }
+  if (is.numeric(labels)) {
+    if (len == 1L) {
+      if (is.na(labels) || labels <= 0 || labels != round(labels))
+        manynet::snet_abort(
+          "{.arg {arg}} should be a positive whole number of ranks to label,",
+          "as in {.code {arg} = 5}, but {.val {labels}} was given.")
+      # Asking for more ranks than there are nodes asks for all of them.
+      if (labels >= n) return(TRUE)
+      crit <- names(labels)
+      crit <- if (is.null(crit) || !nzchar(crit)) "degree" else
+        .check_choice(crit, .label_criteria(), arg)
+      return(structure(as.integer(labels), criterion = crit))
+    }
+    bad <- labels[is.na(labels) | labels < 1 | labels > n |
+                    labels != round(labels)]
+    n_bad <- length(bad)
+    if (n_bad)
+      manynet::snet_abort(
+        "{.arg {arg}} should be the positions of the nodes to label, between",
+        "1 and {n}, the number of nodes in the network,",
+        "but {n_bad} of the values given {?is/are} not: {.val {bad}}.")
+    return(nms[unique(labels)])
+  }
+  if (is.character(labels)) {
+    if (len == 1L) {
+      # A node attribute takes precedence over a criterion, and a criterion over
+      # a node name, as .check_node_color() prefers an attribute to a colour.
+      value <- .match_name(labels, igraph::vertex_attr_names(g), arg,
+                           what = "node attribute",
+                           extra = unique(c(.label_criteria(), nms)),
+                           show = igraph::vertex_attr_names(g),
+                           extra_desc = .label_desc)
+      if (value %in% igraph::vertex_attr_names(g))
+        return(.labels_from_attribute(g, value, arg))
+      if (value %in% .label_criteria())
+        # Every criterion but "random" has a maximum to take, so one rank is
+        # enough; a random selection has to be given a size instead.
+        return(structure(if (value == "random") min(10L, as.integer(n)) else 1L,
+                         criterion = value))
+      return(value)
+    }
+    unknown <- setdiff(labels, nms)
+    n_unknown <- length(unknown)
+    if (n_unknown) {
+      suggestion <- .suggest_name(unknown[1], nms)
+      msg <- paste("{.arg {arg}} should name nodes in the network, but",
+                   "{n_unknown} of the names given {?was/were} not found",
+                   "among them: {.val {unknown}}.")
+      if (!is.null(suggestion))
+        msg <- paste(msg, "Did you mean {.val {suggestion}}?")
+      manynet::snet_abort(msg)
+    }
+    return(labels)
+  }
+  .abort_labels_type(labels, arg)
+}
+
+.labels_from_attribute <- function(g, attribute, arg) {
+  vals <- manynet::node_attribute(g, attribute)
+  if (!is.logical(vals))
+    manynet::snet_abort(
+      "{.arg {arg}} can name a node attribute marking which nodes to label,",
+      "but {.val {attribute}} holds {.cls {class(vals)}} values rather than",
+      "{.cls logical} ones.",
+      "A measure can be given instead, as in {.code {arg} = \"degree\"}.")
+  manynet::node_names(g)[!is.na(vals) & vals]
+}
+
+.abort_labels_type <- function(labels, arg) {
+  manynet::snet_abort(
+    "{.arg {arg}} should be {.code TRUE} or {.code FALSE}, a number of ranks",
+    "to label, the name of a node attribute or measure, or a vector selecting",
+    "which nodes to label, but a value of class {.cls {class(labels)}}",
+    "was given.")
+}
+
 # Layout arguments ----
 
 # Several of autograph's layouts need one value per node -- a membership, a
