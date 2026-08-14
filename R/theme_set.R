@@ -62,9 +62,16 @@ theme_opts <- c("default", "bw", "crisp", "neon",
 #'   The following themes are currently available:
 #'   `r autograph:::theme_opts`.
 #'   This string can be capitalised or not.
+#' @param persist Logical, by default FALSE.
+#'   If TRUE, the theme is remembered across sessions,
+#'   by writing it to the user's configuration directory
+#'   (see `tools::R_user_dir()`).
+#'   Nothing is written to disk unless this is set explicitly.
+#'   Use `stocnet_theme(persist = FALSE)` when setting a theme
+#'   to forget a previously persisted choice.
 #' @importFrom manynet snet_info snet_success
 #' @export
-stocnet_theme <- function(theme = NULL){
+stocnet_theme <- function(theme = NULL, persist = FALSE){
   if(is.null(theme)){
     theme <- getOption("stocnet_theme", default = "default")
     snet_info("Theme is currently set to {.emph {theme}}.",
@@ -84,7 +91,41 @@ stocnet_theme <- function(theme = NULL){
     set_categorical_theme(theme)
     set_font_theme(theme)
     snet_success("Theme set to {.emph {theme}}.")
+    if(persist){
+      if(write_theme_pref(theme))
+        snet_success("Theme will be remembered in future sessions.")
+    } else forget_theme_pref()
   }
+}
+
+theme_pref_file <- function(){
+  file.path(tools::R_user_dir("autograph", which = "config"), "theme.rds")
+}
+
+# Only ever called with persist = TRUE, i.e. at the user's explicit request.
+write_theme_pref <- function(theme){
+  f <- theme_pref_file()
+  tryCatch({
+    dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
+    saveRDS(theme, f)
+    TRUE
+  }, error = function(e) FALSE, warning = function(w) FALSE)
+}
+
+forget_theme_pref <- function(){
+  f <- theme_pref_file()
+  if(file.exists(f)) tryCatch(unlink(f), error = function(e) NULL)
+  invisible(NULL)
+}
+
+read_theme_pref <- function(){
+  f <- theme_pref_file()
+  if(!file.exists(f)) return(NULL)
+  theme <- tryCatch(readRDS(f), error = function(e) NULL)
+  # Guard against a stale file naming a theme this version no longer ships.
+  if(is.null(theme) || !is.character(theme) || length(theme) != 1L ||
+     !theme %in% theme_opts) return(NULL)
+  theme
 }
 
 #' @rdname theme_set

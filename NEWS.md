@@ -4,6 +4,13 @@
 
 - Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
 
+
+## Themes
+
+- Added a `persist` argument to `stocnet_theme()` so chosen themes can be remembered across sessions
+  - With `persist = TRUE` the theme is written to `tools::R_user_dir("autograph", "config")` and applied when `{autograph}` is next attached
+  - Nothing is written to disk unless `persist = TRUE` is passed explicitly, and setting a theme without it clears any previously persisted choice
+
 # autograph 1.1.2
 
 ## Package

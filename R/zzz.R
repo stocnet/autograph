@@ -5,7 +5,20 @@
   if (!interactive()) return()
   
   # options(manynet_verbosity = getOption("manynet_verbosity", "verbose"))
-  options(stocnet_theme = getOption("stocnet_theme", "default"))
+  # A theme the user chose with `stocnet_theme(persist = TRUE)` becomes the
+  # default, but an option set in this session still wins.
+  saved_theme <- read_theme_pref()
+  options(stocnet_theme = getOption("stocnet_theme",
+                                    if (is.null(saved_theme)) "default" else saved_theme))
+  # Apply the palettes too, so a persisted theme takes effect on the first plot
+  # rather than only after `stocnet_theme()` is called again.
+  if (!is.null(saved_theme)) {
+    set_highlight_theme(saved_theme)
+    set_divergent_theme(saved_theme)
+    set_background_theme(saved_theme)
+    set_categorical_theme(saved_theme)
+    set_font_theme(saved_theme)
+  }
   # options(cli.theme = manynet_console_theme())
   # options(cli.progress_clear = TRUE)
 

@@ -6,9 +6,9 @@
 \alias{set_stocnet_theme}
 \title{Setting a consistent theme for all plots}
 \usage{
-stocnet_theme(theme = NULL)
+stocnet_theme(theme = NULL, persist = FALSE)
 
-set_stocnet_theme(theme = NULL)
+set_stocnet_theme(theme = NULL, persist = FALSE)
 }
 \arguments{
 \item{theme}{String naming a theme.
@@ -16,6 +16,14 @@ By default "default".
 The following themes are currently available:
 default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf, unige, cmu, iast, hwu, rainbow.
 This string can be capitalised or not.}
+
+\item{persist}{Logical, by default FALSE.
+If TRUE, the theme is remembered across sessions,
+by writing it to the user's configuration directory
+(see \code{tools::R_user_dir()}).
+Nothing is written to disk unless this is set explicitly.
+Use \code{stocnet_theme(persist = FALSE)} when setting a theme
+to forget a previously persisted choice.}
 }
 \value{
 This function sets the theme and palette(s) to be used across all
