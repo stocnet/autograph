@@ -1,3 +1,9 @@
+# autograph 1.2.0
+
+## Package
+
+- Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
+
 # autograph 1.1.2
 
 ## Package

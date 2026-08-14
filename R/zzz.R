@@ -8,17 +8,10 @@
   options(stocnet_theme = getOption("stocnet_theme", "default"))
   # options(cli.theme = manynet_console_theme())
   # options(cli.progress_clear = TRUE)
-  
-  # pkgs <- as.data.frame(utils::available.packages(utils::contrib.url(getOption("repos"))))
-  # 
-  # cran_version <- pkgs[pkgs$Package == "manynet","Version"]
 
   local_version <- utils::packageVersion("autograph")
   snet_info("You are using {.auto autograph} version {.version {local_version}}.")
-  old.list <- as.data.frame(utils::old.packages())
-  behind_cran <- "autograph" %in% old.list$Package
-  curr_theme <- getOption('stocnet_theme')
-  
+
   greet_startup_cli <- function() {
     tips <- c(
       # "i" = "Theming graphs and plots is straightforward with `stocnet_theme()`",
@@ -32,17 +25,7 @@
     snet_info(sample(tips, 1))
   }
 
-  if (interactive()) {
-    if (behind_cran) {
-      msg <- "A new version of autograph is available with bug fixes and new features."
-      packageStartupMessage(msg, "\nWould you like to install it?")
-      if (utils::menu(c("Yes", "No")) == 1) {
-        utils::update.packages("autograph")
-      }
-    } else {
-      greet_startup_cli()
-    }
-  }
+  greet_startup_cli()
 
 }
 # nocov end
