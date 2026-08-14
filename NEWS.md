@@ -4,6 +4,10 @@
 
 - Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
 
+## Layouts
+
+- Fixed `layout_multilevel()` to identify modes without having to name a `level`
+- Added `method`, `alpha`, `beta`, `FUN1` and `FUN2` arguments to `layout_multilevel()`, exposing how `graphlayouts::layout_as_multilevel()` lays out and projects the levels
 
 ## Graphing
 

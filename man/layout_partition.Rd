@@ -42,9 +42,27 @@ layout_tbl_graph_concentric(
   times = 1000
 )
 
-layout_multilevel(.data, level, circular = FALSE)
+layout_multilevel(
+  .data,
+  level,
+  method = c("all", "separate", "fix1", "fix2"),
+  circular = FALSE,
+  alpha = 25,
+  beta = 45,
+  FUN1 = graphlayouts::layout_with_stress,
+  FUN2 = graphlayouts::layout_with_stress
+)
 
-layout_tbl_graph_multilevel(.data, level, circular = FALSE)
+layout_tbl_graph_multilevel(
+  .data,
+  level,
+  method = c("all", "separate", "fix1", "fix2"),
+  circular = FALSE,
+  alpha = 25,
+  beta = 45,
+  FUN1 = graphlayouts::layout_with_stress,
+  FUN2 = graphlayouts::layout_with_stress
+)
 
 layout_lineage(.data, rank, circular = FALSE)
 
@@ -94,7 +112,25 @@ Only possible for some layouts. Defaults to FALSE.}
 \item{times}{Maximum number of iterations, where appropriate}
 
 \item{level}{A node attribute or a vector to hierarchically order levels for
-"multilevel" layout.}
+"multilevel" layout.
+By default the levels are those already recorded in a "lvl" node attribute,
+as \code{manynet::to_multilevel()} writes, or, for a two-mode network,
+the two modes, with whichever mode holds the ties within itself
+placed at the first level.}
+
+\item{method}{How the levels should be laid out for "multilevel" layout:
+"all" (the default) lays every level out at once,
+"separate" lays each level out independently,
+and "fix1" and "fix2" lay out the first or second level respectively
+and derive the other from it.
+Note that all but "all" require ties within the levels they lay out.}
+
+\item{alpha, beta}{The angles, in degrees, at which the levels of a
+"multilevel" layout are projected onto the plane.}
+
+\item{FUN1, FUN2}{The layout functions used for the first and second levels
+respectively by the "separate", "fix1" and "fix2" methods.
+By default both are \code{graphlayouts::layout_with_stress()}.}
 
 \item{rank}{A numerical node attribute to place nodes in Y axis
 according to values for "lineage" layout.}
@@ -125,8 +161,10 @@ The "lineage" layout ranks nodes in Y axis according to values.
 \examples{
 #graphr(ison_southern_women, layout = "concentric", membership = "type",
 #           node_color = "type", node_size = 3)
-#graphr(ison_lotr, layout = "multilevel",
-#           node_color = "Race", level = "Race", node_size = 3)
+# fict_marvel interlocks a one-mode layer of ties among its characters
+# with a two-mode layer of their affiliations, so it is laid out this way
+# by default; the levels need not be named.
+graphr(manynet::fict_marvel, labels = FALSE)
 # ison_adolescents \%>\%
 #   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2),
 #          cut = node_is_cutpoint(ison_adolescents)) \%>\%

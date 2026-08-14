@@ -52,8 +52,8 @@ layout_args_map <- list(
   lineage    = list(labelled = list(rank = "year")),
   hierarchy  = list(twomode = list(center = "events")),
   concentric = list(labelled = list(membership = rep(c("a", "b"), 4)),
-                    twomode  = list(membership = "type")),
-  multilevel = list(twomode = list(level = "type"))
+                    twomode  = list(membership = "type"))
+  # multilevel needs no `level` here: it takes the two modes as its two levels.
 )
 
 test_that("every exported layout algorithm draws a buildable plot", {
