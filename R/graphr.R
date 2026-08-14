@@ -27,10 +27,10 @@
 #' @family mapping
 #' @param .data A manynet-consistent object.
 #' @param layout An igraph, ggraph, or manynet layout algorithm.
-#'   If not declared, defaults to "triad" for networks with 3 nodes,
-#'   "quad" for networks with 4 nodes,
-#'   "stress" for all other one mode networks,
-#'   or "hierarchy" for two mode networks.
+#'   If not declared, defaults to "configuration" for networks of up to
+#'   six nodes, "multilevel" for connected multilevel networks,
+#'   "hierarchy" for other two mode networks,
+#'   and "stress" for all other networks.
 #'   For "hierarchy" layout, one can further split graph by
 #'   declaring the "center" argument as the "events", "actors",
 #'   or by declaring a node name.
@@ -38,12 +38,13 @@
 #'   extra argument.
 #'   The "membership" argument expects either a quoted node attribute present
 #'   in data or vector with the same length as nodes to draw concentric circles.
-#'   For "multilevel" layout algorithm please declare the "level"
+#'   For "multilevel" layout algorithm one may declare the "level"
 #'   as extra argument.
 #'   The "level" argument expects either a quoted node attribute present
 #'   in data or vector with the same length as nodes to hierarchically
 #'   order categories.
-#'   If "level" is missing, function will look for 'lvl' node attribute in data.
+#'   If "level" is missing, the levels are taken from a 'lvl' node attribute
+#'   where there is one, or else from the two modes of a two mode network.
 #'   The "lineage" layout ranks nodes in Y axis according to values.
 #'   For "lineage" layout algorithm please declare the "rank"
 #'   as extra argument.
@@ -170,7 +171,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     } else {
       isos <- which(.node_is_isolate(g))
     }
-    g <- manynet::to_no_isolates(g)
+    g <- manynet::delete_isolates(g)
   } 
   
   layout <- .infer_layout(g, .check_layout(layout))
@@ -206,13 +207,13 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
   # Add edges ----
-  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle)
+  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout)
   # Add nodes ----
-  p <- graph_nodes(p, g, node_color, node_shape, node_size)
+  p <- graph_nodes(p, g, node_color, node_shape, node_size, layout)
   # Add labels ----
   if (isTRUE(labels) & manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout, label_dist, label_repel,
-                      node_size = .infer_nsize(g, node_size))
+                      node_size = .infer_nsize(g, node_size, layout))
   }
   
   # Note isolates ----
@@ -264,6 +265,14 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       g <- g[[1]]
     if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
+    } else if (manynet::is_multilevel(g) && manynet::is_connected(g)) {
+      # Checked before `is_twomode()`, which is also TRUE for these networks.
+      # A "hierarchy" layout would place each level along a single row, which
+      # collapses the within-level ties that make the network multilevel.
+      # Only where the network is connected, since the multilevel layout
+      # orients its levels by the distances between them and so cannot place
+      # components that have no distance to each other.
+      layout <- "multilevel"
     } else if (manynet::is_twomode(g)) {
       layout <- "hierarchy"
     } else layout <- "stress"

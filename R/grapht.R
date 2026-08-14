@@ -89,6 +89,11 @@
 #'   Some further `graphr()` features are not available in animations:
 #'   `node_group` hulls, edge bundling, curved arcs for reciprocated ties,
 #'   and self-loops (loops are not drawn; a note is printed if present).
+#'   Note too that, where no `layout` is named, `grapht()` defaults to
+#'   the "stress" layout for every network rather than choosing one by
+#'   the network's shape as `graphr()` does,
+#'   so that nodes move smoothly from one wave to the next.
+#'   A layout named explicitly is still used, computed on the aggregate network.
 #' @inheritParams plot_graphr
 #' @importFrom igraph as_data_frame vcount add_vertices permute
 #' @importFrom igraph vertex_attr_names delete_vertex_attr delete_edge_attr 

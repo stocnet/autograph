@@ -11,6 +11,7 @@
 
 ## Graphing
 
+- Improved `graphr()` to draw multilevel networks of interlocking one-mode and two-mode layers (identified by `manynet::is_multilevel()`) with the "multilevel" layout by default
 - Improved node shape legend of a two-mode network to name the modes where the network records them instead of default "One" and "Two"
 - Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
 

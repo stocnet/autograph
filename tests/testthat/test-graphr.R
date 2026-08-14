@@ -179,6 +179,77 @@ test_that("two-mode networks get correct node shapes", {
   expect_false(is.null(node_layer[["mapping"]][["shape"]]))
 })
 
+test_that("two-mode shape legends name the modes where the network does", {
+  skip_on_cran()
+  # "One" and "Two" say nothing that the shapes do not already say.
+  expect_equal(levels(.infer_nshape(fict_marvel, NULL)),
+               c("characters", "teams"))
+  expect_equal(levels(.infer_nshape(ison_southern_women, NULL)),
+               c("women", "social events"))
+  # A factor rather than a character vector, so that the first mode keeps the
+  # first shape: "social events" would otherwise sort before "women" and the
+  # two modes would swap symbols.
+  shapes <- .infer_nshape(ison_southern_women, NULL)
+  expect_s3_class(shapes, "factor")
+  expect_equal(as.character(shapes[!manynet::node_is_mode(ison_southern_women)][1]),
+               "women")
+  # Networks that do not record their modes keep the old labels.
+  expect_null(manynet::mode_names(irps_revere))
+  expect_equal(levels(.infer_nshape(irps_revere, NULL)), c("One", "Two"))
+  # One-mode networks are unaffected: mode_names() gives them a single name.
+  expect_equal(.infer_nshape(ison_adolescents, NULL), 21)
+})
+
+test_that("multiplex networks are coloured by layer rather than by sign", {
+  skip_on_cran()
+  # fict_marvel's affiliation ties carry no sign, and were coloured "Negative"
+  # while being drawn solid, so colour and linetype disagreed about which ties
+  # were negative. Layer is what every tie has, and sign is left to linetype.
+  colours <- .infer_ecolor(fict_marvel, NULL)
+  expect_setequal(levels(colours), c("affiliation", "relationship"))
+  expect_equal(.infer_ecolor_title(fict_marvel, NULL), "Layer")
+  # Whether there are layers to draw is how many the ties are divided between,
+  # which is 1 for a network whose ties are not divided at all.
+  expect_equal(manynet::net_layers(ison_adolescents), 1L)
+  expect_false(.has_layers(ison_adolescents))
+  expect_gt(manynet::net_layers(fict_marvel), 1)
+  expect_true(.has_layers(ison_algebra))
+  # Not `is_multiplex()`, which is TRUE for a network with no layers to draw.
+  expect_true(manynet::is_multiplex(ison_monks))
+  expect_true(.has_layers(ison_monks))
+  # Signed networks without layers still show their signs, and now treat an
+  # absent sign as positive, as the linetype always did.
+  signed <- manynet::to_uniplex(fict_marvel, "relationship")
+  expect_equal(manynet::net_layers(signed), 1L)
+  expect_false(.has_layers(signed))
+  expect_setequal(levels(.infer_ecolor(signed, NULL)), c("Positive", "Negative"))
+  expect_equal(.infer_ecolor_title(signed, NULL), "Sign")
+  unsigned_ties <- is.na(igraph::E(fict_marvel)$sign)
+  expect_equal(as.character(.infer_line_type(fict_marvel)[unsigned_ties][1]),
+               "solid")
+  # An explicitly named attribute still titles the legend after itself.
+  expect_equal(.infer_ecolor_title(fict_marvel, "type"), "type")
+})
+
+test_that("signs are given a legend wherever the colours no longer carry them", {
+  skip_on_cran()
+  # The linetype is drawn through an identity scale, which shows no legend of
+  # its own. That was right while the colours said "Sign" too, but leaves the
+  # dashes unexplained now that the colours of a multiplex network say "Layer".
+  guide_titles <- function(p) {
+    vapply(ggplot2::ggplot_build(p)$plot$scales$scales, function(s) {
+      nm <- s$name
+      if (is.null(nm) || !is.character(nm)) NA_character_ else nm
+    }, character(1))
+  }
+  expect_true("Sign" %in% guide_titles(graphr(fict_marvel)))
+  # A signed network without layers is coloured by sign, so a second legend
+  # saying the same thing is not drawn.
+  signed <- manynet::to_giant(manynet::to_uniplex(fict_marvel, "relationship"))
+  expect_false("Sign" %in% guide_titles(signed %>% graphr()))
+  expect_buildable(graphr(fict_marvel))
+})
+
 test_that("color legend uses fillable shape when node_shape is also mapped", {
   skip_on_cran()
   p <- ison_brandes %>%

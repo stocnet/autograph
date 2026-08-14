@@ -29,10 +29,10 @@ graphr(
 \item{.data}{A manynet-consistent object.}
 
 \item{layout}{An igraph, ggraph, or manynet layout algorithm.
-If not declared, defaults to "triad" for networks with 3 nodes,
-"quad" for networks with 4 nodes,
-"stress" for all other one mode networks,
-or "hierarchy" for two mode networks.
+If not declared, defaults to "configuration" for networks of up to
+six nodes, "multilevel" for connected multilevel networks,
+"hierarchy" for other two mode networks,
+and "stress" for all other networks.
 For "hierarchy" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
@@ -40,12 +40,13 @@ For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm please declare the "level"
+For "multilevel" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically
 order categories.
-If "level" is missing, function will look for 'lvl' node attribute in data.
+If "level" is missing, the levels are taken from a 'lvl' node attribute
+where there is one, or else from the two modes of a two mode network.
 The "lineage" layout ranks nodes in Y axis according to values.
 For "lineage" layout algorithm please declare the "rank"
 as extra argument.
