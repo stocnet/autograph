@@ -60,6 +60,17 @@
   out
 }
 
+# What to call each of a two-mode network's modes in the shape legend. Where
+# the network records them, "characters" and "teams" say far more than "One"
+# and "Two"; `mode_names()` returns NULL where it does not, and a single name
+# for a one-mode network, so both modes have to be there to be used.
+.mode_labels <- function(g) {
+  modes <- tryCatch(manynet::mode_names(g), error = function(e) NULL)
+  if (length(modes) != 2 || anyNA(modes) || any(!nzchar(modes)))
+    return(c("One", "Two"))
+  as.character(modes)
+}
+
 .infer_ncolor <- function(g, node_color) {
   if (!is.null(node_color)) {
     if (node_color %in% names(manynet::node_attribute(g))) {
