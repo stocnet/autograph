@@ -88,7 +88,7 @@ test_that("the gof x axis is the object's clock, not a re-derived one", {
   # The bands are valid on whichever clock produced the process, so the axis
   # has to be the `u` column the object carries. Reading an event index here
   # would draw the path on one clock and the reference on another.
-  expect_identical(rlang::quo_get_expr(p$mapping$x), quote(.data$u))
+  expect_identical(deparse(p$mapping$x), "~.data$u")
   expect_identical(p$labels$x, "Share of events")
 
   # And the label follows the clock rather than being fixed.
@@ -333,7 +333,7 @@ test_that("the Schoenfeld panel caps the effects it draws", {
 
 flavor_stack <- function(object) {
   block <- function(flavor, family) {
-    out <- tibble::as_tibble(object)
+    out <- dplyr::as_tibble(object)
     out$flavor <- flavor
     out$family <- family
     out

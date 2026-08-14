@@ -29,12 +29,14 @@ You can also access the documents in the repository,
 although this won't be necessary after you have cloned it on your computer via Fork.
 
 ### Cloning
+
 Once you have downloaded Fork, the first thing you have to do is to 
 clone the remote repository on your computer. 
 Before cloning, you will be able to choose on which `branch` you want to work: 
 develop or main. 
 
 ### Pull 
+
 This command allows you to `pull` changes from the remote repository to your local repository on Sourcetree.
 Make sure you do that before starting working on your files so you have the newest versions. 
 When pulling, make sure you choose master or develop, 
