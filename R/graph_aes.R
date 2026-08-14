@@ -16,7 +16,7 @@
 
 # Node aesthetics ----
 
-.infer_nsize <- function(g, node_size) {
+.infer_nsize <- function(g, node_size, layout = NULL) {
   if (!is.null(node_size)) {
     if (is.character(node_size)) {
       out <- manynet::node_attribute(g, node_size)
@@ -27,9 +27,32 @@
     # at face value: `node_size = 0.5` means 0.5.
     if (length(out) > 1 && all(out <= 1 & out >= 0, na.rm = TRUE)) out <- out * 10
   } else {
-    out <- min(20, (250 / manynet::net_nodes(g)) / 2)
+    out <- .default_nsize(manynet::net_nodes(g))
+    # The default size shrinks with how crowded the plot is, but a multilevel
+    # layout draws each level in a plane of its own, so each is only as crowded
+    # as itself. Sizing them from the whole network instead would draw the
+    # smaller level -- 53 of `fict_marvel`'s 194 nodes -- as if it held all of
+    # them, which is where the one-mode structure of such networks is.
+    lvl <- .node_level(g, layout)
+    if (!is.null(lvl))
+      out <- vapply(lvl, function(l) .default_nsize(sum(lvl == l)), numeric(1))
   }
   as.numeric(out)
+}
+
+.default_nsize <- function(n) min(20, (250 / n) / 2)
+
+# The level each node is drawn at by a multilevel layout, or NULL where the
+# network is not being drawn that way. Only how the nodes are grouped matters
+# here, not which group ends up at which level, so unlike `.infer_level()` in
+# R/layout_partition.R there is no need to work out which mode holds the ties
+# within itself.
+.node_level <- function(g, layout) {
+  if (!identical(layout, "multilevel")) return(NULL)
+  if ("lvl" %in% igraph::vertex_attr_names(g))
+    return(as.integer(as.factor(igraph::vertex_attr(g, "lvl"))))
+  if (!manynet::is_twomode(g)) return(NULL)
+  as.integer(manynet::node_is_mode(g)) + 1L
 }
 
 # A value mapped to an aesthetic has to be either a single value or one per
@@ -51,9 +74,13 @@
     } else out <- node_shape
   } else if (is_twomode(g) & is.null(node_shape)) {
     # igraph convention: type FALSE is the first mode, TRUE the second.
-    # "One" sorts before "Two", so the first mode takes the first shape in
-    # the scale (a circle) and the second mode the second (a square).
-    out <- ifelse(igraph::V(g)$type, "Two", "One")
+    # A factor rather than a character vector, so that the first mode takes
+    # the first shape in the scale (a circle) and the second mode the second
+    # (a square). Relying on the labels sorting into that order only held
+    # while they were "One" and "Two": mode names need not be alphabetical,
+    # and `ison_southern_women`'s "social events" sort before its "women".
+    modes <- .mode_labels(g)
+    out <- factor(ifelse(igraph::V(g)$type, modes[2], modes[1]), levels = modes)
   } else {
     out <- 21  # Use fillable circle shape (was "circle")
   }
@@ -105,12 +132,25 @@
     } else {
       out <- edge_color
     }
+  } else if (is.null(edge_color) & .has_layers(g)) {
+    # Which layer a tie belongs to says more about a multiplex network than
+    # its sign does, and only some of its ties have a sign to show: a sign is
+    # still drawn, as the linetype, but every tie belongs to a layer.
+    # Ordered alphabetically, as every other attribute mapped to a colour is.
+    # Taking the order from `manynet::layer_names()` instead was tried and
+    # dropped: with the two-value highlight palette it decides which layer is
+    # drawn in the emphasis colour, and `fict_marvel` names its layers in an
+    # order that greys out the very layer the plot is about.
+    out <- as.factor(as.character(manynet::tie_attribute(g, "type")))
+    if (length(unique(out)) == 1) out <- "black"
   } else if (is.null(edge_color) & manynet::is_signed(g)) {
-    # Multiplex/complex signed networks carry a sign only on the signed layer;
-    # ties on other layers have `NA` sign. Treat those (and any NA) as positive
-    # so the resulting factor never contains NA, which grid rejects at draw time.
+    # Signed networks that are not layered can still carry a sign on only
+    # some of their ties. Treat those (and any NA) as positive, as the
+    # linetype does, so that the factor never contains NA, which grid rejects
+    # at draw time, and so that colour and linetype agree about which ties
+    # are negative.
     signs <- igraph::E(g)$sign
-    out <- factor(ifelse(!is.na(signs) & signs >= 0, "Positive", "Negative"),
+    out <- factor(ifelse(is.na(signs) | signs >= 0, "Positive", "Negative"),
                   levels = c("Positive", "Negative"))
     if (length(unique(out)) == 1) {
       out <- "black"
@@ -119,6 +159,27 @@
     out <- "black"
   }
   out
+}
+
+# `manynet::net_layers()` counts the layers the ties are actually divided
+# between, rather than `is_multiplex()`, which is TRUE for any network carrying
+# a non-reserved tie attribute or parallel ties, whether or not those
+# distinguish layers. It counts the distinct values of the 'type' tie attribute
+# and returns 1 where there is none, so a single test covers both that the
+# layers are recorded per tie -- which naming them, as `layer_names()` does,
+# need not imply -- and that there are at least two of them to tell apart.
+.has_layers <- function(g) manynet::net_layers(g) > 1
+
+# What the edge colour legend is titled. `edge_color` names the attribute when
+# the user gave one; otherwise the colour carries whatever the default chose,
+# so this is decided here alongside `.infer_ecolor()` rather than separately
+# by each caller, which is how the legend came to say "Sign" over colours that
+# were showing layers.
+.infer_ecolor_title <- function(g, edge_color) {
+  if (!is.null(edge_color)) return(edge_color)
+  if (.has_layers(g)) return("Layer")
+  if (manynet::is_signed(g)) return("Sign")
+  "Color"
 }
 
 .infer_esize <- function(g, edge_size){

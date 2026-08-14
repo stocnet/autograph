@@ -16,10 +16,12 @@ graph_legends <- function(p, g,
                                                  title = ifelse(is.null(node_size),
                                                                 "Size", node_size)),
                     linetype = ggplot2::guide_legend(order = 5),
-                    edge_colour = ggplot2::guide_legend(order = 6,
-                                                        title = ifelse(is.null(edge_color),
-                                                                       ifelse(manynet::is_signed(g), "Sign", "Color"),
-                                                                       edge_color)),
+                    # `.infer_ecolor_title()` decides this alongside the colours
+                    # themselves in R/graph_aes.R, so that the two cannot
+                    # disagree about what the colour is showing, as they did
+                    # when this said "Sign" over colours that showed layers.
+                    edge_colour = ggplot2::guide_legend(
+                      order = 6, title = .infer_ecolor_title(g, edge_color)),
                     edge_size = ggplot2::guide_legend(order = 7,
                                                       title = ifelse(is.null(edge_size),
                                                                      ifelse(manynet::is_weighted(g), "Weight", "Size"),
