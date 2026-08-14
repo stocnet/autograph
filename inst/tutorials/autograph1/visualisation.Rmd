@@ -126,7 +126,21 @@ Remember the three flavours of bundled data as a rough difficulty ladder —
 **Real-world** (`irps_*`, larger & realistic) —
 and that you can browse the full list with `table_data()`.
 
-<img src="https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif" alt="gif of Bob Ross painting a happy little landscape"/>
+```{r data-flavours-Q, echo=FALSE, purl = FALSE}
+question("Which prefix marks the larger, more realistic networks bundled with the stocnet packages?",
+  answer("irps_",
+         correct = TRUE,
+         message = "Right — the irps_ datasets are the real-world ones, so they are the most demanding to graph. No mistakes here, just happy little accidents. <img src='https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif' alt='gif of Bob Ross painting a happy little landscape'/>"),
+  answer("ison_",
+         message = "The ison_ datasets are the classics: small, tidy, and a good place to start."),
+  answer("fict_",
+         message = "The fict_ datasets are fictional networks, mid-sized and fun, but not the largest."),
+  answer("net_",
+         message = "There is no net_ prefix for data — net_* are measures of whole networks."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
+```
 
 ## Getting started
 
@@ -420,8 +434,6 @@ graphr(ison_southern_women)
 
 ### Colouring nodes {#colouring-nodes}
 
-<img src="https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif" alt="gif of an artist swirling paint colours together on a palette"/>
-
 Let's try instead colouring the nodes by this "Race" variable.
 It is very similar to the shape example above.
 **Can you complete the code yourself?**
@@ -505,7 +517,7 @@ Who turns out to be the most connected character in the fellowship?
 question("Which aesthetic is generally most appropriate for a *continuous* node attribute, such as degree or age?",
   answer("Size",
          correct = TRUE,
-         message = "Yes — our eyes read graded sizes as graded quantities. Colour gradients can also work, but are harder to compare precisely."),
+         message = "Yes — our eyes read graded sizes as graded quantities. Colour gradients can also work, but are harder to compare precisely. <img src='https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif' alt='gif of an artist swirling paint colours together on a palette'/>"),
   answer("Shape",
          message = "Shapes are categorical: there is no natural ordering from circle to triangle to square."),
   answer("Group shading (node_group)",
@@ -670,8 +682,6 @@ More institutional scales and themes can be implemented upon pull request.
 
 ### Who's hue? {#whos-hue}
 
-<img src="https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif" alt="gif from The Devil Wears Prada: that is not just blue, that is cerulean"/>
-
 By default, `graphr()` will use a colour palette that offers fairly good contrast
 and better accessibility.
 However, a different hue might offer a better aesthetic or
@@ -698,7 +708,7 @@ graphr(fict_lotr,
 question("Why does changing node colours use scale_fill_*() functions rather than scale_color_*()?",
   answer("Because nodes are drawn as filled shapes, so their interior colour is the 'fill' aesthetic",
          correct = TRUE,
-         message = "Correct, 'color' in ggplot2 refers to outlines and lines, while the interior of a filled shape is its 'fill'."),
+         message = "Correct, 'color' in ggplot2 refers to outlines and lines, while the interior of a filled shape is its 'fill'. That is not just blue, it is cerulean. <img src='https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif' alt='gif from The Devil Wears Prada: that is not just blue, that is cerulean'/>"),
   answer("Because scale_color_*() functions do not exist in ggplot2",
          message = "They do exist — they control the colour aesthetic, used e.g. for lines and outlines."),
   answer("It is an arbitrary choice and either would work",
@@ -927,8 +937,6 @@ In the following sections, we review some of the most common types of layouts.
 
 ### Force-directed layouts {#force-directed-layouts}
 
-<img src="https://giffiles.alphacoders.com/131/13131.gif" alt="gif of yoda moving things with the force"/>
-
 Force-directed layouts update some initial placement of vertices
 through the operation of some system of metaphorically-physical forces.
 These might include attractive and repulsive forces.
@@ -962,7 +970,7 @@ on the same network.
 question("Can we interpret the distance between two nodes in a force-directed layout as a precise measure of how closely they are related?",
   answer("No",
          correct = TRUE,
-         message = "That's right — force-directed layouts are illustrative. Nearby nodes are often closely connected, but distances are a by-product of the algorithm, not a measurement to cite."),
+         message = "That's right — force-directed layouts are illustrative. Nearby nodes are often closely connected, but distances are a by-product of the algorithm, not a measurement to cite. The force moves the nodes, but it does not measure them. <img src='https://giffiles.alphacoders.com/131/13131.gif' alt='gif of yoda moving things with the force'/>"),
   answer("Yes",
          message = "Careful — two nodes can end up near each other simply because the algorithm ran out of better places to put them. Use spectral or MDS layouts if you need interpretable distances. No mistakes here though, just a happy little accident. <img src='https://media1.tenor.com/m/XP2eqZczZ2MAAAAC/bob-ross-happy.gif' alt='gif of Bob Ross smiling in front of a painting'/>"),
   allow_retry = TRUE
@@ -1078,8 +1086,6 @@ question("Can we interpret the distance between nodes in spectral and MDS layout
 
 ### Grid layouts {#grid-layouts}
 
-<img src="https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif" alt="gif of a cartoon character energetically rearranging the living room furniture"/>
-
 Grid layouts arrange nodes based on some Cartesian coordinates.
 These can be useful for making sure all nodes' labels are visible,
 but horizontal and vertical lines can overlap,
@@ -1103,6 +1109,22 @@ snapped version.**
 ```{r snap, exercise=TRUE, fig.width=9}
 (graphr(fict_lotr) + ggtitle("stress") |
    graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+```
+
+```{r snap-Q, echo=FALSE, purl = FALSE}
+question("What does snap = TRUE do to the layout you asked for?",
+  answer("It keeps that layout, but moves each node onto the nearest grid coordinate",
+         correct = TRUE,
+         message = "Exactly — the arrangement stays recognisable, and the nodes just shuffle onto tidier positions. <img src='https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif' alt='gif of a cartoon character energetically rearranging the living room furniture'/>"),
+  answer("It replaces that layout with the grid layout",
+         message = "That is layout = 'grid'. With snap = TRUE the chosen layout is computed first, and only then rounded onto a grid."),
+  answer("It fixes the layout so that it is the same each time it is run",
+         message = "Some layouts, such as 'stress', are already deterministic. Snapping is about grid coordinates, not repeatability."),
+  answer("It removes overlapping labels",
+         message = "Snapping often helps label legibility, but it moves nodes rather than labels. Use label_repel and label_dist for labels."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
 ```
 
 ### Manual layouts {#manual-layouts}
@@ -1228,8 +1250,6 @@ every node, so in that case isolates are kept in place.
 
 ### Dynamics {#dynamics}
 
-<img src="https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif" alt="gif of a hand flipping through a flipbook of animated stick figures"/>
-
 `grapht()` is another alternative to `graphr()`,
 this time rendering network changes over time as an animated gif.
 Longitudinal networks (with discrete waves)
@@ -1258,6 +1278,22 @@ will split it without being told which attribute to use.
 From `{manynet}` 2.2.2, any other name (say, `year`) works just as well —
 it only needs declaring via `to_waves()`'s `attribute` argument.
 
+```{r grapht-Q, echo=FALSE, purl = FALSE}
+question("A tie attribute named what marks a network as longitudinal for {manynet}, so that to_waves() and grapht() split it without being told?",
+  answer("wave",
+         correct = TRUE,
+         message = "Yes — name it wave and the waves are found for you, like the pages of a flipbook. Any other name works too, but must be declared via to_waves()'s attribute argument. <img src='https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif' alt='gif of a hand flipping through a flipbook of animated stick figures'/>"),
+  answer("time",
+         message = "Close in spirit, but it is wave that is recognised automatically."),
+  answer("year",
+         message = "year is a perfectly good name, but you have to declare it via to_waves()'s attribute argument."),
+  answer("frame",
+         message = "Frames are what the animation renders, not what the network attribute is called."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
+```
+
 ::: {.callout}
 <span class="callout-label">**Going further**:</span>
 Animation constrains a few things that a static graph allows.
@@ -1280,8 +1316,6 @@ and animate longitudinal or dynamic networks with `grapht()`.
 :::
 
 ## Going further with ggraph
-
-<img src="https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif" alt="gif of Mr Bean taking the restoration of a painting into his own hands"/>
 
 For more flexibility with visualisations,
 `{autograph}` users are encouraged to use the excellent `{ggraph}` package.
@@ -1352,6 +1386,22 @@ and padding between the arrowhead and the node can also be specified.
 
 For more see David Schoch's [excellent resources on this](http://mr.schochastics.net/netVizR.html).
 
+```{r ggraph-Q, echo=FALSE, purl = FALSE}
+question("What is the main trade-off in building a graph directly in {ggraph} rather than with graphr()?",
+  answer("You control every layer yourself, but you have to specify each one",
+         correct = TRUE,
+         message = "Just so — nothing is drawn until you ask for it, so a plain graph takes more typing. Take the restoration into your own hands only when you need that control. <img src='https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif' alt='gif of Mr Bean taking the restoration of a painting into his own hands'/>"),
+  answer("You cannot use {ggplot2} layers with {ggraph}",
+         message = "{ggraph} is built on {ggplot2}, so the usual layers, scales, and themes all apply."),
+  answer("{ggraph} accepts fewer network classes, so graphr() is always faster to run",
+         message = "{ggraph} does expect tbl_graph or igraph objects, but the trade-off here is about control, not speed."),
+  answer("Graphs built in {ggraph} cannot be saved with ggsave()",
+         message = "They can — both graphr() and ggraph() return ggplot objects, which ggsave() handles alike."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
+```
+
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> Because `graphr()` returns a ggplot object,
 you can go a long way just appending `{ggplot2}`/`{ggraph}` layers to it.
@@ -1400,8 +1450,6 @@ of the packages that produce those results.
 
 ## Exporting plots
 
-<img src="https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif" alt="gif of a maker declaring that the masterpiece is done and it is time to show the world"/>
-
 We can save the plots we have made by point-and-click
 by selecting 'Save as PDF...' from under the 'Export' dropdown menu
 in the plots panel tab of RStudio.
@@ -1431,9 +1479,23 @@ Animations made with `grapht()` are saved slightly differently:
 use `gganimate::anim_save("my_animation.gif")`,
 which works just like `ggsave()` but for the last animation rendered.
 
-## Summary
+```{r export-Q, echo=FALSE, purl = FALSE}
+question("Which file format should you prefer when a publisher asks for a figure that stays sharp at any size?",
+  answer(".pdf",
+         correct = TRUE,
+         message = "Yes — .pdf and .svg are vector formats, so they scale without going blurry. The masterpiece is done: show the world. <img src='https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif' alt='gif of a maker declaring that the masterpiece is done and it is time to show the world'/>"),
+  answer(".png",
+         message = "A .png is a raster format. It is fine for the web, and for print at a high dpi, but it does not scale freely."),
+  answer(".jpeg",
+         message = "A .jpeg is raster too, and its compression blurs lines and text. Avoid it for graphs."),
+  answer(".gif",
+         message = "Save a .gif for animations from grapht(), via gganimate::anim_save()."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
+```
 
-<img src="https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif" alt="gif of an enthusiastic standing ovation and cries of bravo"/>
+## Summary
 
 Well done — you have completed the tutorial on visualising networks!
 Along the way, you have learned to use these functions:
@@ -1455,6 +1517,22 @@ Along the way, you have learned to use these functions:
 | `grapht()` | animates a longitudinal or dynamic network as a gif |
 | `plot()` | plots measures, motifs, and model results consistently |
 | `ggsave()` | exports the last plot at publication quality |
+
+```{r summary-Q, echo=FALSE, purl = FALSE}
+question("One last one: which function graphs a list of related networks as comparable panels?",
+  answer("graphs()",
+         correct = TRUE,
+         message = "Correct — graphs() for panels, grapht() for animations, graphr() for a single graph. Take a bow. <img src='https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif' alt='gif of an enthusiastic standing ovation and cries of bravo'/>"),
+  answer("grapht()",
+         message = "grapht() animates change over time instead, rendering the waves as frames."),
+  answer("graphr()",
+         message = "graphr() draws one network. You can combine several graphr() calls with {patchwork} operators, though."),
+  answer("plot()",
+         message = "The plot() methods are for measures, motifs, and model results, not for lists of networks."),
+  random_answer_order = TRUE,
+  allow_retry = TRUE
+)
+```
 
 When you are ready, continue with the tutorials in the other `{stocnet}`
 packages — on network structure and centrality in `{netrics}`,

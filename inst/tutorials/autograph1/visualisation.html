@@ -225,7 +225,14 @@ difficulty ladder — <strong>Classic</strong> (<code>ison_*</code>, small
 &amp; fun), <strong>Real-world</strong> (<code>irps_*</code>, larger
 &amp; realistic) — and that you can browse the full list with
 <code>table_data()</code>.</p>
-<p><img src="https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif" alt="gif of Bob Ross painting a happy little landscape"/></p>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="data-flavours-Q" class="tutorial-question panel-body">
+<div id="data-flavours-Q-answer_container" class="shiny-html-output"></div>
+<div id="data-flavours-Q-message_container" class="shiny-html-output"></div>
+<div id="data-flavours-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div>
 </div>
 </div>
 <div id="section-getting-started" class="section level2">
@@ -340,12 +347,12 @@ ggraph::ggraph(as_tidygraph(fict_lotr)) +
 fairly basic way, straight to the plotting device (window). By default,
 it uses a force-directed layout (see the Layouts section below),<a
 href="#section-fn4" class="footnote-ref"
-id="section-fnref4"><sup>4</sup></a> colors the nodes orange, and prints
-node labels if they have them. However, the layout is not optimised for
-the size of the plotting window, the node labels are regularly
-overlapping, and the orange color with black borders is not particularly
-appealing or helpful for label legibility. It only works with ‘igraph’
-objects.</p>
+id="section-fnref4"><sup>4</sup></a> colours the nodes orange, and
+prints node labels if they have them. However, the layout is not
+optimised for the size of the plotting window, the node labels are
+regularly overlapping, and the orange colour with black borders is not
+particularly appealing or helpful for label legibility. It only works
+with ‘igraph’ objects.</p>
 <p>In contrast, <code>{ggraph}</code> offers the trademark flexibility
 of the grammar of graphics approach. However, it requires the user to
 build up a plot from the ground up, which can be daunting for new users
@@ -509,13 +516,25 @@ dimensions:</p>
 <td align="left"><code>edge_size=</code></td>
 </tr>
 <tr class="odd">
-<td align="left">Color</td>
-<td align="left"><code>node_color=</code>/<code>node_colour=</code></td>
-<td align="left">Color</td>
-<td align="left"><code>edge_color=</code>/<code>edge_colour=</code></td>
+<td align="left">Colour</td>
+<td align="left"><code>node_colour=</code>/<code>node_color=</code></td>
+<td align="left">Colour</td>
+<td align="left"><code>edge_colour=</code>/<code>edge_color=</code></td>
 </tr>
 </tbody>
 </table>
+<div class="callout">
+<p><span class="callout-label"><strong>Beginner note</strong>:</span> As
+the table shows, both spellings work: <code>node_colour=</code> and
+<code>node_color=</code> are the same argument, as are
+<code>edge_colour=</code> and <code>edge_color=</code>, and the same
+goes for <code>{ggplot2}</code>‘s <code>colour</code>/<code>color</code>
+aesthetics and
+<code>scale_colour_*()</code>/<code>scale_color_*()</code> functions.
+This tutorial is written in British English and so says ’colour’
+throughout, but you should use whichever spelling comes naturally to
+you.</p>
+</div>
 <p>The named arguments in the table above cover the aesthetics you will
 reach for most often. Several other visual features are not arguments at
 all: <code>graphr()</code> reads them off the data and sets them for
@@ -550,7 +569,7 @@ drawn; we meet each in its own section below.</p>
 <p>Each of the mapping arguments can be given either a literal value
 (e.g. <code>node_size = 6</code>) or, more interestingly, the name of a
 node or tie attribute in the data
-(e.g. <code>node_color = "Race"</code>), in which case
+(e.g. <code>node_colour = "Race"</code>), in which case
 <code>graphr()</code> maps the attribute to that aesthetic and adds a
 legend where appropriate. Let’s go through some of these options in more
 detail.</p>
@@ -604,7 +623,6 @@ debatable.<a href="#section-fnref5" class="footnote-back">↩︎</a></p></li>
 </div>
 <div id="section-colouring-nodes" class="section level3">
 <h3>Colouring nodes</h3>
-<p><img src="https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif" alt="gif of an artist swirling paint colours together on a palette"/></p>
 <p>Let’s try instead colouring the nodes by this “Race” variable. It is
 very similar to the shape example above. <strong>Can you complete the
 code yourself?</strong></p>
@@ -616,13 +634,13 @@ data-pipe="|&gt;">
 <div class="tutorial-exercise-support" data-label="speceg-hint-1"
 data-completion="1" data-diagnostics="1" data-startover="1"
 data-lines="0" data-pipe="|&gt;">
-<pre class="text"><code># Use the same syntax as with node_shape, but with the node_color argument.
+<pre class="text"><code># Use the same syntax as with node_shape, but with the node_colour argument.
 # Remember to name the attribute in quotation marks.</code></pre>
 </div>
 <div class="tutorial-exercise-support" data-label="speceg-solution"
 data-completion="1" data-diagnostics="1" data-startover="1"
 data-lines="0" data-pipe="|&gt;">
-<pre class="text"><code>graphr(fict_lotr, node_color = &quot;Race&quot;)</code></pre>
+<pre class="text"><code>graphr(fict_lotr, node_colour = &quot;Race&quot;)</code></pre>
 </div>
 <p>That’s much easier to read. Note how a legend has been added
 automatically, using the colours of whatever theme is currently set
@@ -649,7 +667,7 @@ data-pipe="|&gt;">
 <pre class="text"><code>graphr(fict_lotr, node_group = &quot;Race&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
-<p>Note that <code>node_color</code> and <code>node_group</code> can be
+<p>Note that <code>node_colour</code> and <code>node_group</code> can be
 used together, either to highlight different groupings, or to emphasise
 group assignment where the groups interpenetrate, as described
 above.</p>
@@ -699,7 +717,7 @@ in the fellowship?</p>
 <h3>Tying up loose ends</h3>
 <p>All this works similarly with ties/edges. Just replace
 <code>node_</code> with <code>edge_</code> in the arguments above, and
-you can control edges’ size and color. In the following example, we add
+you can control edges’ size and colour. In the following example, we add
 two tie attributes: a continuous variable measuring how ‘close’ each tie
 is to others, and a binary variable indicating whether the tie is part
 of a <abbr><dfn title='A cycle of length three in a network.'> triangle
@@ -712,7 +730,7 @@ data-pipe="|&gt;">
 <pre class="text"><code>fict_lotr |&gt;
   mutate_ties(weight = tie_by_closeness(fict_lotr),
               is_tri = tie_is_triangular(fict_lotr)) |&gt;
-  graphr(edge_color = &quot;is_tri&quot;)</code></pre>
+  graphr(edge_colour = &quot;is_tri&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>Note also that some tie attributes are recognised automatically: if a
@@ -828,9 +846,9 @@ data-lines="0" data-pipe="|&gt;">
 <div class="callout">
 <p><span class="callout-label"><strong>In brief</strong>:</span>
 <code>graphr()</code> maps node and tie attributes to visual aesthetics
-by name: <code>node_color</code>, <code>node_shape</code>,
+by name: <code>node_colour</code>, <code>node_shape</code>,
 <code>node_size</code>, and <code>node_group</code> for nodes,
-<code>edge_color</code> and <code>edge_size</code> for ties. Use colour
+<code>edge_colour</code> and <code>edge_size</code> for ties. Use colour
 or shape for categorical attributes (colour scales better), size for
 continuous ones, and <code>node_group</code> to shade spatially
 clustered memberships. For dense or disconnected networks,
@@ -846,7 +864,7 @@ onclick="document.getElementById(&#39;section-setting-a-theme&#39;).scrollIntoVi
 a theme</span> · <span class="page-toc-link"
 onclick="document.getElementById(&#39;section-whos-hue&#39;).scrollIntoView({behavior:&#39;auto&#39;,block:&#39;start&#39;});">Hues</span>
 · <span class="page-toc-link"
-onclick="document.getElementById(&#39;section-grayscale&#39;).scrollIntoView({behavior:&#39;auto&#39;,block:&#39;start&#39;});">Grayscale</span>
+onclick="document.getElementById(&#39;section-greyscale&#39;).scrollIntoView({behavior:&#39;auto&#39;,block:&#39;start&#39;});">Greyscale</span>
 · <span class="page-toc-link"
 onclick="document.getElementById(&#39;section-manual-override&#39;).scrollIntoView({behavior:&#39;auto&#39;,block:&#39;start&#39;});">Manual
 override</span></span></p>
@@ -854,7 +872,7 @@ override</span></span></p>
 <h3>Setting a theme</h3>
 <p>Perhaps you are preparing a presentation, representing your
 institution, department, or research centre at home or abroad. In this
-case, you may wish to theme the whole network with institutional colors
+case, you may wish to theme the whole network with institutional colours
 and fonts. Indeed, you may even want to set a theme that is then reused
 across all your graphs and plots. <code>{autograph}</code> offers a
 number of themes that can be set using the <code>stocnet_theme()</code>
@@ -864,9 +882,9 @@ and plot in your session — no need to repeat yourself.</p>
 data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code>stocnet_theme(&quot;default&quot;)
-graphr(fict_lotr, node_color = &quot;Race&quot;)
+graphr(fict_lotr, node_colour = &quot;Race&quot;)
 stocnet_theme(&quot;iheid&quot;)
-graphr(fict_lotr, node_color = &quot;Race&quot;)
+graphr(fict_lotr, node_colour = &quot;Race&quot;)
 stocnet_theme(&quot;default&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -882,25 +900,24 @@ and themes can be implemented upon pull request.</p>
 </div>
 <div id="section-whos-hue" class="section level3">
 <h3>Who’s hue?</h3>
-<p><img src="https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif" alt="gif from The Devil Wears Prada: that is not just blue, that is cerulean"/></p>
-<p>By default, <code>graphr()</code> will use a color palette that
+<p>By default, <code>graphr()</code> will use a colour palette that
 offers fairly good contrast and better accessibility. However, a
 different hue might offer a better aesthetic or identifiability for some
 nodes. Because the <code>graphr()</code> function is based on the
 grammar of graphics, it’s easy to extend or alter aesthetic aspects.
-Here let’s try and change the colors assigned to the different races in
+Here let’s try and change the colours assigned to the different races in
 the <code>fict_lotr</code> dataset. Note that despite the argument being
-<code>node_color</code>, when overwriting the colors please use
+<code>node_colour</code>, when overwriting the colours please use
 functions of the type <code>ggplot2::scale_fill_*()</code>, as it is the
 “fill” aesthetic that is being mapped to the variable in this case.</p>
-<div class="tutorial-exercise" data-label="colorch" data-completion="1"
+<div class="tutorial-exercise" data-label="colourch" data-completion="1"
 data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code>graphr(fict_lotr,
-           node_color = &quot;Race&quot;)
+           node_colour = &quot;Race&quot;)
 
 graphr(fict_lotr,
-           node_color = &quot;Race&quot;) +
+           node_colour = &quot;Race&quot;) +
   ggplot2::scale_fill_hue()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -939,38 +956,38 @@ class="footnote-back">↩︎</a></p></li>
 </ol>
 </div>
 </div>
-<div id="section-grayscale" class="section level3">
-<h3>Grayscale</h3>
-<p>Other times color may not be desired. Some publications require
-grayscale images. To use a grayscale color palette, replace
+<div id="section-greyscale" class="section level3">
+<h3>Greyscale</h3>
+<p>Other times colour may not be desired. Some publications require
+greyscale images. To use a greyscale colour palette, replace
 <code>_hue</code> from above with <code>_grey</code> (note the ‘e’
 spelling):</p>
 <div class="tutorial-exercise" data-label="greyscale"
 data-completion="1" data-diagnostics="1" data-startover="1"
 data-lines="0" data-pipe="|&gt;">
 <pre class="text"><code>graphr(fict_lotr,
-           node_color = &quot;Race&quot;) +
+           node_colour = &quot;Race&quot;) +
   ggplot2::scale_fill_grey()</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
-<p>As you can see, grayscale is more effective for continuous variables
+<p>As you can see, greyscale is more effective for continuous variables
 or for very few discrete categories than for the six categories used
 here. If you need to distinguish several categories in print, consider
-combining grayscale with <code>node_shape</code>, or use the
+combining greyscale with <code>node_shape</code>, or use the
 <code>"bw"</code> theme, which is designed for this purpose.</p>
 </div>
 <div id="section-manual-override" class="section level3">
 <h3>Manual override</h3>
-<p>Or we may want to choose particular colors for each category. This is
-pretty straightforward to do with
-<code>ggplot2::scale_fill_manual()</code>. Some common color names are
-available, but otherwise hex color codes can be used for more specific
-colors. Unspecified categories are coloured (dark) grey.</p>
-<div class="tutorial-exercise" data-label="mancolor" data-completion="1"
-data-diagnostics="1" data-startover="1" data-lines="0"
-data-pipe="|&gt;">
+<p>Or we may want to choose particular colours for each category. This
+is pretty straightforward to do with
+<code>ggplot2::scale_fill_manual()</code>. Some common colour names are
+available, but otherwise hex colour codes can be used for more specific
+colours. Unspecified categories are coloured (dark) grey.</p>
+<div class="tutorial-exercise" data-label="mancolour"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
 <pre class="text"><code>graphr(fict_lotr,
-           node_color = &quot;Race&quot;) +
+           node_colour = &quot;Race&quot;) +
   ggplot2::scale_fill_manual(
     values = c(&quot;Dwarf&quot; = &quot;red&quot;,
                &quot;Hobbit&quot; = &quot;orange&quot;,
@@ -978,7 +995,7 @@ data-pipe="|&gt;">
                &quot;Human&quot; = &quot;lightblue&quot;,
                &quot;Elf&quot; = &quot;lightgreen&quot;,
                &quot;Ent&quot; = &quot;darkgreen&quot;)) +
-  labs(fill = &quot;Color&quot;)</code></pre>
+  labs(fill = &quot;Colour&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <div class="callout">
@@ -1081,7 +1098,7 @@ data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code>fict_lotr |&gt;
   mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |&gt;
-  graphr(node_color = &quot;maxbet&quot;)</code></pre>
+  graphr(node_colour = &quot;maxbet&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>Which node is highlighted here, and why might that be? Without a
@@ -1097,9 +1114,9 @@ data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code>fict_lotr |&gt;
   mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |&gt;
-  graphr(node_color = &quot;maxbet&quot;) +
-  guides(color = &quot;legend&quot;) +
-  labs(color = &quot;Maximum\nBetweenness&quot;)</code></pre>
+  graphr(node_colour = &quot;maxbet&quot;) +
+  guides(colour = &quot;legend&quot;) +
+  labs(colour = &quot;Maximum\nBetweenness&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
 <p>To change the position of the legend, add the <code>theme()</code>
@@ -1169,7 +1186,6 @@ visible. In the following sections, we review some of the most common
 types of layouts.</p>
 <div id="section-force-directed-layouts" class="section level3">
 <h3>Force-directed layouts</h3>
-<p><img src="https://giffiles.alphacoders.com/131/13131.gif" alt="gif of yoda moving things with the force"/></p>
 <p>Force-directed layouts update some initial placement of vertices
 through the operation of some system of metaphorically-physical forces.
 These might include attractive and repulsive forces.</p>
@@ -1328,7 +1344,6 @@ data-pipe="|&gt;">
 </div>
 <div id="section-grid-layouts" class="section level3">
 <h3>Grid layouts</h3>
-<p><img src="https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif" alt="gif of a cartoon character energetically rearranging the living room furniture"/></p>
 <p>Grid layouts arrange nodes based on some Cartesian coordinates. These
 can be useful for making sure all nodes’ labels are visible, but
 horizontal and vertical lines can overlap, making it difficult to
@@ -1356,6 +1371,14 @@ data-pipe="|&gt;">
 <pre class="text"><code>(graphr(fict_lotr) + ggtitle(&quot;stress&quot;) |
    graphr(fict_lotr, snap = TRUE) + ggtitle(&quot;stress + snap&quot;))</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="snap-Q" class="tutorial-question panel-body">
+<div id="snap-Q-answer_container" class="shiny-html-output"></div>
+<div id="snap-Q-message_container" class="shiny-html-output"></div>
+<div id="snap-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
 </div>
 </div>
 <div id="section-manual-layouts" class="section level3">
@@ -1489,7 +1512,6 @@ has to draw every node, so in that case isolates are kept in place.</p>
 </div>
 <div id="section-dynamics" class="section level3">
 <h3>Dynamics</h3>
-<p><img src="https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif" alt="gif of a hand flipping through a flipbook of animated stick figures"/></p>
 <p><code>grapht()</code> is another alternative to
 <code>graphr()</code>, this time rendering network changes over time as
 an animated gif. Longitudinal networks (with discrete waves) and dynamic
@@ -1518,6 +1540,14 @@ it without being told which attribute to use. From
 <code>{manynet}</code> 2.2.2, any other name (say, <code>year</code>)
 works just as well — it only needs declaring via
 <code>to_waves()</code>’s <code>attribute</code> argument.</p>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="grapht-Q" class="tutorial-question panel-body">
+<div id="grapht-Q-answer_container" class="shiny-html-output"></div>
+<div id="grapht-Q-message_container" class="shiny-html-output"></div>
+<div id="grapht-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div>
 <div class="callout">
 <p><span class="callout-label"><strong>Going further</strong>:</span>
 Animation constrains a few things that a static graph allows.
@@ -1544,7 +1574,6 @@ panels, and animate longitudinal or dynamic networks with
 </div>
 <div id="section-going-further-with-ggraph" class="section level2">
 <h2>Going further with ggraph</h2>
-<p><img src="https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif" alt="gif of Mr Bean taking the restoration of a painting into his own hands"/></p>
 <p>For more flexibility with visualisations, <code>{autograph}</code>
 users are encouraged to use the excellent <code>{ggraph}</code> package.
 <code>{ggraph}</code> is built upon the venerable <code>{ggplot2}</code>
@@ -1613,6 +1642,14 @@ between the arrowhead and the node can also be specified.</p>
 <p>For more see David Schoch’s <a
 href="http://mr.schochastics.net/netVizR.html">excellent resources on
 this</a>.</p>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="ggraph-Q" class="tutorial-question panel-body">
+<div id="ggraph-Q-answer_container" class="shiny-html-output"></div>
+<div id="ggraph-Q-message_container" class="shiny-html-output"></div>
+<div id="ggraph-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div>
 <div class="callout">
 <p><span class="callout-label"><strong>In brief</strong>:</span> Because
 <code>graphr()</code> returns a ggplot object, you can go a long way
@@ -1665,7 +1702,6 @@ results.</p>
 </div>
 <div id="section-exporting-plots" class="section level2">
 <h2>Exporting plots</h2>
-<p><img src="https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif" alt="gif of a maker declaring that the masterpiece is done and it is time to show the world"/></p>
 <p>We can save the plots we have made by point-and-click by selecting
 ‘Save as PDF…’ from under the ‘Export’ dropdown menu in the plots panel
 tab of RStudio.</p>
@@ -1674,7 +1710,7 @@ record how you have saved it so that you can e.g. make some changes to
 the parameters at some point, this is also not too difficult. After
 running the (gg-based) plot you want to save, use <code>ggsave()</code>
 to save it to disk:</p>
-<pre class="r"><code>graphr(fict_lotr, node_color = &quot;Race&quot;)
+<pre class="r"><code>graphr(fict_lotr, node_colour = &quot;Race&quot;)
 ggsave(&quot;lotr_race.pdf&quot;)
 ggsave(&quot;lotr_race.png&quot;, width = 9, height = 6, dpi = 300)</code></pre>
 <p><code>ggsave()</code> infers the file type from the extension
@@ -1689,10 +1725,17 @@ requires. For print, prefer vector formats (<code>.pdf</code>,
 differently: use <code>gganimate::anim_save("my_animation.gif")</code>,
 which works just like <code>ggsave()</code> but for the last animation
 rendered.</p>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="export-Q" class="tutorial-question panel-body">
+<div id="export-Q-answer_container" class="shiny-html-output"></div>
+<div id="export-Q-message_container" class="shiny-html-output"></div>
+<div id="export-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div>
 </div>
 <div id="section-summary" class="section level2">
 <h2>Summary</h2>
-<p><img src="https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif" alt="gif of an enthusiastic standing ovation and cries of bravo"/></p>
 <p>Well done — you have completed the tutorial on visualising networks!
 Along the way, you have learned to use these functions:</p>
 <table>
@@ -1712,11 +1755,11 @@ Along the way, you have learned to use these functions:</p>
 <td>graphs any manynet-compatible network with sensible defaults</td>
 </tr>
 <tr class="even">
-<td><code>graphr(..., node_color/node_shape/node_size/node_group)</code></td>
+<td><code>graphr(..., node_colour/node_shape/node_size/node_group)</code></td>
 <td>maps node attributes to aesthetics</td>
 </tr>
 <tr class="odd">
-<td><code>graphr(..., edge_color/edge_size)</code></td>
+<td><code>graphr(..., edge_colour/edge_size)</code></td>
 <td>maps tie attributes to aesthetics</td>
 </tr>
 <tr class="even">
@@ -1771,6 +1814,14 @@ Along the way, you have learned to use these functions:</p>
 </tr>
 </tbody>
 </table>
+<div class="panel panel-default tutorial-question-container">
+<div data-label="summary-Q" class="tutorial-question panel-body">
+<div id="summary-Q-answer_container" class="shiny-html-output"></div>
+<div id="summary-Q-message_container" class="shiny-html-output"></div>
+<div id="summary-Q-action_button_container" class="shiny-html-output"></div>
+<script>if (Tutorial.triggerMathJax) Tutorial.triggerMathJax()</script>
+</div>
+</div>
 <p>When you are ready, continue with the tutorials in the other
 <code>{stocnet}</code> packages — on network structure and centrality in
 <code>{netrics}</code>, and on diffusion and regression in
@@ -1959,13 +2010,44 @@ session$onSessionEnded(function() {
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "data-flavours-Q", 
+    question = structure("Which prefix marks the larger, more realistic networks bundled with the stocnet packages?", html = TRUE, class = c("html", 
+    "character")), answers = list(structure(list(id = "lnr_ans_a473320", 
+        option = "irps_", value = "irps_", label = structure("irps_", html = TRUE, class = c("html", 
+        "character")), correct = TRUE, message = structure("Right — the irps_ datasets are the real-world ones, so they are the most demanding to graph. No mistakes here, just happy little accidents. <img src='https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif' alt='gif of Bob Ross painting a happy little landscape'/>", html = TRUE, class = c("html", 
+        "character")), type = "literal"), class = c("tutorial_question_answer", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_f7cfd0c", 
+        option = "ison_", value = "ison_", label = structure("ison_", html = TRUE, class = c("html", 
+        "character")), correct = FALSE, message = structure("The ison_ datasets are the classics: small, tidy, and a good place to start.", html = TRUE, class = c("html", 
+        "character")), type = "literal"), class = c("tutorial_question_answer", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_3e1c84f", 
+        option = "fict_", value = "fict_", label = structure("fict_", html = TRUE, class = c("html", 
+        "character")), correct = FALSE, message = structure("The fict_ datasets are fictional networks, mid-sized and fun, but not the largest.", html = TRUE, class = c("html", 
+        "character")), type = "literal"), class = c("tutorial_question_answer", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_c31d4ff", 
+        option = "net_", value = "net_", label = structure("net_", html = TRUE, class = c("html", 
+        "character")), correct = FALSE, message = structure("There is no net_ prefix for data — net_* are measures of whole networks.", html = TRUE, class = c("html", 
+        "character")), type = "literal"), class = c("tutorial_question_answer", 
+    "tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+    "character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+    "character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+    "character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+    "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+    "character")), message = NULL, post_message = NULL), ids = list(
+        answer = "data-flavours-Q-answer", question = "data-flavours-Q"), 
+    loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
+    seed = 1763714220.67871, options = list()), class = c("learnr_radio", 
+"tutorial_question")), session = session)
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-base-vs-gg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-base-vs-gg-code-editor`)), session)
 output$`tutorial-exercise-base-vs-gg-output` <- renderUI({
   `tutorial-exercise-base-vs-gg-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "base-vs-gg", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2002,15 +2084,15 @@ learnr:::store_exercise_cache(structure(list(label = "base-vs-gg", global_setup 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-igraph-vs-ggraph-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-igraph-vs-ggraph-code-editor`)), session)
 output$`tutorial-exercise-igraph-vs-ggraph-output` <- renderUI({
   `tutorial-exercise-igraph-vs-ggraph-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "igraph-vs-ggraph", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2047,15 +2129,15 @@ learnr:::store_exercise_cache(structure(list(label = "igraph-vs-ggraph", global_
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-agsimple-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-agsimple-code-editor`)), session)
 output$`tutorial-exercise-agsimple-output` <- renderUI({
   `tutorial-exercise-agsimple-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "agsimple", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2088,27 +2170,28 @@ learnr:::store_exercise_cache(structure(list(label = "agsimple", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "graphr-classes-Q", 
     question = structure("Which network objects can graphr() draw?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_2a325f6", 
+    "character")), answers = list(structure(list(id = "lnr_ans_fe5dee5", 
         option = "Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", 
         value = "Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", 
         label = structure("Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("Right — graphr() coerces compatible objects internally, so you rarely need to convert anything first. <img src='https://media1.tenor.com/m/LLLJYVQJNVAAAAAC/chefs-kiss-french-chef.gif' alt='gif of a chef giving a chefs kiss'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_8d15e3d", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_5d8d4f3", 
         option = "Only igraph objects", value = "Only igraph objects", 
         label = structure("Only igraph objects", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("That is plot.igraph(). graphr() handles igraph objects too, but not only those.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_c160675", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_bb20d30", 
         option = "Only tidygraph (tbl_graph) objects", value = "Only tidygraph (tbl_graph) objects", 
         label = structure("Only tidygraph (tbl_graph) objects", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("That is what ggraph::ggraph() expects. graphr() is more catholic.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_6f32deb", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_1d11ca7", 
         option = "Only networks bundled in manynet", value = "Only networks bundled in manynet", 
         label = structure("Only networks bundled in manynet", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("The bundled data are just convenient examples — any compatible network object works.", html = TRUE, class = c("html", 
@@ -2121,18 +2204,18 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "graphr-classes-Q-answer", question = "graphr-classes-Q"), 
     loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
-    seed = 333625677.844643, options = list()), class = c("learnr_radio", 
+    seed = 7609691.49645646, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-shapeeg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-shapeeg-code-editor`)), session)
 output$`tutorial-exercise-shapeeg-output` <- renderUI({
   `tutorial-exercise-shapeeg-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "shapeeg", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2165,15 +2248,15 @@ learnr:::store_exercise_cache(structure(list(label = "shapeeg", global_setup = s
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-twomode-shapes-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-twomode-shapes-code-editor`)), session)
 output$`tutorial-exercise-twomode-shapes-output` <- renderUI({
   `tutorial-exercise-twomode-shapes-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "twomode-shapes", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2206,15 +2289,15 @@ learnr:::store_exercise_cache(structure(list(label = "twomode-shapes", global_se
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-speceg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-speceg-code-editor`)), session)
 output$`tutorial-exercise-speceg-output` <- renderUI({
   `tutorial-exercise-speceg-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "speceg", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2223,7 +2306,7 @@ learnr:::store_exercise_cache(structure(list(label = "speceg", global_setup = st
     setup = NULL, chunks = list(list(label = "speceg", code = "", 
         opts = list(label = "\"speceg\"", exercise = "TRUE", 
             purl = "FALSE", fig.width = "9"), engine = "r")), 
-    code_check = NULL, error_check = NULL, check = NULL, solution = structure("graphr(fict_lotr, node_color = \"Race\")", chunk_opts = list(
+    code_check = NULL, error_check = NULL, check = NULL, solution = structure("graphr(fict_lotr, node_colour = \"Race\")", chunk_opts = list(
         label = "speceg-solution")), tests = NULL, options = list(
         eval = FALSE, echo = TRUE, results = "markup", tidy = FALSE, 
         tidy.opts = NULL, collapse = FALSE, prompt = FALSE, comment = NA, 
@@ -2246,15 +2329,15 @@ learnr:::store_exercise_cache(structure(list(label = "speceg", global_setup = st
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-group-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-group-code-editor`)), session)
 output$`tutorial-exercise-group-output` <- renderUI({
   `tutorial-exercise-group-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "group", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2285,15 +2368,15 @@ learnr:::store_exercise_cache(structure(list(label = "group", global_setup = str
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-degsize-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-degsize-code-editor`)), session)
 output$`tutorial-exercise-degsize-output` <- renderUI({
   `tutorial-exercise-degsize-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "degsize", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2327,25 +2410,24 @@ learnr:::store_exercise_cache(structure(list(label = "degsize", global_setup = s
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "aes-choice-Q", 
     question = structure("Which aesthetic is generally most appropriate for a <em>continuous<\u002fem> node attribute, such as degree or age?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_e760d2f", 
+    "character")), answers = list(structure(list(id = "lnr_ans_3b70160", 
         option = "Size", value = "Size", label = structure("Size", html = TRUE, class = c("html", 
-        "character")), correct = TRUE, message = structure("Yes — our eyes read graded sizes as graded quantities. Colour gradients can also work, but are harder to compare precisely.", html = TRUE, class = c("html", 
+        "character")), correct = TRUE, message = structure("Yes — our eyes read graded sizes as graded quantities. Colour gradients can also work, but are harder to compare precisely. <img src='https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif' alt='gif of an artist swirling paint colours together on a palette'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_54aceab", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_d4e5593", 
         option = "Shape", value = "Shape", label = structure("Shape", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Shapes are categorical: there is no natural ordering from circle to triangle to square.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_2a4e7ba", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_e4df630", 
         option = "Group shading (node_group)", value = "Group shading (node_group)", 
         label = structure("Group shading (node_group)", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Group shading highlights membership in discrete groups, not amounts.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_147a2c2", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_8090dd3", 
         option = "Labels", value = "Labels", label = structure("Labels", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("You could print the values as labels, but the point of graphing is to see patterns at a glance.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -2357,24 +2439,24 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "aes-choice-Q-answer", question = "aes-choice-Q"), 
     loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
-    seed = 1728620415.69505, options = list()), class = c("learnr_radio", 
+    seed = 285018729.367278, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-tiesize-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-tiesize-code-editor`)), session)
 output$`tutorial-exercise-tiesize-output` <- renderUI({
   `tutorial-exercise-tiesize-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "tiesize", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "tiesize", code = "fict_lotr |>\n  mutate_ties(weight = tie_by_closeness(fict_lotr),\n              is_tri = tie_is_triangular(fict_lotr)) |>\n  graphr(edge_color = \"is_tri\")", 
+    setup = NULL, chunks = list(list(label = "tiesize", code = "fict_lotr |>\n  mutate_ties(weight = tie_by_closeness(fict_lotr),\n              is_tri = tie_is_triangular(fict_lotr)) |>\n  graphr(edge_colour = \"is_tri\")", 
         opts = list(label = "\"tiesize\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
@@ -2397,21 +2479,21 @@ learnr:::store_exercise_cache(structure(list(label = "tiesize", global_setup = s
         max.print = 1000, label = "tiesize", exercise = TRUE, 
         code = c("fict_lotr |>", "  mutate_ties(weight = tie_by_closeness(fict_lotr),", 
         "              is_tri = tie_is_triangular(fict_lotr)) |>", 
-        "  graphr(edge_color = \"is_tri\")"), out.width.px = 864, 
+        "  graphr(edge_colour = \"is_tri\")"), out.width.px = 864, 
         out.height.px = 384, params.src = "tiesize, exercise = TRUE, fig.width=9", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-directed-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-directed-code-editor`)), session)
 output$`tutorial-exercise-directed-output` <- renderUI({
   `tutorial-exercise-directed-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "directed", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2445,15 +2527,15 @@ learnr:::store_exercise_cache(structure(list(label = "directed", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-bundle-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-bundle-code-editor`)), session)
 output$`tutorial-exercise-bundle-output` <- renderUI({
   `tutorial-exercise-bundle-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "bundle", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2487,15 +2569,15 @@ learnr:::store_exercise_cache(structure(list(label = "bundle", global_setup = st
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-isolates-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-isolates-code-editor`)), session)
 output$`tutorial-exercise-isolates-output` <- renderUI({
   `tutorial-exercise-isolates-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "isolates", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2530,15 +2612,15 @@ learnr:::store_exercise_cache(structure(list(label = "isolates", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-illus-free-play-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-illus-free-play-code-editor`)), session)
 output$`tutorial-exercise-illus-free-play-output` <- renderUI({
   `tutorial-exercise-illus-free-play-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "illus-free-play", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2570,21 +2652,21 @@ learnr:::store_exercise_cache(structure(list(label = "illus-free-play", global_s
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-theming-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-theming-code-editor`)), session)
 output$`tutorial-exercise-theming-output` <- renderUI({
   `tutorial-exercise-theming-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "theming", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "theming", code = "stocnet_theme(\"default\")\ngraphr(fict_lotr, node_color = \"Race\")\nstocnet_theme(\"iheid\")\ngraphr(fict_lotr, node_color = \"Race\")\nstocnet_theme(\"default\")", 
+    setup = NULL, chunks = list(list(label = "theming", code = "stocnet_theme(\"default\")\ngraphr(fict_lotr, node_colour = \"Race\")\nstocnet_theme(\"iheid\")\ngraphr(fict_lotr, node_colour = \"Race\")\nstocnet_theme(\"default\")", 
         opts = list(label = "\"theming\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
@@ -2605,30 +2687,30 @@ learnr:::store_exercise_cache(structure(list(label = "theming", global_setup = s
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "theming", exercise = TRUE, 
-        code = c("stocnet_theme(\"default\")", "graphr(fict_lotr, node_color = \"Race\")", 
-        "stocnet_theme(\"iheid\")", "graphr(fict_lotr, node_color = \"Race\")", 
+        code = c("stocnet_theme(\"default\")", "graphr(fict_lotr, node_colour = \"Race\")", 
+        "stocnet_theme(\"iheid\")", "graphr(fict_lotr, node_colour = \"Race\")", 
         "stocnet_theme(\"default\")"), out.width.px = 864, out.height.px = 384, 
         params.src = "theming, exercise=TRUE, fig.width=9", fig.num = 0, 
         exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-colorch-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-colorch-code-editor`)), session)
-output$`tutorial-exercise-colorch-output` <- renderUI({
-  `tutorial-exercise-colorch-result`()
+`tutorial-exercise-colourch-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-colourch-code-editor`)), session)
+output$`tutorial-exercise-colourch-output` <- renderUI({
+  `tutorial-exercise-colourch-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "colorch", global_setup = structure(c("library(learnr)", 
+learnr:::store_exercise_cache(structure(list(label = "colourch", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "colorch", code = "graphr(fict_lotr,\n           node_color = \"Race\")\n\ngraphr(fict_lotr,\n           node_color = \"Race\") +\n  ggplot2::scale_fill_hue()", 
-        opts = list(label = "\"colorch\"", exercise = "TRUE", 
+    setup = NULL, chunks = list(list(label = "colourch", code = "graphr(fict_lotr,\n           node_colour = \"Race\")\n\ngraphr(fict_lotr,\n           node_colour = \"Race\") +\n  ggplot2::scale_fill_hue()", 
+        opts = list(label = "\"colourch\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
     options = list(eval = FALSE, echo = TRUE, results = "markup", 
@@ -2647,31 +2729,32 @@ learnr:::store_exercise_cache(structure(list(label = "colorch", global_setup = s
         aniopts = "controls,loop", warning = TRUE, error = FALSE, 
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
-        max.print = 1000, label = "colorch", exercise = TRUE, 
-        code = c("graphr(fict_lotr,", "           node_color = \"Race\")", 
-        "", "graphr(fict_lotr,", "           node_color = \"Race\") +", 
+        max.print = 1000, label = "colourch", exercise = TRUE, 
+        code = c("graphr(fict_lotr,", "           node_colour = \"Race\")", 
+        "", "graphr(fict_lotr,", "           node_colour = \"Race\") +", 
         "  ggplot2::scale_fill_hue()"), out.width.px = 864, out.height.px = 384, 
-        params.src = "colorch, exercise=TRUE, fig.width=9", fig.num = 0, 
-        exercise.df_print = "paged", exercise.checker = "NULL"), 
+        params.src = "colourch, exercise=TRUE, fig.width=9", 
+        fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "fill-Q", question = structure("Why does changing node colours use scale_fill_<em>() functions rather than scale_color_<\u002fem>()?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_30cdd22", 
+"character")), answers = list(structure(list(id = "lnr_ans_727849", 
     option = "Because nodes are drawn as filled shapes, so their interior colour is the 'fill' aesthetic", 
     value = "Because nodes are drawn as filled shapes, so their interior colour is the 'fill' aesthetic", 
     label = structure("Because nodes are drawn as filled shapes, so their interior colour is the ‘fill’ aesthetic", html = TRUE, class = c("html", 
-    "character")), correct = TRUE, message = structure("Correct, ‘color’ in ggplot2 refers to outlines and lines, while the interior of a filled shape is its ‘fill’.", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Correct, ‘color’ in ggplot2 refers to outlines and lines, while the interior of a filled shape is its ‘fill’. That is not just blue, it is cerulean. <img src='https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif' alt='gif from The Devil Wears Prada: that is not just blue, that is cerulean'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_cd63d9e", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_72ae785", 
     option = "Because scale_color_*() functions do not exist in ggplot2", 
     value = "Because scale_color_*() functions do not exist in ggplot2", 
     label = structure("Because scale_color_*() functions do not exist in ggplot2", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("They do exist — they control the colour aesthetic, used e.g. for lines and outlines.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ce23b43", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_14a2775", 
     option = "It is an arbitrary choice and either would work", 
     value = "It is an arbitrary choice and either would work", 
     label = structure("It is an arbitrary choice and either would work", html = TRUE, class = c("html", 
@@ -2684,25 +2767,25 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "fill-Q-answer", question = "fill-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1523312355.29065, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1780078318.17109, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-greyscale-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-greyscale-code-editor`)), session)
 output$`tutorial-exercise-greyscale-output` <- renderUI({
   `tutorial-exercise-greyscale-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "greyscale", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "greyscale", code = "graphr(fict_lotr,\n           node_color = \"Race\") +\n  ggplot2::scale_fill_grey()", 
+    setup = NULL, chunks = list(list(label = "greyscale", code = "graphr(fict_lotr,\n           node_colour = \"Race\") +\n  ggplot2::scale_fill_grey()", 
         opts = list(label = "\"greyscale\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
@@ -2723,29 +2806,29 @@ learnr:::store_exercise_cache(structure(list(label = "greyscale", global_setup =
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "greyscale", exercise = TRUE, 
-        code = c("graphr(fict_lotr,", "           node_color = \"Race\") +", 
+        code = c("graphr(fict_lotr,", "           node_colour = \"Race\") +", 
         "  ggplot2::scale_fill_grey()"), out.width.px = 864, 
         out.height.px = 384, params.src = "greyscale, exercise=TRUE, fig.width=9", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
-<script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-mancolor-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-mancolor-code-editor`)), session)
-output$`tutorial-exercise-mancolor-output` <- renderUI({
-  `tutorial-exercise-mancolor-result`()
-})
-</script>
  
 <script type="application/shiny-prerendered" data-context="server">
-learnr:::store_exercise_cache(structure(list(label = "mancolor", global_setup = structure(c("library(learnr)", 
+`tutorial-exercise-mancolour-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-mancolour-code-editor`)), session)
+output$`tutorial-exercise-mancolour-output` <- renderUI({
+  `tutorial-exercise-mancolour-result`()
+})
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "mancolour", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "mancolor", code = "graphr(fict_lotr,\n           node_color = \"Race\") +\n  ggplot2::scale_fill_manual(\n    values = c(\"Dwarf\" = \"red\",\n               \"Hobbit\" = \"orange\",\n               \"Maiar\" = \"#DEC20B\",\n               \"Human\" = \"lightblue\",\n               \"Elf\" = \"lightgreen\",\n               \"Ent\" = \"darkgreen\")) +\n  labs(fill = \"Color\")", 
-        opts = list(label = "\"mancolor\"", exercise = "TRUE", 
+    setup = NULL, chunks = list(list(label = "mancolour", code = "graphr(fict_lotr,\n           node_colour = \"Race\") +\n  ggplot2::scale_fill_manual(\n    values = c(\"Dwarf\" = \"red\",\n               \"Hobbit\" = \"orange\",\n               \"Maiar\" = \"#DEC20B\",\n               \"Human\" = \"lightblue\",\n               \"Elf\" = \"lightgreen\",\n               \"Ent\" = \"darkgreen\")) +\n  labs(fill = \"Colour\")", 
+        opts = list(label = "\"mancolour\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
     options = list(eval = FALSE, echo = TRUE, results = "markup", 
@@ -2764,26 +2847,26 @@ learnr:::store_exercise_cache(structure(list(label = "mancolor", global_setup = 
         aniopts = "controls,loop", warning = TRUE, error = FALSE, 
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
-        max.print = 1000, label = "mancolor", exercise = TRUE, 
-        code = c("graphr(fict_lotr,", "           node_color = \"Race\") +", 
+        max.print = 1000, label = "mancolour", exercise = TRUE, 
+        code = c("graphr(fict_lotr,", "           node_colour = \"Race\") +", 
         "  ggplot2::scale_fill_manual(", "    values = c(\"Dwarf\" = \"red\",", 
         "               \"Hobbit\" = \"orange\",", "               \"Maiar\" = \"#DEC20B\",", 
         "               \"Human\" = \"lightblue\",", "               \"Elf\" = \"lightgreen\",", 
-        "               \"Ent\" = \"darkgreen\")) +", "  labs(fill = \"Color\")"
-        ), out.width.px = 864, out.height.px = 384, params.src = "mancolor, exercise=TRUE, fig.width=9", 
+        "               \"Ent\" = \"darkgreen\")) +", "  labs(fill = \"Colour\")"
+        ), out.width.px = 864, out.height.px = 384, params.src = "mancolour, exercise=TRUE, fig.width=9", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-nodelab-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-nodelab-code-editor`)), session)
 output$`tutorial-exercise-nodelab-output` <- renderUI({
   `tutorial-exercise-nodelab-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "nodelab", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2816,15 +2899,15 @@ learnr:::store_exercise_cache(structure(list(label = "nodelab", global_setup = s
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-manynetexample2-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-manynetexample2-code-editor`)), session)
 output$`tutorial-exercise-manynetexample2-output` <- renderUI({
   `tutorial-exercise-manynetexample2-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "manynetexample2", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2859,21 +2942,21 @@ learnr:::store_exercise_cache(structure(list(label = "manynetexample2", global_s
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-maxbet-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-maxbet-code-editor`)), session)
 output$`tutorial-exercise-maxbet-output` <- renderUI({
   `tutorial-exercise-maxbet-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "maxbet", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "maxbet", code = "fict_lotr |>\n  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>\n  graphr(node_color = \"maxbet\")", 
+    setup = NULL, chunks = list(list(label = "maxbet", code = "fict_lotr |>\n  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>\n  graphr(node_colour = \"maxbet\")", 
         opts = list(label = "\"maxbet\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
@@ -2895,27 +2978,27 @@ learnr:::store_exercise_cache(structure(list(label = "maxbet", global_setup = st
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "maxbet", exercise = TRUE, 
         code = c("fict_lotr |>", "  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>", 
-        "  graphr(node_color = \"maxbet\")"), out.width.px = 864, 
+        "  graphr(node_colour = \"maxbet\")"), out.width.px = 864, 
         out.height.px = 384, params.src = "maxbet, exercise = TRUE, fig.width=9", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-legend-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-legend-code-editor`)), session)
 output$`tutorial-exercise-legend-output` <- renderUI({
   `tutorial-exercise-legend-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "legend", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "legend", code = "fict_lotr |>\n  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>\n  graphr(node_color = \"maxbet\") +\n  guides(color = \"legend\") +\n  labs(color = \"Maximum\\nBetweenness\")", 
+    setup = NULL, chunks = list(list(label = "legend", code = "fict_lotr |>\n  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>\n  graphr(node_colour = \"maxbet\") +\n  guides(colour = \"legend\") +\n  labs(colour = \"Maximum\\nBetweenness\")", 
         opts = list(label = "\"legend\"", exercise = "TRUE", 
             fig.width = "9"), engine = "r")), code_check = NULL, 
     error_check = NULL, check = NULL, solution = NULL, tests = NULL, 
@@ -2937,22 +3020,22 @@ learnr:::store_exercise_cache(structure(list(label = "legend", global_setup = st
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "legend", exercise = TRUE, 
         code = c("fict_lotr |>", "  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>", 
-        "  graphr(node_color = \"maxbet\") +", "  guides(color = \"legend\") +", 
-        "  labs(color = \"Maximum\\nBetweenness\")"), out.width.px = 864, 
+        "  graphr(node_colour = \"maxbet\") +", "  guides(colour = \"legend\") +", 
+        "  labs(colour = \"Maximum\\nBetweenness\")"), out.width.px = 864, 
         out.height.px = 384, params.src = "legend, exercise=TRUE, fig.width=9", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-forcedir-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-forcedir-code-editor`)), session)
 output$`tutorial-exercise-forcedir-output` <- renderUI({
   `tutorial-exercise-forcedir-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "forcedir", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -2987,16 +3070,15 @@ learnr:::store_exercise_cache(structure(list(label = "forcedir", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "layoutinterp-Q", 
     question = structure("Can we interpret the distance between two nodes in a force-directed layout as a precise measure of how closely they are related?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_8b8938d", 
+    "character")), answers = list(structure(list(id = "lnr_ans_27c9954", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
-        "character")), correct = TRUE, message = structure("That’s right — force-directed layouts are illustrative. Nearby nodes are often closely connected, but distances are a by-product of the algorithm, not a measurement to cite.", html = TRUE, class = c("html", 
+        "character")), correct = TRUE, message = structure("That’s right — force-directed layouts are illustrative. Nearby nodes are often closely connected, but distances are a by-product of the algorithm, not a measurement to cite. The force moves the nodes, but it does not measure them. <img src='https://giffiles.alphacoders.com/131/13131.gif' alt='gif of yoda moving things with the force'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_69189ee", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_9a0fc93", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Careful — two nodes can end up near each other simply because the algorithm ran out of better places to put them. Use spectral or MDS layouts if you need interpretable distances. No mistakes here though, just a happy little accident. <img src='https://media1.tenor.com/m/XP2eqZczZ2MAAAAC/bob-ross-happy.gif' alt='gif of Bob Ross smiling in front of a painting'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -3008,18 +3090,18 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "layoutinterp-Q-answer", question = "layoutinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 1618219677.74646, options = list()), class = c("learnr_radio", 
+    seed = 876400942.591894, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-bipartite-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-bipartite-code-editor`)), session)
 output$`tutorial-exercise-bipartite-output` <- renderUI({
   `tutorial-exercise-bipartite-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "bipartite", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3054,15 +3136,15 @@ learnr:::store_exercise_cache(structure(list(label = "bipartite", global_setup =
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-hierarchy-center-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-hierarchy-center-code-editor`)), session)
 output$`tutorial-exercise-hierarchy-center-output` <- renderUI({
   `tutorial-exercise-hierarchy-center-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "hierarchy-center", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3096,15 +3178,15 @@ learnr:::store_exercise_cache(structure(list(label = "hierarchy-center", global_
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-alluvial-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-alluvial-code-editor`)), session)
 output$`tutorial-exercise-alluvial-output` <- renderUI({
   `tutorial-exercise-alluvial-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "alluvial", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3137,15 +3219,15 @@ learnr:::store_exercise_cache(structure(list(label = "alluvial", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-circular-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-circular-code-editor`)), session)
 output$`tutorial-exercise-circular-output` <- renderUI({
   `tutorial-exercise-circular-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "circular", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3178,15 +3260,15 @@ learnr:::store_exercise_cache(structure(list(label = "circular", global_setup = 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-concentric-membership-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-concentric-membership-code-editor`)), session)
 output$`tutorial-exercise-concentric-membership-output` <- renderUI({
   `tutorial-exercise-concentric-membership-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "concentric-membership", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3220,15 +3302,15 @@ learnr:::store_exercise_cache(structure(list(label = "concentric-membership", gl
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-eigen-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-eigen-code-editor`)), session)
 output$`tutorial-exercise-eigen-output` <- renderUI({
   `tutorial-exercise-eigen-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "eigen", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3259,15 +3341,15 @@ learnr:::store_exercise_cache(structure(list(label = "eigen", global_setup = str
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-mds-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-mds-code-editor`)), session)
 output$`tutorial-exercise-mds-output` <- renderUI({
   `tutorial-exercise-mds-result`()
 })
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "mds", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3298,15 +3380,16 @@ learnr:::store_exercise_cache(structure(list(label = "mds", global_setup = struc
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "spectralinterp-Q", 
     question = structure("Can we interpret the distance between nodes in spectral and MDS layouts?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_320e3c0", 
+    "character")), answers = list(structure(list(id = "lnr_ans_3d9ae7e", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right — in these layouts proximity reflects measured (dis)similarity, though it is not always easy to do…", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_a7f57b7", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_5f377c9", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Unlike force-directed layouts, spectral and MDS layouts place nodes according to calculated similarities, so distances do carry meaning here.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -3318,18 +3401,18 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "spectralinterp-Q-answer", question = "spectralinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 263140303.377466, options = list()), class = c("learnr_radio", 
+    seed = 2111845284.0166, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-grid-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-grid-code-editor`)), session)
 output$`tutorial-exercise-grid-output` <- renderUI({
   `tutorial-exercise-grid-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "grid", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3360,15 +3443,15 @@ learnr:::store_exercise_cache(structure(list(label = "grid", global_setup = stru
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
-
-
+ 
 <script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-snap-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-snap-code-editor`)), session)
 output$`tutorial-exercise-snap-output` <- renderUI({
   `tutorial-exercise-snap-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "snap", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3399,6 +3482,42 @@ learnr:::store_exercise_cache(structure(list(label = "snap", global_setup = stru
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "snap-Q", question = structure("What does snap = TRUE do to the layout you asked for?", html = TRUE, class = c("html", 
+"character")), answers = list(structure(list(id = "lnr_ans_26e0854", 
+    option = "It keeps that layout, but moves each node onto the nearest grid coordinate", 
+    value = "It keeps that layout, but moves each node onto the nearest grid coordinate", 
+    label = structure("It keeps that layout, but moves each node onto the nearest grid coordinate", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Exactly — the arrangement stays recognisable, and the nodes just shuffle onto tidier positions. <img src='https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif' alt='gif of a cartoon character energetically rearranging the living room furniture'/>", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_4ab98b0", 
+    option = "It replaces that layout with the grid layout", 
+    value = "It replaces that layout with the grid layout", label = structure("It replaces that layout with the grid layout", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("That is layout = ‘grid’. With snap = TRUE the chosen layout is computed first, and only then rounded onto a grid.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_fc680a3", 
+    option = "It fixes the layout so that it is the same each time it is run", 
+    value = "It fixes the layout so that it is the same each time it is run", 
+    label = structure("It fixes the layout so that it is the same each time it is run", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("Some layouts, such as ‘stress’, are already deterministic. Snapping is about grid coordinates, not repeatability.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_3ddbf88", 
+    option = "It removes overlapping labels", value = "It removes overlapping labels", 
+    label = structure("It removes overlapping labels", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("Snapping often helps label legibility, but it moves nodes rather than labels. Use label_repel and label_dist for labels.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), message = NULL, post_message = NULL), ids = list(
+    answer = "snap-Q-answer", question = "snap-Q"), loading = NULL, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1778326078.6719, 
+    options = list()), class = c("learnr_radio", "tutorial_question"
+)), session = session)
 </script>
 
 
@@ -3570,12 +3689,43 @@ learnr:::store_exercise_cache(structure(list(label = "grapht", global_setup = st
 
 
 <script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "grapht-Q", question = structure("A tie attribute named what marks a network as longitudinal for {manynet}, so that to_waves() and grapht() split it without being told?", html = TRUE, class = c("html", 
+"character")), answers = list(structure(list(id = "lnr_ans_4df7fa2", 
+    option = "wave", value = "wave", label = structure("wave", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Yes — name it wave and the waves are found for you, like the pages of a flipbook. Any other name works too, but must be declared via to_waves()’s attribute argument. <img src='https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif' alt='gif of a hand flipping through a flipbook of animated stick figures'/>", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_414d72c", 
+    option = "time", value = "time", label = structure("time", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("Close in spirit, but it is wave that is recognised automatically.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_b771fb6", 
+    option = "year", value = "year", label = structure("year", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("year is a perfectly good name, but you have to declare it via to_waves()’s attribute argument.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_1e0a6a6", 
+    option = "frame", value = "frame", label = structure("frame", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("Frames are what the animation renders, not what the network attribute is called.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), message = NULL, post_message = NULL), ids = list(
+    answer = "grapht-Q-answer", question = "grapht-Q"), loading = NULL, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1480916796.81039, 
+    options = list()), class = c("learnr_radio", "tutorial_question"
+)), session = session)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
 `tutorial-exercise-ggrapheg-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ggrapheg-code-editor`)), session)
 output$`tutorial-exercise-ggrapheg-output` <- renderUI({
   `tutorial-exercise-ggrapheg-result`()
 })
 </script>
- 
+
+
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::store_exercise_cache(structure(list(label = "ggrapheg", global_setup = structure(c("library(learnr)", 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
@@ -3614,6 +3764,44 @@ learnr:::store_exercise_cache(structure(list(label = "ggrapheg", global_setup = 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "ggraph-Q", question = structure("What is the main trade-off in building a graph directly in {ggraph} rather than with graphr()?", html = TRUE, class = c("html", 
+"character")), answers = list(structure(list(id = "lnr_ans_d44a77d", 
+    option = "You control every layer yourself, but you have to specify each one", 
+    value = "You control every layer yourself, but you have to specify each one", 
+    label = structure("You control every layer yourself, but you have to specify each one", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Just so — nothing is drawn until you ask for it, so a plain graph takes more typing. Take the restoration into your own hands only when you need that control. <img src='https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif' alt='gif of Mr Bean taking the restoration of a painting into his own hands'/>", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_1ac16d0", 
+    option = "You cannot use {ggplot2} layers with {ggraph}", 
+    value = "You cannot use {ggplot2} layers with {ggraph}", 
+    label = structure("You cannot use {ggplot2} layers with {ggraph}", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("{ggraph} is built on {ggplot2}, so the usual layers, scales, and themes all apply.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6206322", 
+    option = "{ggraph} accepts fewer network classes, so graphr() is always faster to run", 
+    value = "{ggraph} accepts fewer network classes, so graphr() is always faster to run", 
+    label = structure("{ggraph} accepts fewer network classes, so graphr() is always faster to run", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("{ggraph} does expect tbl_graph or igraph objects, but the trade-off here is about control, not speed.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_eb0a2d8", 
+    option = "Graphs built in {ggraph} cannot be saved with ggsave()", 
+    value = "Graphs built in {ggraph} cannot be saved with ggsave()", 
+    label = structure("Graphs built in {ggraph} cannot be saved with ggsave()", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("They can — both graphr() and ggraph() return ggplot objects, which ggsave() handles alike.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), message = NULL, post_message = NULL), ids = list(
+    answer = "ggraph-Q-answer", question = "ggraph-Q"), loading = NULL, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1758068029.68134, 
+    options = list()), class = c("learnr_radio", "tutorial_question"
+)), session = session)
 </script>
 
 
@@ -3660,6 +3848,67 @@ learnr:::store_exercise_cache(structure(list(label = "plotexamples", global_setu
     engine = "r", version = "4"), class = c("r", "tutorial_exercise"
 )))
 </script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "export-Q", question = structure("Which file format should you prefer when a publisher asks for a figure that stays sharp at any size?", html = TRUE, class = c("html", 
+"character")), answers = list(structure(list(id = "lnr_ans_5043488", 
+    option = ".pdf", value = ".pdf", label = structure(".pdf", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Yes — .pdf and .svg are vector formats, so they scale without going blurry. The masterpiece is done: show the world. <img src='https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif' alt='gif of a maker declaring that the masterpiece is done and it is time to show the world'/>", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_2f6aed", 
+    option = ".png", value = ".png", label = structure(".png", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("A .png is a raster format. It is fine for the web, and for print at a high dpi, but it does not scale freely.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e7c9030", 
+    option = ".jpeg", value = ".jpeg", label = structure(".jpeg", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("A .jpeg is raster too, and its compression blurs lines and text. Avoid it for graphs.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f05e6cd", 
+    option = ".gif", value = ".gif", label = structure(".gif", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("Save a .gif for animations from grapht(), via gganimate::anim_save().", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), message = NULL, post_message = NULL), ids = list(
+    answer = "export-Q-answer", question = "export-Q"), loading = NULL, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1406143574.34521, 
+    options = list()), class = c("learnr_radio", "tutorial_question"
+)), session = session)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "summary-Q", question = structure("One last one: which function graphs a list of related networks as comparable panels?", html = TRUE, class = c("html", 
+"character")), answers = list(structure(list(id = "lnr_ans_2601af8", 
+    option = "graphs()", value = "graphs()", label = structure("graphs()", html = TRUE, class = c("html", 
+    "character")), correct = TRUE, message = structure("Correct — graphs() for panels, grapht() for animations, graphr() for a single graph. Take a bow. <img src='https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif' alt='gif of an enthusiastic standing ovation and cries of bravo'/>", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e1f6cf0", 
+    option = "grapht()", value = "grapht()", label = structure("grapht()", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("grapht() animates change over time instead, rendering the waves as frames.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d75ce5b", 
+    option = "graphr()", value = "graphr()", label = structure("graphr()", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("graphr() draws one network. You can combine several graphr() calls with {patchwork} operators, though.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ada462c", 
+    option = "plot()", value = "plot()", label = structure("plot()", html = TRUE, class = c("html", 
+    "character")), correct = FALSE, message = structure("The plot() methods are for measures, motifs, and model results, not for lists of networks.", html = TRUE, class = c("html", 
+    "character")), type = "literal"), class = c("tutorial_question_answer", 
+"tutorial_quiz_answer"))), button_labels = list(submit = structure("<span data-i18n=\"button.questionsubmit\">Submit Answer<\u002fspan>", html = TRUE, class = c("html", 
+"character")), try_again = structure("<span data-i18n=\"button.questiontryagain\">Try Again<\u002fspan>", html = TRUE, class = c("html", 
+"character"))), messages = list(correct = structure("Correct!", html = TRUE, class = c("html", 
+"character")), try_again = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
+"character")), message = NULL, post_message = NULL), ids = list(
+    answer = "summary-Q-answer", question = "summary-Q"), loading = NULL, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1631259279.24039, 
+    options = list()), class = c("learnr_radio", "tutorial_question"
+)), session = session)
+</script>
 </p>
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="dependencies">
@@ -3668,7 +3917,7 @@ learnr:::store_exercise_cache(structure(list(label = "plotexamples", global_setu
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85]}},"value":[{"type":"character","attributes":{},"value":["autograph","backports","base","bslib","cachem","checkmate","cli","coda","commonmark","compiler","datasets","digest","dplyr","evaluate","farver","fastmap","fontawesome","generics","ggdendro","ggforce","ggplot2","ggraph","ggrepel","glue","graphics","graphlayouts","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","igraph","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","litedown","magrittr","manynet","markdown","MASS","memoise","methods","mime","netrics","network","otel","patchwork","pillar","pkgconfig","polyclip","promises","purrr","R6","RColorBrewer","Rcpp","rlang","rmarkdown","rprojroot","rstudioapi","S7","sass","scales","shiny","statnet.common","stats","tibble","tidygraph","tidyr","tidyselect","tools","tweenr","utils","vctrs","viridis","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.1.1","1.5.1","4.6.0","0.11.0","1.1.0","2.3.4","3.6.6","0.19-4.1","2.0.0","4.6.0","4.6.0","0.6.39","1.2.1","1.0.5","2.1.2","1.2.0","0.5.3","0.1.4","0.2.0","0.5.0","4.0.3","2.2.2","0.9.8","1.8.1","4.6.0","1.2.4","4.6.0","4.6.0","2.3.1","0.3.6","0.5.9","1.6.4","1.6.17","2.3.3","0.1.4","2.0.0","1.51","1.4.8","0.22-9","0.11.6","1.0.5","0.9","2.0.5","2.2.2","2.0","7.3-65","2.0.1","4.6.0","0.13","0.3.2","1.20.0","0.2.0","1.3.2","1.11.1","2.0.3","1.10-7","1.5.0","1.2.2","2.6.1","1.1-3","1.1.2","1.3.0","2.31","2.1.1","0.19.0","0.2.2","0.4.10","1.4.0","1.14.0","4.13.0","4.6.0","3.3.1","1.3.1","1.3.2","1.2.1","4.6.0","2.0.3","4.6.0","0.7.3","0.6.5","0.4.3","3.0.3","0.60","1.8-8","2.3.12"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83]}},"value":[{"type":"character","attributes":{},"value":["autograph","backports","base","bslib","cachem","checkmate","cli","coda","commonmark","compiler","datasets","digest","dplyr","evaluate","farver","fastmap","fontawesome","generics","ggforce","ggplot2","ggraph","ggrepel","glue","graphics","graphlayouts","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","igraph","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","litedown","magrittr","manynet","markdown","MASS","memoise","methods","mime","netrics","network","otel","patchwork","pillar","pkgconfig","polyclip","promises","purrr","R6","RColorBrewer","Rcpp","rlang","rmarkdown","rprojroot","S7","sass","scales","shiny","statnet.common","stats","tibble","tidygraph","tidyr","tidyselect","tools","tweenr","utils","vctrs","viridis","viridisLite","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.2.0","1.5.1","4.6.1","0.11.0","1.1.0","2.3.4","3.6.6","0.19-4.1","2.0.0","4.6.1","4.6.1","0.6.39","1.2.1","1.0.5","2.1.2","1.2.0","0.5.3","0.1.4","0.5.0","4.0.3","2.2.2","0.9.8","1.8.1","4.6.1","1.2.5","4.6.1","4.6.1","2.3.1","0.3.6","0.5.9","1.6.4","1.6.17","2.3.3","0.1.4","2.0.0","1.51","1.4.8","0.22-9","0.11.6","1.0.5","0.10","2.0.5","2.3.0","2.0","7.3-66","2.0.1","4.6.1","0.13","1.0.0","1.20.0","0.2.0","1.3.2","1.11.1","2.0.3","1.10-7","1.5.0","1.2.2","2.6.1","1.1-3","1.1.2","1.3.0","2.31","2.1.1","0.2.2","0.4.10","1.4.0","1.14.0","4.13.0","4.6.1","3.3.1","1.3.1","1.3.2","1.2.1","4.6.1","2.0.3","4.6.1","0.7.3","0.6.5","0.4.3","3.0.3","0.60","1.8-8","2.3.12"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

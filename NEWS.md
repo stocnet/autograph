@@ -67,6 +67,10 @@
   - With `persist = TRUE` the theme is written to `tools::R_user_dir("autograph", "config")` and applied when `{autograph}` is next attached
   - Nothing is written to disk unless `persist = TRUE` is passed explicitly, and setting a theme without it clears any previously persisted choice
 
+## Tutorials
+
+- Moved the decorative gifs in the visualisation tutorial into quiz answer feedback, so that they reward an answer in the interactive tutorial rather than appearing in the static pkgdown article, which drops quiz chunks
+
 # autograph 1.1.2
 
 ## Package

@@ -127,7 +127,9 @@ Remember the three flavours of bundled data as a rough difficulty ladder —
 **Real-world** (`irps_*`, larger & realistic) —
 and that you can browse the full list with `table_data()`.
 
-<img src="https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif" alt="gif of Bob Ross painting a happy little landscape"/>
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
 
 ## Getting started
 
@@ -409,8 +411,6 @@ graphr(ison_southern_women)
 
 ### Colouring nodes {#colouring-nodes}
 
-<img src="https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif" alt="gif of an artist swirling paint colours together on a palette"/>
-
 Let's try instead colouring the nodes by this "Race" variable.
 It is very similar to the shape example above.
 **Can you complete the code yourself?**
@@ -631,8 +631,6 @@ Run `stocnet_theme()` without arguments to see which theme is currently set.
 More institutional scales and themes can be implemented upon pull request.
 
 ### Who's hue? {#whos-hue}
-
-<img src="https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif" alt="gif from The Devil Wears Prada: that is not just blue, that is cerulean"/>
 
 By default, `graphr()` will use a colour palette that offers fairly good contrast
 and better accessibility.
@@ -864,8 +862,6 @@ In the following sections, we review some of the most common types of layouts.
 
 ### Force-directed layouts {#force-directed-layouts}
 
-<img src="https://giffiles.alphacoders.com/131/13131.gif" alt="gif of yoda moving things with the force"/>
-
 Force-directed layouts update some initial placement of vertices
 through the operation of some system of metaphorically-physical forces.
 These might include attractive and repulsive forces.
@@ -1001,8 +997,6 @@ Other such layouts include:
 
 ### Grid layouts {#grid-layouts}
 
-<img src="https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif" alt="gif of a cartoon character energetically rearranging the living room furniture"/>
-
 Grid layouts arrange nodes based on some Cartesian coordinates.
 These can be useful for making sure all nodes' labels are visible,
 but horizontal and vertical lines can overlap,
@@ -1027,6 +1021,10 @@ snapped version.**
 (graphr(fict_lotr) + ggtitle("stress") |
    graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
 ```
+
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
 
 ### Manual layouts {#manual-layouts}
 
@@ -1137,8 +1135,6 @@ every node, so in that case isolates are kept in place.
 
 ### Dynamics {#dynamics}
 
-<img src="https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif" alt="gif of a hand flipping through a flipbook of animated stick figures"/>
-
 `grapht()` is another alternative to `graphr()`,
 this time rendering network changes over time as an animated gif.
 Longitudinal networks (with discrete waves)
@@ -1168,6 +1164,10 @@ From `{manynet}` 2.2.2, any other name (say, `year`) works just as well —
 it only needs declaring via `to_waves()`'s `attribute` argument.
 
 ::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
+
+::: {.callout}
 <span class="callout-label">**Going further**:</span>
 Animation constrains a few things that a static graph allows.
 `grapht()`'s `isolates` argument takes `"keep"` (the default) or `"fade"`
@@ -1189,8 +1189,6 @@ and animate longitudinal or dynamic networks with `grapht()`.
 :::
 
 ## Going further with ggraph
-
-<img src="https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif" alt="gif of Mr Bean taking the restoration of a painting into his own hands"/>
 
 For more flexibility with visualisations,
 `{autograph}` users are encouraged to use the excellent `{ggraph}` package.
@@ -1262,6 +1260,10 @@ and padding between the arrowhead and the node can also be specified.
 For more see David Schoch's [excellent resources on this](http://mr.schochastics.net/netVizR.html).
 
 ::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
+
+::: {.callout}
 <span class="callout-label">**In brief**:</span> Because `graphr()` returns a ggplot object,
 you can go a long way just appending `{ggplot2}`/`{ggraph}` layers to it.
 When you need full control over every geom,
@@ -1309,8 +1311,6 @@ of the packages that produce those results.
 
 ## Exporting plots
 
-<img src="https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif" alt="gif of a maker declaring that the masterpiece is done and it is time to show the world"/>
-
 We can save the plots we have made by point-and-click
 by selecting 'Save as PDF...' from under the 'Export' dropdown menu
 in the plots panel tab of RStudio.
@@ -1340,9 +1340,11 @@ Animations made with `grapht()` are saved slightly differently:
 use `gganimate::anim_save("my_animation.gif")`,
 which works just like `ggsave()` but for the last animation rendered.
 
-## Summary
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
 
-<img src="https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif" alt="gif of an enthusiastic standing ovation and cries of bravo"/>
+## Summary
 
 Well done — you have completed the tutorial on visualising networks!
 Along the way, you have learned to use these functions:
@@ -1364,6 +1366,10 @@ Along the way, you have learned to use these functions:
 | `grapht()` | animates a longitudinal or dynamic network as a gif |
 | `plot()` | plots measures, motifs, and model results consistently |
 | `ggsave()` | exports the last plot at publication quality |
+
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
 
 When you are ready, continue with the tutorials in the other `{stocnet}`
 packages — on network structure and centrality in `{netrics}`,
