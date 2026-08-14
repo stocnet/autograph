@@ -17,7 +17,11 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
     }
   }
   if (manynet::is_complex(g)) {
-    p <- p + ggraph::geom_edge_loop0(edge_alpha = 0.4)
+    # Resolved here rather than inside aes(), which would evaluate it lazily
+    # against whatever `p` held by the time the plot was built.
+    loop_strength <- .infer_loop_strength(p)
+    p <- p + ggraph::geom_edge_loop0(ggplot2::aes(strength = loop_strength),
+                                     edge_alpha = 0.4)
   }
   # Check legends
   if (length(unique(out[["esize"]])) == 1) {
@@ -69,8 +73,29 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # R/graph_aes.R, shared with grapht(). These arguments have already been checked
 # against the network's attributes by graphr()/grapht() (see R/graph_checks.R).
 
-.infer_end_cap <- function(g, node_size) {
-  nsize <- .infer_nsize(g, node_size)/2
+# A self-loop's `strength` is its diameter, measured in the same units as the
+# layout's coordinates, and `geom_edge_loop0()` defaults it to 1. Since layouts
+# differ by orders of magnitude in how far their coordinates spread, that one
+# number draws a loop that is either invisible or, as for the "multilevel"
+# layout whose coordinates span about one unit in each direction, a circle
+# wider than the network it belongs to -- which then stretches the panel to
+# fit, leaving the plot squeezed against its legend. Sized as a fraction of
+# the layout instead, a loop reads as a loop whatever the layout.
+#
+# Note that `strength` is an aesthetic of the loop geoms rather than a layer
+# parameter: passed as a parameter it is silently dropped ("Ignoring unknown
+# parameters"), so it has to be mapped through `aes()`.
+.infer_loop_strength <- function(p) {
+  spread <- max(diff(range(p[["data"]][["x"]], na.rm = TRUE)),
+                diff(range(p[["data"]][["y"]], na.rm = TRUE)))
+  # A network drawn at a single point has no spread to take a fraction of.
+  if (!is.finite(spread) || spread <= 0) return(1)
+  spread * 0.06
+}
+
+
+.infer_end_cap <- function(g, node_size, layout = NULL) {
+  nsize <- .infer_nsize(g, node_size, layout)/2
   # Accounts for rescaling
   if (length(unique(nsize)) == 1) {
     out <- rep(unique(nsize), manynet::net_ties(g))

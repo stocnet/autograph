@@ -5,6 +5,10 @@
 - Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
 
 
+## Graphing
+
+- Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
+
 ## Themes
 
 - Added a `persist` argument to `stocnet_theme()` so chosen themes can be remembered across sessions
