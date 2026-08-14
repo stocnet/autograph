@@ -11,8 +11,18 @@ plot_fixture_registry <- list(
   ag_conv   = NULL, # internal wrapper class, exercised via traces.monan
   ag_gof    = NULL, # internal wrapper class, exercised via sienaGOF etc.
   grapht    = NULL, # print method for animations, tested in test-grapht.R
-  changepoints.goldfish = function() autograph::goldfish_changepoints,
-  outliers.goldfish     = function() autograph::goldfish_outliers,
+  diagnose_changepoints = function() autograph::goldfish_changepoints,
+  diagnose_outliers     = function() autograph::goldfish_outliers,
+  diagnose_onset        = function() autograph::goldfish_onset,
+  margin_table          = function() autograph::goldfish_margins,
+  test_gof              = function() autograph::goldfish_gof,
+  test_time             = function() autograph::goldfish_time,
+  # The overview draws each panel from a goldfish diagnostic rather than from
+  # the fit alone, so with goldfish absent or older than 1.9.21 every panel
+  # drops and the method prints and returns NULL. The audit accepts that, so
+  # this fixture exercises the composition where goldfish can supply it and
+  # the message where it cannot.
+  result.goldfish       = function() autograph::goldfish_fit,
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
   learn_model = function() {
@@ -148,12 +158,15 @@ test_that("diffusion summaries plot for mnet and diff_model objects", {
 })
 
 test_that("goldfish diagnostics print a message when nothing is found", {
+  # Both flags are logical columns as goldfish 1.9.21 emits them: `outlier`
+  # replaces the old "YES"/"NO" strings, and `cpt` the old list of a data
+  # frame and a vector of break positions.
   quiet_outliers <- autograph::goldfish_outliers
-  quiet_outliers$outlier <- rep("NO", nrow(quiet_outliers))
+  quiet_outliers$outlier <- rep(FALSE, nrow(quiet_outliers))
   expect_output(out <- plot(quiet_outliers), "No outliers found")
   expect_null(out)
   quiet_cpts <- autograph::goldfish_changepoints
-  quiet_cpts$cpt_points <- NULL
+  quiet_cpts$cpt <- rep(FALSE, nrow(quiet_cpts))
   expect_output(out <- plot(quiet_cpts), "No regime changes found")
   expect_null(out)
 })

@@ -255,6 +255,7 @@ test_that("the onset plot renders without goldfish attached", {
 # appear is itself a readout of what was requested at estimation.
 
 test_that("the overview composes the panels the fit can supply", {
+  skip_without_gf_diagnostics()
   p <- plot(goldfish_fit)
   expect_s3_class(p, "patchwork")
   # The fixture stores loglik, scores and conditional_scores and is
@@ -263,6 +264,7 @@ test_that("the overview composes the panels the fit can supply", {
 })
 
 test_that("the overview costs no evaluation pass", {
+  skip_without_gf_diagnostics()
   # Stored primitives only: the fixture carries no preprocessed statistics, so
   # anything reaching for a replay would abort rather than draw.
   expect_null(goldfish_fit$preprocessed)
@@ -270,6 +272,7 @@ test_that("the overview costs no evaluation pass", {
 })
 
 test_that("a panel whose primitive is missing is left out, not an error", {
+  skip_without_gf_diagnostics()
   stripped <- goldfish_fit
   stripped$event_scores <- NULL
   stripped$conditional_scores <- NULL
@@ -281,6 +284,7 @@ test_that("a panel whose primitive is missing is left out, not an error", {
 })
 
 test_that("an ordinal fit has no waiting-time panel", {
+  skip_without_gf_diagnostics()
   # An ordinal likelihood conditions the timing away, so there is no
   # compensator and no waiting time to check.
   ordinal <- goldfish_fit
@@ -304,6 +308,7 @@ test_that("a fit with nothing stored says so instead of drawing", {
 })
 
 test_that("the Schoenfeld panel caps the effects it draws", {
+  skip_without_gf_diagnostics()
   # A model with a dozen terms makes a facet grid unreadable at overview size,
   # so the panel is capped and ranked by the cumulative-score statistic.
   wide <- plot(goldfish_fit, effects = 2)

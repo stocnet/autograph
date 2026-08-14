@@ -7,7 +7,7 @@
 ag_pages(x, nrow = 2, ncol = 2)
 }
 \arguments{
-\item{x}{a diagnostic object with one panel per term — as returned by
+\item{x}{a diagnostic object with one panel per term -- as returned by
 \code{test_gof()}, \code{test_time()}, \code{diagnose_onset()}, or a fitted goldfish
 model.}
 

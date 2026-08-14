@@ -54,6 +54,24 @@ expect_buildable <- function(p) {
   invisible(built)
 }
 
+# `plot.result.goldfish()` composes its panels out of goldfish's own
+# diagnostics rather than out of the fit alone, so no precooked fixture can
+# stand in for them: without goldfish, or with one older than the 1.9.21 that
+# added them, every panel drops and the method prints and returns NULL. Tests
+# of what the composition contains are skipped there. The test is for the
+# functions rather than for the version string, matching the shims in
+# R/autograph-defunct.R, since a pre-release build can carry the version
+# without yet exporting them.
+skip_without_gf_diagnostics <- function() {
+  testthat::skip_if_not_installed("goldfish")
+  needed <- c("diagnose_outliers", "test_gof")
+  missing <- setdiff(needed, getNamespaceExports("goldfish"))
+  if (length(missing) > 0) {
+    testthat::skip(paste("goldfish does not export",
+                         paste(missing, collapse = ", ")))
+  }
+}
+
 # Standard grid of fixture networks covering the formats autograph's
 # layouts and graphr() aesthetics are expected to handle.
 ag_fixtures <- local({
