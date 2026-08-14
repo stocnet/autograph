@@ -13,7 +13,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 4.1.0),
-    manynet (>= 2.3.0)
+    manynet (>= 2.2.3)
 Imports:
     dplyr (>= 1.1.0),
     ggraph (>= 2.2.0),
@@ -27,10 +27,11 @@ Suggests:
     gifski,
     methods,
     migraph,
-    netrics (>= 1.0.0),
+    netrics (>= 0.4.0),
     testthat (>= 3.0.0)
 Enhances:
     ergm,
+    goldfish,
     RSiena
 Authors@R: 
     c(person(given = "James",

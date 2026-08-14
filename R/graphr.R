@@ -171,7 +171,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     } else {
       isos <- which(.node_is_isolate(g))
     }
-    g <- manynet::delete_isolates(g)
+    g <- .ag_delete_isolates(g)
   } 
   
   layout <- .infer_layout(g, .check_layout(layout))
@@ -265,7 +265,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       g <- g[[1]]
     if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
-    } else if (manynet::is_multilevel(g) && manynet::is_connected(g)) {
+    } else if (.ag_is_multilevel(g) && manynet::is_connected(g)) {
       # Checked before `is_twomode()`, which is also TRUE for these networks.
       # A "hierarchy" layout would place each level along a single row, which
       # collapses the within-level ties that make the network multilevel.

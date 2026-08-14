@@ -580,7 +580,7 @@ gf_onset_path_panel <- function(
 }
 
 # The accrual panel: full range with the onset window shaded, and the
-# proportional diagonal drawn. The diagonal is what makes the curve readable —
+# proportional diagonal drawn. The diagonal is what makes the curve readable --
 # the departure from it is the finding, not the curve's monotonicity.
 gf_onset_accrual_panel <- function(x, summary, context) {
   accrual <- as.data.frame(x$accrual)
@@ -689,7 +689,7 @@ gf_overview_try <- function(expr) {
 }
 
 gf_overview_deviance <- function(x) {
-  outliers <- gf_overview_try(goldfish::diagnose_outliers(x))
+  outliers <- gf_overview_try(.ag_goldfish("diagnose_outliers")(x))
   if (is.null(outliers)) {
     return(NULL)
   }
@@ -750,7 +750,7 @@ gf_overview_schoenfeld <- function(x, effects) {
       # see anything: the output looks like an answer about the whole model.
       subtitle = if (omitted > 0) {
         paste0(
-          "Scaled Schoenfeld — ",
+          "Scaled Schoenfeld \u2014 ",
           length(keep),
           " of ",
           length(available),
@@ -771,7 +771,7 @@ gf_overview_rank <- function(x, terms, effects) {
   if (length(terms) <= effects) {
     return(seq_along(terms))
   }
-  gof <- gf_overview_try(goldfish::test_gof(x))
+  gof <- gf_overview_try(.ag_goldfish("test_gof")(x))
   if (is.null(gof)) {
     return(seq_len(effects))
   }
@@ -795,7 +795,7 @@ gf_overview_rank <- function(x, terms, effects) {
 # two networks; otherwise the residual names made unique, which is ugly but
 # never ambiguous.
 gf_overview_labels <- function(x, keep, terms) {
-  gof <- gf_overview_try(goldfish::test_gof(x))
+  gof <- gf_overview_try(.ag_goldfish("test_gof")(x))
   labels <- make.unique(terms)[keep]
   if (!is.null(gof)) {
     matched <- match(keep, gof$effects$index)
@@ -805,7 +805,7 @@ gf_overview_labels <- function(x, keep, terms) {
 }
 
 gf_overview_gof <- function(x) {
-  gof <- gf_overview_try(goldfish::test_gof(x))
+  gof <- gf_overview_try(.ag_goldfish("test_gof")(x))
   if (is.null(gof)) {
     return(NULL)
   }
@@ -854,7 +854,7 @@ gf_overview_waiting <- function(x) {
 #' cluster, so a figure has to be producible with nobody at a screen to press
 #' return.
 #'
-#' @param x a diagnostic object with one panel per term — as returned by
+#' @param x a diagnostic object with one panel per term -- as returned by
 #'   `test_gof()`, `test_time()`, `diagnose_onset()`, or a fitted goldfish
 #'   model.
 #' @param nrow,ncol panels per page, matching what will be passed to `plot()`.
@@ -913,16 +913,15 @@ gf_facet_paged <- function(p, facets, page, nrow, ncol, n_pages, scales) {
     return(p + ggplot2::facet_wrap(facets, scales = scales))
   }
   if (!is.numeric(page) || length(page) != 1L || is.na(page) || page < 1) {
-    cli::cli_abort("{.arg page} must be a single positive number.")
+    manynet::snet_abort("{.arg page} must be a single positive number.")
   }
   page <- as.integer(page)
   if (page > n_pages) {
-    cli::cli_abort(c(
+    manynet::snet_abort(
       "{.arg page} {.val {page}} is past the last page.",
-      "i" = "This figure has {n_pages} page{?s} at
-             {.code nrow = {nrow}, ncol = {ncol}}.",
-      "i" = "{.fn ag_pages} reports the count without rendering."
-    ))
+      "This figure has {n_pages} page{?s} at",
+      "{.code nrow = {nrow}, ncol = {ncol}}.",
+      "{.fn ag_pages} reports the count without rendering.")
   }
   p +
     ggforce::facet_wrap_paginate(

@@ -174,6 +174,17 @@ so code paths depending on them should guard with `requireNamespace()`
 (see the `thisRequires()` helper in [R/autograph_utilities.R](../R/autograph_utilities.R))
 or be skipped gracefully when unavailable.
 
+The declared minimum of each `stocnet` dependency is the version on CRAN, so that CI can install it.
+Where `autograph` needs something that only a newer, unreleased version has,
+reach it through a shim in [R/autograph_utilities.R](../R/autograph_utilities.R)
+rather than by raising the minimum.
+Test for the function with `.ag_has_manynet()` rather than for the version string,
+because a pre-release development build can carry the version without yet exporting the function.
+Call the function with `getExportedValue()` and not `::`,
+because `R CMD check` resolves a `::` call against the installed package
+and reports the newer name as missing even where the call is never reached.
+Delete each shim once the minimum is raised past the version that added the function.
+
 ### Tests
 
 `tests/testthat/` uses testthat edition 3 with parallel execution

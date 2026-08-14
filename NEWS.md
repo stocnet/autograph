@@ -58,6 +58,8 @@
 - Added the precooked `goldfish_margins`, `goldfish_gof`, `goldfish_time` and `goldfish_onset` fixtures, and refreshed `goldfish_outliers` and `goldfish_changepoints`
   - All are produced by goldfish 1.9.21 and stamped with that version, so a fixture that has aged can be spotted
   - `goldfish_outliers` comes from a receiver-choice model of the `social_evolution` calls, `goldfish_changepoints` and `goldfish_margins` from a relational event model of the `fisheries_treaties` layer
+- Replaced `cli::cli_abort()` in `gf_facet_paged()` with `manynet::snet_abort()`, both declaring cli and matching how the rest of the package reports
+- Replaced the em dashes in `R/plot_diagnostics.R` with `--` in the comments and a unicode escape in the axis label, which is what the reader sees, since only ASCII is portable in R code
 
 ## Themes
 

@@ -72,12 +72,12 @@ test_that("multilevel is the default layout for multilevel networks", {
   # fict_marvel interlocks a one-mode layer among its characters with a
   # two-mode layer of their affiliations. A hierarchy layout would put each
   # mode on a row of its own, collapsing the one-mode layer entirely.
-  expect_true(manynet::is_multilevel(fict_marvel))
+  expect_true(.ag_is_multilevel(fict_marvel))
   expect_equal(graphr(fict_marvel)$plot_env$layout, "multilevel")
   expect_equal(graphr(fict_actually)$plot_env$layout, "multilevel")
   # Two-mode networks whose ties all run between the modes are unaffected,
   # as are one-mode networks.
-  expect_false(manynet::is_multilevel(ison_southern_women))
+  expect_false(.ag_is_multilevel(ison_southern_women))
   expect_equal(graphr(ison_southern_women)$plot_env$layout, "hierarchy")
   expect_equal(graphr(ison_adolescents)$plot_env$layout, "stress")
   # The one-mode layer of fict_marvel on its own is not multilevel.
@@ -130,7 +130,7 @@ test_that("multilevel layout reports what it cannot lay out", {
   disconnected <- igraph::make_undirected_graph(
     c(1,2, 1,3, 2,3, 4,5, 4,6, 5,6))
   igraph::V(disconnected)$type <- c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE)
-  expect_true(manynet::is_multilevel(disconnected))
+  expect_true(.ag_is_multilevel(disconnected))
   expect_false(manynet::is_connected(disconnected))
   expect_error(layout_multilevel(disconnected), "connected")
   # A one-mode network has no levels to derive, and says so.
