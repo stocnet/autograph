@@ -81,3 +81,33 @@
 #' @rdname made_earlier
 #' @usage data(goldfish_changepoints)
 "goldfish_changepoints"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_margins)
+"goldfish_margins"
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_gof)
+"goldfish_gof"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_time)
+"goldfish_time"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_onset)
+"goldfish_onset"
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(goldfish_fit)
+"goldfish_fit"
+
