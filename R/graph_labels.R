@@ -81,6 +81,36 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
       args$nudge_y <- -nudge_unit
     }
     p <- p + do.call(ggraph::geom_node_text, args)
+  } else if (layout == "multilevel") {
+    # `geom_node_label()`, used below, boxes each label in white, which at the
+    # density these networks tend to have would paper over the plot entirely.
+    # Plain text instead, nudged away from the plane the node sits in: down
+    # from the lower level and up from the upper, so that labels fall into the
+    # empty space beyond each plane rather than over the ties between them.
+    y_coord <- p[["data"]][["y"]]
+    args <- list(mapping = label_aes,
+                 family = ag_font(), size = 2, colour = "grey20",
+                 repel = label_repel,
+                 nudge_y = ifelse(y_coord <= stats::median(y_coord),
+                                  -nudge_unit, nudge_unit))
+    if (label_repel) {
+      args$point.padding <- padding
+      args$seed <- 1234
+      # These layouts leave a lot of empty space above and below each plane
+      # for ggrepel to push labels into, far enough that which node a label
+      # belongs to stops being obvious. Pull each label back hard towards its
+      # own node, and let labels sit closer to each other so that there is
+      # less pushing to begin with.
+      args$force_pull <- 4
+      args$box.padding <- 0.1
+      # Wherever a label still ends up away from its node, draw a leader line
+      # to it however short the move, rather than only beyond ggrepel's
+      # default half a line of text.
+      args$min.segment.length <- 0
+      args$segment.size <- 0.2
+      args$segment.colour <- "grey70"
+    }
+    p <- p + do.call(ggraph::geom_node_text, args)
   } else if (layout %in% c("alluvial", "lineage")) {
     # `fill = "white"` matches ggrepel's own hardcoded label background
     # (`GeomLabelRepel$default_aes$fill`); without it, plain `GeomLabel`
