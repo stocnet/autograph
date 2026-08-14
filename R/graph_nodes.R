@@ -1,5 +1,6 @@
-graph_nodes <- function(p, g, node_color, node_shape, node_size) {
-  out <- .infer_node_mapping(g, node_color, node_size, node_shape)
+graph_nodes <- function(p, g, node_color, node_shape, node_size,
+                        layout = NULL) {
+  out <- .infer_node_mapping(g, node_color, node_size, node_shape, layout)
   # A changing network is only treated as a diffusion when nodes actually
   # adopt; otherwise (e.g. `fict_potter`) it is rendered as a standard
   # changing network. TODO: revisit once diffusion is reworked in manynet.
@@ -11,7 +12,7 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
   } else {
     p <- .map_nodes(p, out)
     # Check legends
-    if (length(unique(out[["nsize"]])) > 1)
+    if (length(unique(out[["nsize"]])) > 1 && !out[["nsize_default"]])
       p <- p + ggplot2::guides(size = ggplot2::guide_legend(title = node_size))
     if (length(unique(out[["nshape"]])) > 1) 
       p <- p + ggplot2::guides(shape = ggplot2::guide_legend(
@@ -36,9 +37,16 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
 
 # Helper functions for .graph_nodes()
 
-.infer_node_mapping <- function(g, node_color, node_size, node_shape) {
+.infer_node_mapping <- function(g, node_color, node_size, node_shape,
+                                layout = NULL) {
   list("nshape" = .infer_nshape(g, node_shape),
-       "nsize" = .infer_nsize(g, node_size),
+       "nsize" = .infer_nsize(g, node_size, layout),
+       # A size the user asked for is mapped through aes(), so that it is
+       # rescaled and given a legend naming the attribute it came from. A
+       # default size is not: it varies only with how crowded the plot is,
+       # which is not something to put in a legend, and rescaling it would
+       # undo the very sizing it was calculated to give.
+       "nsize_default" = is.null(node_size),
        "ncolor" = .infer_ncolor(g, node_color))
 }
 
@@ -93,48 +101,34 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size) {
                     shape = ggplot2::guide_legend(order = 2))
 }
 
+# Each of the three node aesthetics is mapped through aes() when it varies
+# across nodes, so that ggplot2 scales it and gives it a legend, and passed as
+# a constant layer parameter when it does not. A default size is the exception:
+# it varies with how crowded each part of the plot is rather than with anything
+# about the nodes themselves, so it is passed as a parameter even when it
+# varies, which also keeps it clear of the rescaling in graph_nodes().
 .map_nodes <- function(p, out) {
-  if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & 
-      length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(fill = out[["ncolor"]], size = out[["nsize"]],
-                                     shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & 
-             length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]]), 
-                                     size = out[["nsize"]], shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & 
-             length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(size = out[["nsize"]]),
-                                     fill = out[["ncolor"]], shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) == 1 & 
-             length(out[["nshape"]]) > 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(shape = out[["nshape"]]),
-                                     fill = out[["ncolor"]], size = out[["nsize"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) > 1 & 
-             length(out[["nshape"]]) == 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]], 
-                                                  size = out[["nsize"]]),
-                                     shape = out[["nshape"]])
-  } else if (length(out[["ncolor"]]) > 1 & length(out[["nsize"]]) == 1 & 
-             length(out[["nshape"]]) > 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]], 
-                                                  shape = out[["nshape"]]),
-                                     size = out[["nsize"]])
-  } else if (length(out[["ncolor"]]) == 1 & length(out[["nsize"]]) > 1 & 
-             length(out[["nshape"]]) > 1) {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(size = out[["nsize"]], 
-                                                  shape = out[["nshape"]]),
-                                     fill = out[["ncolor"]])
-  } else {
-    p <- p + ggraph::geom_node_point(ggplot2::aes(fill = out[["ncolor"]],
-                                                  shape = out[["nshape"]],
-                                                  size = out[["nsize"]]))
+  # The expressions are quoted rather than evaluated so that
+  # do.call(aes, mapping) captures them as quosures resolved lazily against
+  # `out`, exactly as writing them literally here would.
+  keys <- c(ncolor = "fill", nshape = "shape", nsize = "size")
+  exprs <- list(ncolor = quote(out[["ncolor"]]),
+                nshape = quote(out[["nshape"]]),
+                nsize  = quote(out[["nsize"]]))
+  mapping <- list(); params <- list()
+  for (nm in names(keys)) {
+    varies <- length(out[[nm]]) > 1 &&
+      !(nm == "nsize" && isTRUE(out[["nsize_default"]]))
+    if (varies) mapping[[keys[[nm]]]] <- exprs[[nm]] else
+      params[[keys[[nm]]]] <- out[[nm]]
   }
-  p <- p + ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25, 
-                                                  3, 4, 8,
-                                                  10, 12, 9,
-                                                  13, 7, 11, 14))
-  p
+  args <- params
+  if (length(mapping)) args$mapping <- do.call(ggplot2::aes, mapping)
+  p + do.call(ggraph::geom_node_point, args) +
+    ggplot2::scale_shape_manual(values = c(21, 22, 24, 23, 25,
+                                           3, 4, 8,
+                                           10, 12, 9,
+                                           13, 7, 11, 14))
 }
 
 .node_adoption_time <- function(.data){
