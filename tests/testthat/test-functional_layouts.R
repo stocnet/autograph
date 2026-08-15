@@ -174,3 +174,21 @@ test_that("snapping still works on a two-mode network with a force layout", {
   # every node lands on its own grid point
   expect_false(any(duplicated(p$data[, c("x", "y")])))
 })
+
+test_that("snapping returns coordinates in the original node order (>= 10 nodes)", {
+  skip_on_cran()
+  # Regression: depth_first_recursive_search() sorts nodes by centroid distance
+  # internally, then must restore the input node order before returning, because
+  # graph_layout() assigns the result positionally. Ordering the row names
+  # lexicographically ("1","10","11",...,"2") scrambled coordinates across nodes
+  # for any network with 10+ nodes; they must be ordered numerically.
+  lo <- ggraph::create_layout(manynet::as_tidygraph(manynet::fict_lotr),
+                              "stress")
+  expect_true(nrow(lo) >= 10)
+  out <- depth_first_recursive_search(lo)
+  # returned rows line up with the input nodes, not a lexicographic shuffle
+  expect_identical(rownames(out), as.character(seq_len(nrow(out))))
+  # snapped positions track the pre-snap layout rather than being permuted
+  expect_gt(stats::cor(lo$x, out$x), 0.5)
+  expect_gt(stats::cor(lo$y, out$y), 0.5)
+})

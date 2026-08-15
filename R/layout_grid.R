@@ -36,7 +36,7 @@ depth_first_recursive_search <- function(layout) {
       changes[[2]]
     vacant_points <- vacant_points[-mindist, ]
   }
-  gridout[order(row.names(gridout)),] # reorder from centroid
+  gridout[order(as.integer(row.names(gridout))), ] # reorder from centroid
   # gridout
   # plot(gridout[order(row.names(gridout)),])
 }
