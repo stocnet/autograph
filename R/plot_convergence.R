@@ -45,18 +45,18 @@ plot.ag_conv <- function(x, ...){
 plot.traces.monan <- function(x, ...) {
   nParams <- length(x[[1]])
   nSims <- length(x[[2]][, 1])
-  dat <- x[[2]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
-    as.data.frame() %>% dplyr::select(sim, dplyr::everything())
+  dat <- x[[2]] |> dplyr::as_tibble() |> dplyr::mutate(sim = 1:dplyr::n()) |> 
+    as.data.frame() |> dplyr::select(sim, dplyr::everything())
   dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
                  direction = "long",
                  varying = list(colnames(dat)[-1]),
                  v.names = "value",
                  timevar = "name",
                  times = colnames(dat)[-1],
-                 idvar = "sim") %>% 
-    dplyr::tibble() %>% dplyr::arrange(sim)
-  # dat <- dat %>% dplyr::mutate(name = gsub("_","\n",name, fixed = TRUE))
-  # dat <- dat %>% dplyr::mutate(name = gsub(" ","\n",name, fixed = TRUE))
+                 idvar = "sim") |> 
+    dplyr::tibble() |> dplyr::arrange(sim)
+  # dat <- dat |> dplyr::mutate(name = gsub("_","\n",name, fixed = TRUE))
+  # dat <- dat |> dplyr::mutate(name = gsub(" ","\n",name, fixed = TRUE))
   class(dat) <- c("ag_conv", class(dat))
   plot.ag_conv(dat)
 }
@@ -68,7 +68,7 @@ plot.traces.monan <- function(x, ...) {
 #' plot(ergm_res)
 #' @export
 plot.ergm <- function(x, ...) {
-  dat <- x$sample[[1]] %>% dplyr::as_tibble() %>% dplyr::mutate(sim = 1:dplyr::n()) %>% 
+  dat <- x$sample[[1]] |> dplyr::as_tibble() |> dplyr::mutate(sim = 1:dplyr::n()) |> 
     as.data.frame()
   dat <- stats::reshape(data = dat, # tidyr::pivot_longer replacement
                         direction = "long",
@@ -76,8 +76,8 @@ plot.ergm <- function(x, ...) {
                         v.names = "value",
                         timevar = "name",
                         times = colnames(dat)[-ncol(dat)],
-                        idvar = "sim") %>% 
-    dplyr::tibble() %>% dplyr::arrange(sim)
+                        idvar = "sim") |> 
+    dplyr::tibble() |> dplyr::arrange(sim)
   class(dat) <- c("ag_conv", class(dat))
   plot.ag_conv(dat)
 }

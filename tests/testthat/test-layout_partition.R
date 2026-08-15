@@ -13,16 +13,16 @@ test_that("concentric and circular layouts graph correctly", {
 
 test_that("concentric layout works when node names are missing", {
   skip_on_cran()
-  llabel <- ison_southern_women %>%
-    mutate(name = ifelse(type == TRUE, "", name)) %>%
+  llabel <- ison_southern_women |>
+    mutate(name = ifelse(type == TRUE, "", name)) |>
     graphr(layout = "concentric")
   expect_true(any(llabel$data$name == ""))
 })
 
 test_that("hierarchy and lineage layouts graph correctly", {
   skip_on_cran()
-  test_lin <- ison_adolescents %>% 
-    mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) %>%
+  test_lin <- ison_adolescents |> 
+    mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
     graphr(layout = "lineage", rank = "year")
   test_hie <- graphr(ison_southern_women,
                      layout = "hierarchy", center = "events")
@@ -51,8 +51,8 @@ test_that("hierarchy and lineage layouts graph correctly", {
 
 test_that("hierarchy layout works for two mode networks", {
   skip_on_cran()
-  tm <- ison_brandes %>%
-    mutate(type = twomode_type, name = LETTERS[1:11]) %>%
+  tm <- ison_brandes |>
+    mutate(type = twomode_type, name = LETTERS[1:11]) |>
     graphr()
   expect_length(unique(tm$data[tm$data$type == TRUE, "y"]), 1)
   expect_length(unique(tm$data[tm$data$type == FALSE, "y"]), 1)

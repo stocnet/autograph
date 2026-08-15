@@ -135,8 +135,8 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
   
   if(inherits(.data, "diff_model")){
     net <- attr(.data, "network") 
-    out <- summary(.data) %>% dplyr::filter(event == "I") %>% 
-      dplyr::distinct(nodes, .keep_all = TRUE) %>% 
+    out <- summary(.data) |> dplyr::filter(event == "I") |> 
+      dplyr::distinct(nodes, .keep_all = TRUE) |> 
       dplyr::select(nodes,t)
     if(!manynet::is_labelled(net))
       out <- dplyr::arrange(out, nodes) else if (is.numeric(out$nodes))
@@ -152,8 +152,8 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
     }
   } else {
     net <- .data
-    out <- manynet::as_changelist(.data) %>% dplyr::filter(value == "I") %>% 
-      dplyr::distinct(node, .keep_all = TRUE) %>% 
+    out <- manynet::as_changelist(.data) |> dplyr::filter(value == "I") |> 
+      dplyr::distinct(node, .keep_all = TRUE) |> 
       dplyr::select(node,time)
     if(!manynet::is_labelled(net))
       out <- dplyr::arrange(out, node) else if (is.numeric(out$node))

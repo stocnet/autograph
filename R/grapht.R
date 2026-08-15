@@ -105,7 +105,7 @@
 #' @importFrom igraph set_vertex_attr graph_from_data_frame delete_graph_attr
 #' @importFrom ggplot2 ggplot geom_segment geom_point geom_text coord_fixed .data
 #' @importFrom ggplot2 scale_alpha_identity scale_linetype_identity theme_void 
-#' @importFrom dplyr mutate select distinct left_join %>%
+#' @importFrom dplyr mutate select distinct left_join
 #' @source https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with-gganimate/
 #' @return A `{ggplot2}`-compatible object with `{gganimate}` animation layers.
 #'   This object can be extended with additional `{ggplot2}` layers

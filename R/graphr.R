@@ -159,10 +159,10 @@
 #' @importFrom ggplot2 aes arrow unit scale_color_brewer scale_fill_brewer
 #' @examples
 #' graphr(ison_adolescents)
-#' ison_adolescents %>%
+#' ison_adolescents |>
 #'   mutate(color = rep(c("introvert","extrovert"), times = 4),
-#'          size = ifelse(netrics::node_is_cutpoint(ison_adolescents), 6, 3)) %>%
-#'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) %>%
+#'          size = ifelse(netrics::node_is_cutpoint(ison_adolescents), 6, 3)) |>
+#'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
 #'   graphr(node_color = "color", node_size = "size",
 #'          edge_size = 1.5, edge_color = "ecolor")
 #' graphr(ison_southern_women, labels = TRUE, label_dist = 10)

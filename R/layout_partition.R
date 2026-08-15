@@ -270,9 +270,9 @@ layout_tbl_graph_multilevel <- layout_multilevel
 
 #' @rdname layout_partition
 #' @examples
-#' # ison_adolescents %>%
+#' # ison_adolescents |>
 #' #   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2),
-#' #          cut = node_is_cutpoint(ison_adolescents)) %>%
+#' #          cut = node_is_cutpoint(ison_adolescents)) |>
 #' #   graphr(layout = "lineage", rank = "year", node_color = "cut",
 #' #              node_size = migraph::node_degree(ison_adolescents)*10)
 #' @export

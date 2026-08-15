@@ -155,16 +155,16 @@ plot.node_member <- function(x, ...) {
 
 # #' @export
 # plot.node_members <- function(x, ...) {
-#   df <- x %>% dplyr::mutate(wave = dplyr::row_number())
-#   df_long <- df %>%
+#   df <- x |> dplyr::mutate(wave = dplyr::row_number())
+#   df_long <- df |>
 #     tidyr::pivot_longer(-wave, names_to = "person", values_to = "group")
-# group_counts <- df_long %>%
-#   dplyr::group_by(wave, group) %>%
+# group_counts <- df_long |>
+#   dplyr::group_by(wave, group) |>
 #   dplyr::summarise(n = dplyr::n(), .groups = "drop")
 #
 # # Step 1: Reshape to wide format: one row per person, one column per wave
-# df_wide <- df_long %>%
-#   dplyr::mutate(wave = paste0("wave", wave)) %>%
+# df_wide <- df_long |>
+#   dplyr::mutate(wave = paste0("wave", wave)) |>
 #   tidyr::pivot_wider(names_from = wave, values_from = group)
 #
 # # Step 2: Create a vector of wave columns for use as axes
@@ -258,7 +258,7 @@ plot.matrix <- function(x, ..., membership = NULL) {
                            manynet::node_names(blocked_data))
   all_nodes <- data.frame(from = all_nodes$Var1, to = all_nodes$Var2,
                           weight = 0)
-  plot_data <- rbind(plot_data, all_nodes) %>% 
+  plot_data <- rbind(plot_data, all_nodes) |> 
     dplyr::distinct(from, to, .keep_all = TRUE)
   g <- ggplot2::ggplot(plot_data, ggplot2::aes(to, from)) +
     ggplot2::theme_grey(base_size = 9) +

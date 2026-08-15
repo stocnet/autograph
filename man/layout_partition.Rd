@@ -165,9 +165,9 @@ The "lineage" layout ranks nodes in Y axis according to values.
 # with a two-mode layer of their affiliations, so it is laid out this way
 # by default; the levels need not be named.
 graphr(manynet::fict_marvel, labels = FALSE)
-# ison_adolescents \%>\%
+# ison_adolescents |>
 #   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2),
-#          cut = node_is_cutpoint(ison_adolescents)) \%>\%
+#          cut = node_is_cutpoint(ison_adolescents)) |>
 #   graphr(layout = "lineage", rank = "year", node_color = "cut",
 #              node_size = migraph::node_degree(ison_adolescents)*10)
 #graphr(ison_southern_women, layout = "hierarchy", center = "events",

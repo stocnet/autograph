@@ -68,23 +68,23 @@ plot.ag_gof <- function(x, ...){
   obs <- x[[1]]
   sims <- x[[2]]
   if(all(!is.na(suppressWarnings(as.numeric(sims$name))))){
-    obs <- obs %>% dplyr::mutate(name = .to_factor(name))
-    sims <- sims %>% dplyr::mutate(name = .to_factor(name))
+    obs <- obs |> dplyr::mutate(name = .to_factor(name))
+    sims <- sims |> dplyr::mutate(name = .to_factor(name))
   }
   main <- x[[3]]
   p_value <- x[[4]]
   
   # Compute quantiles for each x
   if("ego" %in% names(obs)) {
-    bounds <- sims %>%
-      dplyr::group_by(name, ego) %>%
+    bounds <- sims |>
+      dplyr::group_by(name, ego) |>
       dplyr::summarise(
         q05 = stats::quantile(value, 0.05),
         q95 = stats::quantile(value, 0.95),
         .groups = "drop")
     } else {
-    bounds <- sims %>%
-      dplyr::group_by(name) %>%
+    bounds <- sims |>
+      dplyr::group_by(name) |>
       dplyr::summarise(
         q05 = stats::quantile(value, 0.05),
         q95 = stats::quantile(value, 0.95),
@@ -157,10 +157,10 @@ plot.gof.stats.monan <- function(x, cumulative = FALSE, ...) {
   p_value <- NULL
   
   if(cumulative){
-    sims <- sims %>% dplyr::group_by(sim) %>%
-      dplyr::mutate(value = cumsum(.data$value)) %>%
+    sims <- sims |> dplyr::group_by(sim) |>
+      dplyr::mutate(value = cumsum(.data$value)) |>
       dplyr::ungroup()
-    obs <- obs %>% 
+    obs <- obs |> 
       mutate(value = cumsum(.data$value))
   }
   
@@ -210,19 +210,19 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
   itns <- nrow(sims)
   n.obs <- nrow(obs)
   sims <- sims[,!no_vary]
-  sims <- as.data.frame(sims) %>% dplyr::mutate(sim = 1:nrow(sims))
+  sims <- as.data.frame(sims) |> dplyr::mutate(sim = 1:nrow(sims))
   sims <- stats::reshape(sims, varying = list(colnames(sims)[-ncol(sims)]), 
                          v.names = "value", timevar = "name", times = colnames(sims)[-ncol(sims)],
-                         idvar = "sim", direction = "long") %>% 
-    dplyr::tibble() %>% dplyr::arrange(sim)
+                         idvar = "sim", direction = "long") |> 
+    dplyr::tibble() |> dplyr::arrange(sim)
   obs <- obs[!no_vary]
   obs <- data.frame(name = sims$name[!duplicated(sims$name)], value = obs)
   
   # if(!cumulative){
-  #   sims <- sims %>% dplyr::group_by(sim) %>%
-  #     dplyr::mutate(value = c(.data$value[1], diff(.data$value))) %>%
+  #   sims <- sims |> dplyr::group_by(sim) |>
+  #     dplyr::mutate(value = c(.data$value[1], diff(.data$value))) |>
   #     dplyr::ungroup()
-  #   obs <- obs %>% 
+  #   obs <- obs |> 
   #     mutate(value = c(.data$value[1], diff(.data$value)))
   # }
   
@@ -230,11 +230,11 @@ plot.sienaGOF <- function(x, cumulative = FALSE, ...){
     if(!all(nchar(obs[,"name"])==2))
       manynet::snet_abort("Ego-alter GOF statistic names should be two characters long,",
       " but some are not. Please check the number or names in the GOF object.")
-    obs <- obs %>% dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
-                                 name = substr(name, 2, 2)) %>% 
+    obs <- obs |> dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
+                                 name = substr(name, 2, 2)) |> 
       dplyr::mutate(ego = .to_factor(ego), name = .to_factor(name))
-    sims <- sims %>% dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
-                                   name = substr(name, 2, 2)) %>% 
+    sims <- sims |> dplyr::mutate(ego = paste("Ego", substr(name, 1, 1)), 
+                                   name = substr(name, 2, 2)) |> 
       dplyr::mutate(ego = .to_factor(ego), name = .to_factor(name))
   }
   
@@ -298,7 +298,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
   
   obs <- data.frame(name = names(x[[paste0("obs.",statistic)]]),
                     value = x[[paste0("obs.",statistic)]],
-                    stringsAsFactors = FALSE) %>% 
+                    stringsAsFactors = FALSE) |> 
     dplyr::tibble()
   if(nrow(obs) == 0){
     manynet::snet_abort("Note: {statdescription} {.code {statistic}} is not available in this GOF object.")
@@ -313,7 +313,7 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
     obs <- obs[!no_vary, ]
     .inform_no_variance(statkeys)
   }
-  obs <- obs %>% dplyr::mutate(name = .to_factor(name))
+  obs <- obs |> dplyr::mutate(name = .to_factor(name))
   sims <- as.data.frame(simsMat, check.names = FALSE)
   sims$sim <- 1:nrow(sims)
   sims <- stats::reshape(sims,
@@ -322,18 +322,18 @@ plot.gof.ergm <- function(x, cumulative = FALSE,
                  v.names = "value",
                  timevar = "name",
                  times = colnames(sims)[-ncol(sims)],
-                 idvar = "sim") %>% 
-    dplyr::tibble() %>% 
-    dplyr::mutate(name = .to_factor(name)) %>% 
+                 idvar = "sim") |> 
+    dplyr::tibble() |> 
+    dplyr::mutate(name = .to_factor(name)) |> 
     dplyr::arrange(sim)
   
   p_value <- NULL
   
   if(cumulative){
-    sims <- sims %>% dplyr::group_by(sim) %>%
-      dplyr::mutate(value = cumsum(.data$value)) %>%
+    sims <- sims |> dplyr::group_by(sim) |>
+      dplyr::mutate(value = cumsum(.data$value)) |>
       dplyr::ungroup()
-    obs <- obs %>% 
+    obs <- obs |> 
       mutate(value = cumsum(.data$value))
   }
 

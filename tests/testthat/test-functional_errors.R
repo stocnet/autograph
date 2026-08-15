@@ -149,7 +149,7 @@ test_that("graphr() explains that a layout is named, not passed as a function", 
 test_that("graphr() validates isolates whether or not there are isolates", {
   # `match.arg()` used to sit inside .infer_isolates(), which does not always
   # force its argument, so this was caught or ignored depending on the network.
-  with_isolates <- manynet::create_empty(4) %>%
+  with_isolates <- manynet::create_empty(4) |>
     manynet::add_ties(c(1, 2))
   expect_error(graphr(manynet::ison_adolescents, isolates = "drop"), "isolates")
   expect_error(graphr(with_isolates, isolates = "drop"), "isolates")

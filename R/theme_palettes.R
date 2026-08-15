@@ -115,7 +115,7 @@ ggpizza <- function(colors, init.angle = 105, cex = 4, labcol = NULL) {
       color = colors[i],
       group = i
     )
-  }) %>% dplyr::bind_rows()
+  }) |> dplyr::bind_rows()
   
   # Label positions
   mids <- (angles[-1] + angles[-(n+1)]) / 2
