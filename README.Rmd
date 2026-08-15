@@ -1,5 +1,7 @@
 ---
-output: github_document
+output:
+  github_document:
+    html_preview: false
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -22,9 +24,41 @@ list_data <- function(string){
 # Several README figures are hosted on jameshollway.com rather than in man/figures,
 # to keep the package tarball small. The chunks below regenerate them in place,
 # but only where that site's checkout is present (i.e. not on CI or CRAN).
-site_dir <- path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/manynet")
+# Set AUTOGRAPH_SITE_DIR to point at your own checkout of that site.
+site_dir <- Sys.getenv(
+  "AUTOGRAPH_SITE_DIR",
+  unset = path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/manynet"))
 site_figure <- function(name) file.path(site_dir, name)
 have_site <- dir.exists(site_dir)
+if (!have_site) {
+  # written straight to stderr, since this chunk's messages are not shown
+  cat("NOTE: no jameshollway.com checkout at ", site_dir, ".\n",
+      "  Hosted figures were not regenerated, and README.md keeps pointing at\n",
+      "  the published copies, so the knit is still correct. Set AUTOGRAPH_SITE_DIR\n",
+      "  or knit from a machine with that checkout to refresh them, and to see\n",
+      "  whether the defaults have drifted.\n", sep = "", file = stderr())
+}
+# Comparison figures pair a base-graphics call against a ggplot, so they are
+# written with an explicit device rather than ggsave(). Both plots are passed
+# unevaluated and forced inside, once the device and viewport are set up.
+# Knitting regenerates each figure from the current defaults, so that drift
+# shows up in the published image even though the chunks themselves are hidden.
+library(igraph)
+library(gridBase)
+library(grid)
+compare_figure <- function(name, base_plot, gg_plot,
+                           mai = c(0, 0, 0.5, 0),
+                           width = 12, height = 4, res = 250) {
+  grDevices::png(site_figure(name),
+                 width = width, height = height, units = "in", res = res)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  par(mfrow = c(1, 2), mai = mai)
+  base_plot                       # forced here, into the left panel
+  plot.new()                      # the ggplot is drawn over the right panel
+  pushViewport(baseViewports()$figure)
+  print(gg_plot, vp = plotViewport(c(1.8, 1, 0, 1)))
+  invisible(name)
+}
 ```
 
 # autograph <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
@@ -94,27 +128,13 @@ Compare the output from `{autograph}` with a similar default from `{igraph}`:
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-```{r layout-comparison, echo = FALSE, message=FALSE, eval = have_site, fig.show="hide"}
-library(autograph)
-library(igraph)
-library(gridBase)
-library(grid)
-
-# base graphics, so written with an explicit device rather than ggsave()
-png(site_figure("README-layout-comparison-1.png"),
-    width = 12, height = 4, units = "in", res = 250)
-
-par(mfrow=c(1, 2), mai = c(0,0,0.5,0))
-plot(as_igraph(ison_southern_women), layout = layout_as_bipartite, main = "{igraph} bipartite")
-## the last one is the current plot
-plot.new()              ## suggested by @Josh
-vps <- baseViewports()
-pushViewport(vps$figure) ##   I am in the space of the autocorrelation plot
-vp1 <-plotViewport(c(1.8,1,0,1)) ## create new vp with margins, you play with this values
-p <- graphr(ison_southern_women) + ggtitle("{autograph} twomode") + guides(shape = "none")
-print(p,vp = vp1)
-
-dev.off()
+```{r layout-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-layout-comparison-1.png",
+  plot(as_igraph(ison_southern_women), layout = layout_as_bipartite,
+       main = "{igraph} bipartite"),
+  graphr(ison_southern_women) + ggtitle("{autograph} twomode") +
+    guides(shape = "none"))
 ```
 
 `{igraph}` requires the bipartite layout to be specified, 
@@ -126,6 +146,30 @@ and uses a bipartite layout by default.
 It also recognises that the network contains names for the nodes and
 prints them vertically so that they are legible in this layout.
 Other 'clever' features include automatic node sizing and more.
+
+This inference matters for more than tidiness.
+Where a default does not recognise a property of the network,
+that property is usually dropped silently.
+Compare the same signed network drawn by each package:
+
+<img src="https://www.jameshollway.com/post/manynet/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
+
+```{r signed-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-signed-comparison-1.png",
+  plot(as_igraph(irps_tribes), main = "{igraph} default"),
+  graphr(irps_tribes) + ggtitle("{autograph} signed"))
+```
+
+`irps_tribes` records both alliance and antagonism between sixteen tribes,
+in equal number.
+`{igraph}` draws all of these ties identically,
+so the distinction that motivates the data is not visible.
+`graphr()` recognises the network as signed and
+maps the sign to both colour and linetype, with a legend.
+The same applies to weights, to self-ties, and to direction:
+`graphr()` reads these from the network rather than
+requiring you to know to ask for them.
 
 ### More options
 
@@ -178,6 +222,14 @@ is used to graph multiple networks together.
 This can be useful for ego networks or network panels.
 `{patchwork}` is used to help arrange individual plots together,
 and is used throughout the package to help arrange plots together informatively.
+
+`graphs()` computes one layout and holds it across every panel.
+Plotting each network separately gives each panel its own layout,
+so a node can appear in a different position in each panel
+even where nothing about that node has changed.
+Holding the layout constant makes the panels comparable,
+so that what moves on the page is what changed in the data.
+`graphs()` also collects a single legend for the whole set.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
@@ -235,7 +287,29 @@ To keep things simple, all users need to remember is a single, generic function:
 `plot()`.
 Method dispatching takes care of the rest,
 so you can concentrate on exploring and interpreting your results.
-Here are some examples, using goodness-of-fit results from fitting a SAOM
+
+Dispatching works because the results carry a class.
+`igraph::degree()` and `sna::degree()` each return a bare numeric vector,
+so `plot()` falls back to a scatterplot of the values against their index,
+and that index is not meaningful.
+`netrics::node_by_degree()` returns a `node_measure`,
+which `{autograph}` plots as a themed distribution:
+
+<img src="https://www.jameshollway.com/post/manynet/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
+
+```{r result-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-result-comparison-1.png",
+  plot(igraph::degree(as_igraph(ison_karateka)),
+       ylab = "igraph::degree(ison_karateka)",
+       main = "plot() of a numeric vector"),
+  plot(netrics::node_by_degree(ison_karateka)) +
+    ggtitle("plot() of a node_measure"),
+  mai = c(0.8, 0.8, 0.5, 0.2))
+```
+
+The same holds for the other result classes.
+Here are some further examples, using goodness-of-fit results from fitting a SAOM
 in `{RSiena}` and an ERGM in `{ergm}`. 
 (Note that neither the data nor the model are similar;
 this is just for illustrative purposes.)

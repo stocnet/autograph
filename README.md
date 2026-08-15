@@ -75,9 +75,6 @@ Compare the output from `{autograph}` with a similar default from
 
 <img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-    #> quartz_off_screen 
-    #>                 2
-
 `{igraph}` requires the bipartite layout to be specified, has cumbersome
 node size defaults for all but the smallest graphs, and labels also very
 often need resizing and adjustment to avoid overlap. Getting this
@@ -87,6 +84,20 @@ bipartite layout by default. It also recognises that the network
 contains names for the nodes and prints them vertically so that they are
 legible in this layout. Other ‘clever’ features include automatic node
 sizing and more.
+
+This inference matters for more than tidiness. Where a default does not
+recognise a property of the network, that property is usually dropped
+silently. Compare the same signed network drawn by each package:
+
+<img src="https://www.jameshollway.com/post/manynet/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
+
+`irps_tribes` records both alliance and antagonism between sixteen
+tribes, in equal number. `{igraph}` draws all of these ties identically,
+so the distinction that motivates the data is not visible. `graphr()`
+recognises the network as signed and maps the sign to both colour and
+linetype, with a legend. The same applies to weights, to self-ties, and
+to direction: `graphr()` reads these from the network rather than
+requiring you to know to ask for them.
 
 ### More options
 
@@ -122,6 +133,13 @@ multiple networks together. This can be useful for ego networks or
 network panels. `{patchwork}` is used to help arrange individual plots
 together, and is used throughout the package to help arrange plots
 together informatively.
+
+`graphs()` computes one layout and holds it across every panel. Plotting
+each network separately gives each panel its own layout, so a node can
+appear in a different position in each panel even where nothing about
+that node has changed. Holding the layout constant makes the panels
+comparable, so that what moves on the page is what changed in the data.
+`graphs()` also collects a single legend for the whole set.
 
 <img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
@@ -162,10 +180,20 @@ also provides a function for plotting results from the analysis or
 modelling of those networks. To keep things simple, all users need to
 remember is a single, generic function: `plot()`. Method dispatching
 takes care of the rest, so you can concentrate on exploring and
-interpreting your results. Here are some examples, using goodness-of-fit
-results from fitting a SAOM in `{RSiena}` and an ERGM in `{ergm}`. (Note
-that neither the data nor the model are similar; this is just for
-illustrative purposes.)
+interpreting your results.
+
+Dispatching works because the results carry a class. `igraph::degree()`
+and `sna::degree()` each return a bare numeric vector, so `plot()` falls
+back to a scatterplot of the values against their index, and that index
+is not meaningful. `netrics::node_by_degree()` returns a `node_measure`,
+which `{autograph}` plots as a themed distribution:
+
+<img src="https://www.jameshollway.com/post/manynet/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
+
+The same holds for the other result classes. Here are some further
+examples, using goodness-of-fit results from fitting a SAOM in
+`{RSiena}` and an ERGM in `{ergm}`. (Note that neither the data nor the
+model are similar; this is just for illustrative purposes.)
 
 <img src="man/figures/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" />
 
