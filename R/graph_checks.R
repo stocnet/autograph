@@ -362,3 +362,88 @@
                   error = function(e) character())
   sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", nms, value = TRUE))
 }
+
+# Layout applicability ----
+
+# Several layouts only make sense for particular kinds of network: a ladder
+# pairs two equally sized modes off, the configurational layouts place an exact
+# number of nodes at fixed coordinates, and a layered layout ranks nodes by
+# path depth. Given anything else they used to either draw a meaningless plot
+# (railway, alluvial and hierarchy on one-mode input) or fail somewhere
+# downstream with a message about the internals ("replacement has 5 rows, data
+# has 8"). Declaring the requirement here means graphr() can say what it needs
+# and fall back to a layout that works, and the test suite can read the same
+# table rather than keeping its own copy of this knowledge.
+#
+# `check` is a predicate over manynet's marks; `need` completes the sentence
+# "The {layout} layout needs ...". Layouts with no entry are unconstrained.
+.layout_requirements <- function() {
+  n_nodes <- function(g) as.integer(manynet::net_nodes(g))
+  exactly <- function(n) list(check = function(g, ...) n_nodes(g) == n,
+                              need = paste("a network of exactly", n, "nodes"))
+  twomode <- list(check = function(g, ...) manynet::is_twomode(g),
+                  need = "a two-mode (bipartite) network")
+  list(
+    alluvial   = twomode,
+    railway    = twomode,
+    hierarchy  = twomode,
+    # Being two-mode is not sufficient: manynet::to_matching() cannot pair off
+    # every two-mode network, and where it fails it does so with a message
+    # about differing numbers of rows. Probing it is cheap for the sizes these
+    # layouts are used at, and a plot beats that error. Note the network need
+    # not have a *perfect* matching -- ison_southern_women has none but lays
+    # out fine -- so is_perfect_matching() is not the test.
+    matching = list(
+      check = function(g, ...) manynet::is_twomode(g) &&
+        !inherits(tryCatch(manynet::to_matching(g), error = function(e) e),
+                  "error"),
+      need = "a two-mode network that a matching can be found for"),
+    ladder = list(
+      check = function(g, ...) manynet::is_twomode(g) &&
+        length(unique(table(manynet::node_is_mode(g)))) == 1L,
+      need = "a two-mode network whose two modes are equally sized"),
+    layered = list(
+      check = function(g, ...) manynet::is_directed(g) && manynet::is_acyclic(g),
+      need = "a directed acyclic network"),
+    valence = list(
+      check = function(g, ...) manynet::is_signed(g),
+      need = "a signed network"),
+    # `concentric` and `multilevel` are deliberately absent. They also need
+    # more than a bare one-mode network, but unlike the layouts above the user
+    # can supply what is missing -- a `membership` or a `level` -- and
+    # .abort_layout_arg() already says exactly how. Substituting would replace
+    # that instruction with a worse message. Substitute only where no argument
+    # could rescue the layout; where one could, ask for it.
+    configuration = list(
+      check = function(g, ...) n_nodes(g) >= 2L && n_nodes(g) <= 6L,
+      need = "a network of between 2 and 6 nodes"),
+    dyad = exactly(2), triad = exactly(3), tetrad = exactly(4),
+    pentad = exactly(5), hexad = exactly(6)
+  )
+}
+
+# Does `layout` apply to `g`? TRUE when nothing is declared for it.
+.layout_applies <- function(g, layout, ...) {
+  req <- .layout_requirements()[[layout]]
+  if (is.null(req)) return(TRUE)
+  isTRUE(tryCatch(req$check(g, ...), error = function(e) FALSE))
+}
+
+# Return the layout to actually use. Where the requested one does not apply,
+# fall back to whatever graphr() would have chosen unasked, and say so, rather
+# than failing downstream or drawing something meaningless.
+.check_layout_applies <- function(g, layout, ...) {
+  if (is.null(layout) || !is.character(layout) || length(layout) != 1L)
+    return(layout)
+  if (.layout_applies(g, layout, ...)) return(layout)
+  need <- .layout_requirements()[[layout]]$need
+  alt <- .infer_layout(g, NULL)
+  # The inferred fallback has its own requirement (e.g. "hierarchy" needs two
+  # modes), so guard against substituting one unusable layout for another.
+  if (identical(alt, layout) || !.layout_applies(g, alt, ...)) alt <- "stress"
+  manynet::snet_info(
+    "The {.val {layout}} layout needs {need}, so {.val {alt}} is used instead.",
+    "Use {.code layout = \"{alt}\"} to choose this explicitly,",
+    "or see {.fn graphr} for the other layouts available.")
+  alt
+}

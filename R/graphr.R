@@ -228,6 +228,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   }
 
   layout <- .infer_layout(g, .check_layout(layout))
+  # Substituted here rather than in graph_layout(), since `layout` is also
+  # passed to graph_edges(), graph_nodes() and graph_labels(), which would
+  # otherwise style the plot for a layout that was not the one drawn.
+  layout <- .check_layout_applies(g, layout, ...)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {

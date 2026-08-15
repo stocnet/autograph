@@ -91,3 +91,25 @@ ag_fixtures <- local({
   )
 })
 
+# The candidate pool the layout audit selects from. ag_fixtures covers the
+# formats, but several layouts are declared (in .layout_requirements(), see
+# R/graph_checks.R) to need a particular size or shape that the grid has no
+# example of: the configurational layouts want exactly 2-6 nodes, and a ladder
+# wants two equally sized modes. Adding those here rather than pinning a
+# network per layout in the test means the audit picks its own fixtures, and a
+# new layout needs no test change at all.
+ag_layout_pool <- c(ag_fixtures, local({
+  set.seed(1234)
+  list(
+    dyadic     = manynet::create_ring(2),
+    triadic    = manynet::create_ring(3),
+    tetradic   = manynet::create_ring(4),
+    pentadic   = manynet::create_ring(5),
+    hexadic    = manynet::create_ring(6),
+    # Two-mode sizes are given as a vector; ison_southern_women is 18/14, so
+    # the pool needs an equally sized pair for the ladder layout
+    balanced   = manynet::create_ring(c(4, 4)),
+    acyclic    = manynet::create_tree(8, directed = TRUE)
+  )
+}))
+

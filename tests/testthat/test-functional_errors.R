@@ -25,12 +25,11 @@ test_that("graphr() handles degenerate node counts", {
   expect_buildable(graphr(manynet::create_empty(0)))
   expect_buildable(graphr(manynet::create_empty(2)))
 
-  # KNOWN GAP: a single-node network errors with "invalid indexing" from inside
-  # the layout code -- note that both 0 and 2 nodes work, so this is an
-  # off-by-one in the layout path rather than an unsupported case. It should
-  # draw one isolate. Pinned here so the crash is documented and regression-
-  # tested; tighten to expect_buildable() once fixed.
-  expect_error(graphr(manynet::create_empty(1)), "invalid indexing")
+  # A single-node network used to error with "invalid indexing" from inside the
+  # layout code. It now draws: the default layout for a network this small is
+  # "configuration", which declares that it needs 2-6 nodes, so one node falls
+  # back to "stress" instead of reaching the off-by-one.
+  expect_buildable(graphr(manynet::create_empty(1)))
 })
 
 test_that("graphr() rejects a nonexistent node attribute name", {

@@ -56,6 +56,14 @@ layout_tbl_graph_layered <- function(.data,
     current_layer <- current_layer + 1
   }
   
+  # The topological sort only ranks nodes it can reach, so any node whose
+  # in-degree never falls to zero -- one caught in a cycle, say -- keeps the NA
+  # it was initialised with. Those NAs used to travel all the way out as NA
+  # coordinates and fail at draw time with "missing value where TRUE/FALSE
+  # needed". Put them in a layer of their own below the ranked nodes instead,
+  # so the layout is defined for every node it was given.
+  if (anyNA(layer)) layer[is.na(layer)] <- current_layer
+
   coords <- data.frame(name = names(layer), layer = layer, stringsAsFactors = FALSE)
   layer_map <- split(coords$name, coords$layer)
   

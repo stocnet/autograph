@@ -125,7 +125,6 @@ layout_concentric <- function(.data, membership,
         if(ncol(lo) >= 3) sort(lo[lo[,2] == x,])[,3] 
         else sort(lo[lo[,2] == x,1])) 
     } else order.values <- membership[order(sapply(membership, length))]
-    # order.values <- getNNvec(.data, members)
   }
   res <- matrix(NA, nrow = length(all_n), ncol = 2)
   for (k in seq_along(membership)) {
@@ -567,39 +566,6 @@ to_list <- function(members) {
 }
 
 #' @importFrom igraph degree
-getNNvec <- function(.data, members){
-  lapply(members, function(circle){
-    diss <- 1 - stats::cor(manynet::to_multilevel(manynet::as_matrix(.data))[, circle])
-    diag(diss) <- NA
-    if(manynet::is_labelled(.data))
-      starts <- names(sort(igraph::degree(.data)[circle], decreasing = TRUE)[1])
-    else starts <- paste0("V",1:manynet::net_nodes(.data))[sort(igraph::degree(.data)[circle], 
-                                                       decreasing = TRUE)[1]]
-    if(length(circle)>1)
-      starts <- c(starts, names(which.min(diss[starts,])))
-    out <- starts
-    if(length(circle)>2){
-      for(i in 1:(length(circle)-2)){
-        diss <- diss[,!colnames(diss) %in% starts]
-        if(is.matrix(diss)){
-          side <- names(which.min(apply(diss[starts,], 1, min, na.rm = TRUE)))
-          new <- names(which.min(diss[side,]))
-        } else {
-          side <- names(which.min(diss[starts]))
-          new <- setdiff(circle,out)
-        }
-        if(side == out[1]){
-          out <- c(new, out)
-          starts <- c(new, starts[2])
-        } else {
-          out <- c(out, new)
-          starts <- c(starts[1], new)
-        }
-      }
-    }
-    out
-  })
-}
 
 getCoordinates <- function(x, r) {
   l <- length(x)
