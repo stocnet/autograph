@@ -19,9 +19,11 @@
 #'   intervals that took no part, which on a rate or REM fit are the
 #'   right-censored ones.
 #' @name plot_adequacy
-#' @param x An object of class `diagnose_outliers`, `diagnose_changepoints`,
-#'   `margin_table`, `test_gof`, `test_time` or `diagnose_onset`, as returned
-#'   by the goldfish functions of the same names.
+#' @param x An object of class `goldfishOutliers`, `goldfishChangepoints`,
+#'   `goldfishMargins`, `goldfishGOF`, `goldfishTimeTest` or `goldfishOnset`,
+#'   as returned by `diagnose_outliers()`, `diagnose_changepoints()`,
+#'   `margin_table()`, `test_gof()`, `test_time()` and `diagnose_onset()` in
+#'   goldfish.
 #' @param ... Additional plotting parameters, currently unused.
 #' @param page Which page to draw, for the per-term figures. `NULL` (the
 #'   default) draws every panel in one figure, exactly as before. A number
@@ -55,7 +57,7 @@ gf_term_subtitle <- function(params) {
 #' @examples
 #' plot(goldfish_outliers)
 #' @export
-plot.diagnose_outliers <- function(x, ...) {
+plot.goldfishOutliers <- function(x, ...) {
   params <- gf_meta(x, "params")
   flagged <- !is.na(x$outlier) & x$outlier
   if (!any(flagged)) {
@@ -110,7 +112,7 @@ gf_facet_processes <- function(p, data) {
 #' @examples
 #' plot(goldfish_changepoints)
 #' @export
-plot.diagnose_changepoints <- function(x, ...) {
+plot.goldfishChangepoints <- function(x, ...) {
   params <- gf_meta(x, "params")
   breaks <- x$time[!is.na(x$cpt) & x$cpt]
   if (length(breaks) == 0) {
@@ -149,7 +151,7 @@ plot.diagnose_changepoints <- function(x, ...) {
 
 #' @rdname plot_adequacy
 #' @details
-#'   `plot.margin_table()` shows each actor's observed activity against what
+#'   `plot.goldfishMargins()` shows each actor's observed activity against what
 #'   the model expected of them. Which comparison it draws follows the scales
 #'   the fit's model class defines, which the object records: where a
 #'   compensator is defined (the exact-time sub-models) the difference
@@ -172,7 +174,7 @@ plot.diagnose_changepoints <- function(x, ...) {
 #' @examples
 #' plot(goldfish_margins)
 #' @export
-plot.margin_table <- function(x, ..., top = 25) {
+plot.goldfishMargins <- function(x, ..., top = 25) {
   scales <- gf_meta(x, "context")$defined_scales
   martingale <- "expected_count" %in% scales
   data <- as.data.frame(x)
@@ -248,7 +250,7 @@ plot.margin_table <- function(x, ..., top = 25) {
 
 #' @rdname plot_adequacy
 #' @details
-#'   `plot.test_gof()` draws each effect's standardized cumulative score
+#'   `plot.goldfishGOF()` draws each effect's standardized cumulative score
 #'   process against the Brownian-bridge bands its p-value was read from. At
 #'   the maximum the per-event scores sum to zero, so every path starts and
 #'   ends at zero; under a correctly specified model it is a bridge, and a path
@@ -268,7 +270,7 @@ plot.margin_table <- function(x, ..., top = 25) {
 #' @examples
 #' plot(goldfish_gof)
 #' @export
-plot.test_gof <- function(
+plot.goldfishGOF <- function(
   x,
   ...,
   level = 0.95,
@@ -313,8 +315,8 @@ plot.test_gof <- function(
 
 #' @rdname plot_adequacy
 #' @details
-#'   `plot.test_time()` draws the scaled Schoenfeld residuals of each tested
-#'   effect against time, with a smooth and the fitted estimate as the
+#'   `plot.goldfishTimeTest()` draws the scaled Schoenfeld residuals of each
+#'   tested effect against time, with a smooth and the fitted estimate as the
 #'   reference. A residual scatter is centred on the coefficient the model
 #'   estimated; a smooth that drifts away from that line over the sequence is
 #'   the coefficient failing to be constant, which is what the test's p-value
@@ -325,7 +327,7 @@ plot.test_gof <- function(
 #' @examples
 #' plot(goldfish_time)
 #' @export
-plot.test_time <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
+plot.goldfishTimeTest <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
   residuals <- as.data.frame(x$residuals)
   params <- gf_meta(x, "params")
   # `period` is all-NA under the trend method, which has no periods; colouring
@@ -378,7 +380,7 @@ plot.test_time <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
 # The panels a test object facets on: the term always, plus the two identity
 # columns a flavoured (multi-process) result appends. Taking them from the
 # table rather than from the object's class is what lets one method serve both
-# shapes, as `plot.margin_table()` already does.
+# shapes, as `plot.goldfishMargins()` already does.
 gf_block_facets <- function(data) {
   facets <- c("term", intersect(c("flavor", "family"), names(data)))
   stats::as.formula(paste("~", paste(facets, collapse = " + ")))
@@ -426,7 +428,7 @@ gf_time_subtitle <- function(params) {
 
 #' @rdname plot_adequacy
 #' @details
-#'   `plot.diagnose_onset()` composes two panels: each coefficient's
+#'   `plot.goldfishOnset()` composes two panels: each coefficient's
 #'   leave-the-first-`m`-events-out path, and the share of the model's
 #'   information those events delivered.
 #'
@@ -455,7 +457,7 @@ gf_time_subtitle <- function(params) {
 #' @examples
 #' plot(goldfish_onset)
 #' @export
-plot.diagnose_onset <- function(
+plot.goldfishOnset <- function(
   x,
   ...,
   view = c("both", "path", "accrual"),
@@ -656,7 +658,7 @@ gf_onset_accrual_panel <- function(x, summary, context) {
 #'   ranked by their cumulative-score statistic, since a model with a dozen
 #'   terms makes a facet grid unreadable at overview size.
 #'
-#' @param x A fitted model of class `result.goldfish`.
+#' @param x A fitted model of class `goldfishFit`.
 #' @param ... Additional plotting parameters, currently unused.
 #' @param effects The number of effects to draw in the Schoenfeld panel.
 #' @return A patchwork composition of the available panels.
@@ -664,7 +666,7 @@ gf_onset_accrual_panel <- function(x, summary, context) {
 #' @examples
 #' plot(goldfish_fit)
 #' @export
-plot.result.goldfish <- function(x, ..., effects = 4) {
+plot.goldfishFit <- function(x, ..., effects = 4) {
   thisRequires("goldfish")
   panels <- list(
     gf_overview_deviance(x),
@@ -887,16 +889,16 @@ gf_panel_count <- function(x) {
 }
 
 gf_panel_data <- function(x) {
-  if (inherits(x, "test_gof")) {
+  if (inherits(x, "goldfishGOF")) {
     return(as.data.frame(x$process))
   }
-  if (inherits(x, "test_time")) {
+  if (inherits(x, "goldfishTimeTest")) {
     return(as.data.frame(x$residuals))
   }
-  if (inherits(x, "diagnose_onset")) {
+  if (inherits(x, "goldfishOnset")) {
     return(as.data.frame(x$path))
   }
-  if (inherits(x, "result.goldfish")) {
+  if (inherits(x, "goldfishFit")) {
     return(NULL)
   }
   NULL

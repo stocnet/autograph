@@ -56,3 +56,66 @@
   getExportedValue("goldfish", fn)
 }
 
+# The goldfish classes were renamed to a package prefix plus a noun, in
+# camelCase (see the class naming rule in .github/CONTRIBUTING.md). Five old
+# names keep an alias that forwards to the renamed method, so an object classed
+# the way an earlier autograph expected still plots. `diagnose_outliers` and
+# `diagnose_changepoints` are the names goldfish 1.9.21 stamps;
+# `outliers.goldfish` and `changepoints.goldfish` are the two the draft methods
+# were written against before that; `result.goldfish` is the fit class every
+# goldfish stamps, back to the version on CRAN, so it is the alias that reaches
+# the most users. Nothing is aliased for the classes only the renamed goldfish
+# emits, since nothing ever stamped those.
+#
+# An alias restores dispatch, not the old column contract: each forwards to a
+# method that reads the current columns (`.series`, and a logical `outlier` or
+# `cpt`), so an object carrying the pre-1.9.21 shape still fails on its columns.
+# Delete each alias once the oldest goldfish autograph works with is past the
+# rename.
+
+#' @rdname plot_adequacy
+#' @details
+#'   `plot.diagnose_outliers()`, `plot.outliers.goldfish()`,
+#'   `plot.diagnose_changepoints()` and `plot.changepoints.goldfish()` are
+#'   aliases for `plot.goldfishOutliers()` and `plot.goldfishChangepoints()`,
+#'   kept so that an object carrying one of the older class names plots as
+#'   before. Each reads the columns the current methods read. They will be
+#'   removed.
+#' @method plot diagnose_outliers
+#' @export
+plot.diagnose_outliers <- function(x, ...) {
+  plot.goldfishOutliers(x, ...)
+}
+
+#' @rdname plot_adequacy
+#' @method plot outliers.goldfish
+#' @export
+plot.outliers.goldfish <- function(x, ...) {
+  plot.goldfishOutliers(x, ...)
+}
+
+#' @rdname plot_adequacy
+#' @method plot diagnose_changepoints
+#' @export
+plot.diagnose_changepoints <- function(x, ...) {
+  plot.goldfishChangepoints(x, ...)
+}
+
+#' @rdname plot_adequacy
+#' @method plot changepoints.goldfish
+#' @export
+plot.changepoints.goldfish <- function(x, ...) {
+  plot.goldfishChangepoints(x, ...)
+}
+
+#' @rdname plot_goldfish_fit
+#' @details
+#'   `plot.result.goldfish()` is an alias for `plot.goldfishFit()`, kept so that
+#'   a fit from a goldfish that still stamps the old class name plots as before.
+#'   It will be removed.
+#' @method plot result.goldfish
+#' @export
+plot.result.goldfish <- function(x, ..., effects = 4) {
+  plot.goldfishFit(x, ..., effects = effects)
+}
+

@@ -54,7 +54,7 @@ expect_buildable <- function(p) {
   invisible(built)
 }
 
-# `plot.result.goldfish()` composes its panels out of goldfish's own
+# `plot.goldfishFit()` composes its panels out of goldfish's own
 # diagnostics rather than out of the fit alone, so no precooked fixture can
 # stand in for them: without goldfish, or with one older than the 1.9.21 that
 # added them, every panel drops and the method prints and returns NULL. Tests

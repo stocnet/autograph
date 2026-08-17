@@ -27,40 +27,45 @@
 
 ## Plotting
 
-- Added `plot.result.goldfish()` for a deviance trace with outlying intervals marked, scaled Schoenfeld smooths, cumulative score processes, and waiting times against the unit exponential
+- Added `plot.goldfishFit()` for a deviance trace with outlying intervals marked, scaled Schoenfeld smooths, cumulative score processes, and waiting times against the unit exponential
   - Draws only from what the fit already stores, so a panel whose primitive is missing is left out rather than erroring
   - Draws the waiting-time panel for exact-time models only
   - Fixed the Schoenfeld panel to select terms by column position, replacing a match of the test's coefficient labels against the residual matrix's effect names, which intersect only on the intercept and so drew one term where four were asked for
   - Labelled those panels with the test's own compact term strings, which do not repeat where an effect appears over two networks
   - Reported how many terms the Schoenfeld panel dropped
-- Added `plot.test_gof()`, drawing each effect's standardized cumulative score process against the Brownian-bridge bands its p-value was read from
+- Added `plot.goldfishGOF()`, drawing each effect's standardized cumulative score process against the Brownian-bridge bands its p-value was read from
   - Draws x axis on the object's own process time, labelled by the clock it records, since the bands are only valid on the clock that produced the process
   - Inverts the same Kolmogorov distribution the event-clock p-value comes from
-- Added `plot.test_time()`, drawing the scaled Schoenfeld residuals of each tested effect with a smooth and the fitted estimate as the reference
+- Added `plot.goldfishTimeTest()`, drawing the scaled Schoenfeld residuals of each tested effect with a smooth and the fitted estimate as the reference
   - Colours the scatter by period under `method = "periods"`
-- Added `plot.diagnose_onset()`, composing the per-coefficient parameter path with the information-accrual curve
+- Added `plot.goldfishOnset()`, composing the per-coefficient parameter path with the information-accrual curve
   - Windows both panels on the excursion rather than the sequence, giving each coefficient its own window and scales
   - Draws proportional diagonal in the accrual panel, the departure from which is the finding
   - Added `view = c("both", "path", "accrual")` to select a single panel where a model has more coefficients than a composed figure can hold
-- Added `plot.margin_table()`, comparing each actor's observed activity with what the model expected of them
+- Added `plot.goldfishMargins()`, comparing each actor's observed activity with what the model expected of them
   - Draws per-actor martingale residual where the model class defines a compensator and the calibration ratio where it does not, choosing between them from the scales the object records
   - Draws `top` actors furthest from the reference and reports how many it left out
   - Draws level against shape where goldfish supplies the `dispersion` column (goldfish >= 1.9.28), sized by event count, separating an actor that acted too often from one whose events were merely bunched
   - Names both kinds of omission: actors below two completed spans, and actors beyond `top`
-- Added a `page` argument to `plot()` on `test_gof`, `test_time` and `diagnose_onset`, paginating the per-term diagnostic figures
+- Added a `page` argument to `plot()` on `goldfishGOF`, `goldfishTimeTest` and `goldfishOnset`, paginating the per-term diagnostic figures
   - Added `ag_pages()`, reporting the page count without rendering, so a loop on a cluster can write every page unattended
   - Errors with the page count where `page` is past the last, instead of drawing an empty panel
   - Leaves each figure as it was where `page` is omitted
-- Renamed `plot.outliers.goldfish()` and `plot.changepoints.goldfish()` to `plot.diagnose_outliers()` and `plot.diagnose_changepoints()`, matching the classes goldfish 1.9.21 emits
+- Renamed `plot.outliers.goldfish()` and `plot.changepoints.goldfish()` to `plot.goldfishOutliers()` and `plot.goldfishChangepoints()`, matching the classes goldfish emits
   - Improved both methods to read the metadata each object carries --- which function produced it, which model it came from, and the arguments that shape it --- instead of inferring it from the columns present
   - Improved both to plot the `.series` column, so a diagnostic called with `effect =` is drawn as the term's own series and named in the subtitle, rather than as a log-likelihood trace beside flags computed from something else
   - Fixed both to facet on process, so a `geom_line()` is no longer drawn across the boundary between one process's last event and the next process's first
-  - Fixed `plot.diagnose_changepoints()` to draw each process's breaks on its own panel only
-  - Fixed `plot.diagnose_outliers()` to consume the now-logical `outlier` column, replacing a string comparison against `"YES"`
-  - Rewrote `plot.diagnose_changepoints()` for the tibble with a logical `cpt` column that replaces the old list of a data frame and a vector of positions, labelling the axis with the break times only where they are numbers so a dated event stream keeps its date scale
+  - Fixed `plot.goldfishChangepoints()` to draw each process's breaks on its own panel only
+  - Fixed `plot.goldfishOutliers()` to consume the now-logical `outlier` column, replacing a string comparison against `"YES"`
+  - Rewrote `plot.goldfishChangepoints()` for the tibble with a logical `cpt` column that replaces the old list of a data frame and a vector of positions, labelling the axis with the break times only where they are numbers so a dated event stream keeps its date scale
 - Added the precooked `goldfish_margins`, `goldfish_gof`, `goldfish_time` and `goldfish_onset` fixtures, and refreshed `goldfish_outliers` and `goldfish_changepoints`
   - All are produced by goldfish 1.9.21 and stamped with that version, so a fixture that has aged can be spotted
   - `goldfish_outliers` comes from a receiver-choice model of the `social_evolution` calls, `goldfish_changepoints` and `goldfish_margins` from a relational event model of the `fisheries_treaties` layer
+- Renamed the goldfish classes to a package prefix plus a noun in camelCase: `goldfishOutliers`, `goldfishChangepoints`, `goldfishOnset`, `goldfishMargins`, `goldfishGOF`, `goldfishTimeTest`, `goldfishScoreTest` and `goldfishFit`
+  - Names such as `test_gof` and `margin_table` are what a sibling stocnet package would pick for the same idea, and two packages that emit one class string cannot be told apart by dispatch or by `inherits()`
+  - Renamed the dispatch methods and the classes the precooked goldfish fixtures carry to match
+  - Kept `plot.diagnose_outliers()`, `plot.outliers.goldfish()`, `plot.diagnose_changepoints()`, `plot.changepoints.goldfish()` and `plot.result.goldfish()` as aliases, so an object carrying one of the older class names plots as before
+  - Documented the convention in `.github/CONTRIBUTING.md`, written for the whole ecosystem
 - Replaced `cli::cli_abort()` in `gf_facet_paged()` with `manynet::snet_abort()`, both declaring cli and matching how the rest of the package reports
 - Replaced the em dashes in `R/plot_diagnostics.R` with `--` in the comments and a unicode escape in the axis label, which is what the reader sees, since only ASCII is portable in R code
 

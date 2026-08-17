@@ -11,18 +11,46 @@ plot_fixture_registry <- list(
   ag_conv   = NULL, # internal wrapper class, exercised via traces.monan
   ag_gof    = NULL, # internal wrapper class, exercised via sienaGOF etc.
   grapht    = NULL, # print method for animations, tested in test-grapht.R
-  diagnose_changepoints = function() autograph::goldfish_changepoints,
-  diagnose_outliers     = function() autograph::goldfish_outliers,
-  diagnose_onset        = function() autograph::goldfish_onset,
-  margin_table          = function() autograph::goldfish_margins,
-  test_gof              = function() autograph::goldfish_gof,
-  test_time             = function() autograph::goldfish_time,
+  goldfishChangepoints = function() autograph::goldfish_changepoints,
+  goldfishOutliers     = function() autograph::goldfish_outliers,
+  goldfishOnset        = function() autograph::goldfish_onset,
+  goldfishMargins      = function() autograph::goldfish_margins,
+  goldfishGOF          = function() autograph::goldfish_gof,
+  goldfishTimeTest     = function() autograph::goldfish_time,
+  # The aliases kept for the older class names. The fixture is the precooked
+  # object with an old class put back: an alias restores dispatch only, so what
+  # it must plot is an object of the current shape under the older name.
+  diagnose_outliers     = function() {
+    x <- autograph::goldfish_outliers
+    class(x)[1] <- "diagnose_outliers"
+    x
+  },
+  diagnose_changepoints = function() {
+    x <- autograph::goldfish_changepoints
+    class(x)[1] <- "diagnose_changepoints"
+    x
+  },
+  outliers.goldfish     = function() {
+    x <- autograph::goldfish_outliers
+    class(x)[1] <- "outliers.goldfish"
+    x
+  },
+  changepoints.goldfish = function() {
+    x <- autograph::goldfish_changepoints
+    class(x)[1] <- "changepoints.goldfish"
+    x
+  },
   # The overview draws each panel from a goldfish diagnostic rather than from
   # the fit alone, so with goldfish absent or older than 1.9.21 every panel
   # drops and the method prints and returns NULL. The audit accepts that, so
   # this fixture exercises the composition where goldfish can supply it and
   # the message where it cannot.
-  result.goldfish       = function() autograph::goldfish_fit,
+  goldfishFit           = function() autograph::goldfish_fit,
+  result.goldfish       = function() {
+    x <- autograph::goldfish_fit
+    class(x)[1] <- "result.goldfish"
+    x
+  },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
   learn_model = function() {

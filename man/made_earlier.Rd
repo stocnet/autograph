@@ -42,19 +42,19 @@ An object of class \code{gof.stats.monan} of length 2.
 
 An object of class \code{gof.ergm} (inherits from \code{gof}) of length 30.
 
-An object of class \code{diagnose_outliers} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 439 rows and 11 columns.
+An object of class \code{goldfishOutliers} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 439 rows and 11 columns.
 
-An object of class \code{diagnose_changepoints} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 115 rows and 10 columns.
+An object of class \code{goldfishChangepoints} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 115 rows and 10 columns.
 
-An object of class \code{margin_table} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 308 rows and 5 columns.
+An object of class \code{goldfishMargins} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 308 rows and 5 columns.
 
-An object of class \code{test_gof} (inherits from \code{list}) of length 3.
+An object of class \code{goldfishGOF} (inherits from \code{list}) of length 3.
 
-An object of class \code{test_time} (inherits from \code{list}) of length 3.
+An object of class \code{goldfishTimeTest} (inherits from \code{list}) of length 3.
 
-An object of class \code{diagnose_onset} (inherits from \code{list}) of length 3.
+An object of class \code{goldfishOnset} (inherits from \code{list}) of length 3.
 
-An object of class \code{result.goldfish} of length 31.
+An object of class \code{goldfishFit} of length 31.
 }
 \usage{
 data(res_migraph_reg)

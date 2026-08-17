@@ -134,11 +134,43 @@ Methods are grouped by the *kind of result object*, not by source package:
 | `plot_analysis.R` | node/tie/network measures, motifs, memberships (`node_measure`, `tie_measure`, `network_measures`, `node_member`, `node_motif`, `network_motif`, `matrix`) |
 | `plot_summaries.R` | diffusion/learning model summaries (`diff_model`, `diffs_model`, `learn_model`, `mnet`) |
 | `plot_gof.R` | goodness-of-fit objects (`gof.ergm`, `sienaGOF`, `gof.stats.monan`, autograph's own `ag_gof`) |
-| `plot_convergence.R`, `plot_diagnostics.R`, `plot_tests.R`, `plot_interp.R` | model diagnostics, convergence traces, statistical tests, and interpretation plots for `netlm`/`netlogit`/`ergm` etc. |
-| `plot_manydata.R` | goldfish `changepoints`/`outliers` and other longitudinal data objects |
+| `plot_diagnostics.R` | adequacy diagnostics and model fits, currently goldfish's (`goldfishOutliers`, `goldfishChangepoints`, `goldfishOnset`, `goldfishMargins`, `goldfishGOF`, `goldfishTimeTest`, `goldfishFit`) |
+| `plot_convergence.R`, `plot_tests.R`, `plot_interp.R` | convergence traces, statistical tests, and interpretation plots for `netlm`/`netlogit`/`ergm` etc. |
+| `plot_manydata.R` | 'many' data plots; the whole file is commented out at present |
 
 New `plot.*` methods must be registered in NAMESPACE via roxygen `@method`/`@export` tags — run `devtools::document()` after adding one.
 Suggestions for new plot methods are welcome.
+
+### Class names across the stocnet ecosystem
+
+S3 dispatch matches exact class strings, so two packages that emit the same class string
+collide: `autograph` cannot tell the objects apart, and neither can a user's `inherits()` check.
+A name such as `test_gof` or `margin_table` is the name any sibling package would pick for the
+same idea, so it is not safe.
+
+The rule for every stocnet package is: **name a class after the package plus a noun, in camelCase**
+(`<pkg><Thing>`), following RSiena's `sienaFit`, `sienaGOF` and `sienaAlgorithm`.
+camelCase keeps a class visually distinct from the snake_case user-facing functions.
+
+Two things the convention does not use:
+
+- **No dot suffix.** A dot in a class string creates no inheritance. R dispatches on exact class
+  strings, and all S3 inheritance comes from the class vector, so `foo.goldfish` does not match an
+  object of class `"diagnose_outliers.goldfish"`. A suffix such as `.goldfish` is convention only.
+- **No shared parent class.** `autograph` draws a different figure for each diagnostic, so a
+  fallback method would have nothing to do. `autograph` standardises by coercion instead, as it
+  already does for other objects.
+
+The goldfish diagnostic classes follow this rule.
+Five older class names remain in [R/autograph-defunct.R](../R/autograph-defunct.R) as aliases
+forwarding to the renamed methods, so that an object classed the way an earlier autograph
+expected still plots:
+`diagnose_outliers` and `diagnose_changepoints` (the names goldfish 1.9.21 stamps),
+`outliers.goldfish` and `changepoints.goldfish` (the two the draft methods were written against),
+and `result.goldfish` (the fit class every goldfish stamps, back to the version on CRAN).
+An alias restores dispatch, not the old column contract: each forwards to a method that reads the
+current columns.
+Delete each alias once the oldest supported goldfish is past the rename.
 
 ### Theming
 
