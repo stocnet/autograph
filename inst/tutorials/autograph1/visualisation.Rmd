@@ -651,6 +651,7 @@ For dense or disconnected networks, `edge_bundle` and `isolates`
 <span class="page-toc">On this page:
 <span class="page-toc-link" onclick="document.getElementById('section-setting-a-theme').scrollIntoView({behavior:'auto',block:'start'});">Setting a theme</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-whos-hue').scrollIntoView({behavior:'auto',block:'start'});">Hues</span> ·
+<span class="page-toc-link" onclick="document.getElementById('section-seeing-what-others-see').scrollIntoView({behavior:'auto',block:'start'});">Colour blindness</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-greyscale').scrollIntoView({behavior:'auto',block:'start'});">Greyscale</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-manual-override').scrollIntoView({behavior:'auto',block:'start'});">Manual override</span></span>
 
@@ -679,9 +680,43 @@ Currently available themes include a number of institutional themes
 (`"iheid"`, `"ethz"`, `"uzh"`, `"rug"`, `"unibe"`, `"oxf"`, `"unige"`,
 `"cmu"`, `"iast"`, `"hwu"`)
 as well as stylistic ones (`"default"`, `"bw"`, `"crisp"`, `"neon"`,
-`"rainbow"`).
+`"clay"`, `"rainbow"`).
 Run `stocnet_theme()` without arguments to see which theme is currently set.
 More institutional scales and themes can be implemented upon pull request.
+
+A theme lasts for the session in which you set it,
+and a new session starts on the default again.
+Where a theme is your usual one, `persist = TRUE` remembers it,
+by writing the name to your user configuration directory:
+
+```{r persist, exercise=TRUE}
+# stocnet_theme("iheid", persist = TRUE)   # remembered next session too
+stocnet_theme()
+```
+
+Nothing is written to disk unless you ask for it.
+Setting any theme with `persist = FALSE`, the default,
+forgets a choice you persisted earlier,
+so `stocnet_theme("default", persist = FALSE)` puts you back where you began.
+
+A theme sets a typeface as well as a palette,
+but only where that typeface is installed and R can see it.
+`list_fonts()` lists the families R can see,
+and `ag_font()` reports the one the current theme settled on.
+
+```{r fonts, exercise=TRUE}
+ag_font()
+head(list_fonts("sans"))
+```
+
+If `ag_font()` returns `"sans"`,
+the theme found none of the fonts it prefers,
+and your graphs will look more generic than they should.
+Install the missing family — many are free from
+[Google Fonts](https://fonts.google.com) —
+then install the `{systemfonts}` package so that R can see the fonts on your
+system, and set the theme again.
+`?stocnet_theme` sets out the steps for each operating system.
 
 ### Who's hue? {#whos-hue}
 
@@ -732,6 +767,67 @@ The old trope is that males are less sensitive to colour distinctions:^[Though s
 
 <img src="http://thedoghousediaries.com/dhdcomics/2010-03-01-12bf011.png" alt="comic strip about perceived colour vocabulary differences" height="500px"/>
 
+### Seeing what others see {#seeing-what-others-see}
+
+About one man in twelve, and one woman in two hundred,
+sees colour differently from the palette designer.
+The most common form, deuteranopia, confuses reds with greens —
+which is precisely the pairing a "stop/go" palette relies on.
+
+`{autograph}` gives you two functions for checking this.
+`simulate_colorblind()` shows you a set of colours as such a viewer sees them,
+and `contrast_colors()` scores how far apart colours are,
+taking the worst case across normal vision and each type of colour blindness.
+A score below 10 means two colours are easily confused,
+10 to 25 that they are separable but close,
+and above 25 that they are comfortably distinct.
+
+```{r cvdcheck, exercise=TRUE}
+# A red and a green that look quite different to most viewers
+contrast_colors(c("#B7352D", "#627313"))
+# But not to everyone
+simulate_colorblind(c("#B7352D", "#627313"), "deutan")
+```
+
+**Run the code, then try `"protan"` or `"tritan"` instead of `"deutan"`.**
+
+You can also look at a whole graph the way another viewer would,
+by mapping the simulated colours back onto it.
+
+```{r cvdgraph, exercise=TRUE, fig.width=9}
+graphr(fict_lotr, node_colour = "Race")
+graphr(fict_lotr, node_colour = "Race") +
+  ggplot2::scale_fill_manual(values = simulate_colorblind(ag_qualitative(6), "deutan"))
+```
+
+Much of this work is already done for you.
+Each theme's palette is reordered when the theme is set,
+so that the colours a graph uses first are the ones that stay distinct
+for every viewer,
+and each divergent palette pairs a warm pole with a cool one
+rather than a red with a green.
+
+```{r cvdpalette, exercise=TRUE}
+stocnet_theme("iheid")
+round(contrast_colors(ag_qualitative(4)))
+# The closest pair among those four colours
+min(contrast_colors(ag_qualitative(4)), na.rm = TRUE)
+stocnet_theme("default")
+```
+
+::: {.callout}
+<span class="callout-label">**Going further**:</span>
+The `"rainbow"` theme is the exception, and is left in the order of the
+spectrum, since that fidelity is its point.
+A spectrum is not a colour-blind safe scheme:
+its reds and greens are the pair that red-green colour blindness cannot
+separate.
+Choose it where the order of your categories is itself meaningful,
+and check the result with `contrast_colors()`.
+Where you need particular colours in an institutional palette,
+`match_color()` finds the closest the palette has to those you ask for.
+:::
+
 ### Greyscale {#greyscale}
 
 Other times colour may not be desired.
@@ -774,12 +870,14 @@ graphr(fict_lotr,
 
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `stocnet_theme()` sets a theme once for all subsequent
-graphs and plots, with institutional and stylistic palettes included.
+graphs and plots, with institutional and stylistic palettes included,
+and `persist = TRUE` keeps it for future sessions.
 Individual graphs can still be adjusted by appending
 `ggplot2::scale_fill_*()` functions —
 `_hue()` for a different palette, `_grey()` for print,
 `_manual()` for hand-picked colours —
-and it is worth checking your palette is colour-blind accessible.
+and `simulate_colorblind()` and `contrast_colors()` check that your palette
+works for colour-blind viewers.
 :::
 
 ## Titles, labels, and legends

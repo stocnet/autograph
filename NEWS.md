@@ -208,6 +208,11 @@
 
 ## Tutorials
 
+- Added a colour blindness section to the visualisation tutorial
+  - Covers `simulate_colorblind()`, `contrast_colors()`, and how palettes are ordered
+  - Notes that the "rainbow" theme is not a colour-blind safe scheme
+- Added a note on installing a theme's fonts to the visualisation tutorial
+- Updated the README with the case for colour-blind readable palettes
 - Updated visualization tutorial to use colour/color consistently
 - Updated the Labels section of the visualisation tutorial to cover selecting which nodes to label, replacing the `mutate(name = ifelse(...))` workaround it used to recommend
   - `fict_lotr`, the tutorial's running example, has 36 nodes, so its graphs now name only its most central characters; the surrounding prose says so and shows how to choose otherwise

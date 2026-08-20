@@ -231,10 +231,70 @@ plot(as_matrix(ison_southern_women),
 <img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
 
 There are a range of institutional and topical themes available,
-including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf,
-unige, cmu, iast, hwu, rainbow, with more on the way.
+including default, bw, crisp, neon, clay, iheid, ethz, uzh, rug, unibe,
+oxf, unige, cmu, iast, hwu, rainbow, with more on the way.
 
 <img src="man/figures/README-theme-opts-1.png" alt="Institutional themes" width="100%" /><img src="man/figures/README-theme-opts-2.png" alt="Institutional themes" width="100%" />
+
+### Colours everyone can read
+
+About one man in twelve, and one woman in two hundred, sees colour
+differently. A palette that separates its categories for most readers
+can collapse for them, and the classic offender is the red-green pair
+that so many palettes hold.
+
+`{autograph}` does something about this without asking you to give up a
+palette. Every theme’s categorical palette is reordered when the theme
+is set, so that the colours a graph reaches for first are those that
+stay distinct under each type of colour blindness, and each divergent
+palette pairs a warm pole with a cool one.
+
+`simulate_colorblind()` shows a set of colours as another viewer sees
+them, so mapping the simulated colours back onto a graph shows you their
+view of it. Here is the same network three times: in `{autograph}`’s
+default palette as most readers see it, then as a reader with
+deuteranopia does, and then in the palette `{ggraph}` falls back on when
+`{autograph}` is not setting the colours, as that same reader sees it.
+
+``` r
+set_stocnet_theme("default")
+as_seen <- function(colours, type, title){
+  graphr(fict_lotr, node_colour = "Race", node_size = 3, labels = FALSE) +
+    ggplot2::scale_fill_manual(values = simulate_colorblind(colours, type)) +
+    ggtitle(title)
+}
+as_seen(ag_qualitative(6), "normal", "autograph") |
+  as_seen(ag_qualitative(6), "deutan", "autograph, deuteranopia") |
+  as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
+```
+
+<img src="man/figures/README-cvd-1.png" alt="The same network seen with normal vision and with deuteranopia, in autograph's palette and in ggraph's" width="100%" />
+
+The six races remain tellable apart in the middle panel, its closest
+pair being Hobbits and Maiar. In the right-hand one, Elves and Ents have
+become the same olive. `contrast_colors()` puts a number on it, scoring
+how far apart colours are at their worst across normal vision and each
+type of colour blindness:
+
+``` r
+round(min(contrast_colors(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
+#> [1] 13.5
+round(min(contrast_colors(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
+#> [1] 5.5
+round(min(contrast_colors(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
+#> [1] 16.2
+```
+
+Below 10 two colours are easily confused, above 25 they are comfortably
+distinct. `{igraph}`’s categorical palette is the Okabe-Ito scheme,
+which was designed for this and scores accordingly: where you are free
+to choose any colours at all, such a scheme is hard to beat, and
+`graphr()` will happily take it. The harder case is the one
+`{autograph}` is built for — colours chosen by somebody else, for
+reasons that were not legibility — and there the ordering is what stands
+between a brand palette and an unreadable graph. A palette with more
+colours to draw on has more room to gain: six categories score 29 under
+the `"hwu"` theme and 26 under `"oxf"`.
 
 If your institution or organisation is not included and you would like
 it to be, please just raise an issue on Github, along with a link to
