@@ -471,8 +471,11 @@ layout_hierarchy <- function(.data, center = NULL,
           side1[,1] <- ifelse(rownames(net) == center, 1, side1[,1])
           side1[,2] <- ifelse(rownames(net) == center, 0.5, side1[,2])
         } else {
-          side2[,1] <- ifelse(rownames(net) == center, 1, side2[,1])
-          side2[,2] <- ifelse(rownames(net) == center, 0.5, side2[,2])
+          # The centred node is in the second mode, which `net` holds in its
+          # columns: comparing the row names here would test the wrong mode
+          # and recycle a vector of the wrong length into `side2`.
+          side2[,1] <- ifelse(colnames(net) == center, 1, side2[,1])
+          side2[,2] <- ifelse(colnames(net) == center, 0.5, side2[,2])
         }
         crd <- rbind(side1, side2)
         crd[which(is.nan(crd))] <- 0.5

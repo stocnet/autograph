@@ -96,7 +96,14 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          # rsconnect is not a package dependency, but pkgdown::build_site()
+          # calls build_tutorials() for inst/tutorials/, and that step reads
+          # rsconnect deployment records. Without it the site build errors out
+          # and the website is never checked. pushrelease.yml installs it too.
+          extra-packages: |
+            any::pkgdown
+            any::rsconnect
+            local::.
           needs: website
 
       # The site itself is deployed from pushrelease.yml, but a missing index
