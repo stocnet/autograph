@@ -135,30 +135,16 @@ stocnet_theme <- function(theme = NULL, persist = FALSE){
   }
 }
 
-theme_pref_file <- function(){
-  file.path(tools::R_user_dir("autograph", which = "config"), "theme.rds")
-}
+# The reading and writing itself is shared with any other remembered
+# preference; see write_pref() in autograph_utilities.R.
+theme_pref_file <- function() pref_file("theme")
 
-# Only ever called with persist = TRUE, i.e. at the user's explicit request.
-write_theme_pref <- function(theme){
-  f <- theme_pref_file()
-  tryCatch({
-    dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
-    saveRDS(theme, f)
-    TRUE
-  }, error = function(e) FALSE, warning = function(w) FALSE)
-}
+write_theme_pref <- function(theme) write_pref("theme", theme)
 
-forget_theme_pref <- function(){
-  f <- theme_pref_file()
-  if(file.exists(f)) tryCatch(unlink(f), error = function(e) NULL)
-  invisible(NULL)
-}
+forget_theme_pref <- function() forget_pref("theme")
 
 read_theme_pref <- function(){
-  f <- theme_pref_file()
-  if(!file.exists(f)) return(NULL)
-  theme <- tryCatch(readRDS(f), error = function(e) NULL)
+  theme <- read_pref("theme")
   # Guard against a stale file naming a theme this version no longer ships.
   if(is.null(theme) || !is.character(theme) || length(theme) != 1L ||
      !theme %in% theme_opts) return(NULL)

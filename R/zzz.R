@@ -19,6 +19,12 @@
   }
 
   if (!interactive()) return()
+
+  # Only after the interactive() guard above: a script or a check run should
+  # never reach into the IDE, whatever is remembered.
+  if (isTRUE(read_pref("completion")) && .completion_activate())
+    snet_info("Completion of argument values is on. Use {.fn stocnet_completion} to switch it off.")
+
   local_version <- utils::packageVersion("autograph")
   snet_info("You are using {.auto autograph} version {.version {local_version}}.")
   snet_info(c("i" = "Theme set to {.code {getOption('stocnet_theme')}}. Use {.fn stocnet_theme} to change the theme."))

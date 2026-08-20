@@ -61,6 +61,7 @@ or a mix, "both", of them.
 }
 \seealso{
 Other mapping:
+\code{\link{completion}},
 \code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphr}},

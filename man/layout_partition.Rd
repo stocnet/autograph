@@ -176,6 +176,7 @@ graphr(manynet::fict_marvel, labels = FALSE)
 }
 \seealso{
 Other mapping:
+\code{\link{completion}},
 \code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},

@@ -213,6 +213,7 @@ graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 }
 \seealso{
 Other mapping:
+\code{\link{completion}},
 \code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphs}},

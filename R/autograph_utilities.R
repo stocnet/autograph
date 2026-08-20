@@ -23,3 +23,35 @@ add_spaces <- function(CamelString) {
 # and
 # https://cran.r-project.org/web/packages/patchwork/vignettes/patchwork.html
 
+
+# Remembered preferences ----
+
+# A preference the user asked to keep, such as a theme or whether argument
+# values are completed, is written to the user's configuration directory. Only
+# ever called with `persist = TRUE`, i.e. at the user's explicit request.
+# Failure is not worth an error: the choice still holds for this session.
+pref_file <- function(name) {
+  file.path(tools::R_user_dir("autograph", which = "config"),
+            paste0(name, ".rds"))
+}
+
+write_pref <- function(name, value) {
+  f <- pref_file(name)
+  tryCatch({
+    dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)
+    saveRDS(value, f)
+    TRUE
+  }, error = function(e) FALSE, warning = function(w) FALSE)
+}
+
+read_pref <- function(name) {
+  f <- pref_file(name)
+  if (!file.exists(f)) return(NULL)
+  tryCatch(readRDS(f), error = function(e) NULL)
+}
+
+forget_pref <- function(name) {
+  f <- pref_file(name)
+  if (file.exists(f)) tryCatch(unlink(f), error = function(e) NULL)
+  invisible(NULL)
+}

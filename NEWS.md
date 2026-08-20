@@ -9,6 +9,12 @@
   - `count_pages()` was missing from the reference index, which stopped it
 - Updated CONTRIBUTING with conventions for function names, `NEWS.md` bullets,
   the website reference index, and keeping tutorials and articles in step
+- Added `stocnet_completion()` to offer values an argument accepts as RStudio completions
+  - `graphr(fict_lotr, node_color =` Tab lists the node variables `fict_lotr` holds
+  - Covers node and tie variables, layouts, label criteria, themes, and defaults such as `isolates`
+  - Off unless asked for, since it replaces/encapsulates one of RStudio's internal functions; `stocnet_completion(FALSE)` restores it
+  - A `persist` argument remembers the choice, as `stocnet_theme()` does
+  - Values labelled with its class and its categories or range; a layout with the package that draws it
 
 ## Layouts
 
@@ -114,15 +120,13 @@
   - Rewrote `plot.goldfishChangepoints()` for the tibble with a `cpt` column
     - Labels the axis with break times only where they are numbers,
       so a dated event stream keeps its date scale
-- Added the precooked `goldfish_margins`, `goldfish_gof`, `goldfish_time`,
+- Added precooked `goldfish_margins`, `goldfish_gof`, `goldfish_time`,
   and `goldfish_onset`, and refreshed the two older fixtures
   - Each is stamped with the goldfish version that produced it, 1.9.21
   - `goldfish_outliers` comes from a receiver-choice model of the calls
   - The others come from event models of the `fisheries_treaties` layer
 - Replaced `cli::cli_abort()` in `gf_facet_paged()` with `snet_abort()`
-- Replaced the em dashes in `R/plot_diagnostics.R`, since only ASCII is
-  portable in R code
-
+- Replaced em dashes in `R/plot_diagnostics.R` since only ASCII is portable
 
 ## Tutorials
 

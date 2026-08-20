@@ -64,6 +64,7 @@ layout_tetrad(manynet::create_ring(4))
 }
 \seealso{
 Other mapping:
+\code{\link{completion}},
 \code{\link{layout_partition}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},

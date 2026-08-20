@@ -85,6 +85,7 @@ reference:
       - graphr
       - graphs
       - grapht
+      - completion
   - title: "Plotting"
     desc: |
       `plot()` methods exist for results and other objects for stocnet packages.
