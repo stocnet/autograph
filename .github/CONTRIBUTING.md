@@ -172,18 +172,50 @@ An alias restores dispatch, not the old column contract: each forwards to a meth
 current columns.
 Delete each alias once the oldest supported goldfish is past the rename.
 
+### Function names
+
+Two naming families, and they do not mix:
+
+- **User-facing functions are snake_case, and usually `verb_noun`**: `graphr()`, `match_color()`,
+  `is_dark()`, `simulate_colorblind()`, `contrast_colors()`, `list_fonts()`, `stocnet_theme()`.
+  This is the convention across the stocnet suite, so a user meets one style everywhere.
+- **The `ag_` prefix is for the theme accessors only**: `ag_base()`, `ag_ink()`, `ag_highlight()`,
+  `ag_positive()`, `ag_negative()`, `ag_qualitative(n)`, `ag_sequential(n)`, `ag_divergent(n)`,
+  `ag_font()`. Each returns the autograph-specific value the current theme holds for one role,
+  and each reads an `snet_*` option. Do not give `ag_` to a function that does something else,
+  even a small one: a new verb belongs in the snake_case family.
+  Internal helpers may take `ag_` where they build such a value (`ag_ground()`, `ag_theme_*()`).
+
 ### Theming
 
 [R/theme_set.R](../R/theme_set.R) implements `stocnet_theme()` (alias `set_stocnet_theme()`),
 which sets an R option (`stocnet_theme`, default `"default"`) read by every plotting function in the package.
-Institutional and stylistic palettes (`default`, `bw`, `crisp`, `neon`, `iheid`, `ethz`, `uzh`, `rug`,
-`unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are defined in [R/theme_palettes.R](../R/theme_palettes.R)
-and exposed via consistent accessor functions
-(`ag_base()`, `ag_highlight()`, `ag_positive()`, `ag_negative()`, `ag_qualitative(n)`,
-`ag_sequential(n)`, `ag_divergent(n)`, `ag_font()`) documented together under `ag_call`.
+Institutional and stylistic palettes (`default`, `bw`, `crisp`, `neon`, `clay`, `iheid`, `ethz`, `uzh`, `rug`,
+`unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are defined in [R/theme_set.R](../R/theme_set.R)
+and exposed via the `ag_` accessors listed above, documented together under `ag_call`.
 Users can override individual palette colours via `options()` (e.g. `options(snet_highlight = ...)`)
 rather than editing theme code.
 [R/theme_match.R](../R/theme_match.R) maps a plot/result object to its appropriate theme treatment.
+
+Three roles, kept separate, because they pull in different directions:
+the **base** is an unhighlighted mark, and may be light where that is what separates it from a
+dark brand highlight; the **ink** (`ag_ink()`) is what a plot writes with, and must stay legible;
+the **highlight** is the brand colour.
+Reference lines, axis text, and other chrome take `ag_ink()`, never `ag_base()`.
+
+Every plot is drawn on the theme's ground. Build plot themes with the `ag_theme_*()` wrappers in
+[R/theme_set.R](../R/theme_set.R) (`ag_theme_minimal()`, `ag_theme_void()`, and so on) rather than
+calling `ggplot2::theme_minimal()` directly, so that a theme with a background other than white
+reaches every plot and not only the graphs.
+
+[R/theme_colorblind.R](../R/theme_colorblind.R) holds the colour-blindness tools: `simulate_colorblind()` and
+`contrast_colors()`, and the internal `colorblind_sort()` that each theme's categorical palette passes
+through when the theme is set.
+A palette added to a theme therefore does not need hand-ordering, but it does need to survive the
+audit in `tests/testthat/test-functional_themes.R`, which requires the first few colours to stay
+apart under each type of colour blindness.
+A palette whose own order carries meaning is exempted by adding it to `colorblind_unsorted`;
+`"rainbow"` is the only member, and is sampled across its length instead of taken from the front.
 
 Because `autograph` re-exports several `ggplot2` symbols (see [R/reexports_ggplot2.R](../R/reexports_ggplot2.R)),
 loading `autograph` last in a session is recommended so its `plot()` methods take precedence over other packages'.
@@ -239,6 +271,58 @@ CI sets `AUTOGRAPH_STRICT_AUDIT: true` so the same cases fail there instead.
 code chunks of the learnr tutorials in `inst/tutorials/`, so tutorial code that errors or raises a
 deprecation warning fails the suite (rendering the tutorials themselves is deliberately not tested).
 
+### Tutorials and articles
+
+The learnr tutorials in `inst/tutorials/` are the source.
+`vignettes/articles/*.Rmd` are their static pkgdown twins, and are *generated*
+from them by [data-raw/build_tutorial_articles.R](../data-raw/build_tutorial_articles.R).
+Never edit an article by hand: the next regeneration discards the edit,
+and [prchecks.yml](workflows/prchecks.yml) fails the PR for drift meanwhile.
+
+After adding or changing functionality, ask whether a reader learning the
+package would meet it, and if so:
+
+1. Edit the tutorial in `inst/tutorials/<tute>/*.Rmd`.
+   Add the new function to the topic it belongs to, in an `exercise=TRUE`
+   chunk, with a sentence saying what it is for.
+   New sections need an entry in that topic's page-toc,
+   and are worth a line in its closing "In brief" callout.
+2. Re-render the tutorial HTML in place
+   (`rmarkdown::render()` on the tutorial `.Rmd`), and commit it.
+3. Re-run `Rscript data-raw/build_tutorial_articles.R`, and commit the
+   regenerated article.
+4. Run `testthat::test_file("tests/testthat/test-tutorials_autograph.R")`,
+   which purls and evaluates every chunk, so new tutorial code is tested.
+
+Where the change is worth showing off rather than only teaching,
+it also belongs in `README.Rmd` — which is knit to `README.md` with
+`devtools::build_readme()`, never edited directly — and its figures land in
+`man/figures/`, from where the website serves them.
+
+### Website
+
+The site is built by `{pkgdown}` from [pkgdown/_pkgdown.yml](../pkgdown/_pkgdown.yml)
+and deployed from [pushrelease.yml](workflows/pushrelease.yml) on a merge to `main`.
+
+**Every exported function must appear in the `reference:` index.**
+A topic left out of it fails the build, so the site stops updating.
+Add a new function to the section it belongs to,
+or add a new section where it starts a family,
+and prefer naming the topic (`theme_colorblind`) over widening a `starts_with()` pattern.
+A helper that users are not meant to call takes `@keywords internal` instead.
+The `reference:` titles are also the headings used in `NEWS.md` (see below),
+so keep the two in step.
+
+Check before opening a PR:
+
+```r
+pkgdown::check_pkgdown()          # every topic is in the index
+pkgdown::build_site(preview = FALSE)  # everything else
+```
+
+[prchecks.yml](workflows/prchecks.yml) runs both in the `website-builds` job,
+so a PR reports whether the site *can* be built without deploying it.
+
 ### `NEWS.md` conventions
 
 `NEWS.md` groups each version's changes under `##` headings that mirror the website
@@ -257,10 +341,35 @@ Start each bullet with a verb matching the change type:
 - `Improved ...` — functional updates to existing behaviour
 - `Updated ...` — documentation changes
 
+Any of these verbs can also lead a sub-bullet.
+
+Keep every bullet to one line of fewer than 81 characters ideally
+(a few more or less is fine).
+If a bullet wraps, it holds too much:
+shorten it, or split it into a lead bullet and sub-bullets.
+Each bullet stands on its own, and states what changed,
+not why or how unless there is space for context.
+Explanation belongs in the function documentation or the vignettes.
+
+Where several bullets describe parallel changes, reuse the sentence structure,
+so that a reader sees the parallelism at a glance.
+Use one word for one thing throughout a version's entries,
+rather than varying the wording for effect.
+
 If a cited GitHub issue was **not** authored by @jhollway, thank the author with an
 `@`-tag in the bullet.
 Cluster related changes (e.g. several fixes to the same function, or sub-points of one
 feature) as indented sub-bullets under a lead bullet, to improve readability.
+Where several changes concern one function, lead with an `Improved ...` bullet that
+names the function, and put the individual `Fixed ...`/`Added ...` points beneath it,
+so the cluster groups by function rather than by change type.
+Under an `Improved ...` lead bullet, do not name the function again in the
+sub-bullets, since the lead bullet already carries it.
+Sub-bullets indent by two spaces, and nest at most one level further (four spaces).
+A sub-bullet does not need a verb: it can state the consequence, the previous
+behaviour, or an example call.
+The more entries a version holds, the more this structure matters,
+so group first and only then write the bullets.
 
 
 
