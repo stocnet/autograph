@@ -106,12 +106,12 @@
                       levels = c("FALSE", "TRUE"))
       } else out <- as.factor(as.character(manynet::node_attribute(g, node_color)))
       if (length(unique(out)) == 1) {
-        out <- rep("black", manynet::net_nodes(g))
+        out <- rep(ag_ink(), manynet::net_nodes(g))
         .inform_constant_color("node_color", node_color, "node")
       }
     } else out <- node_color
   } else {
-    out <- "black"
+    out <- ag_ink()
   }
   out
 }
@@ -126,7 +126,7 @@
                       levels = c("FALSE", "TRUE"))
       } else out <- as.factor(as.character(manynet::tie_attribute(g, edge_color)))
       if (length(unique(out)) == 1) {
-        out <- rep("black", manynet::net_ties(g))
+        out <- rep(ag_ink(), manynet::net_ties(g))
         .inform_constant_color("edge_color", edge_color, "tie")
       }
     } else {
@@ -142,7 +142,7 @@
     # drawn in the emphasis colour, and `fict_marvel` names its layers in an
     # order that greys out the very layer the plot is about.
     out <- as.factor(as.character(manynet::tie_attribute(g, "type")))
-    if (length(unique(out)) == 1) out <- "black"
+    if (length(unique(out)) == 1) out <- ag_ink()
   } else if (is.null(edge_color) & manynet::is_signed(g)) {
     # Signed networks that are not layered can still carry a sign on only
     # some of their ties. Treat those (and any NA) as positive, as the
@@ -153,10 +153,10 @@
     out <- factor(ifelse(is.na(signs) | signs >= 0, "Positive", "Negative"),
                   levels = c("Positive", "Negative"))
     if (length(unique(out)) == 1) {
-      out <- "black"
+      out <- ag_ink()
     }
   } else {
-    out <- "black"
+    out <- ag_ink()
   }
   out
 }

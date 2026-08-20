@@ -499,12 +499,12 @@ print.grapht <- function(x, ...) {
       character(igraph::vcount(waves[[1]])))
     if (length(unique(stats::na.omit(as.vector(vals)))) == 1) {
       .inform_constant_color("node_color", node_color, "node")
-      return(list(mapped = FALSE, diffusion = FALSE, literal = "black"))
+      return(list(mapped = FALSE, diffusion = FALSE, literal = ag_ink()))
     }
     return(list(mapped = TRUE, diffusion = FALSE, values = vals))
   }
   list(mapped = FALSE, diffusion = FALSE,
-       literal = if (!is.null(node_color)) node_color else "black")
+       literal = if (!is.null(node_color)) node_color else ag_ink())
 }
 
 # One row per union node per frame, with stable coordinates, presence and
@@ -550,12 +550,12 @@ print.grapht <- function(x, ...) {
       ifelse(as.numeric(manynet::tie_signs(w)) >= 0, "Positive", "Negative"))
   } else {
     return(list(mapped = FALSE,
-                literal = if (!is.null(edge_color)) edge_color else "black"))
+                literal = if (!is.null(edge_color)) edge_color else ag_ink()))
   }
   if (length(unique(stats::na.omit(unlist(raw)))) <= 1) {
     if (attr_mapped)
       .inform_constant_color("edge_color", edge_color, "tie")
-    return(list(mapped = FALSE, literal = "black"))
+    return(list(mapped = FALSE, literal = ag_ink()))
   }
   list(mapped = TRUE, signed = signed, raw = raw)
 }

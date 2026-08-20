@@ -28,7 +28,7 @@
 #' @param page Which page to draw, for the per-term figures. `NULL` (the
 #'   default) draws every panel in one figure, exactly as before. A number
 #'   draws that page alone; a number past the last is an error naming the
-#'   count. Use [ag_pages()] to learn the count without rendering, so a loop
+#'   count. Use [count_pages()] to learn the count without rendering, so a loop
 #'   can write every page with nobody at a screen.
 #' @param nrow,ncol Panels per page when `page` is given.
 #' @return A ggplot object.
@@ -206,7 +206,7 @@ plot.goldfishMargins <- function(x, ..., top = 25) {
   data$actor <- stats::reorder(factor(data$actor), data$value)
 
   p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$value, y = .data$actor)) +
-    ggplot2::geom_vline(xintercept = reference, colour = ag_base()) +
+    ggplot2::geom_vline(xintercept = reference, colour = ag_ink()) +
     ggplot2::geom_segment(
       ggplot2::aes(
         x = reference,
@@ -308,7 +308,7 @@ plot.goldfishGOF <- function(
     page,
     nrow,
     ncol,
-    ag_pages(x, nrow, ncol),
+    count_pages(x, nrow, ncol),
     scales = "fixed"
   )
 }
@@ -372,7 +372,7 @@ plot.goldfishTimeTest <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
     page,
     nrow,
     ncol,
-    ag_pages(x, nrow, ncol),
+    count_pages(x, nrow, ncol),
     scales = "free_y"
   )
 }
@@ -485,7 +485,7 @@ plot.goldfishOnset <- function(
     page = page,
     nrow = nrow,
     ncol = ncol,
-    n_pages = ag_pages(x, nrow, ncol)
+    n_pages = count_pages(x, nrow, ncol)
   )
   if (identical(view, "path")) {
     return(path)
@@ -833,7 +833,7 @@ gf_overview_waiting <- function(x) {
     data,
     ggplot2::aes(x = .data$theoretical, y = .data$observed)
   ) +
-    ggplot2::geom_abline(slope = 1, intercept = 0, colour = ag_base()) +
+    ggplot2::geom_abline(slope = 1, intercept = 0, colour = ag_ink()) +
     ggplot2::geom_point(colour = ag_highlight(), alpha = 0.5) +
     ag_theme_minimal() +
     ggplot2::labs(
@@ -863,9 +863,9 @@ gf_overview_waiting <- function(x) {
 #'
 #' @return A single integer, at least 1.
 #' @examples
-#' ag_pages(goldfish_gof)
+#' count_pages(goldfish_gof)
 #' @export
-ag_pages <- function(x, nrow = 2, ncol = 2) {
+count_pages <- function(x, nrow = 2, ncol = 2) {
   panels <- gf_panel_count(x)
   if (is.na(panels) || panels < 1) {
     return(1L)
@@ -923,7 +923,7 @@ gf_facet_paged <- function(p, facets, page, nrow, ncol, n_pages, scales) {
       "{.arg page} {.val {page}} is past the last page.",
       "This figure has {n_pages} page{?s} at",
       "{.code nrow = {nrow}, ncol = {ncol}}.",
-      "{.fn ag_pages} reports the count without rendering.")
+      "{.fn count_pages} reports the count without rendering.")
   }
   p +
     ggforce::facet_wrap_paginate(
@@ -967,10 +967,10 @@ gf_margin_scatter <- function(data, martingale, top) {
     usable,
     ggplot2::aes(x = .data$value, y = .data$dispersion)
   ) +
-    ggplot2::geom_vline(xintercept = reference, colour = ag_base()) +
+    ggplot2::geom_vline(xintercept = reference, colour = ag_ink()) +
     # One is the dispersion of a unit exponential, which each span is under a
     # correct model -- the same reference the level axis reads against.
-    ggplot2::geom_hline(yintercept = 1, colour = ag_base()) +
+    ggplot2::geom_hline(yintercept = 1, colour = ag_ink()) +
     ggplot2::geom_point(
       ggplot2::aes(size = .data$observed),
       alpha = 0.6,

@@ -42,6 +42,9 @@
   - Plot themes are now built with the `ag_theme_*()` wrappers
   - Blanked elements stay blank, so a graph keeps no axis text or coordinates
   - Ties, nodes, and labels with no colour take `ag_ink()` and the ground
+- Added `ag_ink()` for the colour a theme writes with
+  - Axis text, reference lines, and other chrome take it, not `ag_base()`
+  - Frees `ag_base()` to be light where that sets it off from the highlight
 - Added `simulate_colorblind()` and `contrast_colors()` for checking palettes
   - Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)
   - Scores a pair by its worst case across those and normal vision

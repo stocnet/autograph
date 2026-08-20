@@ -60,7 +60,7 @@ Brownian bridge, which is the reference the event-clock p-value uses.}
 \item{page}{Which page to draw, for the per-term figures. \code{NULL} (the
 default) draws every panel in one figure, exactly as before. A number
 draws that page alone; a number past the last is an error naming the
-count. Use \code{\link[=ag_pages]{ag_pages()}} to learn the count without rendering, so a loop
+count. Use \code{\link[=count_pages]{count_pages()}} to learn the count without rendering, so a loop
 can write every page with nobody at a screen.}
 
 \item{nrow, ncol}{Panels per page when \code{page} is given.}

@@ -104,7 +104,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     midline <- stats::median(p[["data"]][["y"]])
     y_coord <- ldata[["y"]]
     args <- list(mapping = label_aes, data = ldata,
-                 family = ag_font(), size = 2, colour = "grey20",
+                 family = ag_font(), size = 2, colour = ag_ink(),
                  repel = label_repel,
                  nudge_y = ifelse(y_coord <= midline,
                                   -nudge_unit, nudge_unit))
@@ -127,12 +127,14 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     }
     p <- p + do.call(ggraph::geom_node_text, args)
   } else if (layout %in% c("alluvial", "lineage")) {
-    # `fill = "white"` matches ggrepel's own hardcoded label background
+    # An opaque fill matches ggrepel's own hardcoded label background
     # (`GeomLabelRepel$default_aes$fill`); without it, plain `GeomLabel`
     # resolves fill via the active theme and renders fully transparent here,
-    # making labels invisible wherever they sit over a node.
+    # making labels invisible wherever they sit over a node. The fill is the
+    # theme's own ground rather than white, so that a dark theme does not
+    # scatter white cards over its graph.
     args <- list(mapping = label_aes, data = ldata,
-                 size = 3, fill = "white",
+                 size = 3, fill = ag_ground_fill(), colour = ag_ink(),
                  family = ag_font(), repel = label_repel,
                  nudge_x = ifelse(ldata[,1] == 1,
                                   nudge_unit, -nudge_unit))
@@ -140,8 +142,8 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     p <- p + do.call(ggraph::geom_node_label, args)
   } else {
     args <- list(mapping = label_aes, data = ldata,
-                 family = ag_font(), fill = "white",
-                 repel = label_repel, size = 3)
+                 family = ag_font(), fill = ag_ground_fill(),
+                 colour = ag_ink(), repel = label_repel, size = 3)
     if (label_repel) {
       args$point.padding <- padding
       args$seed <- 1234
