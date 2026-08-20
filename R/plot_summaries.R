@@ -33,7 +33,7 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
                          linewidth = 1.25) +
       ggplot2::geom_col(ggplot2::aes(x = time, y = I_new/n), 
                         alpha = 0.4) +
-      ggplot2::theme_minimal() + 
+      ag_theme_minimal() + 
       # using coord_cartesian to avoid printing warnings
       ggplot2::coord_cartesian(ylim = c(0,1)) + 
       ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
@@ -85,7 +85,7 @@ plot.diffs_model <- function(x, ...){
                          method = "loess", se=TRUE, level = .95, formula = 'y~x') +
     ggplot2::geom_smooth(ggplot2::aes(x = time, y = I/n, color = "C"), 
                          method = "loess", se=TRUE, level = .95, formula = 'y~x') +
-    ggplot2::theme_minimal() + 
+    ag_theme_minimal() + 
     ggplot2::coord_cartesian(ylim = c(0,1)) + # using coord_cartesion to avoid printing warnings
     ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
     ggplot2::ylab("Proportion") + ggplot2::xlab("Steps")
@@ -121,7 +121,7 @@ plot.learn_model <- function(x, ...){
   y <- as.data.frame.table(y)
   y$Step <- as.numeric(gsub("t", "", y$Var2))
   ggplot2::ggplot(y, ggplot2::aes(x = Step, y = Freq, color = Var1)) + 
-    ggplot2::geom_line(show.legend = FALSE) + ggplot2::theme_minimal() +
+    ggplot2::geom_line(show.legend = FALSE) + ag_theme_minimal() +
     ggplot2::scale_color_manual(values = ag_qualitative(ncol(x))) +
     ggplot2::ylab("Belief")
 }

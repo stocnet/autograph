@@ -38,6 +38,10 @@
   - Setting a theme without it clears any choice persisted earlier
 - Improved font detection in `stocnet_theme()` via `{systemfonts}`
   - Added `list_fonts()` for listing the font families R can see
+- Improved theme backgrounds to reach every plot, not only the graphs
+  - Plot themes are now built with the `ag_theme_*()` wrappers
+  - Blanked elements stay blank, so a graph keeps no axis text or coordinates
+  - Ties, nodes, and labels with no colour take `ag_ink()` and the ground
 - Added `simulate_colorblind()` and `contrast_colors()` for checking palettes
   - Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)
   - Scores a pair by its worst case across those and normal vision

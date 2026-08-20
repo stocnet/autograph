@@ -12,7 +12,7 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
       }
     }
   }
-  p <- ggraph::ggraph(lo) + ggplot2::theme_void()
+  p <- ggraph::ggraph(lo) + ag_theme_void()
   if (!is.null(node_group)) {
     # thisRequires("ggforce")
     p <- p + 
@@ -50,10 +50,6 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
     } else p$data[,c("x","y")] <- depth_first_recursive_search(p)
     }
   }
-  # Add background ----
-  if(getOption("snet_background", default = "#FFFFFF")!="#FFFFFF")
-    p <- p + ggplot2::theme(panel.background = ggplot2::element_rect(fill = getOption("snet_background", 
-                                                                                      default = "#FFFFFF")))
   p
 }
 

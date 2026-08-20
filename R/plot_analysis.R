@@ -51,7 +51,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
       ggplot2::ylab("Density")
   }
   p +
-    ggplot2::theme_classic(base_family = ag_font()) +
+    ag_theme_classic(base_family = ag_font()) +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -88,7 +88,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
                             linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
-  p + ggplot2::theme_classic(base_family = ag_font()) +
+  p + ag_theme_classic(base_family = ag_font()) +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -99,7 +99,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
     ggplot2::geom_line(colour = ag_highlight()) +
-    ggplot2::theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal(base_family = ag_font()) +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
 }
@@ -146,10 +146,10 @@ plot.node_member <- function(x, ...) {
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0.22, 0.02))) +
     ggplot2::coord_flip() +
-    ggplot2::theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal(base_family = ag_font()) +
     ggplot2::theme(axis.title = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(colour = ag_base()),
+                   axis.text.x = ggplot2::element_text(colour = ag_ink()),
                    panel.grid = ggplot2::element_blank())
 }
 
@@ -182,7 +182,7 @@ plot.node_member <- function(x, ...) {
 #   ggplot2::geom_text(stat = "stratum",
 #                      ggplot2::aes(label = ggplot2::after_stat(stratum))) +
 #   ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
-#   ggplot2::theme_minimal()
+#   ag_theme_minimal()
 
 #   # Step 1: Reshape to wide format with one row per person
 #   df_wide <- df_long |>
@@ -208,7 +208,7 @@ plot.node_member <- function(x, ...) {
 #       size = 3
 #     ) +
 #     ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
-#     ggplot2::theme_minimal()
+#     ag_theme_minimal()
 # 
 # }
 
@@ -261,7 +261,7 @@ plot.matrix <- function(x, ..., membership = NULL) {
   plot_data <- rbind(plot_data, all_nodes) |> 
     dplyr::distinct(from, to, .keep_all = TRUE)
   g <- ggplot2::ggplot(plot_data, ggplot2::aes(to, from)) +
-    ggplot2::theme_grey(base_size = 9) +
+    ag_theme_grey(base_size = 9) +
     ggplot2::labs(x = "", y = "") +
     ggplot2::theme(
       legend.position = "none",

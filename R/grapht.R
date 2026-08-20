@@ -789,12 +789,8 @@ print.grapht <- function(x, ...) {
   # --- Legends and theme (consistent with graphr) ----
   p <- graph_legends(p, g_ref, node_color, node_shape, node_size,
                      edge_color, edge_size)
-  p <- p + ggplot2::theme_void() +
+  p <- p + ag_theme_void() +
     ggplot2::theme(legend.position = "bottom")
   if (directed) p <- p + ggplot2::coord_fixed()
-  if (getOption("snet_background", default = "#FFFFFF") != "#FFFFFF")
-    p <- p + ggplot2::theme(
-      panel.background = ggplot2::element_rect(
-        fill = getOption("snet_background", default = "#FFFFFF")))
   p
 }

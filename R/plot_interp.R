@@ -70,7 +70,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       # ggplot2::scale_linetype_manual(
       # values= c('solid',  'longdash','dashed',
       #           'twodash', 'dotdash', 'dotted'), labels=labels) +
-      ggplot2::theme_minimal(base_size=8, base_family=ag_font()) 
+      ag_theme_minimal(base_size=8, base_family=ag_font()) 
     # + ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
     #         panel.grid.minor = ggplot2::element_blank())
   } else {
@@ -78,7 +78,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       gs +
       ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), 
                                                      labs)) + 
-      ggplot2::theme_minimal(base_size=8, base_family=ag_font())
+      ag_theme_minimal(base_size=8, base_family=ag_font())
   }
   
   nametext <- attr(x, "name")
@@ -120,7 +120,7 @@ plot.influenceTable <- function(x, separation=0, ...){
   
   sp <- ggplot2::ggplot(zselect, ggplot2::aes(zego, select, 
                                               group=alter, colour=alter)) +
-    ggplot2::theme_bw()
+    ag_theme_bw()
   
   if (quad) {
     gs <- ggplot2::geom_smooth(linewidth=1.2, span=3, 
@@ -144,7 +144,7 @@ plot.influenceTable <- function(x, separation=0, ...){
     ggplot2::labs(x=paste(beh.label,'ego value'), y=ylabel, title=title,
                   # linetype=paste(beh.label,'\nalter\nvalue'),
                   colour=paste(beh.label,'\nalter\nvalue')) +
-    # ggplot2::theme_grey(base_size=14, base_family="") +
+    # ag_theme_grey(base_size=14, base_family="") +
     ggplot2::theme(legend.key.width = ggplot2::unit(1, "cm")) +
     ggplot2::theme(text = element_text(family = ag_font()),
                    plot.title = element_text(hjust=0.5,

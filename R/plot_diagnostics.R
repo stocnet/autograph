@@ -76,7 +76,7 @@ plot.goldfishOutliers <- function(x, ...) {
       hjust = "outward",
       colour = ag_highlight()
     ) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::scale_colour_manual(
       values = c("FALSE" = ag_base(), "TRUE" = ag_highlight()),
       guide = "none"
@@ -133,7 +133,7 @@ plot.goldfishChangepoints <- function(x, ...) {
       mapping = ggplot2::aes(xintercept = .data$time),
       colour = ag_highlight()
     ) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "",
       y = gf_series_label(params),
@@ -221,7 +221,7 @@ plot.goldfishMargins <- function(x, ..., top = 25) {
       values = c(above = ag_positive(), below = ag_negative()),
       guide = "none"
     ) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = if (martingale) {
         "Observed minus expected events"
@@ -285,14 +285,14 @@ plot.goldfishGOF <- function(
     process,
     ggplot2::aes(x = .data$u, y = .data$process)
   ) +
-    ggplot2::geom_hline(yintercept = 0, colour = ag_base()) +
+    ggplot2::geom_hline(yintercept = 0, colour = ag_ink()) +
     ggplot2::geom_hline(
       yintercept = c(-1, 1) * gf_bridge_quantile(level),
       colour = ag_highlight(),
       linetype = "dashed"
     ) +
     ggplot2::geom_step(na.rm = TRUE) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = gf_clock_label(clock),
       y = "Standardized cumulative score",
@@ -360,7 +360,7 @@ plot.goldfishTimeTest <- function(x, ..., page = NULL, nrow = 2, ncol = 2) {
       colour = ag_highlight(),
       na.rm = TRUE
     ) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "Model time",
       y = "Scaled Schoenfeld residual",
@@ -564,7 +564,7 @@ gf_onset_path_panel <- function(
       )
   }
   p <- p +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "Initial events dropped",
       y = "Estimate",
@@ -616,7 +616,7 @@ gf_onset_accrual_panel <- function(x, summary, context) {
       linetype = "dashed"
     ) +
     ggplot2::geom_line(colour = ag_base(), na.rm = TRUE) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "Initial events dropped",
       y = "Share of information",
@@ -706,7 +706,7 @@ gf_overview_deviance <- function(x) {
       colour = ag_highlight(),
       na.rm = TRUE
     ) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(x = "", y = "Interval log likelihood", subtitle = "Deviance")
 }
 
@@ -743,7 +743,7 @@ gf_overview_schoenfeld <- function(x, effects) {
       na.rm = TRUE
     ) +
     ggplot2::facet_wrap(~ .data$term, scales = "free_y") +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "",
       y = "",
@@ -835,7 +835,7 @@ gf_overview_waiting <- function(x) {
   ) +
     ggplot2::geom_abline(slope = 1, intercept = 0, colour = ag_base()) +
     ggplot2::geom_point(colour = ag_highlight(), alpha = 0.5) +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = "Unit exponential",
       y = "Cox-Snell residual",
@@ -978,7 +978,7 @@ gf_margin_scatter <- function(data, martingale, top) {
       na.rm = TRUE
     ) +
     ggplot2::scale_size_continuous(name = "Events") +
-    ggplot2::theme_minimal() +
+    ag_theme_minimal() +
     ggplot2::labs(
       x = if (martingale) {
         "Observed minus expected events"
