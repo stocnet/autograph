@@ -3,7 +3,12 @@
 ## Package
 
 - Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
-- Added goldfish to `Enhances`
+- Added `{goldfish}` to `Enhances`
+- Added `{systemfonts}` to `Suggests`
+- Added a `website-builds` job to `prchecks.yml`, reporting whether the site builds
+  - `count_pages()` was missing from the reference index, which stopped it
+- Updated CONTRIBUTING with conventions for function names, `NEWS.md` bullets,
+  the website reference index, and keeping tutorials and articles in step
 
 ## Layouts
 
@@ -24,6 +29,11 @@
   - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing
 - Improved node shape legend of a two-mode network to name the modes where the network records them instead of default "One" and "Two"
 - Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
+
+## Theming
+
+- Improved font detection in `stocnet_theme()` via `{systemfonts}`
+- Added `list_fonts()` for listing the font families R can see
 
 ## Plotting
 

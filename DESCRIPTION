@@ -28,6 +28,7 @@ Suggests:
     methods,
     migraph,
     netrics (>= 0.4.0),
+    systemfonts,
     testthat (>= 3.0.0)
 Enhances:
     ergm,
