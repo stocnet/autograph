@@ -4,6 +4,10 @@
 #'   For example, `ag_base()` will return the current theme's base or background
 #'   color, and `ag_highlight()` will return the color used in that theme to
 #'   highlight one or more nodes, lines, or such.
+#'   `ag_ink()` returns the darker colour that theme writes with:
+#'   axis text, reference lines, and other chrome.
+#'   Keeping the two apart lets the base be light enough to stand away from
+#'   the highlight while the ink stays dark enough to read.
 #'   
 #'   Using palettes that are high contrast, aesthetically pleasing, and
 #'   institutionally or thematically consistent is not without its challenges.
@@ -19,15 +23,33 @@
 #'   These include the [viridis](https://CRAN.R-project.org/package=viridis) 
 #'   palette,
 #'   and the ColorBrewer palettes (included in the RColorBrewer package).
-#'   The default palettes in `{autograph}` are designed to be colour-blind
-#'   friendly, but users should always check that their visualisations serve
-#'   their intended audience.
+#'   
+#'   An institutional palette is not ours to change, but its order is.
+#'   Each theme's categorical palette is therefore reordered when the theme is
+#'   set, so that the first colours a plot draws on are those that stay
+#'   distinct under each type of colour blindness, and `ag_qualitative()`
+#'   takes those colours in order rather than interpolating between them.
+#'   Divergent palettes pair a warm pole with a cool one for the same reason.
+#'   Use [contrast_colors()] to check how your own colours fare,
+#'   and [simulate_colorblind()] to see them as a colour-blind viewer would.
+#'   
+#'   The "rainbow" theme is the exception, and is left in its own order.
+#'   Its point is fidelity to the spectrum of an observed rainbow,
+#'   which reordering would destroy,
+#'   so `ag_qualitative()` samples across its whole length instead.
+#'   A spectrum is not a colour-blind safe scheme:
+#'   its reds and greens are exactly the pair that red-green colour blindness
+#'   cannot separate.
+#'   Choose it where the order of the categories is itself meaningful,
+#'   and check the result with [contrast_colors()];
+#'   for categories with no order, another theme serves more readers.
 #' @name ag_call
 #' @param number Integer of how many category colours to return.
 #' @returns One or more hexcodes as strings.
 #' @examples
 #' # Single colours from the currently active theme
 #' ag_base()
+#' ag_ink()
 #' ag_highlight()
 #' ag_positive()
 #' ag_negative()
@@ -41,6 +63,12 @@
 #' @export
 ag_base <- function(){
   utils::head(getOption("snet_highlight", default = "black"), n = 1)
+}
+
+#' @rdname ag_call
+#' @export
+ag_ink <- function(){
+  getOption("snet_ink", default = "#121212")
 }
 
 #' @rdname ag_call
@@ -64,10 +92,23 @@ ag_negative <- function(){
 #' @rdname ag_call
 #' @export
 ag_qualitative <- function(number){
-  snet_colors <- getOption("snet_cat", default = c("#1B9E77","#4575b4","#d73027",
-                                                   "#66A61E","#E6AB02","#D95F02","#7570B3",
-                                                   "#A6761D","#E7298A","#666666"))
+  # The fallback is the default theme's palette in the order colorblind_sort() gives
+  # it, so that a session that has not called stocnet_theme() yet draws the
+  # same colours, in the same order, as one that has.
+  snet_colors <- getOption("snet_cat", default = c("#1B9E77","#E6AB02","#7570B3",
+                                                   "#d73027","#666666","#D95F02",
+                                                   "#66A61E","#E7298A","#A6761D",
+                                                   "#4575b4"))
   if(missing(number)) number <- length(snet_colors)
+  # Take the palette's own colours while they last. Interpolating between them
+  # returned mixtures that no longer belonged to the palette, and that sat much
+  # closer together than the colours they were mixed from: five categories from
+  # the "clay" palette used to come back only 3 apart under simulation, where
+  # anything under 10 reads as the same colour. Palettes are ordered so that
+  # the first `number` of them are the ones that separate best.
+  if(number <= length(snet_colors) &&
+     !isTRUE(getOption("snet_cat_spread", default = FALSE)))
+    return(snet_colors[seq_len(number)])
   colorRampPalette(snet_colors)(number)
 }
 

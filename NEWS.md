@@ -48,6 +48,15 @@
 - Added `simulate_colorblind()` and `contrast_colors()` for checking palettes
   - Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)
   - Scores a pair by its worst case across those and normal vision
+- Improved every theme's categorical palette for colour-blind viewers
+  - `ag_qualitative()` uses most distinct, own colors first not mixtures
+  - Samples across the palette only where it holds too few colours
+  - Kept "rainbow" in its own order, since fidelity to a spectrum is its point
+- Improved some highlight pairs
+  - Fixed "neon" highlight pair, a cyan and a green 12.7 apart
+  - Fixed "ethz" and "cmu" highlight pairs by lightening their greys
+- Fixed divergent palettes pairing a red pole with a green or teal one, such as in "ethz"
+- Added a "clay" theme inspired by palette and fonts of Anthropic's Claude
 
 ## Plotting
 

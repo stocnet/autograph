@@ -69,6 +69,8 @@ reference:
     contents:
       - theme_set
       - ag_call
+      - list_fonts
+      - theme_colorblind
       - match_color
       - ends_with("themes")
       - ends_with("scales")
@@ -88,6 +90,7 @@ reference:
       `plot()` methods exist for results and other objects for stocnet packages.
     contents:
       - starts_with("plot.")
+      - count_pages
   - title: "Layouts"
     desc: |
       Functions for laying out the nodes in a graph.

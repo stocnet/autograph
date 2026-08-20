@@ -148,7 +148,9 @@ test_that("nodes use fill aesthetic instead of colour", {
   skip_on_cran()
   # Default node uses fill parameter
   p <- graphr(ison_brandes)
-  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], "black")
+  # The default node fill is the colour the theme writes with, which is a
+  # near-black on a white ground and a near-white on a dark one.
+  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], ag_ink())
   # Mapped node_color uses fill in aes
   p2 <- ison_brandes |>
     dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) |>

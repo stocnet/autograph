@@ -413,10 +413,10 @@ test_that("the page count is known without rendering", {
   for (object in list(goldfish_gof, goldfish_time, goldfish_onset)) {
     panels <- gf_panel_count(object)
     expect_gt(panels, 0L)
-    expect_identical(ag_pages(object, nrow = 1, ncol = 1), as.integer(panels))
-    expect_identical(ag_pages(object, nrow = panels, ncol = panels), 1L)
+    expect_identical(count_pages(object, nrow = 1, ncol = 1), as.integer(panels))
+    expect_identical(count_pages(object, nrow = panels, ncol = panels), 1L)
     # Never zero: a figure with nothing to facet is still one page.
-    expect_gte(ag_pages(object), 1L)
+    expect_gte(count_pages(object), 1L)
   }
 })
 
@@ -434,7 +434,7 @@ test_that("the count matches the panels actually drawn", {
 test_that("the pages cover every term exactly once", {
   for (object in list(goldfish_gof, goldfish_time)) {
     all_terms <- page_terms(plot(object))
-    n_pages <- ag_pages(object, nrow = 1, ncol = 1)
+    n_pages <- count_pages(object, nrow = 1, ncol = 1)
 
     seen <- unlist(lapply(seq_len(n_pages), function(k) {
       page_terms(plot(object, page = k, nrow = 1, ncol = 1))
@@ -451,7 +451,7 @@ test_that("every page renders without prompting", {
   expect_false(interactive())
   before <- grDevices::devAskNewPage()
 
-  n_pages <- ag_pages(goldfish_gof, nrow = 1, ncol = 1)
+  n_pages <- count_pages(goldfish_gof, nrow = 1, ncol = 1)
   for (k in seq_len(n_pages)) {
     p <- plot(goldfish_gof, page = k, nrow = 1, ncol = 1)
     expect_s3_class(p, "ggplot")
@@ -463,7 +463,7 @@ test_that("every page renders without prompting", {
 })
 
 test_that("a page past the last one is an error naming the count", {
-  n_pages <- ag_pages(goldfish_gof, nrow = 1, ncol = 1)
+  n_pages <- count_pages(goldfish_gof, nrow = 1, ncol = 1)
   expect_error(
     plot(goldfish_gof, page = n_pages + 1L, nrow = 1, ncol = 1),
     "past the last page"
