@@ -32,8 +32,15 @@
 
 ## Theming
 
+- Added a `persist` argument to `stocnet_theme()`, remembering a theme
+  - `persist = TRUE` writes it to `tools::R_user_dir("autograph", "config")`
+  - Nothing written to disk unless passed explicitly
+  - Setting a theme without it clears any choice persisted earlier
 - Improved font detection in `stocnet_theme()` via `{systemfonts}`
-- Added `list_fonts()` for listing the font families R can see
+  - Added `list_fonts()` for listing the font families R can see
+- Added `simulate_colorblind()` and `contrast_colors()` for checking palettes
+  - Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)
+  - Scores a pair by its worst case across those and normal vision
 
 ## Plotting
 

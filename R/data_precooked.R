@@ -1,10 +1,15 @@
 #' Precooked results for demonstrating plotting
+#' @name made_earlier
 #' @description
 #'   These are all pre-cooked results objects, saved here to save time in
 #'   testing and demonstrating how autograph plots look.
+NULL
+
+# migraph objects ####
+
 #' @docType data
 #' @keywords datasets
-#' @name made_earlier
+#' @rdname made_earlier
 #' @usage data(res_migraph_reg)
 "res_migraph_reg"
 
@@ -19,6 +24,8 @@
 #' @rdname made_earlier
 #' @usage data(res_migraph_diff)
 "res_migraph_diff"
+
+# manynet objects ####
 
 #' @docType data
 #' @keywords datasets
@@ -60,7 +67,7 @@
 #' @usage data(monan_gof)
 "monan_gof"
 
-# ERGM objects ####
+# ergm objects ####
 
 #' @docType data
 #' @keywords datasets
@@ -68,7 +75,7 @@
 #' @usage data(ergm_gof)
 "ergm_gof"
 
-# Goldfish objects ####
+# goldfish objects ####
 
 #' @docType data
 #' @keywords datasets
@@ -87,6 +94,7 @@
 #' @rdname made_earlier
 #' @usage data(goldfish_margins)
 "goldfish_margins"
+
 #' @docType data
 #' @keywords datasets
 #' @rdname made_earlier
