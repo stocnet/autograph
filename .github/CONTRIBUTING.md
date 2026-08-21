@@ -232,6 +232,38 @@ It scales text through `ag_size()` and `ag_text_size()`, and `"print"` overrides
 Text set on a geom or on a theme element directly does not pass through `base_size`, so wrap it in
 `ag_text_size()`; marks are deliberately left unscaled, since a node's size is relative to its layout.
 
+#### Adding a theme or palette
+
+1. Add the name to `theme_opts` in [R/theme_palette_set.R](../R/theme_palette_set.R).
+2. Give it a branch in each `set_*_theme()` it needs: background, ink, highlight, divergent,
+   categorical, font. Omitting one leaves the theme on that setter's default, which is usually right.
+   `set_missing_theme()` needs nothing: it derives `ag_missing()` from the ground and the palette.
+3. Store the categorical palette in the order `colorblind_sort()` gives it, not the order the brand
+   guide lists it in. The test suite asserts that the stored palette is already a fixed point of the
+   sort, so a hand-ordered palette will fail.
+4. Run `tests/testthat/test-functional_themes.R`. It holds every theme to: the first few categorical
+   colours staying apart under each type of colour blindness, divergent poles that are not a
+   red-green pair, a highlight pair that every viewer can separate, and ink that clears WCAG's 4.5:1
+   on the theme's own ground.
+
+Reorder a palette; do not repaint it. An institution's colours are that institution's, and the point
+of `colorblind_sort()` is that the order is ours to choose while the colours are not. Where a brand
+colour genuinely cannot meet a floor — the `"clay"` and `"oxf"` highlights fall just under WCAG's
+3:1 — name the exception in the test rather than adjusting the colour or dropping the assertion.
+
+Tools worth checking a candidate palette with before it is added:
+
+- [ColorBrewer](https://colorbrewer2.org) for whether a scheme should be qualitative, sequential or
+  diverging, and for its colour-blind safe, print-friendly and photocopy-safe filters.
+- [Viz Palette](https://projects.susielu.com/viz-palette) for seeing a set of hexcodes at once under
+  each type of colour vision deficiency.
+- Datawrapper's [notes on colour in a data-vis style guide](https://www.datawrapper.de/blog/colors-for-data-vis-style-guides)
+  for why a palette needs to vary in lightness and not only in hue, and for the case for a
+  de-emphasis colour (`ag_missing()` here).
+- The [`{GGenemy}`](https://cran.r-project.org/package=GGenemy) and
+  [`{colorify}`](https://cran.r-project.org/package=colorify) packages, for auditing a finished
+  `ggplot2` figure and for generating candidate palettes respectively. Neither is a dependency.
+
 Because `autograph` re-exports several `ggplot2` symbols (see [R/reexports_ggplot2.R](../R/reexports_ggplot2.R)),
 loading `autograph` last in a session is recommended so its `plot()` methods take precedence over other packages'.
 

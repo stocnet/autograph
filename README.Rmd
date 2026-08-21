@@ -387,13 +387,14 @@ and each divergent palette pairs a warm pole with a cool one.
 
 `simulate_colorblind()` shows a set of colours as another viewer sees them,
 so mapping the simulated colours back onto a graph shows you their view of it.
-Here is the same network three times:
+Here is the same network four times:
 in `{autograph}`'s default palette as most readers see it,
 then as a reader with deuteranopia does,
+then as a photocopier renders it,
 and then in the palette `{ggraph}` falls back on when `{autograph}` is not
-setting the colours, as that same reader sees it.
+setting the colours, as that same reader with deuteranopia sees it.
 
-```{r cvd, message=FALSE, warning=FALSE, dpi = 300, fig.height=3, fig.width=9, fig.alt="The same network seen with normal vision and with deuteranopia, in autograph's palette and in ggraph's"}
+```{r cvd, message=FALSE, warning=FALSE, dpi = 300, fig.height=3, fig.width=12, fig.alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's"}
 set_stocnet_theme("default")
 as_seen <- function(colours, type, title){
   graphr(fict_lotr, node_colour = "Race", node_size = 3, labels = FALSE) +
@@ -402,12 +403,19 @@ as_seen <- function(colours, type, title){
 }
 as_seen(ag_qualitative(6), "normal", "autograph") |
   as_seen(ag_qualitative(6), "deutan", "autograph, deuteranopia") |
+  as_seen(ag_qualitative(6), "grey", "autograph, greyscale") |
   as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
 ```
 
-The six races remain tellable apart in the middle panel,
+The six races remain tellable apart in the second panel,
 its closest pair being Hobbits and Maiar.
 In the right-hand one, Elves and Ents have become the same olive.
+The third panel is the harder case, and it is not one reordering can fix:
+a greyscale device keeps only the luminance of a colour,
+so two colours of the same lightness merge however different their hues.
+`contrast_colors()` reports that view beside its own score;
+where a figure has to print in black and white,
+use the `"bw"` theme or add a second channel such as `node_shape`.
 `contrast_colors()` puts a number on it,
 scoring how far apart colours are at their worst
 across normal vision and each type of colour blindness:
@@ -429,6 +437,42 @@ and there the ordering is what stands between a brand palette and an
 unreadable graph.
 A palette with more colours to draw on has more room to gain:
 six categories score 29 under the `"hwu"` theme and 26 under `"oxf"`.
+
+Marks are only half of it.
+Text has to be read rather than told apart,
+which is a matter of contrast rather than of hue,
+and `contrast_ratio()` scores it against the thresholds of WCAG 2.1:
+4.5 for body text, 3 for large text and for graphical objects.
+Every theme's ink clears 4.5 on that theme's own ground,
+and the test suite holds it there.
+
+```{r wcag, echo=FALSE, dpi = 300, fig.height=2.2, fig.width=9, fig.alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio"}
+inks <- do.call(rbind, lapply(autograph:::theme_opts, function(t){
+  set_stocnet_theme(t)
+  bg <- getOption("snet_background")
+  data.frame(theme = t, ink = ag_ink(), ground = bg,
+             ratio = round(contrast_ratio(ag_ink(), bg)[1, 2], 1))
+}))
+set_stocnet_theme("default")
+inks$x <- (seq_len(nrow(inks)) - 1) %% 8
+inks$y <- -((seq_len(nrow(inks)) - 1) %/% 8)
+ggplot(inks, aes(x, y)) +
+  ggplot2::geom_tile(aes(fill = ground), width = 0.96, height = 0.9,
+                     colour = "grey80") +
+  ggplot2::geom_text(aes(label = theme, colour = ink), nudge_y = 0.13, size = 4) +
+  ggplot2::geom_text(aes(label = paste0(ratio, ":1"), colour = ink),
+                     nudge_y = -0.17, size = 3) +
+  ggplot2::scale_fill_identity() + ggplot2::scale_colour_identity() +
+  ggplot2::coord_equal() + ggplot2::theme_void()
+```
+
+The medium is a separate question again.
+`stocnet_medium()` sizes the text for where the figure will be seen —
+`"screen"`, `"presentation"`, `"mobile"` — and `"print"` draws on white
+whatever ground the theme prefers, since a tinted ground costs ink
+and is often not reproduced.
+The theme is untouched by it, so one institutional palette carries
+from the desk to the slide to the page.
 
 If your institution or organisation is not included and you would like it to be,
 please just raise an issue on Github, 

@@ -12,11 +12,21 @@
   # rather than only after `stocnet_theme()` is called again.
   if (!is.null(saved_theme)) {
     set_highlight_theme(saved_theme)
+    # The ink was missing here, so a persisted dark theme -- "neon" above all
+    # -- came back with its near-black ground and the default dark ink.
+    set_ink_theme(saved_theme)
     set_divergent_theme(saved_theme)
     set_background_theme(saved_theme)
     set_categorical_theme(saved_theme)
+    set_missing_theme(saved_theme)
     set_font_theme(saved_theme)
   }
+
+  # The medium is remembered separately from the theme, and says where the
+  # plot will be seen rather than how it should look. See ?stocnet_medium.
+  saved_medium <- read_medium_pref()
+  options(stocnet_medium = getOption("stocnet_medium",
+                                     if (is.null(saved_medium)) "screen" else saved_medium))
 
   if (!interactive()) return()
 

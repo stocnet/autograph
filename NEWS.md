@@ -3,6 +3,7 @@
 ## Package
 
 - Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
+  - Fixed `.onAttach()` not applying the ink of a persisted theme
 - Added `{goldfish}` to `Enhances`
 - Added `{systemfonts}` to `Suggests`
 - Added a `website-builds` job to `prchecks.yml`, reporting whether the site builds
@@ -61,6 +62,12 @@
   - Scores a pair by its worst case across those and normal vision
   - Added `severity=` to view anomalous trichromacy (deuteranomaly, protanomaly)
   - Added "grey" type to show a palette as print and photocopy may render it
+- Added `ag_ink()` for the colour a theme writes with
+  - Used by axis text and reference lines, clearing 4.5:1 from the ground
+  - Frees `ag_base()` to be light where that sets it off from the highlight
+- Added `ag_missing()` for the neutral that data recedes into: 
+  - missing values, isolates, and any "other" remainder
+- Improved `ag_qualitative()` to note when a palette is asked for more colours than it holds
 - Improved every theme's categorical palette for colour-blind viewers
   - `ag_qualitative()` uses most distinct, own colors first not mixtures
   - Samples across the palette only where it holds too few colours

@@ -126,6 +126,7 @@ stocnet_theme <- function(theme = NULL, persist = FALSE){
     set_divergent_theme(theme)
     set_background_theme(theme)
     set_categorical_theme(theme)
+    set_missing_theme(theme)
     set_font_theme(theme)
     snet_success("Theme set to {.emph {theme}}.")
     if(persist){
@@ -184,6 +185,44 @@ set_ink_theme <- function(theme){
                             "bw" = "#000000",
                             "rug" = "#000000",
                             "#121212"))
+}
+
+# The neutral that data recedes into: missing values, isolates counted out of
+# a drawing, and any "other" remainder. It has two jobs at once, and they pull
+# apart: it must clear the theme's ground by enough to be seen at all (WCAG
+# asks 3:1 of a graphical object), while staying far enough from every
+# categorical colour not to be read as one of them. Several palettes hold a
+# grey of their own, so which neutral is free depends on the theme, and
+# hand-picking sixteen of them would go stale the moment a palette changed.
+# It is chosen the way colorblind_sort() chooses an order instead: from a
+# ladder of neutrals, take the one that clears the ground and sits furthest
+# from anything the palette already uses.
+missing_candidates <- c("#4D4D4D", "#595959", "#666666", "#737373", "#808080",
+                        "#8C8C8C", "#999999", "#A6A6A6", "#B3B3B3",
+                        # A warm and a cool neutral for the tinted grounds.
+                        "#6B665C", "#7E766A", "#8A8378", "#96907F",
+                        "#5C6270", "#6E7482", "#7F87A0", "#919AAE")
+
+set_missing_theme <- function(theme){
+  bg <- getOption("snet_background", default = "#FFFFFF")
+  pal <- getOption("snet_cat", default = "#4576B5")
+  seen <- vapply(missing_candidates,
+                 function(x) contrast_ratio(x, bg)[1, 2], numeric(1))
+  keep <- seen >= 3
+  if(!any(keep)) keep <- seq_along(seen) == which.max(seen)
+  ok <- missing_candidates[keep]
+  seen <- seen[keep]
+  apart <- vapply(ok, function(x) min(contrast_colors(c(x, pal))[1, -1]),
+                  numeric(1))
+  free <- ok[apart >= 10]
+  # Among the neutrals that are both visible and unmistakable, take the one
+  # nearest the ground. The point of this colour is to recede, so the least
+  # contrast that still clears the floor is the right amount, not the most.
+  if(length(free)){
+    options(snet_missing = unname(free[which.min(seen[apart >= 10])]))
+    return(invisible(NULL))
+  }
+  options(snet_missing = unname(ok[which.max(apart)]))
 }
 
 set_highlight_theme <- function(theme){
@@ -353,7 +392,7 @@ set_categorical_theme <- function(theme){
 # a dark network plot and white-backed panels for everything else, which left
 # the "neon" highlights unreadable on the plots that missed out.
 ag_ground <- function(base){
-  bg <- getOption("snet_background", default = "#FFFFFF")
+  bg <- ag_ground_fill()
   if(bg == "#FFFFFF") return(base)
   out <- base + ggplot2::theme(
     plot.background = ggplot2::element_rect(fill = bg, colour = NA),
@@ -377,18 +416,37 @@ ag_ground <- function(base){
   out
 }
 
-# The colour a plot is drawn on, which is white unless the theme says otherwise.
+# The colour a plot is drawn on, which is white unless the theme says
+# otherwise -- and white again where the medium is print, whatever the theme
+# says, since a tinted ground costs ink and is often not reproduced.
 ag_ground_fill <- function(){
-  getOption("snet_background", default = "#FFFFFF")
+  medium_background() %||% getOption("snet_background", default = "#FFFFFF")
 }
 
-ag_theme_minimal <- function(...) ag_ground(ggplot2::theme_minimal(...))
+`%||%` <- function(x, y) if(is.null(x)) y else x
 
-ag_theme_classic <- function(...) ag_ground(ggplot2::theme_classic(...))
+# Every ag_theme_*() wrapper wants the same two things of its base theme: the
+# theme's typeface, and a text size scaled to the medium the plot is made for.
+# Building them from one factory means neither has to be remembered at each of
+# the several dozen call sites, and a caller that gives its own base_size --
+# a small inset, say -- still has it scaled rather than overridden.
+ag_themer <- function(fun){
+  function(...){
+    args <- list(...)
+    if(is.null(args$base_family)) args$base_family <- ag_font()
+    if(is.null(args$base_size)) args$base_size <- 11
+    args$base_size <- args$base_size * ag_size()
+    ag_ground(do.call(fun, args))
+  }
+}
 
-ag_theme_grey <- function(...) ag_ground(ggplot2::theme_grey(...))
+ag_theme_minimal <- ag_themer(ggplot2::theme_minimal)
 
-ag_theme_bw <- function(...) ag_ground(ggplot2::theme_bw(...))
+ag_theme_classic <- ag_themer(ggplot2::theme_classic)
 
-ag_theme_void <- function(...) ag_ground(ggplot2::theme_void(...))
+ag_theme_grey <- ag_themer(ggplot2::theme_grey)
+
+ag_theme_bw <- ag_themer(ggplot2::theme_bw)
+
+ag_theme_void <- ag_themer(ggplot2::theme_void)
 

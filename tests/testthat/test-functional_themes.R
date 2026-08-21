@@ -151,6 +151,19 @@ test_that("palettes separate colours for colour-blind viewers", {
   expect_lt(contrast_colors(c("#B7352D", "#627313"))[1, 2], 10)
   expect_length(simulate_colorblind(c("#d73027", "#4575b4"), "deutan"), 2)
   expect_error(simulate_colorblind("#d73027", "quadran"))
+  # A lower severity is anomalous trichromacy, which moves a colour less far
+  # than dichromacy does, and severity zero moves it not at all.
+  expect_identical(simulate_colorblind("#d73027", "deutan", severity = 0),
+                   simulate_colorblind("#d73027", "normal"))
+  expect_lt(contrast_colors(c("#B7352D", "#627313"))[1, 2],
+            contrast_colors(c(simulate_colorblind("#B7352D", "deutan", 0.4),
+                              simulate_colorblind("#627313", "deutan", 0.4)))[1, 2])
+  expect_error(simulate_colorblind("#d73027", "deutan", severity = 2))
+  # Greyscale keeps only the luminance, so a colour and its grey have the
+  # same relative luminance, and two colours of the same lightness merge.
+  expect_lt(min(attr(contrast_colors(c("#d73027", "#4575b4")), "grey"),
+                na.rm = TRUE),
+            contrast_colors(c("#d73027", "#4575b4"))[1, 2])
 
   for (thm in autograph:::theme_opts) {
     suppressMessages(stocnet_theme(thm))
@@ -180,10 +193,60 @@ test_that("palettes separate colours for colour-blind viewers", {
     hl <- getOption("snet_highlight")
     expect_gt(contrast_colors(hl)[1, 2], 20, label = thm)
     # The ink must stay legible on the theme's own ground, whether that
-    # ground is white, ivory, or near-black.
-    expect_gt(contrast_colors(c(ag_ink(), getOption("snet_background")))[1, 2],
-              50, label = thm)
+    # ground is white, ivory, or near-black. The distance says the two are
+    # different colours; the WCAG ratio says the text can actually be read,
+    # which is the question a reader is asking.
+    bg <- getOption("snet_background")
+    expect_gt(contrast_colors(c(ag_ink(), bg))[1, 2], 50, label = thm)
+    expect_gte(contrast_ratio(ag_ink(), bg)[1, 2], 4.5, label = thm)
+    # WCAG asks 3:1 of a graphical object. Two highlights are an institution's
+    # own colour on that institution's own ground, and repainting a brand is
+    # not something this package does -- see the Colour blindness section of
+    # ?ag_call -- so they are held to a lower floor, named here so that a
+    # palette added later cannot join them quietly.
+    hl_floor <- if (thm %in% c("clay", "oxf")) 2.5 else 3
+    expect_gte(contrast_ratio(ag_highlight(), bg)[1, 2], hl_floor, label = thm)
+    # The colour missing data recedes into must be visible on the ground and
+    # must not be read as one of the categories.
+    expect_gte(contrast_ratio(ag_missing(), bg)[1, 2], 3, label = thm)
+    expect_gt(min(contrast_colors(c(ag_missing(), pal))[1, -1]), 8, label = thm)
   }
+  # Greyscale is reported, not enforced: an institutional palette that
+  # separates by hue collapses in print and should not fail for it. The "bw"
+  # theme is the one built for print, so it is held to the standard.
+  suppressMessages(stocnet_theme("bw"))
+  expect_gt(min(attr(contrast_colors(ag_qualitative(2)), "grey"), na.rm = TRUE),
+            25)
+})
+
+test_that("the medium scales text and prints on white", {
+  on.exit({
+    suppressMessages(stocnet_theme("default"))
+    suppressMessages(stocnet_medium("screen"))
+  }, add = TRUE)
+  suppressMessages(stocnet_medium("screen"))
+  expect_equal(ag_size(), 1)
+  expect_equal(autograph:::ag_text_size(3), 3)
+  suppressMessages(stocnet_medium("presentation"))
+  expect_gt(ag_size(), 1)
+  expect_equal(autograph:::ag_text_size(3), 3 * ag_size())
+  # The base size every plot is built from follows the medium.
+  small <- autograph:::ag_theme_minimal()$text$size
+  suppressMessages(stocnet_medium("mobile"))
+  expect_gt(autograph:::ag_theme_minimal()$text$size, small)
+  # A caller that sets its own base size still has it scaled, not overridden.
+  expect_equal(autograph:::ag_theme_minimal(base_size = 8)$text$size,
+               8 * ag_size())
+  # Print draws on white whatever the theme prefers, and the ink follows the
+  # ground rather than staying the light ink a dark theme chose.
+  suppressMessages(stocnet_theme("neon"))
+  expect_equal(getOption("snet_background"), "#070f23")
+  suppressMessages(stocnet_medium("print"))
+  expect_equal(autograph:::ag_ground_fill(), "#FFFFFF")
+  expect_gte(contrast_ratio(ag_ink())[1, 2], 4.5)
+  # The palettes are the theme's own in every medium.
+  expect_equal(ag_highlight(), "#fdfd54")
+  expect_error(stocnet_medium("papyrus"))
 })
 
 test_that("a theme's ground reaches every plot, not only the graphs", {

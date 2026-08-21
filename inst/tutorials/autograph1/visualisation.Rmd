@@ -653,7 +653,8 @@ For dense or disconnected networks, `edge_bundle` and `isolates`
 <span class="page-toc-link" onclick="document.getElementById('section-whos-hue').scrollIntoView({behavior:'auto',block:'start'});">Hues</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-seeing-what-others-see').scrollIntoView({behavior:'auto',block:'start'});">Colour blindness</span> ·
 <span class="page-toc-link" onclick="document.getElementById('section-greyscale').scrollIntoView({behavior:'auto',block:'start'});">Greyscale</span> ·
-<span class="page-toc-link" onclick="document.getElementById('section-manual-override').scrollIntoView({behavior:'auto',block:'start'});">Manual override</span></span>
+<span class="page-toc-link" onclick="document.getElementById('section-manual-override').scrollIntoView({behavior:'auto',block:'start'});">Manual override</span> ·
+<span class="page-toc-link" onclick="document.getElementById('section-where-will-it-be-seen').scrollIntoView({behavior:'auto',block:'start'});">Medium</span></span>
 
 ### Setting a theme {#setting-a-theme}
 
@@ -791,6 +792,18 @@ simulate_colorblind(c("#B7352D", "#627313"), "deutan")
 
 **Run the code, then try `"protan"` or `"tritan"` instead of `"deutan"`.**
 
+How far the simulation goes is set by `severity`.
+Full severity, the default, is dichromacy:
+deuteranopia, protanopia, tritanopia.
+A lower severity is anomalous trichromacy —
+deuteranomaly, protanomaly — which is the more common condition,
+and which the paragraph above named without being able to show you.
+
+```{r cvdseverity, exercise=TRUE}
+simulate_colorblind(c("#B7352D", "#627313"), "deutan", severity = 1)
+simulate_colorblind(c("#B7352D", "#627313"), "deutan", severity = 0.4)
+```
+
 You can also look at a whole graph the way another viewer would,
 by mapping the simulated colours back onto it.
 
@@ -831,8 +844,27 @@ Where you need particular colours in an institutional palette,
 ### Greyscale {#greyscale}
 
 Other times colour may not be desired.
-Some publications require greyscale images.
-To use a greyscale colour palette,
+Some publications require greyscale images,
+and a figure may be photocopied whether or not you meant it to be.
+A greyscale device keeps the luminance of a colour and throws the rest away,
+so two colours of the same lightness merge, however different their hues.
+This is why ColorBrewer marks a palette print-safe and photocopy-safe
+separately from marking it colour-blind safe:
+they are different questions, and a palette can pass one and fail the other.
+
+`simulate_colorblind()` answers the second with `type = "grey"`,
+and `contrast_colors()` reports the greyscale distances beside its own score.
+
+```{r greysim, exercise=TRUE}
+contrast_colors(ag_qualitative(4))
+```
+
+The matrix is what every viewer can see.
+The line beneath it is what survives a photocopier.
+Most institutional palettes separate their categories by hue,
+so most of them collapse in greyscale.
+
+To draw in greyscale from the start,
 replace `_hue` from above with `_grey` (note the 'e' spelling):
 
 ```{r greyscale, exercise=TRUE, fig.width=9}
@@ -846,6 +878,8 @@ or for very few discrete categories than for the six categories used here.
 If you need to distinguish several categories in print,
 consider combining greyscale with `node_shape`,
 or use the `"bw"` theme, which is designed for this purpose.
+`stocnet_medium("print")` is the companion to this;
+see _Where will it be seen?_ below.
 
 ### Manual override {#manual-override}
 
@@ -868,6 +902,54 @@ graphr(fict_lotr,
   labs(fill = "Colour")
 ```
 
+### Where will it be seen? {#where-will-it-be-seen}
+
+A theme says how a plot should look.
+Where it will be seen is a separate question,
+and the answer changes more often than the theme does.
+The same institutional theme has to serve a figure worked on at a desk,
+projected in a lecture theatre, printed in an article,
+and read on a phone in a narrow column.
+Each of those wants a different size of text,
+and one of them wants a different background.
+
+`stocnet_medium()` sets this, and leaves the theme alone.
+
+```{r medium, exercise=TRUE, fig.width=9}
+stocnet_medium()
+stocnet_medium("presentation")
+graphr(fict_lotr, node_colour = "Race")
+stocnet_medium("screen")
+```
+
+The media are `"screen"` (the default), `"presentation"`, `"mobile"`,
+and `"print"`.
+The first three differ in the size of their text;
+`ag_size()` reports the multiplier in force.
+`"print"` leaves the text alone and draws on white,
+whatever ground the theme prefers,
+since a dark or tinted ground costs ink and is often not reproduced.
+As with `stocnet_theme()`, `persist = TRUE` remembers your choice.
+
+The medium scales text, not marks.
+A node's size is relative to the layout it sits in,
+so enlarging the nodes without enlarging the layout would only crowd it.
+Use `node_size` in `graphr()` where a figure needs larger nodes too.
+
+Nor does the medium set the size of the file you write.
+Give `ggsave()` the width, height, and resolution to match;
+see _Exporting plots_ below.
+
+::: {.callout}
+<span class="callout-label">**Going further**:</span>
+A small figure limits how much it can carry, not just how large the type is.
+Keep a legend to about seven keys, and `graphs()` to about three panels.
+`graphr()` says so when a colour or shape legend grows past that,
+because past it a reader stops matching keys to marks and starts guessing.
+Splitting one crowded figure into two that each make a single point
+is almost always better than shrinking the type until it fits.
+:::
+
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> `stocnet_theme()` sets a theme once for all subsequent
 graphs and plots, with institutional and stylistic palettes included,
@@ -876,8 +958,9 @@ Individual graphs can still be adjusted by appending
 `ggplot2::scale_fill_*()` functions —
 `_hue()` for a different palette, `_grey()` for print,
 `_manual()` for hand-picked colours —
-and `simulate_colorblind()` and `contrast_colors()` check that your palette
-works for colour-blind viewers.
+and `simulate_colorblind()`, `contrast_colors()` and `contrast_ratio()` check
+that your palette works for colour-blind viewers, in greyscale, and as text.
+`stocnet_medium()` then sizes the result for where it will be seen.
 :::
 
 ## Titles, labels, and legends
@@ -991,6 +1074,15 @@ but if you just remember `labs()` you can also use it to add labels
 for _x_ and _y_ axes, and legends (see below).
 
 ### Legends {#legends}
+
+A legend asks a reader to hold a colour in mind while they hunt for it in the
+graph, and people are poor at that:
+colour is not recalled reliably, even over a couple of seconds.
+Labelling nodes directly asks less of them,
+which is why `graphr()` labels nodes where it can,
+and why, above thirty nodes, it labels the most central ones
+rather than none at all (see _Labels_ above).
+Keep a legend for what cannot be written onto the graph itself, and keep it short.
 
 While `{autograph}` attempts to provide legends where necessary,
 in some cases the legends offer insufficient detail, or are absent,

@@ -4,6 +4,7 @@
 \alias{ag_call}
 \alias{ag_base}
 \alias{ag_ink}
+\alias{ag_missing}
 \alias{ag_highlight}
 \alias{ag_positive}
 \alias{ag_negative}
@@ -16,6 +17,8 @@
 ag_base()
 
 ag_ink()
+
+ag_missing()
 
 ag_highlight()
 
@@ -44,8 +47,16 @@ color, and \code{ag_highlight()} will return the color used in that theme to
 highlight one or more nodes, lines, or such.
 \code{ag_ink()} returns the darker colour that theme writes with:
 axis text, reference lines, and other chrome.
+\code{ag_missing()} returns the neutral that theme sets aside for data that
+should recede: missing values, isolates counted out of a drawing,
+and any "other" remainder left when small categories are grouped down.
+Keeping one colour for all three means a reader learns it once.
 Keeping the two apart lets the base be light enough to stand away from
 the highlight while the ink stays dark enough to read.
+Where the ground changes under a theme -- the "print" medium forces
+white, whatever the theme prefers -- \code{ag_ink()} falls back to black or
+white rather than return an ink that cannot be read on it.
+See \code{\link[=contrast_ratio]{contrast_ratio()}} and \code{\link[=stocnet_medium]{stocnet_medium()}}.
 
 Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges.
@@ -73,6 +84,18 @@ Divergent palettes pair a warm pole with a cool one for the same reason.
 Use \code{\link[=contrast_colors]{contrast_colors()}} to check how your own colours fare,
 and \code{\link[=simulate_colorblind]{simulate_colorblind()}} to see them as a colour-blind viewer would.
 
+Two further questions are worth asking of a palette.
+Whether its text can be read on what it sits on is a matter of contrast
+rather than of hue, and \code{\link[=contrast_ratio]{contrast_ratio()}} scores it against the
+thresholds of WCAG 2.1.
+Whether it survives print is a matter of lightness alone, since a
+greyscale device keeps the luminance of a colour and discards the rest;
+\code{simulate_colorblind(type = "grey")} shows that view, and
+\code{\link[=contrast_colors]{contrast_colors()}} reports the greyscale distances beside its own score.
+Most institutional palettes separate by hue and so collapse in greyscale.
+Where a figure has to print in black and white, use the "bw" theme, or
+add a second channel such as \code{node_shape}.
+
 The "rainbow" theme is the exception, and is left in its own order.
 Its point is fidelity to the spectrum of an observed rainbow,
 which reordering would destroy,
@@ -90,6 +113,7 @@ for categories with no order, another theme serves more readers.
 ag_base()
 ag_ink()
 ag_highlight()
+ag_missing()
 ag_positive()
 ag_negative()
 # Palettes of a requested length

@@ -636,6 +636,35 @@ test_that("an attribute that varies nowhere is drawn in one colour", {
 
 # Colourblind palettes ----
 
+test_that("a palette says when it is asked for more colours than it holds", {
+  skip_on_cran()
+  old <- options(snet_verbosity = "verbose")
+  on.exit({
+    options(old)
+    suppressMessages(stocnet_theme("default"))
+  }, add = TRUE)
+  suppressMessages(stocnet_theme("iheid"))
+  n <- length(getOption("snet_cat"))
+  expect_silent(ag_qualitative(n))
+  expect_message(ag_qualitative(n + 3), "mixtures")
+})
+
+test_that("a legend of more than seven keys is worth saying something about", {
+  skip_on_cran()
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  net <- manynet::as_igraph(manynet::ison_adolescents)
+  many <- igraph::set_vertex_attr(net, "band",
+                                  value = paste0("b", seq_len(igraph::vcount(net))))
+  expect_message(graphr(many, node_colour = "band", labels = FALSE), "8 keys")
+  # Six categories are within what a reader can match, and a continuous
+  # attribute has no keys to count at all.
+  expect_no_message(autograph:::.check_legend_size(
+    manynet::as_igraph(fict_lotr), node_color = "Race"))
+  expect_no_message(autograph:::.check_legend_size(
+    many, node_color = NULL, node_shape = NULL, edge_color = NULL))
+})
+
 test_that("a single colour and an indistinct palette are still handled", {
   # convertColor() drops to a vector for one colour, which the caller reads
   # by row like any other.
