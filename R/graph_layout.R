@@ -15,10 +15,25 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   p <- ggraph::ggraph(lo) + ag_theme_void()
   if (!is.null(node_group)) {
     # thisRequires("ggforce")
+    # A membership matrix repeats a node's coordinates once for each group it
+    # belongs to, so a node in several groups is inside several hulls and the
+    # hulls overlap. One long data frame draws them all: ggforce draws one hull
+    # for each level of the fill.
+    if (is.matrix(node_group)) {
+      idx <- which(node_group, arr.ind = TRUE)
+      hulls <- data.frame(
+        x = lo[["x"]][idx[, 1]], y = lo[["y"]][idx[, 1]],
+        node_group = factor(colnames(node_group)[idx[, 2]],
+                            levels = colnames(node_group)))
+      ngroups <- ncol(node_group)
+    } else {
+      hulls <- lo
+      ngroups <- length(unique(p$data[[node_group]]))
+    }
     p <- p + 
       ggforce::geom_mark_hull(ggplot2::aes(x, y, fill = node_group,
-                                           label = node_group), data = lo) +
-      ggplot2::scale_fill_manual(values = ag_qualitative(length(unique(p$data[[node_group]]))),
+                                           label = node_group), data = hulls) +
+      ggplot2::scale_fill_manual(values = ag_qualitative(ngroups),
                                  guide = ggplot2::guide_legend("Group"))
   }
   if(snap){

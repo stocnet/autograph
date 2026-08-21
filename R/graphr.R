@@ -103,6 +103,15 @@
 #'   Group variables should have a minimum of 3 nodes,
 #'   if less, number groups will be reduced by
 #'   merging categories with lower counts into one called "other".
+#'   A membership vector can also be given here.
+#'   Where nodes belong to several groups at once, as they can to several
+#'   cliques, give a membership matrix instead: one row for each node,
+#'   one column for each group, and a one wherever the node belongs to
+#'   the group. One hull is then drawn for each column, and the hulls
+#'   overlap where the groups do.
+#'   A measure that returns such a matrix, such as
+#'   `netrics::node_x_clique()`, can be named without its network,
+#'   which is taken to be the network being drawn.
 #' @param edge_color,edge_colour Tie variable to be used for coloring the nodes.
 #'   It is easiest if this is added as an edge or tie attribute 
 #'   to the graph before plotting.
@@ -172,6 +181,8 @@
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+#' # Nodes can belong to several groups at once, e.g. overlapping cliques
+#' graphr(ison_adolescents, node_group = netrics::node_x_clique())
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
@@ -246,9 +257,19 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     node_size <- .check_node_size(g, as.character(substitute(node_size)))
   }
   if (missing(node_group)) node_group <- NULL else {
-    node_group <- .check_node_group(g, as.character(substitute(node_group)))
-    g <- manynet::mutate_nodes(g,
-                               node_group = .reduce_categories(g, node_group))
+    node_group <- .infer_node_group(g, substitute(node_group), parent.frame())
+    if (!is.matrix(node_group)) {
+      if (is.character(node_group) && length(node_group) == 1L) {
+        node_group <- .check_node_group(g, node_group)
+      } else {
+        # A membership vector is held on the network, so that it is treated as
+        # any other node attribute from here on.
+        g <- manynet::mutate_nodes(g, .group = node_group)
+        node_group <- ".group"
+      }
+      g <- manynet::mutate_nodes(g,
+                                 node_group = .reduce_categories(g, node_group))
+    }
   }
   if (missing(edge_color) && missing(edge_colour)) {
     edge_color <- NULL
@@ -336,6 +357,95 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     } else layout <- "stress"
   }
   layout
+}
+
+# `node_group` names one node attribute, which can put each node in one group
+# only. A node can belong to several groups at once, though, as it can to
+# several cliques, and a single attribute cannot record that. A membership
+# matrix can: one row for each node, one column for each group, and a one
+# wherever the node belongs to the group. `netrics::node_x_clique()` returns
+# such a matrix, and graph_layout() draws one hull for each of its columns,
+# so that the hulls overlap where the groups do.
+
+# Resolves what the user gave to `node_group` into either the name of a node
+# attribute, as before, or a membership matrix. A call such as
+# `node_x_clique()` is evaluated on the network being drawn, so that the user
+# does not need to name the network twice.
+.infer_node_group <- function(g, expr, env) {
+  # A name or a string is a node attribute, as it has always been. Only where
+  # it names no attribute is it evaluated, which is how a matrix held in a
+  # variable reaches the branch below.
+  if (is.character(expr) || is.name(expr)) {
+    value <- as.character(expr)
+    if (length(value) != 1L || value %in% igraph::vertex_attr_names(g))
+      return(value)
+    out <- tryCatch(eval(expr, env), error = function(e) NULL)
+    # Nothing of that name to evaluate, so the mismatch is reported against
+    # the node attributes. A single string is a node attribute name too,
+    # whether it was written out or held in a variable.
+    if (is.null(out)) return(value)
+    if (is.character(out) && length(out) == 1L) return(out)
+  } else out <- eval(.add_data_arg(expr, g, env), env)
+  if (is.matrix(out) || is.array(out) || inherits(out, "data.frame"))
+    return(.as_group_matrix(g, out))
+  # A vector of memberships is returned as it is, for graphr() to hold on the
+  # network and treat as any other node attribute.
+  if (length(out) == as.numeric(manynet::net_nodes(g))) return(out)
+  manynet::snet_abort(
+    "{.arg node_group} should name a node attribute, or give a membership",
+    "vector or matrix with one row for each of the {manynet::net_nodes(g)} nodes.")
+}
+
+# Adds the network as the `.data` argument of a call that does not give one,
+# e.g. `node_x_clique()` or `node_x_clique(min_clique_size = 4)`. A call that
+# names its own network, e.g. `node_x_clique(ison_adolescents)`, is left alone.
+.add_data_arg <- function(expr, g, env) {
+  if (!is.call(expr)) return(expr)
+  fun <- tryCatch(eval(expr[[1L]], env), error = function(e) NULL)
+  if (!is.function(fun) || !".data" %in% names(formals(fun))) return(expr)
+  args <- as.list(expr)[-1]
+  given <- names(args)
+  if (".data" %in% given) return(expr)
+  # An unnamed argument would be matched to `.data` positionally.
+  if (length(args) && (is.null(given) || !all(nzchar(given)))) return(expr)
+  expr[[".data"]] <- g
+  expr
+}
+
+# Normalises a membership matrix onto the nodes of `g`: one row for each node,
+# in the order the network holds them, and one named column for each group.
+.as_group_matrix <- function(g, value) {
+  if (inherits(value, "data.frame")) {
+    ischr <- vapply(value, function(x) is.character(x) || is.factor(x),
+                    logical(1))
+    labels <- if (any(ischr)) as.character(value[[which(ischr)[1]]]) else NULL
+    value <- as.matrix(value[!ischr])
+    if (!is.null(labels)) rownames(value) <- labels
+  } else value <- as.matrix(unclass(value))
+  n <- as.numeric(manynet::net_nodes(g))
+  # Isolates are dropped before this point, so a matrix calculated on the
+  # network as the user holds it can have more rows than there are nodes to
+  # draw. Node names say which rows those are.
+  if (!is.null(rownames(value)) && manynet::is_labelled(g)) {
+    nms <- manynet::node_names(g)
+    if (all(nms %in% rownames(value))) value <- value[nms, , drop = FALSE]
+  }
+  if (nrow(value) != n)
+    manynet::snet_abort(
+      "{.arg node_group} was given a membership matrix with {nrow(value)} rows,",
+      "but the network has {n} nodes.")
+  if (is.null(colnames(value)))
+    colnames(value) <- paste0("G", seq_len(ncol(value)))
+  value <- value > 0
+  # A group no node belongs to has no hull to draw.
+  value <- value[, colSums(value) > 0, drop = FALSE]
+  if (ncol(value) == 0)
+    manynet::snet_abort("{.arg node_group} was given no groups to draw.")
+  if (any(colSums(value) <= 2))
+    manynet::snet_info(
+      "Groups of two nodes or fewer can be difficult to draw a hull around,",
+      "so this plot may look uneven.")
+  value
 }
 
 .reduce_categories <- function(g, node_group) {

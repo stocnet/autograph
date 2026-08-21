@@ -137,6 +137,34 @@ test_that("node_group works correctly", {
                graphr(ison_lawfirm, node_group = "gender"))
 })
 
+test_that("node_group draws overlapping hulls from a membership matrix", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  skip_if_not_installed("ggforce")
+  cliques <- netrics::node_x_clique(ison_adolescents)
+  p <- graphr(ison_adolescents, node_group = netrics::node_x_clique())
+  hulls <- p[["layers"]][[1]][["data"]]
+  # One row for each membership, so a node in two cliques appears twice.
+  expect_equal(nrow(hulls), sum(cliques > 0))
+  expect_equal(levels(hulls[["node_group"]]), colnames(cliques))
+  # Naming the network, or a matrix calculated beforehand, gives the same plot.
+  expect_equal(graphr(ison_adolescents, node_group = cliques)[["layers"]][[1]][["data"]],
+               hulls)
+  expect_error(graphr(ison_adolescents, node_group = matrix(1, 3, 2)),
+               "8 nodes")
+})
+
+test_that("node_group accepts a membership vector", {
+  skip_on_cran()
+  skip_if_not_installed("ggforce")
+  memb <- c(1, 1, 1, 2, 2, 2, 3, 3)
+  expect_equal(graphr(ison_adolescents, node_group = memb)[["layers"]][[1]][["data"]][["node_group"]],
+               graphr(ison_adolescents |> dplyr::mutate(grp = memb),
+                      node_group = "grp")[["layers"]][[1]][["data"]][["node_group"]])
+  expect_error(graphr(ison_adolescents, node_group = c(1, 2)),
+               "membership vector")
+})
+
 test_that("unquoted arguments plot correctly", {
   skip_on_cran()
   expect_equal(graphr(ison_lawfirm, node_color = "gender"),

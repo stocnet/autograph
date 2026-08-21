@@ -36,6 +36,8 @@
   - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing
 - Improved node shape legend of a two-mode network to name the modes where the network records them instead of default "One" and "Two"
 - Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
+- Improved `node_group` to draw overlapping hulls (closes #51)
+  - e.g. `graphr(ison_adolescents, node_group = netrics::node_x_clique())`
 
 ## Theming
 

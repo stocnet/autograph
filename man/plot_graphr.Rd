@@ -110,7 +110,16 @@ It is easiest if this is added as a hull over
 groups before plotting.
 Group variables should have a minimum of 3 nodes,
 if less, number groups will be reduced by
-merging categories with lower counts into one called "other".}
+merging categories with lower counts into one called "other".
+A membership vector can also be given here.
+Where nodes belong to several groups at once, as they can to several
+cliques, give a membership matrix instead: one row for each node,
+one column for each group, and a one wherever the node belongs to
+the group. One hull is then drawn for each column, and the hulls
+overlap where the groups do.
+A measure that returns such a matrix, such as
+\code{netrics::node_x_clique()}, can be named without its network,
+which is taken to be the network being drawn.}
 
 \item{edge_color, edge_colour}{Tie variable to be used for coloring the nodes.
 It is easiest if this is added as an edge or tie attribute
@@ -210,6 +219,8 @@ graphr(ison_southern_women, labels = 2)
 graphr(ison_southern_women, labels = "betweenness")
 graphr(ison_adolescents, labels = c("Alice", "Betty"))
 graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+# Nodes can belong to several groups at once, e.g. overlapping cliques
+graphr(ison_adolescents, node_group = netrics::node_x_clique())
 }
 \seealso{
 Other mapping:
