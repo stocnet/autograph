@@ -24,7 +24,7 @@ plot.ag_conv <- function(x, ...){
     ggplot2::facet_grid(name ~ ., scales = "free", switch = "y") + 
     ggplot2::geom_smooth(formula = y ~ x, method = "loess", se = FALSE, 
                          color = ag_highlight(), linewidth = 0.5) +
-    ag_theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal() +
     ggplot2::theme(axis.text.y = element_blank(),
                    strip.text.y.left = element_text(angle = 0)) +
     ggplot2::labs(x = "Simulation step", y = "")

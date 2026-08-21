@@ -70,7 +70,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       # ggplot2::scale_linetype_manual(
       # values= c('solid',  'longdash','dashed',
       #           'twodash', 'dotdash', 'dotted'), labels=labels) +
-      ag_theme_minimal(base_size=8, base_family=ag_font()) 
+      ag_theme_minimal(base_size=8) 
     # + ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
     #         panel.grid.minor = ggplot2::element_blank())
   } else {
@@ -78,7 +78,7 @@ plot.selectionTable <- function(x, quad = TRUE, separation = 0, ...){
       gs +
       ggplot2::scale_colour_manual(values = setNames(ag_sequential(length(labs)), 
                                                      labs)) + 
-      ag_theme_minimal(base_size=8, base_family=ag_font())
+      ag_theme_minimal(base_size=8)
   }
   
   nametext <- attr(x, "name")

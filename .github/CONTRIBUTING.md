@@ -208,9 +208,17 @@ Every plot is drawn on the theme's ground. Build plot themes with the `ag_theme_
 calling `ggplot2::theme_minimal()` directly, so that a theme with a background other than white
 reaches every plot and not only the graphs.
 
-[R/theme_colorblind.R](../R/theme_colorblind.R) holds the colour-blindness tools: `simulate_colorblind()` and
-`contrast_colors()`, and the internal `colorblind_sort()` that each theme's categorical palette passes
-through when the theme is set.
+[R/theme_colorblind.R](../R/theme_colorblind.R) holds the colour-checking tools: `simulate_colorblind()`,
+`contrast_colors()`, `contrast_ratio()`, and the internal `colorblind_sort()` that each theme's
+categorical palette passes through when the theme is set.
+The three answer three different questions and none substitutes for another:
+`contrast_colors()` asks whether two marks can be told apart (CIELAB distance, worst case across
+normal and colour-blind vision), `contrast_ratio()` asks whether text can be read on what it sits on
+(WCAG 2.1 relative luminance), and `simulate_colorblind(type = "grey")` asks whether either survives
+a photocopier.
+Greyscale is reported beside `contrast_colors()`'s score rather than folded into it: two colours that
+differ only in hue collapse in greyscale however well they serve a colour-blind reader, so a worst
+case that included it would condemn nearly every institutional palette.
 A palette added to a theme therefore does not need hand-ordering, but it does need to survive the
 audit in `tests/testthat/test-functional_themes.R`, which requires the first few colours to stay
 apart under each type of colour blindness.

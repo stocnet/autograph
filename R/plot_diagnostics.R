@@ -813,7 +813,7 @@ gf_overview_gof <- function(x) {
   }
   plot(gof) +
     ggplot2::labs(subtitle = "Cumulative score", x = "", y = "") +
-    ggplot2::theme(strip.text = ggplot2::element_text(size = 7))
+    ggplot2::theme(strip.text = ggplot2::element_text(size = ag_text_size(7)))
 }
 
 gf_overview_waiting <- function(x) {

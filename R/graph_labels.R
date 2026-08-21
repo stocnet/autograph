@@ -62,7 +62,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     }
     args <- list(mapping = label_aes, data = ldata,
                  repel = label_repel,
-                 family = ag_font(), size = 3, hjust = hj, angle = angles_deg)
+                 family = ag_font(), size = ag_text_size(3), hjust = hj, angle = angles_deg)
     if (label_repel) {
       args$point.padding <- padding
     } else {
@@ -76,7 +76,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
              length(unique(p[["data"]][["y"]])) <= 2) {
     args <- list(mapping = label_aes, data = ldata,
                  angle = 90,
-                 family = ag_font(), size = 3, hjust = "outward",
+                 family = ag_font(), size = ag_text_size(3), hjust = "outward",
                  repel = label_repel,
                  nudge_y = ifelse(ldata[,2] == 1,
                                   nudge_unit, -nudge_unit))
@@ -86,7 +86,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   } else if (layout == "hierarchy" & length(unique(p[["data"]][["y"]])) > 2) {
     args <- list(mapping = label_aes, data = ldata,
                  family = ag_font(),
-                 size = 3, hjust = "inward", repel = label_repel)
+                 size = ag_text_size(3), hjust = "inward", repel = label_repel)
     if (label_repel) {
       args$point.padding <- padding
     } else {
@@ -104,7 +104,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     midline <- stats::median(p[["data"]][["y"]])
     y_coord <- ldata[["y"]]
     args <- list(mapping = label_aes, data = ldata,
-                 family = ag_font(), size = 2, colour = ag_ink(),
+                 family = ag_font(), size = ag_text_size(2), colour = ag_ink(),
                  repel = label_repel,
                  nudge_y = ifelse(y_coord <= midline,
                                   -nudge_unit, nudge_unit))
@@ -134,7 +134,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     # theme's own ground rather than white, so that a dark theme does not
     # scatter white cards over its graph.
     args <- list(mapping = label_aes, data = ldata,
-                 size = 3, fill = ag_ground_fill(), colour = ag_ink(),
+                 size = ag_text_size(3), fill = ag_ground_fill(), colour = ag_ink(),
                  family = ag_font(), repel = label_repel,
                  nudge_x = ifelse(ldata[,1] == 1,
                                   nudge_unit, -nudge_unit))
@@ -143,7 +143,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   } else {
     args <- list(mapping = label_aes, data = ldata,
                  family = ag_font(), fill = ag_ground_fill(),
-                 colour = ag_ink(), repel = label_repel, size = 3)
+                 colour = ag_ink(), repel = label_repel, size = ag_text_size(3))
     if (label_repel) {
       args$point.padding <- padding
       args$seed <- 1234

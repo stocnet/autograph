@@ -51,7 +51,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
       ggplot2::ylab("Density")
   }
   p +
-    ag_theme_classic(base_family = ag_font()) +
+    ag_theme_classic() +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -88,7 +88,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
                             linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
-  p + ag_theme_classic(base_family = ag_font()) +
+  p + ag_theme_classic() +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -99,7 +99,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
     ggplot2::geom_line(colour = ag_highlight()) +
-    ag_theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal() +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
 }
@@ -139,14 +139,14 @@ plot.node_member <- function(x, ...) {
     ggraph::geom_node_text(
       ggplot2::aes(filter = .data$leaf, label = .data$label,
                    colour = .data$label),
-      hjust = 1, nudge_y = -max(hc$height) / 60, size = 3.5,
+      hjust = 1, nudge_y = -max(hc$height) / 60, size = ag_text_size(3.5),
       family = ag_font(), show.legend = FALSE) +
     ggplot2::scale_colour_manual(
       values = stats::setNames(colors, hc$labels[hc$order])) +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0.22, 0.02))) +
     ggplot2::coord_flip() +
-    ag_theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal() +
     ggplot2::theme(axis.title = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_blank(),
                    axis.text.x = ggplot2::element_text(colour = ag_ink()),
@@ -267,11 +267,11 @@ plot.matrix <- function(x, ..., membership = NULL) {
       legend.position = "none",
       axis.ticks = ggplot2::element_blank(),
       axis.text.y = ggplot2::element_text(
-        size = 9 * 0.8,
+        size = ag_text_size(9 * 0.8),
         colour = ag_base()
       ),
       axis.text.x = ggplot2::element_text(
-        size = 9 * 0.8,
+        size = ag_text_size(9 * 0.8),
         angle = 30, hjust = 0,
         colour = ag_base()
       )

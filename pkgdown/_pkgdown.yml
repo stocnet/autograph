@@ -68,6 +68,7 @@ reference:
       Functions for tailoring graphs with themes, scales, and palettes.
     contents:
       - theme_set
+      - theme_medium
       - ag_call
       - list_fonts
       - theme_colorblind

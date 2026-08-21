@@ -1,54 +1,107 @@
-#' Checking colours for colour blindness
+#' Checking colours for colour blindness, print, and legibility
 #' @description
 #'   These functions report how a set of colours holds up for viewers with
 #'   colour vision deficiency (CVD), which affects about 8% of men and 0.5%
-#'   of women.
+#'   of women, and for readers who see the plot in greyscale or at a distance.
 #'   
 #'   `simulate_colorblind()` returns what a set of colours looks like to a viewer with
-#'   a given type of colour blindness.
+#'   a given type of colour blindness, or in greyscale.
 #'   `contrast_colors()` scores how far apart colours are, taking the worst case
 #'   over normal vision and each type of colour blindness,
 #'   so that a palette is only credited for a difference that every viewer
 #'   can see.
+#'   `contrast_ratio()` scores whether text can be read on a ground.
 #' @details
-#'   Simulation uses the matrices of Machado, Oliveira and Fernandes (2009)
-#'   at full severity, applied in linear RGB.
+#'   The three functions answer three different questions,
+#'   and a palette needs all three answered.
+#'   `contrast_colors()` asks whether two marks can be told apart,
+#'   `contrast_ratio()` asks whether text can be read on what it sits on,
+#'   and the "grey" simulation asks whether either survives a photocopier.
+#'   
+#'   Simulation uses the matrices of Machado, Oliveira and Fernandes (2009),
+#'   applied in linear RGB.
+#'   Those matrices are published for each severity of colour blindness;
+#'   `severity` interpolates between the identity and the full-severity matrix,
+#'   which approximates the published steps closely enough for a check.
+#'   Full severity is dichromacy (deuteranopia, protanopia, tritanopia);
+#'   a lower severity is anomalous trichromacy (deuteranomaly, protanomaly),
+#'   which is the more common condition.
+#'   Greyscale conversion takes the relative luminance of the colour,
+#'   the same quantity `contrast_ratio()` scores with.
+#'   
 #'   Distances are Euclidean distances in CIELAB space, the same measure
 #'   [match_color()] uses.
 #'   As a rule of thumb, a distance below 10 means two colours are easily
 #'   confused, 10 to 25 means they are separable but close, 
 #'   and above 25 means they are comfortably distinct.
+#'   Ratios are those of WCAG 2.1, which asks for at least 4.5 for body text
+#'   and at least 3 for large text and for graphical objects.
 #' @name theme_colorblind
 #' @family themes
 #' @param colors One or more colours, given as hexcodes or as names R knows.
 #' @param type The type of colour blindness to simulate:
 #'   "deutan" (green-blind, the most common), "protan" (red-blind),
-#'   "tritan" (blue-blind), or "normal" for unaffected vision.
+#'   "tritan" (blue-blind), "grey" for greyscale, as a photocopier renders it,
+#'   or "normal" for unaffected vision.
+#' @param severity How severe the colour blindness is, between 0 and 1.
+#'   By default 1, which is dichromacy.
+#'   A value between 0 and 1 is anomalous trichromacy.
+#'   Ignored for the "grey" and "normal" types.
 #' @references
 #'   Machado, Gustavo M., Manuel M. Oliveira, and Leandro A. F. Fernandes. 2009.
 #'   "A Physiologically-Based Model for Simulation of Color Vision Deficiency".
 #'   _IEEE Transactions on Visualization and Computer Graphics_ 15(6): 1291-98.
 #'   \doi{10.1109/TVCG.2009.113}
+#'   
+#'   World Wide Web Consortium. 2018.
+#'   _Web Content Accessibility Guidelines (WCAG) 2.1_.
+#'   \url{https://www.w3.org/TR/WCAG21/}
 #' @returns 
 #'   `simulate_colorblind()` returns a vector of hexcodes as long as `colors`.
+#'   
 #'   `contrast_colors()` returns a square matrix of worst-case distances,
 #'   with the colours as its dimnames and a missing diagonal,
 #'   so that `min(x, na.rm = TRUE)` gives the closest pair.
+#'   A "grey" attribute holds the same matrix as seen in greyscale.
+#'   
+#'   `contrast_ratio()` returns a square matrix of WCAG contrast ratios,
+#'   shaped the same way.
 #' @examples
 #' simulate_colorblind(c("#d73027", "#4575b4"), "deutan")
+#' # A milder deuteranomaly, and the same colours in greyscale
+#' simulate_colorblind(c("#d73027", "#4575b4"), "deutan", severity = 0.5)
+#' simulate_colorblind(c("#d73027", "#4575b4"), "grey")
 #' # How well does the current theme's palette separate five categories?
 #' contrast_colors(ag_qualitative(5))
 #' # The closest pair in it
 #' min(contrast_colors(ag_qualitative(5)), na.rm = TRUE)
+#' # And the closest pair once it is printed in greyscale
+#' min(attr(contrast_colors(ag_qualitative(5)), "grey"), na.rm = TRUE)
 #' # A red and a green that only look different to some viewers
 #' contrast_colors(c("#B7352D", "#627313"))[1, 2]
+#' # Can the current theme's ink be read on its ground?
+#' contrast_ratio(ag_ink())[1, 2]
 #' @export
 simulate_colorblind <- function(colors,
-                        type = c("deutan", "protan", "tritan", "normal")){
+                        type = c("deutan", "protan", "tritan", "grey", "normal"),
+                        severity = 1){
   type <- match.arg(type)
+  if(!is.numeric(severity) || length(severity) != 1L ||
+     is.na(severity) || severity < 0 || severity > 1)
+    manynet::snet_abort(
+      "{.arg severity} should be a single number between 0 and 1,",
+      "but {.val {severity}} was given.")
   rgb <- t(grDevices::col2rgb(colors))/255
   rgb[] <- srgb_to_linear(rgb)
-  sim <- rgb %*% t(colorblind_matrices[[type]])
+  if(type == "grey"){
+    # A greyscale device keeps the luminance of a colour and discards the rest,
+    # which is why two colours of the same lightness merge in print however
+    # different their hues.
+    lum <- as.vector(rgb %*% luminance_weights)
+    sim <- cbind(lum, lum, lum)
+  } else {
+    sim <- rgb %*% t(colorblind_matrix(type, severity))
+  }
   sim[sim < 0] <- 0
   sim[sim > 1] <- 1
   sim[] <- linear_to_srgb(sim)
@@ -74,6 +127,49 @@ contrast_colors <- function(colors, background = NULL){
   # colour to itself.
   diag(out) <- NA_real_
   dimnames(out) <- list(colors, colors)
+  # Greyscale is reported beside the score rather than folded into it. Two
+  # colours that differ only in hue collapse in greyscale however well they
+  # serve a colour-blind reader, so a worst case that included it would
+  # condemn nearly every institutional palette and leave only lightness to
+  # design with. Whether a figure has to survive a photocopier is the user's
+  # question to answer, so the number is offered, not imposed.
+  grey <- as.matrix(stats::dist(colorblind_lab(colors, "grey")))
+  diag(grey) <- NA_real_
+  dimnames(grey) <- dimnames(out)
+  attr(out, "grey") <- grey
+  class(out) <- c("contrast_colors", class(out))
+  out
+}
+
+#' @export
+print.contrast_colors <- function(x, ...){
+  grey <- attr(x, "grey")
+  out <- unclass(x)
+  attr(out, "grey") <- NULL
+  print(out, ...)
+  # The greyscale matrix is summarised rather than printed. Its interest is
+  # almost always the one number -- whether anything collapses in print --
+  # and a second matrix of the same size would bury the first.
+  if(!is.null(grey) && any(!is.na(grey)))
+    cat("\nClosest pair in greyscale: ",
+        round(min(grey, na.rm = TRUE), 1), "\n", sep = "")
+  invisible(x)
+}
+
+#' @rdname theme_colorblind
+#' @export
+contrast_ratio <- function(colors, background = NULL){
+  # Unlike contrast_colors(), where a background is one more colour to keep
+  # away from, here it is what the others are read *on*, so it belongs in the
+  # comparison whether or not the user names one.
+  if(is.null(background)) background <- ag_ground_fill()
+  colors <- c(background, colors)
+  lum <- relative_luminance(colors)
+  lighter <- outer(lum, lum, pmax)
+  darker <- outer(lum, lum, pmin)
+  out <- (lighter + 0.05)/(darker + 0.05)
+  diag(out) <- NA_real_
+  dimnames(out) <- list(colors, colors)
   out
 }
 
@@ -89,6 +185,23 @@ colorblind_matrices <- list(
   tritan = matrix(c( 1.255528, -0.076749, -0.178779,
                     -0.078411,  0.930809,  0.147602,
                      0.004733,  0.691367,  0.303900), 3, 3, byrow = TRUE))
+
+# The published matrices run from the identity at severity 0 to those above at
+# severity 1, so a partial severity is read off the line between the two.
+colorblind_matrix <- function(type, severity = 1){
+  full <- colorblind_matrices[[type]]
+  if(severity == 1) return(full)
+  (1 - severity) * diag(3) + severity * full
+}
+
+# Rec. 709 luminance weights, which both WCAG and greyscale conversion use.
+luminance_weights <- c(0.2126, 0.7152, 0.0722)
+
+relative_luminance <- function(colors){
+  rgb <- t(grDevices::col2rgb(colors))/255
+  rgb[] <- srgb_to_linear(rgb)
+  as.vector(rgb %*% luminance_weights)
+}
 
 srgb_to_linear <- function(u){
   ifelse(u <= 0.04045, u/12.92, ((u + 0.055)/1.055)^2.4)
