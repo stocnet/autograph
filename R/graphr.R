@@ -181,8 +181,6 @@
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
-#' # Nodes can belong to several groups at once, e.g. overlapping cliques
-#' graphr(ison_adolescents, node_group = netrics::node_x_clique())
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,

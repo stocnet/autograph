@@ -284,9 +284,12 @@ plot.matrix <- function(x, ..., membership = NULL) {
   # Color for signed networks
   if (manynet::is_signed(x)) {
     g <- g +
-      ggplot2::scale_fill_gradient2(high = "#003049",
-                                    mid = "white",
-                                    low = "#d62828")
+      # These poles were hard-coded, so this was the one signed plot that
+      # ignored the theme -- and the one that missed the repair of the
+      # red-green divergent pairs. See ?ag_call.
+      ggplot2::scale_fill_gradient2(high = ag_positive(),
+                                    mid = ag_ground_fill(),
+                                    low = ag_negative())
   } else {
     g <- g +
       ggplot2::scale_fill_gradient(

@@ -129,6 +129,7 @@
   - The others come from event models of the `fisheries_treaties` layer
 - Replaced `cli::cli_abort()` in `gf_facet_paged()` with `snet_abort()`
 - Replaced em dashes in `R/plot_diagnostics.R` since only ASCII is portable
+- Fixed signed branch of `plot.matrix()` hard-coding its poles
 
 ## Tutorials
 
