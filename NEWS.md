@@ -27,17 +27,18 @@
 
 ## Graphing
 
-- Improved `graphr()` to draw multilevel networks of interlocking one-mode and two-mode layers (identified by `manynet::is_multilevel()`) with the "multilevel" layout by default
+- Improved `graphr()` to draw multilevel networks of interlocking one-mode and two-mode layers by default
   - Fixed tie opacity so that those between levels fade behind those within them
   - Fixed default node size in multilevel layout, which is now taken from how many nodes there are at each level rather than in the whole network
   - Fixed labelling to be plain text nudged away instead of white-boxed labels
 - Fixed tie colouring in multiplex networks to color layers not signs by default
   - Signs are still drawn as linetypes
   - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing
-- Improved node shape legend of a two-mode network to name the modes where the network records them instead of default "One" and "Two"
+- Improved node shape legend to name modes where two-mode network records them instead of default "One" and "Two"
 - Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
 - Improved `node_group` to draw overlapping hulls (closes #51)
   - e.g. `graphr(ison_adolescents, node_group = netrics::node_x_clique())`
+- Improved `graphr()` to note when a colour/shape legend grows past about 7 keys
 
 ## Theming
 
