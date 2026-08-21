@@ -28,6 +28,7 @@ head(list_fonts())
 \seealso{
 Other themes:
 \code{\link{theme_colorblind}},
+\code{\link{theme_medium}},
 \code{\link{theme_set}}
 }
 \concept{themes}

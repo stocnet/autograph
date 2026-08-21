@@ -42,12 +42,16 @@
 
 ## Theming
 
-- Added a `persist` argument to `stocnet_theme()`, remembering a theme
+- Added `persist=` to `stocnet_theme()`
   - `persist = TRUE` writes it to `tools::R_user_dir("autograph", "config")`
   - Nothing written to disk unless passed explicitly
   - Setting a theme without it clears any choice persisted earlier
 - Improved font detection in `stocnet_theme()` via `{systemfonts}`
   - Added `list_fonts()` for listing the font families R can see
+- Added `stocnet_medium()` for standardising output to the expected medium: 
+  - "screen" (default), "presentation", "mobile", and "print"
+  - `ag_size()` scales text, not node size or anything else
+  - "print" draws on white irrespective of theme grounding
 - Improved theme backgrounds to reach every plot, not only the graphs
   - Plot themes are now built with the `ag_theme_*()` wrappers
   - Blanked elements stay blank, so a graph keeps no axis text or coordinates

@@ -118,6 +118,7 @@ plot(netrics::node_by_degree(ison_karateka))
 \seealso{
 Other themes:
 \code{\link[=list_fonts]{list_fonts()}},
-\code{\link{theme_colorblind}}
+\code{\link{theme_colorblind}},
+\code{\link{theme_medium}}
 }
 \concept{themes}

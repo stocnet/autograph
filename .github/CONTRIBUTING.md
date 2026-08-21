@@ -188,10 +188,10 @@ Two naming families, and they do not mix:
 
 ### Theming
 
-[R/theme_set.R](../R/theme_set.R) implements `stocnet_theme()` (alias `set_stocnet_theme()`),
+[R/theme_palette_set.R](../R/theme_palette_set.R) implements `stocnet_theme()` (alias `set_stocnet_theme()`),
 which sets an R option (`stocnet_theme`, default `"default"`) read by every plotting function in the package.
 Institutional and stylistic palettes (`default`, `bw`, `crisp`, `neon`, `clay`, `iheid`, `ethz`, `uzh`, `rug`,
-`unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are defined in [R/theme_set.R](../R/theme_set.R)
+`unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are defined in [R/theme_palette_set.R](../R/theme_palette_set.R)
 and exposed via the `ag_` accessors listed above, documented together under `ag_call`.
 Users can override individual palette colours via `options()` (e.g. `options(snet_highlight = ...)`)
 rather than editing theme code.
@@ -204,7 +204,7 @@ the **highlight** is the brand colour.
 Reference lines, axis text, and other chrome take `ag_ink()`, never `ag_base()`.
 
 Every plot is drawn on the theme's ground. Build plot themes with the `ag_theme_*()` wrappers in
-[R/theme_set.R](../R/theme_set.R) (`ag_theme_minimal()`, `ag_theme_void()`, and so on) rather than
+[R/theme_palette_set.R](../R/theme_palette_set.R) (`ag_theme_minimal()`, `ag_theme_void()`, and so on) rather than
 calling `ggplot2::theme_minimal()` directly, so that a theme with a background other than white
 reaches every plot and not only the graphs.
 
@@ -216,6 +216,13 @@ audit in `tests/testthat/test-functional_themes.R`, which requires the first few
 apart under each type of colour blindness.
 A palette whose own order carries meaning is exempted by adding it to `colorblind_unsorted`;
 `"rainbow"` is the only member, and is sampled across its length instead of taken from the front.
+
+The **medium** is separate from the theme, and lives in
+[R/theme_medium.R](../R/theme_medium.R): `stocnet_medium()` says where a plot will be seen
+(`"screen"`, `"presentation"`, `"mobile"`, `"print"`), not how it should look.
+It scales text through `ag_size()` and `ag_text_size()`, and `"print"` overrides the ground to white.
+Text set on a geom or on a theme element directly does not pass through `base_size`, so wrap it in
+`ag_text_size()`; marks are deliberately left unscaled, since a node's size is relative to its layout.
 
 Because `autograph` re-exports several `ggplot2` symbols (see [R/reexports_ggplot2.R](../R/reexports_ggplot2.R)),
 loading `autograph` last in a session is recommended so its `plot()` methods take precedence over other packages'.
