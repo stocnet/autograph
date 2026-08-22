@@ -406,8 +406,9 @@ ag_ground <- function(base){
   for(part in c("text", "axis.text", "strip.text", "legend.text",
                 "plot.title", "plot.subtitle", "plot.caption")){
     if(inherits(out[[part]], "element_blank")) next
-    out <- out + ggplot2::theme(
-      !!part := ggplot2::element_text(colour = ag_ink()))
+    inked <- list(ggplot2::element_text(colour = ag_ink()))
+    names(inked) <- part
+    out <- out + do.call(ggplot2::theme, inked)
   }
   # A theme that blanks its strips has no strip background to fill either.
   if(!inherits(out[["strip.text"]], "element_blank"))

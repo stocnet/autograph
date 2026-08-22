@@ -371,7 +371,7 @@ print.grapht <- function(x, ...) {
   }
   if (inherits(out, "error")) {
     if (.manynet_has("to_times")) {
-      alt <- tryCatch(manynet::to_times(x), error = function(e) NULL)
+      alt <- tryCatch(.manynet_fn("to_times")(x), error = function(e) NULL)
       if (manynet::is_list(alt) && length(alt) > 1) return(alt)
     }
     stop(out)
@@ -385,6 +385,14 @@ print.grapht <- function(x, ...) {
 # since a development build can carry a version string without the function.
 .manynet_has <- function(fn) {
   isTRUE(fn %in% getNamespaceExports("manynet"))
+}
+
+# The function itself, fetched from the manynet namespace at run time. A
+# `manynet::to_times()` written out in full is a hard reference, which R CMD
+# check reports as a missing object against a manynet that does not export it
+# yet. Always guard a call to this with `.manynet_has()`.
+.manynet_fn <- function(fn) {
+  get(fn, envir = asNamespace("manynet"))
 }
 
 # A spell (interval) network records each tie's lifespan as `begin`/`end` tie
@@ -409,7 +417,7 @@ print.grapht <- function(x, ...) {
 # without yet exposing the feature. All three are behaviourally identical.
 .grapht_spell_slices <- function(net) {
   if (.manynet_has("to_times")) {
-    out <- manynet::to_times(net)
+    out <- .manynet_fn("to_times")(net)
     if (!manynet::is_list(out)) out <- list(out)
     return(out)
   }
