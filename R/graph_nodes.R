@@ -7,7 +7,8 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
   if(is.null(node_color) && manynet::is_changing(g) &&
      any(is.finite(.node_adoption_time(g)))){
     p <- .map_diff_model_nodes(p, g, out)
-  } else if(is.null(node_color) && "diffusion" %in% names(manynet::node_attribute(g))){
+  } else if(is.null(node_color) &&
+            "diffusion" %in% manynet::net_node_attributes(g)){
     p <- .map_infected_nodes(p, g, out)
   } else {
     p <- .map_nodes(p, out)

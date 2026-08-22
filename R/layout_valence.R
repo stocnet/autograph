@@ -18,6 +18,21 @@ layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE,
   
   graph <- manynet::as_tidygraph(.data)
   n <- manynet::net_nodes(graph)
+  # A sign is read through manynet rather than from a "sign" tie attribute,
+  # since manynet 2.3.0 records the sign of a tie in its weight instead. A tie
+  # with no sign attracts as a positive tie does, and a network with no weights
+  # weighs every tie the same.
+  signs <- if (manynet::is_signed(graph))
+    as.numeric(manynet::tie_signs(graph)) else
+      rep(1, manynet::net_ties(graph))
+  signs[is.na(signs)] <- 1
+  # The magnitude of the weight, since manynet 2.3.0 carries the sign in the
+  # weight itself; multiplying a negative weight by a negative sign would make
+  # a negative tie attract.
+  weights <- if (manynet::is_weighted(graph))
+    abs(as.numeric(manynet::tie_attribute(graph, "weight"))) else
+      rep(1, manynet::net_ties(graph))
+  weights[is.na(weights)] <- 1
   
   coords <- matrix(stats::runif(n * 2, min = -1, max = 1), ncol = 2)
   
@@ -47,7 +62,7 @@ layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE,
       vec <- coords[t_id, ] - coords[s_id, ]
       dist <- sqrt(sum(vec^2)) + 1e-4
       dir <- vec / dist
-      force <- attraction_coef * igraph::E(graph)$weight[e] * igraph::E(graph)$sign[e]
+      force <- attraction_coef * weights[e] * signs[e]
       
       delta[s_id, ] <- delta[s_id, ] + force * dir
       delta[t_id, ] <- delta[t_id, ] - force * dir

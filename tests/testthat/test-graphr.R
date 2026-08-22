@@ -90,7 +90,7 @@ test_that("weighted, unsigned, directed networks graph correctly", {
 test_that("fancy node mods graph correctly", {
   skip_on_cran()
   # one-mode network
-  fmrg <- dplyr::mutate(fmrg, nodesize = Appearances/1000)
+  fmrg <- dplyr::mutate(ag_net(fmrg), nodesize = Appearances/1000)
   testcolnodes <- graphr(fmrg, node_color = "Gender",
                          node_size = "Appearances", 
                          node_shape = "Attractive")
@@ -139,7 +139,7 @@ test_that("node_group works correctly", {
 
 test_that("node_group draws overlapping hulls from a membership matrix", {
   skip_on_cran()
-  skip_if_not_installed("netrics")
+  skip_if_not_installed("netrics", "1.0.0")
   skip_if_not_installed("ggforce")
   cliques <- netrics::node_x_clique(ison_adolescents)
   p <- graphr(ison_adolescents, node_group = netrics::node_x_clique())
@@ -212,22 +212,23 @@ test_that("two-mode networks get correct node shapes", {
 test_that("two-mode shape legends name the modes where the network does", {
   skip_on_cran()
   # "One" and "Two" say nothing that the shapes do not already say.
-  expect_equal(levels(.infer_nshape(fict_marvel, NULL)),
+  expect_equal(levels(.infer_nshape(ag_net(fict_marvel), NULL)),
                c("characters", "teams"))
-  expect_equal(levels(.infer_nshape(ison_southern_women, NULL)),
+  expect_equal(levels(.infer_nshape(ag_net(ison_southern_women), NULL)),
                c("women", "social events"))
   # A factor rather than a character vector, so that the first mode keeps the
   # first shape: "social events" would otherwise sort before "women" and the
   # two modes would swap symbols.
-  shapes <- .infer_nshape(ison_southern_women, NULL)
+  shapes <- .infer_nshape(ag_net(ison_southern_women), NULL)
   expect_s3_class(shapes, "factor")
   expect_equal(as.character(shapes[!manynet::node_is_mode(ison_southern_women)][1]),
                "women")
   # Networks that do not record their modes keep the old labels.
   expect_null(manynet::mode_names(irps_revere))
-  expect_equal(levels(.infer_nshape(irps_revere, NULL)), c("One", "Two"))
+  expect_equal(levels(.infer_nshape(ag_net(irps_revere), NULL)),
+               c("One", "Two"))
   # One-mode networks are unaffected: mode_names() gives them a single name.
-  expect_equal(.infer_nshape(ison_adolescents, NULL), 21)
+  expect_equal(.infer_nshape(ag_net(ison_adolescents), NULL), 21)
 })
 
 test_that("multiplex networks are coloured by layer rather than by sign", {
@@ -235,30 +236,42 @@ test_that("multiplex networks are coloured by layer rather than by sign", {
   # fict_marvel's affiliation ties carry no sign, and were coloured "Negative"
   # while being drawn solid, so colour and linetype disagreed about which ties
   # were negative. Layer is what every tie has, and sign is left to linetype.
-  colours <- .infer_ecolor(fict_marvel, NULL)
+  marvel <- ag_net(fict_marvel)
+  colours <- .infer_ecolor(marvel, NULL)
   expect_setequal(levels(colours), c("affiliation", "relationship"))
-  expect_equal(.infer_ecolor_title(fict_marvel, NULL), "Layer")
+  expect_equal(.infer_ecolor_title(marvel, NULL), "Layer")
   # Whether there are layers to draw is how many the ties are divided between,
   # which is 1 for a network whose ties are not divided at all.
   expect_equal(manynet::net_layers(ison_adolescents), 1L)
-  expect_false(.has_layers(ison_adolescents))
+  expect_false(.has_layers(ag_net(ison_adolescents)))
   expect_gt(manynet::net_layers(fict_marvel), 1)
-  expect_true(.has_layers(ison_algebra))
+  expect_true(.has_layers(ag_net(ison_algebra)))
   # Not `is_multiplex()`, which is TRUE for a network with no layers to draw.
   expect_true(manynet::is_multiplex(ison_monks))
-  expect_true(.has_layers(ison_monks))
+  expect_true(.has_layers(ag_net(ison_monks)))
   # Signed networks without layers still show their signs, and now treat an
   # absent sign as positive, as the linetype always did.
-  signed <- manynet::to_uniplex(fict_marvel, "relationship")
+  signed <- ag_net(manynet::to_uniplex(fict_marvel, "relationship"))
   expect_equal(manynet::net_layers(signed), 1L)
   expect_false(.has_layers(signed))
   expect_setequal(levels(.infer_ecolor(signed, NULL)), c("Positive", "Negative"))
   expect_equal(.infer_ecolor_title(signed, NULL), "Sign")
-  unsigned_ties <- is.na(igraph::E(fict_marvel)$sign)
-  expect_equal(as.character(.infer_line_type(fict_marvel)[unsigned_ties][1]),
+  # The affiliation ties are the ties that carry no sign: manynet 2.2.3 leaves
+  # their sign missing, and 2.3.0 weights them positively. Either way they are
+  # drawn solid, as only a negative tie is dashed.
+  unsigned_ties <- manynet::tie_attribute(marvel, .layer_attribute(marvel)) ==
+    "affiliation"
+  expect_equal(as.character(.infer_line_type(marvel)[unsigned_ties][1]),
                "solid")
   # An explicitly named attribute still titles the legend after itself.
-  expect_equal(.infer_ecolor_title(fict_marvel, "type"), "type")
+  expect_equal(.infer_ecolor_title(marvel, .layer_attribute(marvel)),
+               .layer_attribute(marvel))
+  # Which tie attribute records the layer is read from the network rather than
+  # assumed, since manynet spells it "type" through 2.2.3 and "layer" from
+  # 2.3.0, and networks of both spellings are in circulation.
+  expect_true(.layer_attribute(marvel) %in% c("type", "layer"))
+  expect_equal(.layer_attribute(ag_net(ison_algebra)), "type")
+  expect_true(is.na(.layer_attribute(ag_net(ison_adolescents))))
 })
 
 test_that("signs are given a legend wherever the colours no longer carry them", {
@@ -542,7 +555,9 @@ test_that("graphs()/graphr() render signed longitudinal snapshots without error"
   # parameter), otherwise geom_edge_arc's point expansion length-checks the
   # linetype vector against the expanded data and fails ("Aesthetics must be
   # either length 1 or the same as the data").
-  waves <- manynet::to_waves(manynet::ison_monks)
+  # Split the way graphs() splits it, since which manynet function does that
+  # depends on the manynet version. See .split_time_network().
+  waves <- .split_time_network(manynet::ison_monks)
   expect_true(manynet::is_signed(waves[[1]]))
   p1 <- graphr(waves[[1]])
   expect_buildable(p1)

@@ -143,12 +143,13 @@ test_that("multilevel layout draws each level at a size of its own", {
   # The default size shrinks with how crowded the plot is, but each level of a
   # multilevel layout is only as crowded as itself: sizing fict_marvel's 53
   # characters as if there were 194 of them draws them as specks.
-  sizes <- .infer_nsize(fict_marvel, NULL, "multilevel")
+  marvel <- ag_net(fict_marvel)
+  sizes <- .infer_nsize(marvel, NULL, "multilevel")
   expect_length(unique(sizes), 2)
-  expect_gt(min(sizes), .infer_nsize(fict_marvel, NULL))
+  expect_gt(min(sizes), .infer_nsize(marvel, NULL))
   # Other layouts, and an explicit size, are unaffected.
-  expect_length(unique(.infer_nsize(fict_marvel, NULL, "hierarchy")), 1)
-  expect_equal(unique(.infer_nsize(fict_marvel, 5, "multilevel")), 5)
+  expect_length(unique(.infer_nsize(marvel, NULL, "hierarchy")), 1)
+  expect_equal(unique(.infer_nsize(marvel, 5, "multilevel")), 5)
   # A default size is not mapped through aes(), so it is neither rescaled nor
   # given a legend of its own.
   p <- graphr(fict_marvel, labels = FALSE)
@@ -160,13 +161,14 @@ test_that("multilevel layout draws the ties between levels more faintly", {
   skip_on_cran()
   # Cross-level ties outnumber within-level ties in fict_marvel, and at equal
   # strength they curtain over both levels.
-  alphas <- .infer_ealpha(fict_marvel, "multilevel")
+  marvel <- ag_net(fict_marvel)
+  alphas <- .infer_ealpha(marvel, "multilevel")
   expect_length(unique(alphas), 2)
-  expect_lt(max(alphas[manynet::tie_is_twomode(fict_marvel)]),
-            min(alphas[!manynet::tie_is_twomode(fict_marvel)]))
+  expect_lt(max(alphas[manynet::tie_is_twomode(marvel)]),
+            min(alphas[!manynet::tie_is_twomode(marvel)]))
   # Every other layout keeps the single constant it always used.
-  expect_equal(.infer_ealpha(fict_marvel, "hierarchy"), 0.4)
-  expect_equal(.infer_ealpha(ison_adolescents, "multilevel"), 0.4)
+  expect_equal(.infer_ealpha(marvel, "hierarchy"), 0.4)
+  expect_equal(.infer_ealpha(ag_net(ison_adolescents), "multilevel"), 0.4)
   # The varying alpha reaches the drawn edges rather than being rescaled.
   built <- ggplot2::ggplot_build(graphr(fict_marvel, labels = FALSE))
   expect_setequal(round(unique(built$data[[1]]$edge_alpha), 2), c(0.08, 0.5))

@@ -69,7 +69,7 @@
 
 .infer_nshape <- function(g, node_shape) {
   if (!is.null(node_shape)) {
-    if (node_shape %in% names(manynet::node_attribute(g))) {
+    if (node_shape %in% manynet::net_node_attributes(g)) {
       out <- as.factor(as.character(manynet::node_attribute(g, node_shape)))
     } else out <- node_shape
   } else if (is_twomode(g) & is.null(node_shape)) {
@@ -100,7 +100,7 @@
 
 .infer_ncolor <- function(g, node_color) {
   if (!is.null(node_color)) {
-    if (node_color %in% names(manynet::node_attribute(g))) {
+    if (node_color %in% manynet::net_node_attributes(g)) {
       if ("node_mark" %in% class(manynet::node_attribute(g, node_color))) {
         out <- factor(as.character(manynet::node_attribute(g, node_color)),
                       levels = c("FALSE", "TRUE"))
@@ -120,7 +120,7 @@
 
 .infer_ecolor <- function(g, edge_color){
   if (!is.null(edge_color)) {
-    if (edge_color %in% names(manynet::tie_attribute(g))) {
+    if (edge_color %in% manynet::net_tie_attributes(g)) {
       if ("tie_mark" %in% class(manynet::tie_attribute(g, edge_color))) {
         out <- factor(as.character(manynet::tie_attribute(g, edge_color)),
                       levels = c("FALSE", "TRUE"))
@@ -141,7 +141,8 @@
     # dropped: with the two-value highlight palette it decides which layer is
     # drawn in the emphasis colour, and `fict_marvel` names its layers in an
     # order that greys out the very layer the plot is about.
-    out <- as.factor(as.character(manynet::tie_attribute(g, "type")))
+    layers <- manynet::tie_attribute(g, .layer_attribute(g))
+    out <- as.factor(as.character(layers))
     if (length(unique(out)) == 1) out <- ag_ink()
   } else if (is.null(edge_color) & manynet::is_signed(g)) {
     # Signed networks that are not layered can still carry a sign on only
@@ -149,7 +150,7 @@
     # linetype does, so that the factor never contains NA, which grid rejects
     # at draw time, and so that colour and linetype agree about which ties
     # are negative.
-    signs <- igraph::E(g)$sign
+    signs <- as.numeric(manynet::tie_signs(g))
     out <- factor(ifelse(is.na(signs) | signs >= 0, "Positive", "Negative"),
                   levels = c("Positive", "Negative"))
     if (length(unique(out)) == 1) {
@@ -161,14 +162,30 @@
   out
 }
 
-# `manynet::net_layers()` counts the layers the ties are actually divided
-# between, rather than `is_multiplex()`, which is TRUE for any network carrying
-# a non-reserved tie attribute or parallel ties, whether or not those
-# distinguish layers. It counts the distinct values of the 'type' tie attribute
-# and returns 1 where there is none, so a single test covers both that the
-# layers are recorded per tie -- which naming them, as `layer_names()` does,
-# need not imply -- and that there are at least two of them to tell apart.
-.has_layers <- function(g) manynet::net_layers(g) > 1
+# Which tie attribute records the layer each tie belongs to, or NA where none
+# does. manynet spells this attribute "type" through 2.2.3 and "layer" from
+# 2.3.0, and both spellings appear in the networks 2.3.0 ships, so the
+# attribute the network carries decides rather than the manynet version.
+# `manynet::net_layers()` reads only the "type" spelling from an igraph, and
+# so counts one layer for a network whose ties record a "layer", which is why
+# the layers are counted here instead.
+.layer_attribute <- function(g) {
+  atts <- manynet::net_tie_attributes(g)
+  out <- intersect(c("type", "layer"), atts)
+  if (length(out) == 0) NA_character_ else out[1]
+}
+
+# Whether the ties are divided between layers to tell apart. This is not
+# `is_multiplex()`, which is TRUE for any network carrying a non-reserved tie
+# attribute or parallel ties, whether or not those distinguish layers. A
+# single test covers both that the layers are recorded per tie -- which naming
+# them, as `layer_names()` does, need not imply -- and that there are at least
+# two of them to tell apart.
+.has_layers <- function(g) {
+  att <- .layer_attribute(g)
+  if (is.na(att)) return(FALSE)
+  length(unique(manynet::tie_attribute(g, att))) > 1
+}
 
 # What the edge colour legend is titled. `edge_color` names the attribute when
 # the user gave one; otherwise the colour carries whatever the default chose,
@@ -184,7 +201,7 @@
 
 .infer_esize <- function(g, edge_size){
   if (!is.null(edge_size)) {
-    if (any(edge_size %in% names(manynet::tie_attribute(g)))) {
+    if (any(edge_size %in% manynet::net_tie_attributes(g))) {
       # strip measure classes (e.g. tie_measure) so scales can rescale
       out <- as.numeric(manynet::tie_attribute(g, edge_size))
     } else {

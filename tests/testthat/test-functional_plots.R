@@ -273,7 +273,8 @@ test_that("graphs() splits a longitudinal network with non-character changing at
   # "Can't combine <character> and <logical>" error; .to_waves_safe() coerces
   # them and retries. See .split_time_network()/.to_waves_safe() in R/grapht.R.
   expect_true(manynet::is_changing(manynet::fict_starwars))
-  expect_true("active" %in% names(manynet::node_attribute(manynet::fict_starwars)))
+  expect_true("active" %in%
+                manynet::net_node_attributes(manynet::fict_starwars))
   expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
   expect_s3_class(suppressMessages(graphs(manynet::fict_starwars)), "patchwork")
 })

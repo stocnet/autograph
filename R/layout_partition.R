@@ -73,6 +73,7 @@ layout_concentric <- function(.data, membership,
                                         radius = NULL, 
                                         order.by = NULL, 
                                         circular = FALSE, times = 1000) {
+  .data <- manynet::as_igraph(.data)
   if (any(igraph::vertex_attr(.data, "name") == "")) {
     ll <- unlist(lapply(seq_len(length(.data)), function(x) {
       ifelse(igraph::vertex_attr(.data, "name")[x] == "",
@@ -154,6 +155,11 @@ layout_multilevel <- function(.data, level,
                               FUN1 = graphlayouts::layout_with_stress,
                               FUN2 = graphlayouts::layout_with_stress) {
   method <- .check_choice(method, c("all", "separate", "fix1", "fix2"), "method")
+  # Coerced up front, as the other layouts do, so that a network given in
+  # another form -- such as the list-based class manynet 2.3.0 introduced --
+  # reaches the igraph functions below as a graph, and `length()` counts its
+  # nodes rather than the parts the object is built from.
+  .data <- manynet::as_igraph(.data)
   if (missing(level)) {
     level <- .infer_level(.data)
   } else {
@@ -279,6 +285,7 @@ layout_lineage <- function(.data, rank, circular = FALSE) {
   # Without this the missing argument surfaces further down as R's own
   # "argument "rank" is missing, with no default".
   if (missing(rank)) .abort_layout_arg("rank", "lineage", length(.data))
+  .data <- manynet::as_tidygraph(.data)
   if (length(rank) > 1 & length(rank) != length(.data)) {
     .abort_layout_arg("rank", "lineage", length(.data))
   } else if (length(rank) != length(.data)) {
