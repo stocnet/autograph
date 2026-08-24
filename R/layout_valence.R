@@ -1,5 +1,11 @@
-#' Valence-based layout
-#' @inheritParams layout_layered
+#' Valence layout
+#'
+#' @description
+#'   The "valence" layout places the nodes of a signed network so that
+#'   positively tied nodes are drawn together and negatively tied nodes apart.
+#' @name layout_valence
+#' @template param_ggraphlayouts
+#' @param center Required for `{ggraph}` compatibility, and not used here.
 #' @param repulsion_coef Coefficient for global repulsion force.
 #'   Default is 1.
 #' @param attraction_coef Coefficient for edge-based attraction/repulsion force.
@@ -12,6 +18,7 @@
 #'   sign = c(1, -1, 1, -1)  # 1 = positive, -1 = negative
 #'   )
 #' graphr(as_igraph(edges), layout="valence")
+#' @family mapping
 #' @export
 layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE, 
                            repulsion_coef = 1, attraction_coef = 0.05) {

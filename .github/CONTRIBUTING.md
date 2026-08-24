@@ -118,9 +118,107 @@ see the comment in [R/autograph_utilities.R](../R/autograph_utilities.R)).
 
 `grapht()` ([R/grapht.R](../R/grapht.R)) animates a longitudinal/dynamic network over time using `{gganimate}`/`{gifski}`.
 
+### Layout names and files
+
 Custom layout algorithms not provided by igraph/ggraph/graphlayouts live in their own `layout_*.R` files
-(`layout_configurational.R`, `layout_grid.R`, `layout_layered.R`, `layout_matching.R`,
-`layout_partition.R`, `layout_valence.R`) and follow the `layout_tbl_graph_*()` naming convention.
+and follow the `layout_tbl_graph_*()` naming convention.
+There is one file for each *family*: `layout_layered.R` (`layered`, `lineage`, `railway`, `ladder`),
+`layout_concentric.R`, `layout_levels.R`, `layout_configurational.R`, `layout_valence.R`
+and `layout_matching.R`.
+
+**One family, one file, one man page, one `@name`.**
+A file named `layout_*.R` registers at least one `layout_tbl_graph_*`.
+A file that registers none is not a layout file: put the helper beside its only caller.
+This rule exists because two files broke it — `layout_grid.R` held the grid-snapping engine
+(now [R/graph_snap.R](../R/graph_snap.R)), and `layout_engine.R` held only the layered engine
+(now the second half of [R/layout_layered.R](../R/layout_layered.R)).
+
+**Each layout file is self-contained** — its exports, its `layout_tbl_graph_*` aliases,
+and the private engine those exports share.
+A private helper used by exactly one family lives in that family's file;
+one used by two or more goes to [R/autograph_utilities.R](../R/autograph_utilities.R).
+`.rescale()` was copied into two files instead, and drifted out of sight of both.
+
+#### Choosing a name
+
+**Reserved names, never usable.**
+`ggraph:::layout_to_table.character()` tests `is.igraphlayout()` *before* it looks for a
+`layout_tbl_graph_*` function, so a layout named with any of these is unreachable
+through `layout =`, and nothing warns:
+
+> `bipartite`, `star`, `tree`, `circle`, `nicely`, `dh`, `drl`, `gem`, `graphopt`,
+> `grid`, `mds`, `sugiyama`, `sphere`, `randomly`, `fr`, `kk`, `lgl`
+
+**Taken names** — `ggraph`'s own `layout_tbl_graph_*`:
+
+> `auto`, `backbone`, `cactustree`, `centrality`, `circlepack`, `dendrogram`, `eigen`,
+> `fabric`, `focus`, `hive`, `htree`, `igraph`, `linear`, `manual`, `matrix`, `metro`,
+> `partition`, `pmds`, `sf`, `sparse_stress`, `stress`, `treemap`, `unrooted`
+
+**Reserved in waiting** — in `graphlayouts` but not yet wrapped by `ggraph`.
+A name here resolves to autograph today and would be silently shadowed the day ggraph wraps it,
+because ggraph's namespace is searched first. Treat them as taken:
+
+> `multilevel`, `umap`, `dynamic`, `stress3D`, `constrained_stress`, `fixed_coords`,
+> `centrality_group`, `focus_group`, `metromap`, `tree_unrooted`
+
+This is what retired `multilevel` in favour of `levels`.
+
+**Reserved by us** — `alluvial` is held for a plot of changing membership composition over time,
+not for a layout.
+
+Check a candidate against all three namespaces before committing to it:
+
+```r
+Rscript -e 'nm <- "yourname"; print(nm %in% c(sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", ls(asNamespace("ggraph")), value = TRUE)), sub("^layout_(as|with|in|on)_", "", grep("^layout_", getNamespaceExports("graphlayouts"), value = TRUE)), sub("^layout_(as|with|in|on)_", "", grep("^layout_", getNamespaceExports("igraph"), value = TRUE))))'
+```
+
+**Name the shape, not the meaning or the algorithm.**
+A layout name is a single lowercase English noun for what the drawing looks like:
+`layered`, `lineage`, `railway`, `ladder`, `concentric`, `valence`.
+Never the algorithm or its author (`sugiyama`), and not a claim the data may not support —
+`hierarchy` was retired because a two-mode network has two layers and no hierarchy between them.
+Where a layout takes the attribute it is named for, keep the two in agreement
+(`layout = "levels"` takes `level = "lvl"`).
+
+**A name is for the drawing; an argument is for the variation — but a common drawing earns a name.**
+`railway` and `ladder` are `alignment = "rungs"` applied to `layered` and `lineage`,
+and they keep their names: making a user learn an argument to reach a common figure
+defeats the point of an *auto*-graph.
+Add a name when a user would look for that word; do not add one for every argument value.
+The counter-example is `dyad`…`hexad`, which were retired because `configuration`
+already picks the one matching the number of nodes, so no user had a reason to type them.
+
+**Prefer overloading an argument to adding one.**
+An argument that takes a keyword should also take a node attribute name or vector where that
+makes sense, as `ranks=` and `node_size=` do.
+That is how `lineage` absorbed a layout of its own that only differed in where the layers came from.
+
+#### Adding a layout
+
+1. Export `layout_<name>()` and alias `layout_tbl_graph_<name> <- layout_<name>`.
+2. Tag it `@family mapping` and `@template param_ggraphlayouts`
+   ([man-roxygen/param_ggraphlayouts.R](../man-roxygen/param_ggraphlayouts.R) holds
+   `.data`, `circular`, `times` and the return value, which every layout shares).
+3. Declare what it needs in `.layout_requirements()` ([R/graph_checks.R](../R/graph_checks.R)),
+   so `graphr()` can substitute and say why instead of failing downstream.
+   Declare nothing where an argument could rescue the layout — `.abort_layout_arg()` asks for it.
+4. Add it to `.layered_layouts()` if its coordinates carry meaning along an axis
+   that grid snapping would collapse.
+5. Add a mirroring `test-layout_<name>.R`. The functional audit in
+   `test-functional_layouts.R` enumerates from the namespace, so it picks the layout up
+   with no further change.
+
+#### Retiring a layout name
+
+1. Add a shim to [R/autograph-defunct.R](../R/autograph-defunct.R) under `@rdname layout_deprecated`,
+   forwarding to the replacement after `manynet::snet_warn()`.
+2. Add the name to `.deprecated_layouts()` and its replacement to `.rename_layout()`.
+   `.rename_layout()` swaps the name once, where the layout is checked, so that every step
+   after it — applicability, node sizes, tie alpha, labels — knows only the current name.
+3. Keep its `.layout_requirements()` entry, so the string is still validated before the swap.
+4. Nothing else needs updating: `.deprecated_layouts()` is what keeps the name out of the
+   RStudio completions and out of the functional audit.
 
 ### Plot-method dispatch (`plot_*.R`)
 
@@ -188,7 +286,8 @@ Two naming families, and they do not mix:
 - **`check_*` scores, `.check_*` guards**: the exported `check_span()`, `check_offset()`,
   `check_contrast()` and `check_separation()` each measure a drawing and return the score, so that
   a user can compare one layout or palette with another. The private `.check_layout()`,
-  `.check_layout_applies()` and `.check_dup()` validate an argument and abort or substitute.
+  `.check_layout_applies()`, `.layout_applies()` and `.check_dup()` validate an argument and
+  abort or substitute, reading the tables `.layout_requirements()` and `.deprecated_layouts()`.
   The two do different jobs, so keep the dot: it is what tells them apart.
 
 ### Theming
@@ -309,7 +408,7 @@ Delete each shim once the minimum is raised past the version that added the func
 (`Config/testthat/parallel: true` in DESCRIPTION).
 `tests/testthat.R` sets `stocnet_theme("default")` before running the suite so theme state doesn't leak between runs.
 Test files are organised by the same grouping as the `R/` source files
-(e.g. `test-graphr.R`, `test-layout_partition.R`, `test-theme_match.R`).
+(e.g. `test-graphr.R`, `test-layout_layered.R`, `test-theme_match.R`).
 
 In addition, the `test-functional_*.R` files implement *functional* (family-enumerating) testing,
 mirroring the approach in `{manynet}`: layout algorithms, `plot.<class>` methods, palette accessors,

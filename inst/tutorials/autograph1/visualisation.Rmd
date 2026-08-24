@@ -1221,37 +1221,116 @@ Other force-directed layouts available include:
 
 ### Layered layouts {#layered-layouts}
 
-Layered layouts arrange nodes into horizontal (or vertical) layers,
+Layered layouts arrange nodes into layers,
 positioning them so that they reduce crossings.
 These layouts are best suited for directed acyclic graphs, two-mode networks,
-or other data with a natural hierarchy or ordering.
+or other data with a natural ordering.
+
+`{autograph}` offers four, and they are one layout drawn four ways.
+Two things vary: which axis the layers run along, and whether the nodes
+line up across them. The names say which is which — a railway lies flat,
+a ladder stands up:
+
+|                          | Layers stacked flat | Layers standing up |
+|--------------------------|---------------------|--------------------|
+| Nodes spaced by their ties | `"layered"`       | `"lineage"`        |
+| Nodes lined up across layers | `"railway"`     | `"ladder"`         |
 
 ```{r bipartite, exercise=TRUE, fig.width=9}
 graphr(ison_southern_women, layout = "bipartite") + ggtitle("Bipartite")
-graphr(ison_southern_women, layout = "hierarchy") + ggtitle("Hierarchy")
+graphr(ison_southern_women, layout = "layered") + ggtitle("Layered")
 graphr(ison_southern_women, layout = "railway") + ggtitle("Railway")
 ```
 
-Note that `"hierarchy"` and `"railway"` use a different algorithm to
+Note that `"layered"` and `"railway"` use a different algorithm to
 `{igraph}`'s `"bipartite"`, and generally perform better,
 especially where there are multiple layers.
-Whereas `"hierarchy"` tries to position nodes to minimise overlaps,
+Whereas `"layered"` tries to position nodes to minimise overlaps,
 `"railway"` sequences the nodes in each layer to a grid
 so that nodes are matched as far as possible.
-For the `"hierarchy"` layout you can also steer which set sits where by
+For the `"layered"` layout you can also steer which set sits where by
 passing a `center` argument — `"events"` or `"actors"` for a two-mode
 network, or the name of a particular node — which helps when the default
 places the less interesting set on top.
 
-```{r hierarchy-center, exercise=TRUE, fig.width=9}
-graphr(ison_southern_women, layout = "hierarchy", center = "events")
+```{r layered-center, exercise=TRUE, fig.width=9}
+graphr(ison_southern_women, layout = "layered", center = "events")
 ```
 
 If you want to flip the horizontal and vertical,
-you could flip the coordinates, or use something like the following layout.
+you could flip the coordinates, or use `"lineage"`,
+which is the same layout with the axes exchanged.
 
-```{r alluvial, exercise=TRUE, fig.align='center'}
-graphr(ison_southern_women, layout = "alluvial") + ggtitle("Alluvial")
+```{r lineage, exercise=TRUE, fig.align='center'}
+graphr(ison_southern_women, layout = "lineage") + ggtitle("Lineage")
+```
+
+These layouts serve both multimodal and directed acyclic networks.
+A geneaological network offers the clearest case: 
+every tie points from an earlier generation to a later one.
+Where a force-directed layout obscures this ordering,
+`graphr()` uses the `"layered"` layout to make it clear.
+**Draw the parent ties among the characters of Westeros.**
+
+```{r thrones-default, exercise=TRUE, fig.width=9, fig.height=6}
+thrones <- to_layer(fict_thrones, "parent")
+graphr(thrones)
+```
+
+This layout tries to minimise two costs. 
+The first is which layer each node goes in. Ranking each node
+by its distance from a root sounds right — a row is then a generation — but it
+pins a parent whose only child is born several generations later to the top
+row, and manufactures a long tie to reach them. 
+The `ranks` argument chooses the rule, 
+and `check_span()` reports how many rows each tie crosses,
+so you can measure the difference.
+
+```{r thrones-ranks, exercise=TRUE}
+thrones <- to_layer(fict_thrones, "parent")
+spans <- sapply(c("generation", "compact", "tight"), function(r) {
+  span <- check_span(graphr(thrones, ranks = r))
+  c(total = attr(span, "total"), `over one row` = mean(span > 1), max = max(span))
+})
+round(t(spans), 3)
+```
+
+`"generation"` is the distance-from-a-root rule and 
+`"compact"` is the one `{igraph}` uses in its Sugiyama layout. 
+`"tight"`, the default, minimises total tie length while 
+still pointing every tie down at least one row.
+Note that the longest tie is the same under all three.
+
+The second cost is where each node sits within its row. 
+`check_offset()` reports how far each tie travels sideways, 
+as a share of the width of the drawing, 
+so a tie that drops straight down scores zero.
+Again, you are wanting to minimise this, 
+and the `alignment` argument chooses the rule.
+**Compare the two alignments.**
+
+```{r thrones-alignment, exercise=TRUE}
+thrones <- to_layer(fict_thrones, "parent")
+c(straight = attr(check_offset(graphr(thrones)), "mean"),
+  rungs = attr(check_offset(graphr(thrones, alignment = "rungs")), "mean"))
+```
+
+`alignment = "rungs"` gives every row the same spacing, 
+which is what `"railway"` and `"ladder"` are for. 
+The default, `"straight"`, pulls each node towards its parents and children instead, 
+which is what makes the families read as families.
+
+`ranks` also accepts a node attribute, instead of one of those three rules.
+Then the layers are that attribute's values, and nodes are placed along the
+axis in proportion to them rather than at even steps,
+so a network of dated nodes is drawn as a timeline.
+**Rank the adolescents by a year of your choosing.**
+
+```{r lineage-ranks, exercise=TRUE, fig.align='center'}
+ison_adolescents |> as_stocnet() |> 
+  mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2),
+               label = paste0(label, " (", year, ")")) |>
+  graphr(layout = "lineage", ranks = "year")
 ```
 
 Other layered layouts include:
@@ -1391,19 +1470,19 @@ useful when readers need to compare them.
 ::: {.callout}
 <span class="callout-label">**Going further**:</span>
 `{autograph}` also provides its own special-purpose layouts —
-`"configuration"`, `"lineage"`, `"multilevel"`, `"triad"`/`"quad"`,
-and layouts that align nodes by partition —
-documented at `?layout_partition` and friends.
+`"configuration"`, `"levels"`, `"matching"`, `"valence"`,
+and the layered family —
+documented at `?layout_layered` and friends.
 Several layouts take a layout-specific extra argument (passed through `...`)
 to control how nodes are ordered: `"concentric"` a `membership`,
-`"multilevel"` a `level`, and `"lineage"` a `rank` — each a node attribute
+`"levels"` a `level`, and the layered layouts `ranks` — each a node attribute
 name or a vector. See `?graphr` for the full list.
 :::
 
 ::: {.callout}
 <span class="callout-label">**In brief**:</span> Pass `layout =` to `graphr()` to choose among
 force-directed (`"stress"`, `"fr"`, `"kk"`),
-layered (`"hierarchy"`, `"railway"`, `"alluvial"`),
+layered (`"layered"`, `"railway"`, `"lineage"`),
 circular (`"concentric"`, `"circle"`),
 spectral (`"eigen"`, `"mds"`),
 and grid layouts.
