@@ -23,6 +23,9 @@
   - Renamed "multilevel" layout to "levels" to avoid potential future collisions
   - Fixed `layout_levels()` to identify modes without having to name a `level`
   - Exposed `method`, `alpha`, `beta`, `FUN1` and `FUN2` arguments
+- Deprecated "dyad", "triad", "tetrad", "pentad" and "hexad" layout names
+  - "configuration" already picks the one matching the number of nodes
+  - The `layout_dyad()` to `layout_hexad()` functions themselves are unchanged
 - Added a `layout_matching()` alias so every layout has a short name
 - Removed unreachable `getNNvec()`
 

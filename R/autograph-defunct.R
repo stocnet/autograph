@@ -162,3 +162,57 @@ layout_multilevel <- function(.data, ...) {
 #' @export
 layout_tbl_graph_multilevel <- layout_multilevel
 
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_dyad <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val dyad} layout is deprecated.",
+    "Please use {.code layout = \"configuration\"} instead,",
+    "which draws whichever configuration the network has nodes for.",
+    "The {.fn layout_dyad} function itself is not deprecated.")
+  layout_configuration(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_triad <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val triad} layout is deprecated.",
+    "Please use {.code layout = \"configuration\"} instead,",
+    "which draws whichever configuration the network has nodes for.",
+    "The {.fn layout_triad} function itself is not deprecated.")
+  layout_configuration(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_tetrad <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val tetrad} layout is deprecated.",
+    "Please use {.code layout = \"configuration\"} instead,",
+    "which draws whichever configuration the network has nodes for.",
+    "The {.fn layout_tetrad} function itself is not deprecated.")
+  layout_configuration(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_pentad <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val pentad} layout is deprecated.",
+    "Please use {.code layout = \"configuration\"} instead,",
+    "which draws whichever configuration the network has nodes for.",
+    "The {.fn layout_pentad} function itself is not deprecated.")
+  layout_configuration(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_hexad <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val hexad} layout is deprecated.",
+    "Please use {.code layout = \"configuration\"} instead,",
+    "which draws whichever configuration the network has nodes for.",
+    "The {.fn layout_hexad} function itself is not deprecated.")
+  layout_configuration(.data, ...)
+}

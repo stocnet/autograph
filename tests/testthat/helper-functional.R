@@ -12,9 +12,14 @@
 # Exported functions in a family, excluding deprecated/defunct shims
 ag_alive_functions <- function(pattern) {
   fns <- sort(grep(pattern, getNamespaceExports("autograph"), value = TRUE))
+  # A retired layout is an ordinary function forwarding to its replacement, so
+  # nothing in its body marks it as retired. The package declares them instead,
+  # and this reads that declaration rather than keeping a second copy of it.
+  retired <- c(paste0("layout_tbl_graph_", autograph:::.deprecated_layouts()),
+               paste0("layout_", autograph:::.deprecated_layouts()))
   keep <- vapply(fns, function(f) {
     fun <- get(f, envir = asNamespace("autograph"))
-    is.function(fun) &&
+    is.function(fun) && !f %in% retired &&
       !grepl("Deprecated|Defunct",
              paste(deparse(body(fun)), collapse = " "))
   }, logical(1))

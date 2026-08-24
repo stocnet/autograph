@@ -210,8 +210,8 @@ or for snapping these layouts to a grid.
 
 ```{r more-layouts, echo = FALSE, message=FALSE, eval = have_site}
 p <- (graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric layout")) /
-  ((graphr(to_unnamed(create_explicit(A-+B-+C, A-+C))) + ggtitle("Triad layout")) |
-  (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Quad layout")))
+  ((graphr(to_unnamed(create_explicit(A-+B-+C, A-+C))) + ggtitle("Triad configuration")) |
+  (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Tetrad configuration")))
 ggsave(site_figure("README-more-layouts-1.png"), p, width = 7, height = 5, dpi = 250)
 ```
 
@@ -413,17 +413,17 @@ In the right-hand one, Elves and Ents have become the same olive.
 The third panel is the harder case, and it is not one reordering can fix:
 a greyscale device keeps only the luminance of a colour,
 so two colours of the same lightness merge however different their hues.
-`contrast_colors()` reports that view beside its own score;
+`check_separation()` reports that view beside its own score;
 where a figure has to print in black and white,
 use the `"bw"` theme or add a second channel such as `node_shape`.
-`contrast_colors()` puts a number on it,
+`check_separation()` puts a number on it,
 scoring how far apart colours are at their worst
 across normal vision and each type of colour blindness:
 
 ```{r cvdscore}
-round(min(contrast_colors(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
-round(min(contrast_colors(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
-round(min(contrast_colors(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
+round(min(check_separation(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
+round(min(check_separation(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
+round(min(check_separation(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
 ```
 
 Below 10 two colours are easily confused, above 25 they are comfortably distinct.
@@ -441,7 +441,7 @@ six categories score 29 under the `"hwu"` theme and 26 under `"oxf"`.
 Marks are only half of it.
 Text has to be read rather than told apart,
 which is a matter of contrast rather than of hue,
-and `contrast_ratio()` scores it against the thresholds of WCAG 2.1:
+and `check_contrast()` scores it against the thresholds of WCAG 2.1:
 4.5 for body text, 3 for large text and for graphical objects.
 Every theme's ink clears 4.5 on that theme's own ground,
 and the test suite holds it there.
@@ -451,7 +451,7 @@ inks <- do.call(rbind, lapply(autograph:::theme_opts, function(t){
   set_stocnet_theme(t)
   bg <- getOption("snet_background")
   data.frame(theme = t, ink = ag_ink(), ground = bg,
-             ratio = round(contrast_ratio(ag_ink(), bg)[1, 2], 1))
+             ratio = round(check_contrast(ag_ink(), bg)[1, 2], 1))
 }))
 set_stocnet_theme("default")
 inks$x <- (seq_len(nrow(inks)) - 1) %% 8

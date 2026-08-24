@@ -33,11 +33,11 @@ test_that("hierarchy refuses to centre a one-mode network", {
     "one-mode network")
 })
 
-test_that("nrm() normalises vectors and arrays onto a common scale", {
-  expect_equal(autograph:::nrm(c(0, 5, 10)), c(0, 0.5, 1))
+test_that(".nrm() normalises vectors and arrays onto a common scale", {
+  expect_equal(autograph:::.nrm(c(0, 5, 10)), c(0, 0.5, 1))
   # A single value has no range to normalise against and is returned as is
-  expect_equal(autograph:::nrm(7), 7)
-  out <- autograph:::nrm(cbind(c(0, 10), c(0, 5)))
+  expect_equal(autograph:::.nrm(7), 7)
+  out <- autograph:::.nrm(cbind(c(0, 10), c(0, 5)))
   expect_s3_class(out, "data.frame")
   expect_equal(nrow(out), 2L)
 })
@@ -55,7 +55,7 @@ test_that("multilevel drops tie weights it cannot use", {
   # calls continuous_scale(trans = ) and so emits a ggplot2 3.5.0 deprecation
   # warning that is not ours to fix.
   suppressWarnings(
-    expect_buildable(graphr(net, layout = "multilevel", level = "type")))
+    expect_buildable(graphr(net, layout = "levels", level = "type")))
 })
 
 # Radial label angles ----
@@ -501,14 +501,14 @@ test_that("a tie spanning two layers is routed through a dummy node", {
 })
 
 test_that("a layer of nodes is spread, and a negative count refused", {
-  # rng() spreads a layer's nodes over a common range; one node has no
+  # .rng() spreads a layer's nodes over a common range; one node has no
   # spread to take.
-  expect_equal(autograph:::rng(1), 0)
-  spread <- autograph:::rng(3)
+  expect_equal(autograph:::.rng(1), 0)
+  spread <- autograph:::.rng(3)
   expect_length(spread, 3L)
   expect_equal(spread[2], 0)
   expect_true(spread[1] < spread[3])
-  expect_error(autograph:::rng(-1), "negative number of nodes")
+  expect_error(autograph:::.rng(-1), "negative number of nodes")
 })
 
 test_that("concentric needs one membership per node", {
@@ -545,7 +545,7 @@ test_that("multilevel ignores weights it cannot read as distances", {
     sw, "weight", rep(c(-1, 1), length.out = as.integer(manynet::net_ties(sw))))
   # suppressWarnings: the weighted edge scale goes through ggraph, see above.
   suppressWarnings(expect_message(
-    p <- graphr(net, layout = "multilevel", level = "type"),
+    p <- graphr(net, layout = "levels", level = "type"),
     "Ignoring the tie weights"))
   suppressWarnings(expect_buildable(p))
 })

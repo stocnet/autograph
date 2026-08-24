@@ -136,7 +136,11 @@
 # network is documented package by package.
 .completion_layout_values <- function() {
   own <- .autograph_layouts()
-  rest <- setdiff(.valid_layouts(), own)
+  # `.valid_layouts()` keeps the retired autograph names, so that giving one is
+  # still valid and gets renamed rather than refused. They are not offered,
+  # here or as `own`, so subtract them rather than let them fall through to
+  # `rest` and be labelled as somebody else's layouts.
+  rest <- setdiff(.valid_layouts(), c(own, .deprecated_layouts()))
   ggraph <- sub("^layout_tbl_graph_", "",
                 grep("^layout_tbl_graph_",
                      tryCatch(ls(asNamespace("ggraph"), all.names = TRUE),
