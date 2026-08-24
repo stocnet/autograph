@@ -1286,28 +1286,82 @@ Other such layouts include:
 
 Spectral layouts arrange nodes according to the eigenvalues
 of the Laplacian matrix of a graph.
-These layouts tend to exaggerate the clustering of like-nodes and the
-separation of less similar nodes in two-dimensional space.
+These layouts exaggerate the clustering of similarly located nodes and 
+separate less similar nodes in two-dimensional space.
 
 ```{r eigen, fig.align='center'}
 graphr(ison_southern_women, layout = "eigen") + ggtitle("Eigenvector")
 ```
 
-Somewhat similar are multidimensional scaling (MDS) techniques,
+Of similar purpose are multidimensional scaling (MDS) techniques,
 which visualise the similarity between nodes in terms of their proximity
 in a two-dimensional (or more) space.
+The `"scaling"` layout places the nodes so that the distance drawn between them
+stands for the number of steps between them in the network.
 
-```{r mds, fig.align='center'}
-graphr(ison_southern_women, layout = "mds") + ggtitle("Multidimensional Scaling")
+```{r scaling, fig.align='center'}
+graphr(ison_southern_women, layout = "scaling") + ggtitle("Multidimensional Scaling")
 ```
 
-Other such layouts include:
+Note that this layout is drawn with the axes labelled,
+whereas you may have noticed that the other graphs are not.
+That is because here the coordinates can be read:
+two nodes drawn twice as far apart are, more or less, twice as far apart.
+The axes are drawn on one scale for the same reason.
+The layout scales the whole network where it is small enough for that,
+using `"mds"` from `{igraph}`,
+and otherwise approximates the scaling from a sample of the nodes
+using `"pmds"` (or pivot MDS) from `{graphlayouts}`.
+You can still call each of these directly, but since they are both used in `"scaling"`,
+dispatch can be automatic, based on the size and structure of the network.
 
-- Pivot multidimensional scaling: `"pmds"` (basically just a faster MDS for large networks)
+"More or less" is doing some work in that sentence.
+A network usually has more structure than two dimensions alone can hold,
+so some of the distances drawn won't capture the real distances in the network.
+In some cases, the dimensionality is so high that the drawing is misleading.
+We can check how much disagreement there is between scaled distances and 
+the network distances as a *stress* score.
+This is printed as a caption under the plot as a percentage of the network distances, 
+such that zero would represent a perfect drawing.
+
+How low is low? Kruskal ([1964](https://doi.org/10.1007/BF02289565)),
+who introduced the score, recommends 20% as poor, 10% as fair, 5% as good,
+and 2.5% as excellent.
+Those figures were established for psychometric data though. 
+Networks typically contain a lot more structure,
+which is hard to capture in just two dimensions,
+so a 20% threshold is often too demanding.
+
+For networks, a score near 30% is quite common,
+and means the clustering can be interpreted though perhaps the distances should not be interpreted as exact.
+Above 40% and the plot does not really show any interpretable structure;
+`graphr()` will alert you in the console where the score is above 30%.
+By contrast, a stress score near 5% is rare and worth trusting.
+
+Note that this stress score is not only for this layout.
+`check_stress()` measures any drawing the same way,
+so layouts can be compared on the same network
+(Brandes and Pich [2007](https://doi.org/10.1007/978-3-540-70904-6_6)):
+
+```{r checkstress, fig.align='center'}
+sapply(c("scaling", "stress", "fr", "circle"),
+       function(x) check_stress(graphr(ison_southern_women, layout = x)))
+```
+
+The default `"stress"` layout scores a little better here,
+which is no accident: it minimises a related criterion directly.
+What `"scaling"` adds is the axes and the score,
+so that the distances can be read and the reading can be checked.
 
 ::: {.callout}
 <span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
 :::
+
+In addition to stress, the scaling layout will also report 
+how much of the network distance variance the two dimensions drawn hold.
+The two numbers answer different questions:
+stress asks how much a multidimensional scaling of the network distances can be trusted,
+whereas the variance explained asks how much of the structure these two dimensions could hold at all.
 
 ### Grid layouts {#grid-layouts}
 
@@ -1369,7 +1423,7 @@ useful when readers need to compare them.
 ::: {.callout}
 <span class="callout-label">**Going further**:</span>
 `{autograph}` also provides its own special-purpose layouts —
-`"configuration"`, `"levels"`, `"matching"`, `"valence"`,
+`"configuration"`, `"levels"`, `"matching"`, `"scaling"`, `"valence"`,
 and the layered family —
 documented at `?layout_layered` and friends.
 Several layouts take a layout-specific extra argument (passed through `...`)
@@ -1383,10 +1437,11 @@ name or a vector. See `?graphr` for the full list.
 force-directed (`"stress"`, `"fr"`, `"kk"`),
 layered (`"layered"`, `"railway"`, `"lineage"`),
 circular (`"concentric"`, `"circle"`),
-spectral (`"eigen"`, `"mds"`),
+spectral (`"eigen"`, `"scaling"`),
 and grid layouts.
 Force-directed layouts are illustrative — do not over-interpret distances;
-spectral/MDS layouts place nodes by measured similarity;
+spectral/MDS layouts place nodes by measured similarity,
+and `"scaling"` captions the plot with how far that reading can be trusted;
 layered layouts suit two-mode or hierarchical data.
 And since every layout is just a table of coordinates,
 you can always compute one with `ggraph::create_layout()`,
