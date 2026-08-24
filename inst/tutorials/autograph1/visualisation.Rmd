@@ -1435,6 +1435,22 @@ which is no accident: it minimises a related criterion directly.
 What `"scaling"` adds is the axes and the score,
 so that the distances can be read and the reading can be checked.
 
+In addition to stress, the scaling layout also reports
+how much of the variance in the network's distances the two dimensions drawn hold.
+The two numbers answer different questions,
+and the comparison above shows how.
+Stress belongs to the drawing:
+draw this one network four ways and you get four different scores.
+The variance explained belongs to the network:
+it is the same 31% whichever of the four you draw,
+because it asks how much of the structure two dimensions could hold at all.
+
+So read them together.
+A low variance explained sets a floor that no layout gets under.
+Where two dimensions can hold only a third of the structure,
+no arrangement of the nodes will draw the distances faithfully,
+and stress tells you how close to that floor this particular drawing gets.
+
 ```{r spectralinterp-Q, echo=FALSE, purl = FALSE}
 question("Can we interpret the distance between nodes in spectral and MDS layouts?",
   answer("Yes",
@@ -1446,11 +1462,20 @@ question("Can we interpret the distance between nodes in spectral and MDS layout
 )
 ```
 
-In addition to stress, the scaling layout will also report 
-how much of the network distance variance the two dimensions drawn hold.
-The two numbers answer different questions:
-stress asks how much a multidimensional scaling of the network distances can be trusted,
-whereas the variance explained asks how much of the structure these two dimensions could hold at all.
+```{r stressvariance-Q, echo=FALSE, purl = FALSE}
+question("A `\"scaling\"` layout reports two numbers: a stress score and a share of the distance variance. One of them would be the same for any other layout of the same network. Which one?",
+  answer("The variance explained",
+         correct = TRUE,
+         message = "That's right — it asks how much of this network's structure two dimensions could hold at all, which no choice of layout changes."),
+  answer("The stress",
+         message = "Stress scores the drawing rather than the network, so it does change: `check_stress()` reports 31% for `\"scaling\"` and 52% for `\"circle\"` on `ison_southern_women`."),
+  answer("Both of them, since both describe the network",
+         message = "Only the variance explained describes the network. Stress measures how far one particular drawing gets the distances wrong, so redrawing the network changes it."),
+  answer("Neither of them, since both describe the drawing",
+         message = "Only stress describes the drawing. The variance explained is read from the network's distances, before any nodes are placed."),
+  allow_retry = TRUE
+)
+```
 
 ### Grid layouts {#grid-layouts}
 

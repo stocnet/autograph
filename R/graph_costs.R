@@ -45,6 +45,16 @@
 #'   such as "layered", "circle" or "configuration",
 #'   scores poorly by design.
 #'
+#'   The score belongs to the drawing rather than to the network,
+#'   which is what separates it from the share of distance variance
+#'   that `graphr()` reports beside it.
+#'   Draw one network two ways and the stress changes, since one drawing
+#'   holds its distances better than the other;
+#'   the share of variance does not, since two dimensions can hold
+#'   just as much of that network either way.
+#'   A network whose variance is held poorly sets a floor
+#'   that no layout gets under.
+#'
 #'   The drawn distances are scaled to the path distances before they are
 #'   compared, since a layout may place its nodes on any scale it likes,
 #'   and the ties are counted unweighted, as `layout_scaling()` counts them.

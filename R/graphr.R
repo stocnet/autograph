@@ -54,6 +54,9 @@
 #'   between them. Since those coordinates can be read, this layout is drawn
 #'   with labelled axes on one scale, and captioned with how well two
 #'   dimensions hold the distances; see `?layout_scaling` and `check_stress()`.
+#'   Note that those axes carry distances rather than named dimensions:
+#'   the drawing can be turned or mirrored without fitting the network
+#'   any better or any worse.
 #' @param labels Which nodes to label, if the network is labelled.
 #'   `TRUE` (the default) labels every node and `FALSE` none of them,
 #'   but a label for every node of a large network hides the network behind

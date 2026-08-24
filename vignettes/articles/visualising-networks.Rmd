@@ -1353,15 +1353,25 @@ which is no accident: it minimises a related criterion directly.
 What `"scaling"` adds is the axes and the score,
 so that the distances can be read and the reading can be checked.
 
-::: {.callout}
-<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
-:::
+In addition to stress, the scaling layout also reports
+how much of the variance in the network's distances the two dimensions drawn hold.
+The two numbers answer different questions,
+and the comparison above shows how.
+Stress belongs to the drawing:
+draw this one network four ways and you get four different scores.
+The variance explained belongs to the network:
+it is the same 31% whichever of the four you draw,
+because it asks how much of the structure two dimensions could hold at all.
 
-In addition to stress, the scaling layout will also report 
-how much of the network distance variance the two dimensions drawn hold.
-The two numbers answer different questions:
-stress asks how much a multidimensional scaling of the network distances can be trusted,
-whereas the variance explained asks how much of the structure these two dimensions could hold at all.
+So read them together.
+A low variance explained sets a floor that no layout gets under.
+Where two dimensions can hold only a third of the structure,
+no arrangement of the nodes will draw the distances faithfully,
+and stress tells you how close to that floor this particular drawing gets.
+
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes interactive quizzes in the live tutorial — run `run_tute()` at the R console to try it.
+:::
 
 ### Grid layouts {#grid-layouts}
 

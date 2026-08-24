@@ -56,7 +56,10 @@ The "scaling" layout places the nodes by multidimensional scaling,
 so that the distance between two nodes approximates the number of steps
 between them. Since those coordinates can be read, this layout is drawn
 with labelled axes on one scale, and captioned with how well two
-dimensions hold the distances; see \code{?layout_scaling} and \code{check_stress()}.}
+dimensions hold the distances; see \code{?layout_scaling} and \code{check_stress()}.
+Note that those axes carry distances rather than named dimensions:
+the drawing can be turned or mirrored without fitting the network
+any better or any worse.}
 
 \item{labels}{Which nodes to label, if the network is labelled.
 \code{TRUE} (the default) labels every node and \code{FALSE} none of them,
