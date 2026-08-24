@@ -20,6 +20,7 @@ graphr(
   label_dist = NULL,
   label_repel = TRUE,
   edge_bundle = FALSE,
+  .shared = NULL,
   ...,
   node_colour,
   edge_colour
@@ -176,6 +177,10 @@ Alternative non-hierarchical algorithms can be selected by name:
 when a network has enough edges; for directed networks arrowheads are
 retained, but the slight reciprocal-tie curvature used for unbundled edges
 does not apply.}
+
+\item{.shared}{Internal. A list of the aesthetic ranges and categories found
+across a list of networks, which \code{graphs()} uses to draw and label each of
+its panels against the same scales. Not intended to be set by hand.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
 }

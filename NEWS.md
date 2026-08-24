@@ -64,6 +64,7 @@
 - Improved `node_group` to draw overlapping hulls (closes #51)
   - e.g. `graphr(ison_adolescents, node_group = netrics::node_x_clique())`
 - Improved `graphr()` to note when a colour/shape legend grows past about 7 keys
+- Fixed `graphs()` to collect guides even where panels held different ranges or categories (closes #15)
 
 ## Theming
 

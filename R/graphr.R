@@ -161,6 +161,9 @@
 #'   when a network has enough edges; for directed networks arrowheads are
 #'   retained, but the slight reciprocal-tie curvature used for unbundled edges
 #'   does not apply.
+#' @param .shared Internal. A list of the aesthetic ranges and categories found
+#'   across a list of networks, which `graphs()` uses to draw and label each of
+#'   its panels against the same scales. Not intended to be set by hand.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
 #'   The last plot can be saved to the file system using `ggplot2::ggsave()`.
@@ -190,7 +193,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                    edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
                    label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
-                   ..., node_colour, edge_colour) {
+                   .shared = NULL, ..., node_colour, edge_colour) {
   # A list of networks is handed to graphs(). The call is forwarded as written,
   # rather than argument by argument, because the aesthetic arguments have no
   # defaults: naming them here would force promises that are still missing.
@@ -286,9 +289,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
   # Add edges ----
-  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout)
+  p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout,
+                   .shared)
   # Add nodes ----
-  p <- graph_nodes(p, g, node_color, node_shape, node_size, layout)
+  p <- graph_nodes(p, g, node_color, node_shape, node_size, layout, .shared)
   # Add labels ----
   if (!isFALSE(labels) && manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout, label_dist, label_repel,

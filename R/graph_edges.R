@@ -1,16 +1,16 @@
 graph_edges <- function(p, g, edge_color, edge_size, node_size,
-                        edge_bundle = FALSE, layout = NULL) {
+                        edge_bundle = FALSE, layout = NULL, shared = NULL) {
   bundle_geom <- .infer_bundle_geom(edge_bundle)
   if (manynet::is_directed(g)) {
     out <- .infer_directed_edge_mapping(g, edge_color, edge_size, node_size,
-                                        layout)
+                                        layout, shared)
     if (is.null(bundle_geom)) {
       p <- .map_directed_edges(p, g, out)
     } else {
       p <- .map_bundled_edges(p, g, out, bundle_geom, directed = TRUE)
     }
   } else {
-    out <- .infer_edge_mapping(g, edge_color, edge_size, layout)
+    out <- .infer_edge_mapping(g, edge_color, edge_size, layout, shared)
     if (is.null(bundle_geom)) {
       p <- .map_edges(p, g, out)
     } else {
@@ -25,21 +25,33 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
                                      edge_alpha = 0.4)
   }
   # Check legends
-  if (length(unique(out[["esize"]])) == 1) {
+  # A `graphs()` panel is scaled against every network beside it rather than
+  # against its own ties alone (see `.shared_aes()`), so that the guides can be
+  # collected and a weight is drawn at the same width in each panel.
+  if (is.null(shared[["esize"]]) && length(unique(out[["esize"]])) == 1) {
     p <- p + ggplot2::guides(edge_width = "none")
   } else p <- p + ggraph::scale_edge_width_continuous(range = c(0.3, 3),
+                                                      limits = shared[["esize"]],
                                                       guide = ggplot2::guide_legend(
                                                         ifelse(is.null(edge_size) &
                                                                  manynet::is_weighted(g),
                                                                "Weight", "Width")))
   ecolor_title <- .infer_ecolor_title(g, edge_color)
-  if (length(unique(out[["ecolor"]])) == 1) {
+  elevels <- shared[["ecolor"]]
+  if (is.null(elevels)) elevels <- unique(as.character(out[["ecolor"]]))
+  if (length(elevels) == 1) {
     p <- p + ggplot2::guides(edge_colour = "none")
-  } else if (length(unique(out[["ecolor"]])) == 2){
-    p <- p + ggraph::scale_edge_colour_manual(values = getOption("snet_highlight", default = c("grey","black")),
-                                              guide = ggplot2::guide_legend(ecolor_title))
-  } else p <- p + ggraph::scale_edge_colour_manual(values = ag_qualitative(length(unique(out[["ecolor"]]))),
-                                                   guide = ggplot2::guide_legend(ecolor_title))
+  } else {
+    # The values are named by the categories, and the scale given those
+    # categories as its limits, so that a category keeps its colour and its key
+    # even in a panel whose ties do not include it.
+    evalues <- if (length(elevels) == 2)
+      getOption("snet_highlight", default = c("grey","black")) else
+        ag_qualitative(length(elevels))
+    p <- p + ggraph::scale_edge_colour_manual(
+      values = stats::setNames(evalues, elevels), limits = elevels,
+      drop = FALSE, guide = ggplot2::guide_legend(ecolor_title))
+  }
   # When linetype varies across ties (signed networks) it is mapped through
   # aes() as literal "solid"/"dashed" strings, so an identity scale is needed to
   # use them verbatim. Such a scale draws no legend by default, which was right
@@ -60,16 +72,17 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # Helper functions for .graph_edges()
 
 .infer_directed_edge_mapping <- function(g, edge_color, edge_size, node_size,
-                                         layout = NULL) {
-  list("ecolor" = .infer_ecolor(g, edge_color),
+                                         layout = NULL, shared = NULL) {
+  list("ecolor" = .infer_ecolor(g, edge_color, shared[["ecolor"]]),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g),
        "ealpha" = .infer_ealpha(g, layout),
        "end_cap" = .infer_end_cap(g, node_size, layout))
 }
 
-.infer_edge_mapping <- function(g, edge_color, edge_size, layout = NULL) {
-  list("ecolor" = .infer_ecolor(g, edge_color),
+.infer_edge_mapping <- function(g, edge_color, edge_size, layout = NULL,
+                               shared = NULL) {
+  list("ecolor" = .infer_ecolor(g, edge_color, shared[["ecolor"]]),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g),
        "ealpha" = .infer_ealpha(g, layout))

@@ -33,6 +33,7 @@ graphr_arg_values <- list(
   snap        = NULL, # exercised in test-functional_layouts.R
   label_dist  = list(0.5),
   label_repel = list(TRUE, FALSE),
+  .shared     = NULL, # internal, set by graphs(); exercised in test-functional_plots.R
   ...         = NULL
 )
 

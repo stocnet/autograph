@@ -233,6 +233,68 @@ test_that("graphs() shares layouts across waves and selects waves", {
                   "patchwork")
 })
 
+# One scale per aesthetic across the panels, so that `patchwork` collects the
+# guides into one legend and the same value is drawn the same way in each panel
+# (stocnet/autograph#15).
+
+test_that("graphs() shares continuous scales across panels", {
+  skip_on_cran()
+  m0 <- matrix(c(0, 0, 0, 2, 0,
+                 0, 0, 4, 0, 0,
+                 0, 4, 0, 0, 0,
+                 2, 0, 0, 0, 1,
+                 0, 0, 0, 1, 0), 5, 5,
+               dimnames = list(letters[1:5], letters[1:5]))
+  m1 <- m0
+  m1[4, 5] <- 0
+  m1[5, 4] <- 0
+  p <- suppressMessages(graphs(list(manynet::as_igraph(m0),
+                                    manynet::as_igraph(m1))))
+  breaks <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("edge_width")$get_breaks())
+  expect_equal(breaks[[1]], breaks[[2]])
+  # The lighter network holds no tie of weight 1, but is still scaled for one
+  expect_equal(p[[2]]$scales$get_scales("edge_width")$limits, c(1, 4))
+  gt <- suppressMessages(patchwork::patchworkGrob(p))
+  expect_length(grep("guide-box", gt$layout$name), 1)
+})
+
+test_that("graphs() shares categorical scales across panels", {
+  skip_on_cran()
+  ties <- matrix(c(0, 1, 1, 0,
+                   1, 0, 1, 0,
+                   1, 1, 0, 1,
+                   0, 0, 1, 0), 4, 4,
+                 dimnames = list(letters[1:4], letters[1:4]))
+  n0 <- manynet::mutate_ties(manynet::as_igraph(ties),
+                             type = c("a", "b", "c", "a"))
+  fewer <- ties
+  fewer[3, 4] <- 0
+  fewer[4, 3] <- 0
+  n1 <- manynet::mutate_ties(manynet::as_igraph(fewer),
+                             type = c("a", "b", "a"))
+  p <- suppressMessages(graphs(list(n0, n1), edge_color = "type"))
+  labels <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("edge_colour")$get_labels())
+  expect_equal(labels[[1]], labels[[2]])
+  expect_equal(labels[[1]], c("a", "b", "c"))
+  # "a" is drawn in the same colour in both panels, although only one of them
+  # holds all three types
+  drawn <- lapply(1:2, function(i)
+    suppressMessages(ggplot2::ggplot_build(p[[i]]))$data[[1]]$edge_colour[1])
+  expect_equal(drawn[[1]], drawn[[2]])
+})
+
+test_that("graphs() shares the diffusion scale across waves", {
+  skip_on_cran()
+  set.seed(2)
+  diff <- manynet::play_diffusion(manynet::ison_adolescents)
+  p <- suppressMessages(graphs(diff))
+  labels <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("fill")$get_labels())
+  expect_equal(labels[[1]], labels[[2]])
+})
+
 test_that("graphs() handles ego networks and changing networks", {
   skip_on_cran()
   # a full set of egos gets the star layout centred on each ego

@@ -67,10 +67,23 @@
     "{n} {what}s in the network, but {len} value{?s} {?was/were} given.")
 }
 
-.infer_nshape <- function(g, node_shape) {
+# The categories the node shape shows, or NULL where every node is drawn with
+# the same shape. Read as in `.infer_nshape()`.
+.nshape_values <- function(g, node_shape) {
+  if (!is.null(node_shape)) {
+    if (!node_shape %in% manynet::net_node_attributes(g)) return(NULL)
+    return(as.factor(as.character(manynet::node_attribute(g, node_shape))))
+  }
+  if (!is_twomode(g)) return(NULL)
+  modes <- .mode_labels(g)
+  factor(ifelse(igraph::V(g)$type, modes[2], modes[1]), levels = modes)
+}
+
+.infer_nshape <- function(g, node_shape, levels = NULL) {
   if (!is.null(node_shape)) {
     if (node_shape %in% manynet::net_node_attributes(g)) {
       out <- as.factor(as.character(manynet::node_attribute(g, node_shape)))
+      if (!is.null(levels)) out <- factor(as.character(out), levels = levels)
     } else out <- node_shape
   } else if (is_twomode(g) & is.null(node_shape)) {
     # igraph convention: type FALSE is the first mode, TRUE the second.
@@ -98,68 +111,88 @@
   as.character(modes)
 }
 
-.infer_ncolor <- function(g, node_color) {
-  if (!is.null(node_color)) {
-    if (node_color %in% manynet::net_node_attributes(g)) {
-      if ("node_mark" %in% class(manynet::node_attribute(g, node_color))) {
-        out <- factor(as.character(manynet::node_attribute(g, node_color)),
-                      levels = c("FALSE", "TRUE"))
-      } else out <- as.factor(as.character(manynet::node_attribute(g, node_color)))
-      if (length(unique(out)) == 1) {
-        out <- rep(ag_ink(), manynet::net_nodes(g))
-        .inform_constant_color("node_color", node_color, "node")
-      }
-    } else out <- node_color
-  } else {
-    out <- ag_ink()
+# The categories the node colour shows, before anything is decided about how to
+# draw them, or NULL where the colour is one colour rather than a mapping.
+# Separated from `.infer_ncolor()` so that `.shared_aes()` can read the
+# categories of every network in a `graphs()` list, including those of a network
+# that holds only one of them.
+.ncolor_values <- function(g, node_color) {
+  if (is.null(node_color)) return(NULL)
+  if (!node_color %in% manynet::net_node_attributes(g)) return(NULL)
+  vals <- manynet::node_attribute(g, node_color)
+  if ("node_mark" %in% class(vals))
+    factor(as.character(vals), levels = c("FALSE", "TRUE")) else
+      as.factor(as.character(vals))
+}
+
+# `levels` holds the categories that `graphs()` found across all of its panels.
+# Where it is given, a network holding only one of them keeps that category
+# rather than collapsing to plain black, so that a category is drawn in the same
+# colour in every panel.
+.infer_ncolor <- function(g, node_color, levels = NULL) {
+  vals <- .ncolor_values(g, node_color)
+  if (is.null(vals)) return(if (!is.null(node_color)) node_color else ag_ink())
+  if (!is.null(levels)) return(factor(as.character(vals), levels = levels))
+  if (length(unique(vals)) == 1) {
+    .inform_constant_color("node_color", node_color, "node")
+    return(rep(ag_ink(), manynet::net_nodes(g)))
   }
-  out
+  vals
 }
 
 # Edge aesthetics ----
 
-.infer_ecolor <- function(g, edge_color){
+# The categories the edge colour shows, before anything is decided about how to
+# draw them: the attribute the user named, else the layer each tie belongs to,
+# else its sign. NULL where the colour is one colour rather than a mapping.
+# Separated from `.infer_ecolor()` for the same reason as `.ncolor_values()`.
+.ecolor_values <- function(g, edge_color) {
   if (!is.null(edge_color)) {
-    if (edge_color %in% manynet::net_tie_attributes(g)) {
-      if ("tie_mark" %in% class(manynet::tie_attribute(g, edge_color))) {
-        out <- factor(as.character(manynet::tie_attribute(g, edge_color)),
-                      levels = c("FALSE", "TRUE"))
-      } else out <- as.factor(as.character(manynet::tie_attribute(g, edge_color)))
-      if (length(unique(out)) == 1) {
-        out <- rep(ag_ink(), manynet::net_ties(g))
-        .inform_constant_color("edge_color", edge_color, "tie")
-      }
-    } else {
-      out <- edge_color
-    }
-  } else if (is.null(edge_color) & .has_layers(g)) {
-    # Which layer a tie belongs to says more about a multiplex network than
-    # its sign does, and only some of its ties have a sign to show: a sign is
-    # still drawn, as the linetype, but every tie belongs to a layer.
-    # Ordered alphabetically, as every other attribute mapped to a colour is.
-    # Taking the order from `manynet::layer_names()` instead was tried and
-    # dropped: with the two-value highlight palette it decides which layer is
-    # drawn in the emphasis colour, and `fict_marvel` names its layers in an
-    # order that greys out the very layer the plot is about.
-    layers <- manynet::tie_attribute(g, .layer_attribute(g))
-    out <- as.factor(as.character(layers))
-    if (length(unique(out)) == 1) out <- ag_ink()
-  } else if (is.null(edge_color) & manynet::is_signed(g)) {
-    # Signed networks that are not layered can still carry a sign on only
-    # some of their ties. Treat those (and any NA) as positive, as the
-    # linetype does, so that the factor never contains NA, which grid rejects
-    # at draw time, and so that colour and linetype agree about which ties
-    # are negative.
-    signs <- as.numeric(manynet::tie_signs(g))
-    out <- factor(ifelse(is.na(signs) | signs >= 0, "Positive", "Negative"),
-                  levels = c("Positive", "Negative"))
-    if (length(unique(out)) == 1) {
-      out <- ag_ink()
-    }
-  } else {
-    out <- ag_ink()
+    if (!edge_color %in% manynet::net_tie_attributes(g)) return(NULL)
+    vals <- manynet::tie_attribute(g, edge_color)
+    return(if ("tie_mark" %in% class(vals))
+      factor(as.character(vals), levels = c("FALSE", "TRUE")) else
+        as.factor(as.character(vals)))
   }
-  out
+  # Which layer a tie belongs to says more about a multiplex network than
+  # its sign does, and only some of its ties have a sign to show: a sign is
+  # still drawn, as the linetype, but every tie belongs to a layer.
+  # Ordered alphabetically, as every other attribute mapped to a colour is.
+  # Taking the order from `manynet::layer_names()` instead was tried and
+  # dropped: with the two-value highlight palette it decides which layer is
+  # drawn in the emphasis colour, and `fict_marvel` names its layers in an
+  # order that greys out the very layer the plot is about.
+  if (.has_layers(g))
+    return(as.factor(as.character(
+      manynet::tie_attribute(g, .layer_attribute(g)))))
+  # Signed networks that are not layered can still carry a sign on only
+  # some of their ties. Treat those (and any NA) as positive, as the
+  # linetype does, so that the factor never contains NA, which grid rejects
+  # at draw time, and so that colour and linetype agree about which ties
+  # are negative.
+  if (manynet::is_signed(g)) {
+    signs <- as.numeric(manynet::tie_signs(g))
+    return(factor(ifelse(is.na(signs) | signs >= 0, "Positive", "Negative"),
+                  levels = c("Positive", "Negative")))
+  }
+  NULL
+}
+
+# `levels` is read as in `.infer_ncolor()`.
+.infer_ecolor <- function(g, edge_color, levels = NULL){
+  vals <- .ecolor_values(g, edge_color)
+  if (is.null(vals)) return(if (!is.null(edge_color)) edge_color else ag_ink())
+  if (!is.null(levels)) return(factor(as.character(vals), levels = levels))
+  if (length(unique(vals)) == 1) {
+    # An attribute the user named is reported when it cannot distinguish
+    # anything; a default the package chose itself is not.
+    if (!is.null(edge_color)) {
+      .inform_constant_color("edge_color", edge_color, "tie")
+      return(rep(ag_ink(), manynet::net_ties(g)))
+    }
+    return(ag_ink())
+  }
+  vals
 }
 
 # Which tie attribute records the layer each tie belongs to, or NA where none
@@ -239,4 +272,74 @@
     if (length(unique(out)) == 1) out <- unique(out)
   } else out <- "solid"
   out
+}
+
+# Shared aesthetics across a list of networks ----
+
+# `graphs()` draws each network as a plot of its own and lets `{patchwork}`
+# collect the guides. A guide can only be collected when it is identical to the
+# one beside it, and a scale takes its limits from the data of its own plot, so
+# two networks holding different values of the same attribute produce two
+# guides. Worse, the palette and the value each category is drawn in are chosen
+# from the categories of that network alone, so the same category can be drawn
+# in a different colour in each panel.
+#
+# This resolves each aesthetic over the whole list, so that every panel is drawn
+# and labelled against the same scale. It reads the same helpers the panels
+# themselves use, so the categories and the sizes cannot disagree.
+#
+# An entry is NULL where the aesthetic does not vary across the list, which
+# leaves the panel to decide as it does for a single plot.
+.shared_aes <- function(netlist, node_color = NULL, node_shape = NULL,
+                        node_size = NULL, edge_color = NULL, edge_size = NULL,
+                        layout = NULL) {
+  nets <- lapply(netlist, function(x)
+    tryCatch(manynet::as_tidygraph(x), error = function(e) NULL))
+  nets <- Filter(Negate(is.null), nets)
+  if (length(nets) < 2) return(NULL)
+  gather <- function(f) lapply(nets, function(g)
+    tryCatch(f(g), error = function(e) NULL))
+  out <- list(
+    esize  = .shared_range(gather(function(g) .infer_esize(g, edge_size))),
+    nsize  = if (is.null(node_size)) NULL else
+      .shared_range(gather(function(g) .infer_nsize(g, node_size, layout))),
+    ecolor = .shared_levels(gather(function(g) .ecolor_values(g, edge_color))),
+    ncolor = .shared_levels(gather(function(g) .ncolor_values(g, node_color))),
+    nshape = .shared_levels(gather(function(g) .nshape_values(g, node_shape))),
+    diffusion = .shared_levels(gather(.diffusion_states)),
+    nadopt = .shared_range(gather(.finite_adoption_time)))
+  if (all(vapply(out, is.null, logical(1)))) NULL else out
+}
+
+# The union of the categories a mapping takes across the list, in the order they
+# are first met, or NULL where there is nothing to tell apart.
+.shared_levels <- function(vals) {
+  vals <- Filter(function(x) is.factor(x) || is.character(x), vals)
+  if (!length(vals)) return(NULL)
+  levs <- unique(unlist(lapply(vals, function(x)
+    if (is.factor(x)) levels(x) else unique(as.character(x)))))
+  levs <- levs[!is.na(levs)]
+  if (length(levs) < 2) NULL else levs
+}
+
+# The range a continuous mapping covers across the list, or NULL where every
+# network holds the same single value and so needs no scale to tell them apart.
+.shared_range <- function(vals) {
+  vals <- unlist(Filter(is.numeric, vals))
+  vals <- vals[is.finite(vals)]
+  if (length(unique(vals)) < 2) NULL else range(vals)
+}
+
+# The categories the two diffusion mappings in R/graph_nodes.R show, read the
+# same way there.
+.diffusion_states <- function(g) {
+  if (!"diffusion" %in% manynet::net_node_attributes(g)) return(NULL)
+  states <- c("Susceptible", "Exposed", "Infected", "Recovered")
+  out <- .recode_diffusion(manynet::node_attribute(g, "diffusion"))
+  factor(out, levels = states[states %in% out])
+}
+
+.finite_adoption_time <- function(g) {
+  out <- .node_adoption_time(g)
+  out[is.finite(out)]
 }
