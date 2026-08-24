@@ -13,6 +13,17 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
     }
   }
   p <- ggraph::ggraph(lo) + ag_theme_void()
+  # A graph has no use for axes, save where its coordinates can be read. The
+  # "scaling" layout draws distances that mean something, so it keeps its axes,
+  # and keeps them on one scale: a distance read off two axes of different
+  # scales is not the distance the layout placed there.
+  if (identical(layout, "scaling")) {
+    p <- p + ag_theme_minimal() +
+      ggplot2::labs(x = "Dimension 1", y = "Dimension 2")
+    # ggraph has already set a coordinate system, and ggplot2 announces the
+    # replacement, which is not news to anyone here.
+    p <- suppressMessages(p + ggplot2::coord_fixed())
+  }
   if (!is.null(node_group)) {
     # thisRequires("ggforce")
     # A membership matrix repeats a node's coordinates once for each group it
@@ -37,16 +48,16 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
                                  guide = ggplot2::guide_legend("Group"))
   }
   if(snap){
-    # Layered layouts already encode meaning in their coordinates -- a layer,
-    # a mode, a generation, or a date along one axis -- which square-grid
-    # snapping would collapse. Skip snapping for those and keep the layout as
-    # computed.
-    is_layered <- is.character(layout) && length(layout) == 1L &&
-      layout %in% .layered_layouts()
-    if (is_layered) {
+    # Some layouts already encode meaning in their coordinates -- a layer, a
+    # mode, a generation, or a date along one axis, a scaled distance along
+    # both -- which square-grid snapping would collapse. Skip snapping for
+    # those and keep the layout as computed.
+    is_fixed <- is.character(layout) && length(layout) == 1L &&
+      layout %in% .fixed_layouts()
+    if (is_fixed) {
       manynet::snet_info(paste0("Skipping snapping: the '", layout,
-                                "' layout is layered, so its coordinates ",
-                                "are kept as computed."))
+                                "' layout carries meaning in its coordinates, ",
+                                "so they are kept as computed."))
     } else {
     manynet::snet_info("Snapping layout coordinates to grid.")
     if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE)){

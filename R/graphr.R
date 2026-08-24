@@ -49,6 +49,11 @@
 #'   accept a "ranks" argument, which takes either one of the methods named
 #'   at `?layout_layered` or a numeric node attribute to lay the layers out by,
 #'   as a quoted attribute name or a vector with one value for each node.
+#'   The "scaling" layout places the nodes by multidimensional scaling,
+#'   so that the distance between two nodes approximates the number of steps
+#'   between them. Since those coordinates can be read, this layout is drawn
+#'   with labelled axes on one scale, and captioned with how well two
+#'   dimensions hold the distances; see `?layout_scaling` and `check_stress()`.
 #' @param labels Which nodes to label, if the network is labelled.
 #'   `TRUE` (the default) labels every node and `FALSE` none of them,
 #'   but a label for every node of a large network hides the network behind
@@ -288,6 +293,9 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   }
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, ...)
+  # Read where the layout left it, since the later steps have no use for it
+  # and no reason to carry it. See `layout_scaling()`.
+  fit <- attr(p[["data"]], "fit")
   # Add edges ----
   p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout,
                    .shared)
@@ -311,7 +319,28 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                                   values = c("Isolates" = 0.5), 
                                   labels = label_text)
   } else if(isolates == "caption"){
-    p <- p + ggplot2::labs(caption = paste("Isolates:", paste(isos, collapse = ", ")))
+    p <- .add_caption(p, paste("Isolates:", paste(isos, collapse = ", ")))
+  }
+
+  # Note the fit ----
+  # A scaled layout draws distances that can be read, so how well two
+  # dimensions hold those distances is part of the drawing rather than an
+  # aside. See `check_stress()` for how to read the score.
+  if (!is.null(fit) && is.finite(fit[["stress"]])) {
+    txt <- paste0("Stress: ", round(fit[["stress"]] * 100), "%.")
+    if (!is.na(fit[["variance"]])) txt <- paste0(
+      txt, " Two dimensions hold ", round(fit[["variance"]] * 100),
+      "% of the distance variance.")
+    p <- .add_caption(p, txt)
+    # Kruskal read a stress of 20% as poor, but that figure was set for
+    # psychometric data: most pairs of nodes in a network sit two or three
+    # steps apart, which no plane holds well, so most networks would be
+    # reported on at 20% and the message would say nothing.
+    if (fit[["stress"]] > 0.3) manynet::snet_info(
+      "Two dimensions hold these path distances poorly",
+      "(stress: {round(fit[['stress']] * 100)}%),",
+      "so read the clusters rather than the distances.",
+      "See {.fn check_stress}.")
   }
   
   # Add legends ----

@@ -62,6 +62,17 @@ forget_pref <- function(name) {
   (vector - min(vector)) / (max(vector) - min(vector))
 }
 
+# A plot has one caption, and more than one step may have something to say in
+# it: a scaled layout reports its fit, and a plot that sets its isolates aside
+# names them. Each is added rather than assigned, so that the second does not
+# replace the first.
+.add_caption <- function(p, text) {
+  old <- p[["labels"]][["caption"]]
+  if (!is.null(old) && !is.na(old) && nzchar(old))
+    text <- paste(old, text, sep = " | ")
+  p + ggplot2::labs(caption = text)
+}
+
 # Every layout returns its coordinates as a two-column data frame named x and y.
 .to_lo <- function(mat) {
   res <- as.data.frame(mat)

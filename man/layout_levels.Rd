@@ -86,6 +86,7 @@ Other mapping:
 \code{\link[=layout_configuration]{layout_configuration()}},
 \code{\link[=layout_layered]{layout_layered()}},
 \code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
 \code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},

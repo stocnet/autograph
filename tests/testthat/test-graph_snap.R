@@ -1,5 +1,5 @@
 # The grid-snapping step behind `graphr(snap = TRUE)`, and the layouts it
-# deliberately leaves alone. See R/graph_snap.R and `.layered_layouts()`.
+# deliberately leaves alone. See R/graph_snap.R and `.fixed_layouts()`.
 
 test_that("snapping a layout to the grid yields integer-ish unique positions", {
   skip_on_cran()

@@ -395,9 +395,10 @@
 }
 
 # Layouts whose coordinates carry meaning -- a layer, a mode, a generation, a
-# date -- along one axis, which snapping to a square grid would collapse.
-.layered_layouts <- function() {
-  c("layered", "lineage", "railway", "ladder", "levels",
+# date along one axis, or a scaled distance along both -- which snapping to a
+# square grid would collapse.
+.fixed_layouts <- function() {
+  c("layered", "lineage", "railway", "ladder", "levels", "scaling",
     "hierarchy", "alluvial", "multilevel")
 }
 

@@ -66,7 +66,12 @@ where there is one, or else from the two modes of a two mode network.
 The layered layouts ("layered", "lineage", "railway" and "ladder")
 accept a "ranks" argument, which takes either one of the methods named
 at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
-as a quoted attribute name or a vector with one value for each node.}
+as a quoted attribute name or a vector with one value for each node.
+The "scaling" layout places the nodes by multidimensional scaling,
+so that the distance between two nodes approximates the number of steps
+between them. Since those coordinates can be read, this layout is drawn
+with labelled axes on one scale, and captioned with how well two
+dimensions hold the distances; see \code{?layout_scaling} and \code{check_stress()}.}
 
 \item{labels}{Which nodes to label, if the network is labelled.
 \code{TRUE} (the default) labels every node and \code{FALSE} none of them,
@@ -274,6 +279,7 @@ Other mapping:
 \code{\link[=layout_layered]{layout_layered()}},
 \code{\link[=layout_levels]{layout_levels()}},
 \code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
 \code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}}

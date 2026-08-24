@@ -51,6 +51,13 @@
   - Fixed drawing each node of an unlabelled network on a circle of its own
   - Fixed erroring where a membership holds `NA`, now gathers `NA` nodes onto own circle
   - Fixed `order.by=`, which errored on every network; now orders nodes around each circle by that attribute, decreasing
+- Added a "scaling" layout for multidimensional scaling
+  - Scales classically up to a hundred nodes, and by pivots above that
+  - Scales unweighted path distances, so it can handle signed/weighted networks
+  - Lays each component out separately, where "pmds" refuses disconnected networks outright
+  - Drawn with labelled axes at a fixed ratio, since these coordinates can be read
+  - Captioned with `check_stress()` for Kruskal's stress-1, and console-reported where poor, 
+  as well as the share of distance variance two dimensions hold
 - Added a `layout_matching()` alias so every layout has a short name
 - Removed unreachable `getNNvec()`
 

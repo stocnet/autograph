@@ -4,11 +4,20 @@
 \alias{check_layout}
 \alias{check_span}
 \alias{check_offset}
+\alias{check_stress}
 \title{Checking how well a layout draws its ties}
+\source{
+Kruskal, Joseph B. 1964.
+"Multidimensional scaling by optimizing goodness of fit to a nonmetric
+hypothesis", \emph{Psychometrika} 29(1): 1-27.
+\doi{10.1007/BF02289565}
+}
 \usage{
 check_span(x)
 
 check_offset(x)
+
+check_stress(x)
 }
 \arguments{
 \item{x}{A plot, as \code{graphr()} returns.}
@@ -19,6 +28,10 @@ with \code{total} and \code{mean} attributes holding the sum and the average.
 
 \code{check_offset()} returns one number between 0 and 1 for each tie,
 with a \code{mean} attribute.
+
+\code{check_stress()} returns a single number of 0 or more,
+with a \code{scale} attribute holding the factor the drawn distances were
+scaled by, and a \code{pairs} attribute holding how many pairs were scored.
 }
 \description{
 These functions score a drawing rather than the network it draws,
@@ -31,9 +44,15 @@ and a long tie is one that skips rows to get where it is going.
 \code{check_offset()} reports how far each tie travels sideways,
 as a share of the width of the whole drawing.
 A tie that drops straight down scores zero.
+
+\code{check_stress()} reports how far the distances drawn
+depart from the distances through the network.
+A layout that draws two nodes twice as far apart as two others
+should be drawing a path twice as long.
 }
 \details{
-The two answer different questions, and a layout needs both answered.
+\code{check_span()} and \code{check_offset()} answer different questions,
+and a layered layout needs both answered.
 \code{check_span()} asks whether the rows were well chosen,
 and \code{check_offset()} asks whether the nodes were well placed within them.
 The "layered" layout minimises each in turn, and its \code{ranks} and
@@ -46,6 +65,26 @@ so the same score can be compared across the two.
 For a layout with no rows at all, such as "stress",
 \code{check_span()} reports the distance in that axis' ranks,
 which is not meaningful; the function is for layered layouts.
+
+\code{check_stress()} applies to any layout, since every layout draws its
+nodes some distance apart, and the score is the share of the path
+distances that the drawn distances get wrong.
+It is Kruskal's stress-1, so 0 is a perfect drawing,
+and Kruskal read 20\% as poor, 10\% as fair, 5\% as good,
+and 2.5\% as excellent.
+Those figures were set for psychometric data rather than for networks,
+which are harder: most pairs of nodes in a small-world network sit
+two or three steps apart, and a plane holds few such distances at once,
+so a score near 30\% is ordinary and one near 5\% is rare.
+A layout that never set out to draw path distances,
+such as "layered", "circle" or "configuration",
+scores poorly by design.
+
+The drawn distances are scaled to the path distances before they are
+compared, since a layout may place its nodes on any scale it likes,
+and the ties are counted unweighted, as \code{layout_scaling()} counts them.
+Where a network is disconnected, the pairs with no path between them
+are left out of the score.
 }
 \examples{
 thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
@@ -55,6 +94,9 @@ attr(check_span(graphr(thrones)), "total")
 attr(check_span(graphr(thrones, ranks = "compact")), "total")
 # How straight are they?
 attr(check_offset(graphr(thrones)), "mean")
+# Which layout draws the path distances best?
+check_stress(graphr(manynet::ison_southern_women, layout = "scaling"))
+check_stress(graphr(manynet::ison_southern_women, layout = "circle"))
 }
 \seealso{
 Other mapping:
@@ -64,6 +106,7 @@ Other mapping:
 \code{\link[=layout_layered]{layout_layered()}},
 \code{\link[=layout_levels]{layout_levels()}},
 \code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
 \code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},
