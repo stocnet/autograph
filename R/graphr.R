@@ -28,8 +28,8 @@
 #' @param .data A manynet-consistent object.
 #' @param layout An igraph, ggraph, or manynet layout algorithm.
 #'   If not declared, defaults to "configuration" for networks of up to
-#'   six nodes, "multilevel" for connected multilevel networks,
 #'   "hierarchy" for other two mode networks,
+#'   six nodes, "levels" for connected multilevel networks,
 #'   and "stress" for all other networks.
 #'   For "hierarchy" layout, one can further split graph by
 #'   declaring the "center" argument as the "events", "actors",
@@ -38,7 +38,7 @@
 #'   extra argument.
 #'   The "membership" argument expects either a quoted node attribute present
 #'   in data or vector with the same length as nodes to draw concentric circles.
-#'   For "multilevel" layout algorithm one may declare the "level"
+#'   For "levels" layout algorithm one may declare the "level"
 #'   as extra argument.
 #'   The "level" argument expects either a quoted node attribute present
 #'   in data or vector with the same length as nodes to hierarchically
@@ -346,10 +346,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       # Checked before `is_twomode()`, which is also TRUE for these networks.
       # A "hierarchy" layout would place each level along a single row, which
       # collapses the within-level ties that make the network multilevel.
-      # Only where the network is connected, since the multilevel layout
+      # Only where the network is connected, since the levels layout
       # orients its levels by the distances between them and so cannot place
       # components that have no distance to each other.
-      layout <- "multilevel"
+      layout <- "levels"
     } else if (manynet::is_twomode(g)) {
       layout <- "hierarchy"
     } else layout <- "stress"

@@ -30,8 +30,8 @@ graphr(
 
 \item{layout}{An igraph, ggraph, or manynet layout algorithm.
 If not declared, defaults to "configuration" for networks of up to
-six nodes, "multilevel" for connected multilevel networks,
 "hierarchy" for other two mode networks,
+six nodes, "levels" for connected multilevel networks,
 and "stress" for all other networks.
 For "hierarchy" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
@@ -40,7 +40,7 @@ For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm one may declare the "level"
+For "levels" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically

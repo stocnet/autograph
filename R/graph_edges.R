@@ -82,7 +82,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # A self-loop's `strength` is its diameter, measured in the same units as the
 # layout's coordinates, and `geom_edge_loop0()` defaults it to 1. Since layouts
 # differ by orders of magnitude in how far their coordinates spread, that one
-# number draws a loop that is either invisible or, as for the "multilevel"
+# number draws a loop that is either invisible or, as for the "levels"
 # layout whose coordinates span about one unit in each direction, a circle
 # wider than the network it belongs to -- which then stretches the panel to
 # fit, leaving the plot squeezed against its legend. Sized as a fraction of
@@ -106,7 +106,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # within each level brought forward, so that the structure of each level and
 # the shape of the interlock can both be seen.
 .infer_ealpha <- function(g, layout = NULL) {
-  if (identical(layout, "multilevel") && manynet::is_twomode(g) &&
+  if (identical(layout, "levels") && manynet::is_twomode(g) &&
       manynet::net_ties(g) > 0)
     ifelse(manynet::tie_is_twomode(g), 0.08, 0.5) else 0.4
 }

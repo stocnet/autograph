@@ -75,6 +75,7 @@ export(layout_dyad)
 export(layout_hexad)
 export(layout_hierarchy)
 export(layout_ladder)
+export(layout_levels)
 export(layout_lineage)
 export(layout_multilevel)
 export(layout_pentad)
@@ -87,6 +88,7 @@ export(layout_tbl_graph_hexad)
 export(layout_tbl_graph_hierarchy)
 export(layout_tbl_graph_ladder)
 export(layout_tbl_graph_layered)
+export(layout_tbl_graph_levels)
 export(layout_tbl_graph_lineage)
 export(layout_tbl_graph_matching)
 export(layout_tbl_graph_multilevel)
@@ -176,7 +178,6 @@ importFrom(grDevices,colorRampPalette)
 importFrom(igraph,
   add_vertices,
   as_data_frame,
-  degree,
   delete_edge_attr,
   delete_graph_attr,
   delete_vertex_attr,

@@ -398,17 +398,10 @@
         !inherits(tryCatch(manynet::to_matching(g), error = function(e) e),
                   "error"),
       need = "a two-mode network that a matching can be found for"),
-    ladder = list(
-      check = function(g, ...) manynet::is_twomode(g) &&
-        length(unique(table(manynet::node_is_mode(g)))) == 1L,
-      need = "a two-mode network whose two modes are equally sized"),
-    layered = list(
-      check = function(g, ...) manynet::is_directed(g) && manynet::is_acyclic(g),
-      need = "a directed acyclic network"),
     valence = list(
       check = function(g, ...) manynet::is_signed(g),
       need = "a signed network"),
-    # `concentric` and `multilevel` are deliberately absent. They also need
+    # `concentric` and `levels` are deliberately absent. They also need
     # more than a bare one-mode network, but unlike the layouts above the user
     # can supply what is missing -- a `membership` or a `level` -- and
     # .abort_layout_arg() already says exactly how. Substituting would replace

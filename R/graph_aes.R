@@ -45,10 +45,10 @@
 # The level each node is drawn at by a multilevel layout, or NULL where the
 # network is not being drawn that way. Only how the nodes are grouped matters
 # here, not which group ends up at which level, so unlike `.infer_level()` in
-# R/layout_partition.R there is no need to work out which mode holds the ties
+# R/layout_levels.R there is no need to work out which mode holds the ties
 # within itself.
 .node_level <- function(g, layout) {
-  if (!identical(layout, "multilevel")) return(NULL)
+  if (!identical(layout, "levels")) return(NULL)
   if ("lvl" %in% igraph::vertex_attr_names(g))
     return(as.integer(as.factor(igraph::vertex_attr(g, "lvl"))))
   if (!manynet::is_twomode(g)) return(NULL)

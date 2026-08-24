@@ -171,8 +171,12 @@ test_that("graphs() rejects waves outside the range available", {
 
 test_that("layouts that need an extra argument say how to give it", {
   net <- manynet::ison_adolescents
-  # Previously "argument \"rank\" is missing, with no default".
-  expect_error(graphr(net, layout = "lineage"), "rank")
-  expect_error(graphr(net, layout = "lineage"), "for each node")
+  # `ranks` is not one of them: the layered layouts work the layers out for
+  # themselves where none are given, and only a `ranks` that names something
+  # the network does not hold is an error.
+  expect_no_error(suppressMessages(graphr(net, layout = "lineage")))
+  expect_error(graphr(net, layout = "lineage", ranks = "nope"),
+               "among the node attributes")
   expect_error(graphr(net, layout = "concentric"), "membership")
+  expect_error(graphr(net, layout = "concentric"), "for each node")
 })

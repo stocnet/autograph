@@ -93,7 +93,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
       args$nudge_y <- -nudge_unit
     }
     p <- p + do.call(ggraph::geom_node_text, args)
-  } else if (layout == "multilevel") {
+  } else if (layout == "levels") {
     # `geom_node_label()`, used below, boxes each label in white, which at the
     # density these networks tend to have would paper over the plot entirely.
     # Plain text instead, nudged away from the plane the node sits in: down
@@ -223,7 +223,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 
 # netrics::node_is_max() splits two-mode networks by mode itself. Multilevel
 # networks that are not two-mode record their levels in the `lvl` attribute
-# instead (see layout_tbl_graph_multilevel()), which it knows nothing about, so
+# instead (see layout_levels()), which it knows nothing about, so
 # those are the only strata worth handling here.
 .label_strata <- function(g) {
   if (manynet::is_twomode(g)) return(NULL)

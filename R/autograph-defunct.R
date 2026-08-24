@@ -119,3 +119,46 @@ plot.result.goldfish <- function(x, ..., effects = 4) {
   plot.goldfishFit(x, ..., effects = effects)
 }
 
+
+# Layouts -----------------------------------------------------------------
+
+#' Deprecated layout names
+#'
+#' @description
+#'   Each of these draws what its replacement draws, after saying so.
+#'   They are kept so that a call naming the older layout still draws,
+#'   and will be removed.
+#'
+#'   - "hierarchy" is now "layered", which is what the layout does to a
+#'     two-mode network, where the two modes are two layers and neither is
+#'     above the other in any hierarchy.
+#'   - "alluvial" is now "lineage". The name is held for a plot of changing
+#'     membership composition over time.
+#'   - "multilevel" is now "levels", which `{graphlayouts}` does not also use.
+#'   - "dyad", "triad", "tetrad", "pentad" and "hexad" are now all
+#'     "configuration", which already picks the one matching the number of
+#'     nodes. The functions of those names are not deprecated.
+#'
+#'   Note that `.deprecated_layouts()` lists these, so that neither the
+#'   completions nor the functional audit offers a retired name.
+#' @name layout_deprecated
+#' @param .data Some `{manynet}` compatible network data.
+#' @param ... Arguments passed on to the replacement layout.
+#' @returns Returns a table of nodes' x and y coordinates.
+#' @keywords internal
+NULL
+
+
+#' @rdname layout_deprecated
+#' @export
+layout_multilevel <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val multilevel} layout is deprecated.",
+    "Please use {.code layout = \"levels\"} instead, which takes the same {.arg level} argument.")
+  layout_levels(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_multilevel <- layout_multilevel
+

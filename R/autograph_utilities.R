@@ -55,3 +55,16 @@ forget_pref <- function(name) {
   if (file.exists(f)) tryCatch(unlink(f), error = function(e) NULL)
   invisible(NULL)
 }
+
+# Squash a vector into the unit interval. Shared by the layouts, which place
+# their coordinates there, and by the grid snapping, which reads them back.
+.rescale <- function(vector){
+  (vector - min(vector)) / (max(vector) - min(vector))
+}
+
+# Every layout returns its coordinates as a two-column data frame named x and y.
+.to_lo <- function(mat) {
+  res <- as.data.frame(mat)
+  names(res) <- c("x","y")
+  res
+}
