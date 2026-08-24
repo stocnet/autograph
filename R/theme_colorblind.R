@@ -6,16 +6,16 @@
 #'   
 #'   `simulate_colorblind()` returns what a set of colours looks like to a viewer with
 #'   a given type of colour blindness, or in greyscale.
-#'   `contrast_colors()` scores how far apart colours are, taking the worst case
+#'   `check_separation()` scores how far apart colours are, taking the worst case
 #'   over normal vision and each type of colour blindness,
 #'   so that a palette is only credited for a difference that every viewer
 #'   can see.
-#'   `contrast_ratio()` scores whether text can be read on a ground.
+#'   `check_contrast()` scores whether text can be read on a ground.
 #' @details
 #'   The three functions answer three different questions,
 #'   and a palette needs all three answered.
-#'   `contrast_colors()` asks whether two marks can be told apart,
-#'   `contrast_ratio()` asks whether text can be read on what it sits on,
+#'   `check_separation()` asks whether two marks can be told apart,
+#'   `check_contrast()` asks whether text can be read on what it sits on,
 #'   and the "grey" simulation asks whether either survives a photocopier.
 #'   
 #'   Simulation uses the matrices of Machado, Oliveira and Fernandes (2009),
@@ -27,7 +27,7 @@
 #'   a lower severity is anomalous trichromacy (deuteranomaly, protanomaly),
 #'   which is the more common condition.
 #'   Greyscale conversion takes the relative luminance of the colour,
-#'   the same quantity `contrast_ratio()` scores with.
+#'   the same quantity `check_contrast()` scores with.
 #'   
 #'   Distances are Euclidean distances in CIELAB space, the same measure
 #'   [match_color()] uses.
@@ -59,12 +59,12 @@
 #' @returns 
 #'   `simulate_colorblind()` returns a vector of hexcodes as long as `colors`.
 #'   
-#'   `contrast_colors()` returns a square matrix of worst-case distances,
+#'   `check_separation()` returns a square matrix of worst-case distances,
 #'   with the colours as its dimnames and a missing diagonal,
 #'   so that `min(x, na.rm = TRUE)` gives the closest pair.
 #'   A "grey" attribute holds the same matrix as seen in greyscale.
 #'   
-#'   `contrast_ratio()` returns a square matrix of WCAG contrast ratios,
+#'   `check_contrast()` returns a square matrix of WCAG contrast ratios,
 #'   shaped the same way.
 #' @examples
 #' simulate_colorblind(c("#d73027", "#4575b4"), "deutan")
@@ -72,15 +72,15 @@
 #' simulate_colorblind(c("#d73027", "#4575b4"), "deutan", severity = 0.5)
 #' simulate_colorblind(c("#d73027", "#4575b4"), "grey")
 #' # How well does the current theme's palette separate five categories?
-#' contrast_colors(ag_qualitative(5))
+#' check_separation(ag_qualitative(5))
 #' # The closest pair in it
-#' min(contrast_colors(ag_qualitative(5)), na.rm = TRUE)
+#' min(check_separation(ag_qualitative(5)), na.rm = TRUE)
 #' # And the closest pair once it is printed in greyscale
-#' min(attr(contrast_colors(ag_qualitative(5)), "grey"), na.rm = TRUE)
+#' min(attr(check_separation(ag_qualitative(5)), "grey"), na.rm = TRUE)
 #' # A red and a green that only look different to some viewers
-#' contrast_colors(c("#B7352D", "#627313"))[1, 2]
+#' check_separation(c("#B7352D", "#627313"))[1, 2]
 #' # Can the current theme's ink be read on its ground?
-#' contrast_ratio(ag_ink())[1, 2]
+#' check_contrast(ag_ink())[1, 2]
 #' @export
 simulate_colorblind <- function(colors,
                         type = c("deutan", "protan", "tritan", "grey", "normal"),
@@ -114,7 +114,7 @@ simulate_colorblind <- function(colors,
 #'   counted as distinct.
 #'   By default the current theme's background is used.
 #' @export
-contrast_colors <- function(colors, background = NULL){
+check_separation <- function(colors, background = NULL){
   if(!is.null(background)) colors <- c(background, colors)
   types <- names(colorblind_matrices)
   dists <- lapply(types,
@@ -137,12 +137,12 @@ contrast_colors <- function(colors, background = NULL){
   diag(grey) <- NA_real_
   dimnames(grey) <- dimnames(out)
   attr(out, "grey") <- grey
-  class(out) <- c("contrast_colors", class(out))
+  class(out) <- c("check_separation", class(out))
   out
 }
 
 #' @export
-print.contrast_colors <- function(x, ...){
+print.check_separation <- function(x, ...){
   grey <- attr(x, "grey")
   out <- unclass(x)
   attr(out, "grey") <- NULL
@@ -158,8 +158,8 @@ print.contrast_colors <- function(x, ...){
 
 #' @rdname theme_colorblind
 #' @export
-contrast_ratio <- function(colors, background = NULL){
-  # Unlike contrast_colors(), where a background is one more colour to keep
+check_contrast <- function(colors, background = NULL){
+  # Unlike check_separation(), where a background is one more colour to keep
   # away from, here it is what the others are read *on*, so it belongs in the
   # comparison whether or not the user names one.
   if(is.null(background)) background <- ag_ground_fill()
@@ -230,7 +230,7 @@ colorblind_lab <- function(colors, type){
 colorblind_sort <- function(colors, background = "#FFFFFF", floor = 30){
   n <- length(colors)
   if(n < 3) return(colors)
-  dists <- contrast_colors(colors, background = background)
+  dists <- check_separation(colors, background = background)
   from_bg <- dists[1, -1]
   dists <- dists[-1, -1, drop = FALSE]
   ord <- which(from_bg >= floor)[1]

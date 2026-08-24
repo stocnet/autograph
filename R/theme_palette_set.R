@@ -207,12 +207,12 @@ set_missing_theme <- function(theme){
   bg <- getOption("snet_background", default = "#FFFFFF")
   pal <- getOption("snet_cat", default = "#4576B5")
   seen <- vapply(missing_candidates,
-                 function(x) contrast_ratio(x, bg)[1, 2], numeric(1))
+                 function(x) check_contrast(x, bg)[1, 2], numeric(1))
   keep <- seen >= 3
   if(!any(keep)) keep <- seq_along(seen) == which.max(seen)
   ok <- missing_candidates[keep]
   seen <- seen[keep]
-  apart <- vapply(ok, function(x) min(contrast_colors(c(x, pal))[1, -1]),
+  apart <- vapply(ok, function(x) min(check_separation(c(x, pal))[1, -1]),
                   numeric(1))
   free <- ok[apart >= 10]
   # Among the neutrals that are both visible and unmistakable, take the one
@@ -267,7 +267,7 @@ set_divergent_theme <- function(theme){
   # the one pairing that red-green colour blindness cannot resolve: the ETH
   # red and olive poles scored 3.8 apart under simulation, where 10 is already
   # confusable. The poles below are still each theme's own colours, chosen for
-  # the widest separation the palette allows. See [contrast_colors()].
+  # the widest separation the palette allows. See [check_separation()].
   dv <- switch(theme,
                "iheid" = c("#820C2B","white","#006EAA"),
                "unige" = c("#F42941","white","#0067C5"),

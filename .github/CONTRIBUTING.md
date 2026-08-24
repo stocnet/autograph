@@ -177,7 +177,7 @@ Delete each alias once the oldest supported goldfish is past the rename.
 Two naming families, and they do not mix:
 
 - **User-facing functions are snake_case, and usually `verb_noun`**: `graphr()`, `match_color()`,
-  `is_dark()`, `simulate_colorblind()`, `contrast_colors()`, `list_fonts()`, `stocnet_theme()`.
+  `is_dark()`, `simulate_colorblind()`, `check_separation()`, `list_fonts()`, `stocnet_theme()`.
   This is the convention across the stocnet suite, so a user meets one style everywhere.
 - **The `ag_` prefix is for the theme accessors only**: `ag_base()`, `ag_ink()`, `ag_highlight()`,
   `ag_positive()`, `ag_negative()`, `ag_qualitative(n)`, `ag_sequential(n)`, `ag_divergent(n)`,
@@ -185,6 +185,11 @@ Two naming families, and they do not mix:
   and each reads an `snet_*` option. Do not give `ag_` to a function that does something else,
   even a small one: a new verb belongs in the snake_case family.
   Internal helpers may take `ag_` where they build such a value (`ag_ground()`, `ag_theme_*()`).
+- **`check_*` scores, `.check_*` guards**: the exported `check_span()`, `check_offset()`,
+  `check_contrast()` and `check_separation()` each measure a drawing and return the score, so that
+  a user can compare one layout or palette with another. The private `.check_layout()`,
+  `.check_layout_applies()` and `.check_dup()` validate an argument and abort or substitute.
+  The two do different jobs, so keep the dot: it is what tells them apart.
 
 ### Theming
 
@@ -209,14 +214,14 @@ calling `ggplot2::theme_minimal()` directly, so that a theme with a background o
 reaches every plot and not only the graphs.
 
 [R/theme_colorblind.R](../R/theme_colorblind.R) holds the colour-checking tools: `simulate_colorblind()`,
-`contrast_colors()`, `contrast_ratio()`, and the internal `colorblind_sort()` that each theme's
+`check_separation()`, `check_contrast()`, and the internal `colorblind_sort()` that each theme's
 categorical palette passes through when the theme is set.
 The three answer three different questions and none substitutes for another:
-`contrast_colors()` asks whether two marks can be told apart (CIELAB distance, worst case across
-normal and colour-blind vision), `contrast_ratio()` asks whether text can be read on what it sits on
+`check_separation()` asks whether two marks can be told apart (CIELAB distance, worst case across
+normal and colour-blind vision), `check_contrast()` asks whether text can be read on what it sits on
 (WCAG 2.1 relative luminance), and `simulate_colorblind(type = "grey")` asks whether either survives
 a photocopier.
-Greyscale is reported beside `contrast_colors()`'s score rather than folded into it: two colours that
+Greyscale is reported beside `check_separation()`'s score rather than folded into it: two colours that
 differ only in hue collapse in greyscale however well they serve a colour-blind reader, so a worst
 case that included it would condemn nearly every institutional palette.
 A palette added to a theme therefore does not need hand-ordering, but it does need to survive the

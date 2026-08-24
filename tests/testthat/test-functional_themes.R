@@ -147,23 +147,23 @@ test_that("palettes separate colours for colour-blind viewers", {
   on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
   # Simulation is anchored on a pair that normal vision separates easily and
   # red-green colour blindness does not.
-  expect_gt(contrast_colors(c("#B7352D", "#4575b4"))[1, 2], 40)
-  expect_lt(contrast_colors(c("#B7352D", "#627313"))[1, 2], 10)
+  expect_gt(check_separation(c("#B7352D", "#4575b4"))[1, 2], 40)
+  expect_lt(check_separation(c("#B7352D", "#627313"))[1, 2], 10)
   expect_length(simulate_colorblind(c("#d73027", "#4575b4"), "deutan"), 2)
   expect_error(simulate_colorblind("#d73027", "quadran"))
   # A lower severity is anomalous trichromacy, which moves a colour less far
   # than dichromacy does, and severity zero moves it not at all.
   expect_identical(simulate_colorblind("#d73027", "deutan", severity = 0),
                    simulate_colorblind("#d73027", "normal"))
-  expect_lt(contrast_colors(c("#B7352D", "#627313"))[1, 2],
-            contrast_colors(c(simulate_colorblind("#B7352D", "deutan", 0.4),
+  expect_lt(check_separation(c("#B7352D", "#627313"))[1, 2],
+            check_separation(c(simulate_colorblind("#B7352D", "deutan", 0.4),
                               simulate_colorblind("#627313", "deutan", 0.4)))[1, 2])
   expect_error(simulate_colorblind("#d73027", "deutan", severity = 2))
   # Greyscale keeps only the luminance, so a colour and its grey have the
   # same relative luminance, and two colours of the same lightness merge.
-  expect_lt(min(attr(contrast_colors(c("#d73027", "#4575b4")), "grey"),
+  expect_lt(min(attr(check_separation(c("#d73027", "#4575b4")), "grey"),
                 na.rm = TRUE),
-            contrast_colors(c("#d73027", "#4575b4"))[1, 2])
+            check_separation(c("#d73027", "#4575b4"))[1, 2])
 
   for (thm in autograph:::theme_opts) {
     suppressMessages(stocnet_theme(thm))
@@ -184,38 +184,38 @@ test_that("palettes separate colours for colour-blind viewers", {
     for (k in 2:4) {
       if (k > length(pal)) next
       cols <- ag_qualitative(k)
-      expect_gt(min(contrast_colors(cols)[upper.tri(diag(k))]), 10)
+      expect_gt(min(check_separation(cols)[upper.tri(diag(k))]), 10)
     }
     # Divergent poles must not be a red-green pair, and the two highlights
     # must not be a pair only some viewers can tell apart.
     dv <- getOption("snet_div")
-    expect_gt(contrast_colors(dv[c(1, length(dv))])[1, 2], 40, label = thm)
+    expect_gt(check_separation(dv[c(1, length(dv))])[1, 2], 40, label = thm)
     hl <- getOption("snet_highlight")
-    expect_gt(contrast_colors(hl)[1, 2], 20, label = thm)
+    expect_gt(check_separation(hl)[1, 2], 20, label = thm)
     # The ink must stay legible on the theme's own ground, whether that
     # ground is white, ivory, or near-black. The distance says the two are
     # different colours; the WCAG ratio says the text can actually be read,
     # which is the question a reader is asking.
     bg <- getOption("snet_background")
-    expect_gt(contrast_colors(c(ag_ink(), bg))[1, 2], 50, label = thm)
-    expect_gte(contrast_ratio(ag_ink(), bg)[1, 2], 4.5, label = thm)
+    expect_gt(check_separation(c(ag_ink(), bg))[1, 2], 50, label = thm)
+    expect_gte(check_contrast(ag_ink(), bg)[1, 2], 4.5, label = thm)
     # WCAG asks 3:1 of a graphical object. Two highlights are an institution's
     # own colour on that institution's own ground, and repainting a brand is
     # not something this package does -- see the Colour blindness section of
     # ?ag_call -- so they are held to a lower floor, named here so that a
     # palette added later cannot join them quietly.
     hl_floor <- if (thm %in% c("clay", "oxf")) 2.5 else 3
-    expect_gte(contrast_ratio(ag_highlight(), bg)[1, 2], hl_floor, label = thm)
+    expect_gte(check_contrast(ag_highlight(), bg)[1, 2], hl_floor, label = thm)
     # The colour missing data recedes into must be visible on the ground and
     # must not be read as one of the categories.
-    expect_gte(contrast_ratio(ag_missing(), bg)[1, 2], 3, label = thm)
-    expect_gt(min(contrast_colors(c(ag_missing(), pal))[1, -1]), 8, label = thm)
+    expect_gte(check_contrast(ag_missing(), bg)[1, 2], 3, label = thm)
+    expect_gt(min(check_separation(c(ag_missing(), pal))[1, -1]), 8, label = thm)
   }
   # Greyscale is reported, not enforced: an institutional palette that
   # separates by hue collapses in print and should not fail for it. The "bw"
   # theme is the one built for print, so it is held to the standard.
   suppressMessages(stocnet_theme("bw"))
-  expect_gt(min(attr(contrast_colors(ag_qualitative(2)), "grey"), na.rm = TRUE),
+  expect_gt(min(attr(check_separation(ag_qualitative(2)), "grey"), na.rm = TRUE),
             25)
 })
 
@@ -243,7 +243,7 @@ test_that("the medium scales text and prints on white", {
   expect_equal(getOption("snet_background"), "#070f23")
   suppressMessages(stocnet_medium("print"))
   expect_equal(autograph:::ag_ground_fill(), "#FFFFFF")
-  expect_gte(contrast_ratio(ag_ink())[1, 2], 4.5)
+  expect_gte(check_contrast(ag_ink())[1, 2], 4.5)
   # The palettes are the theme's own in every medium.
   expect_equal(ag_highlight(), "#fdfd54")
   expect_error(stocnet_medium("papyrus"))

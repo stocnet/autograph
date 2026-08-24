@@ -3,8 +3,8 @@
 \name{theme_colorblind}
 \alias{theme_colorblind}
 \alias{simulate_colorblind}
-\alias{contrast_colors}
-\alias{contrast_ratio}
+\alias{check_separation}
+\alias{check_contrast}
 \title{Checking colours for colour blindness, print, and legibility}
 \usage{
 simulate_colorblind(
@@ -13,9 +13,9 @@ simulate_colorblind(
   severity = 1
 )
 
-contrast_colors(colors, background = NULL)
+check_separation(colors, background = NULL)
 
-contrast_ratio(colors, background = NULL)
+check_contrast(colors, background = NULL)
 }
 \arguments{
 \item{colors}{One or more colours, given as hexcodes or as names R knows.}
@@ -38,12 +38,12 @@ By default the current theme's background is used.}
 \value{
 \code{simulate_colorblind()} returns a vector of hexcodes as long as \code{colors}.
 
-\code{contrast_colors()} returns a square matrix of worst-case distances,
+\code{check_separation()} returns a square matrix of worst-case distances,
 with the colours as its dimnames and a missing diagonal,
 so that \code{min(x, na.rm = TRUE)} gives the closest pair.
 A "grey" attribute holds the same matrix as seen in greyscale.
 
-\code{contrast_ratio()} returns a square matrix of WCAG contrast ratios,
+\code{check_contrast()} returns a square matrix of WCAG contrast ratios,
 shaped the same way.
 }
 \description{
@@ -53,17 +53,17 @@ of women, and for readers who see the plot in greyscale or at a distance.
 
 \code{simulate_colorblind()} returns what a set of colours looks like to a viewer with
 a given type of colour blindness, or in greyscale.
-\code{contrast_colors()} scores how far apart colours are, taking the worst case
+\code{check_separation()} scores how far apart colours are, taking the worst case
 over normal vision and each type of colour blindness,
 so that a palette is only credited for a difference that every viewer
 can see.
-\code{contrast_ratio()} scores whether text can be read on a ground.
+\code{check_contrast()} scores whether text can be read on a ground.
 }
 \details{
 The three functions answer three different questions,
 and a palette needs all three answered.
-\code{contrast_colors()} asks whether two marks can be told apart,
-\code{contrast_ratio()} asks whether text can be read on what it sits on,
+\code{check_separation()} asks whether two marks can be told apart,
+\code{check_contrast()} asks whether text can be read on what it sits on,
 and the "grey" simulation asks whether either survives a photocopier.
 
 Simulation uses the matrices of Machado, Oliveira and Fernandes (2009),
@@ -75,7 +75,7 @@ Full severity is dichromacy (deuteranopia, protanopia, tritanopia);
 a lower severity is anomalous trichromacy (deuteranomaly, protanomaly),
 which is the more common condition.
 Greyscale conversion takes the relative luminance of the colour,
-the same quantity \code{contrast_ratio()} scores with.
+the same quantity \code{check_contrast()} scores with.
 
 Distances are Euclidean distances in CIELAB space, the same measure
 \code{\link[=match_color]{match_color()}} uses.
@@ -91,15 +91,15 @@ simulate_colorblind(c("#d73027", "#4575b4"), "deutan")
 simulate_colorblind(c("#d73027", "#4575b4"), "deutan", severity = 0.5)
 simulate_colorblind(c("#d73027", "#4575b4"), "grey")
 # How well does the current theme's palette separate five categories?
-contrast_colors(ag_qualitative(5))
+check_separation(ag_qualitative(5))
 # The closest pair in it
-min(contrast_colors(ag_qualitative(5)), na.rm = TRUE)
+min(check_separation(ag_qualitative(5)), na.rm = TRUE)
 # And the closest pair once it is printed in greyscale
-min(attr(contrast_colors(ag_qualitative(5)), "grey"), na.rm = TRUE)
+min(attr(check_separation(ag_qualitative(5)), "grey"), na.rm = TRUE)
 # A red and a green that only look different to some viewers
-contrast_colors(c("#B7352D", "#627313"))[1, 2]
+check_separation(c("#B7352D", "#627313"))[1, 2]
 # Can the current theme's ink be read on its ground?
-contrast_ratio(ag_ink())[1, 2]
+check_contrast(ag_ink())[1, 2]
 }
 \references{
 Machado, Gustavo M., Manuel M. Oliveira, and Leandro A. F. Fernandes. 2009.

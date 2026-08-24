@@ -56,7 +56,7 @@ the highlight while the ink stays dark enough to read.
 Where the ground changes under a theme -- the "print" medium forces
 white, whatever the theme prefers -- \code{ag_ink()} falls back to black or
 white rather than return an ink that cannot be read on it.
-See \code{\link[=contrast_ratio]{contrast_ratio()}} and \code{\link[=stocnet_medium]{stocnet_medium()}}.
+See \code{\link[=check_contrast]{check_contrast()}} and \code{\link[=stocnet_medium]{stocnet_medium()}}.
 
 Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges.
@@ -81,17 +81,17 @@ set, so that the first colours a plot draws on are those that stay
 distinct under each type of colour blindness, and \code{ag_qualitative()}
 takes those colours in order rather than interpolating between them.
 Divergent palettes pair a warm pole with a cool one for the same reason.
-Use \code{\link[=contrast_colors]{contrast_colors()}} to check how your own colours fare,
+Use \code{\link[=check_separation]{check_separation()}} to check how your own colours fare,
 and \code{\link[=simulate_colorblind]{simulate_colorblind()}} to see them as a colour-blind viewer would.
 
 Two further questions are worth asking of a palette.
 Whether its text can be read on what it sits on is a matter of contrast
-rather than of hue, and \code{\link[=contrast_ratio]{contrast_ratio()}} scores it against the
+rather than of hue, and \code{\link[=check_contrast]{check_contrast()}} scores it against the
 thresholds of WCAG 2.1.
 Whether it survives print is a matter of lightness alone, since a
 greyscale device keeps the luminance of a colour and discards the rest;
 \code{simulate_colorblind(type = "grey")} shows that view, and
-\code{\link[=contrast_colors]{contrast_colors()}} reports the greyscale distances beside its own score.
+\code{\link[=check_separation]{check_separation()}} reports the greyscale distances beside its own score.
 Most institutional palettes separate by hue and so collapse in greyscale.
 Where a figure has to print in black and white, use the "bw" theme, or
 add a second channel such as \code{node_shape}.
@@ -104,7 +104,7 @@ A spectrum is not a colour-blind safe scheme:
 its reds and greens are exactly the pair that red-green colour blindness
 cannot separate.
 Choose it where the order of the categories is itself meaningful,
-and check the result with \code{\link[=contrast_colors]{contrast_colors()}};
+and check the result with \code{\link[=check_separation]{check_separation()}};
 for categories with no order, another theme serves more readers.
 }
 

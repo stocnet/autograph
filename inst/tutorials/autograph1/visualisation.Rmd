@@ -777,7 +777,7 @@ which is precisely the pairing a "stop/go" palette relies on.
 
 `{autograph}` gives you two functions for checking this.
 `simulate_colorblind()` shows you a set of colours as such a viewer sees them,
-and `contrast_colors()` scores how far apart colours are,
+and `check_separation()` scores how far apart colours are,
 taking the worst case across normal vision and each type of colour blindness.
 A score below 10 means two colours are easily confused,
 10 to 25 that they are separable but close,
@@ -785,7 +785,7 @@ and above 25 that they are comfortably distinct.
 
 ```{r cvdcheck, exercise=TRUE}
 # A red and a green that look quite different to most viewers
-contrast_colors(c("#B7352D", "#627313"))
+check_separation(c("#B7352D", "#627313"))
 # But not to everyone
 simulate_colorblind(c("#B7352D", "#627313"), "deutan")
 ```
@@ -822,9 +822,9 @@ rather than a red with a green.
 
 ```{r cvdpalette, exercise=TRUE}
 stocnet_theme("iheid")
-round(contrast_colors(ag_qualitative(4)))
+round(check_separation(ag_qualitative(4)))
 # The closest pair among those four colours
-min(contrast_colors(ag_qualitative(4)), na.rm = TRUE)
+min(check_separation(ag_qualitative(4)), na.rm = TRUE)
 stocnet_theme("default")
 ```
 
@@ -836,7 +836,7 @@ A spectrum is not a colour-blind safe scheme:
 its reds and greens are the pair that red-green colour blindness cannot
 separate.
 Choose it where the order of your categories is itself meaningful,
-and check the result with `contrast_colors()`.
+and check the result with `check_separation()`.
 Where you need particular colours in an institutional palette,
 `match_color()` finds the closest the palette has to those you ask for.
 :::
@@ -853,10 +853,10 @@ separately from marking it colour-blind safe:
 they are different questions, and a palette can pass one and fail the other.
 
 `simulate_colorblind()` answers the second with `type = "grey"`,
-and `contrast_colors()` reports the greyscale distances beside its own score.
+and `check_separation()` reports the greyscale distances beside its own score.
 
 ```{r greysim, exercise=TRUE}
-contrast_colors(ag_qualitative(4))
+check_separation(ag_qualitative(4))
 ```
 
 The matrix is what every viewer can see.
@@ -958,7 +958,7 @@ Individual graphs can still be adjusted by appending
 `ggplot2::scale_fill_*()` functions —
 `_hue()` for a different palette, `_grey()` for print,
 `_manual()` for hand-picked colours —
-and `simulate_colorblind()`, `contrast_colors()` and `contrast_ratio()` check
+and `simulate_colorblind()`, `check_separation()` and `check_contrast()` check
 that your palette works for colour-blind viewers, in greyscale, and as text.
 `stocnet_medium()` then sizes the result for where it will be seen.
 :::

@@ -1005,7 +1005,7 @@ deuteranopia, confuses reds with greens — which is precisely the pairing
 a “stop/go” palette relies on.</p>
 <p><code>{autograph}</code> gives you two functions for checking this.
 <code>simulate_colorblind()</code> shows you a set of colours as such a
-viewer sees them, and <code>contrast_colors()</code> scores how far
+viewer sees them, and <code>check_separation()</code> scores how far
 apart colours are, taking the worst case across normal vision and each
 type of colour blindness. A score below 10 means two colours are easily
 confused, 10 to 25 that they are separable but close, and above 25 that
@@ -1014,7 +1014,7 @@ they are comfortably distinct.</p>
 data-diagnostics="1" data-startover="1" data-lines="0"
 data-pipe="|&gt;">
 <pre class="text"><code># A red and a green that look quite different to most viewers
-contrast_colors(c(&quot;#B7352D&quot;, &quot;#627313&quot;))
+check_separation(c(&quot;#B7352D&quot;, &quot;#627313&quot;))
 # But not to everyone
 simulate_colorblind(c(&quot;#B7352D&quot;, &quot;#627313&quot;), &quot;deutan&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
@@ -1040,9 +1040,9 @@ green.</p>
 data-completion="1" data-diagnostics="1" data-startover="1"
 data-lines="0" data-pipe="|&gt;">
 <pre class="text"><code>stocnet_theme(&quot;iheid&quot;)
-round(contrast_colors(ag_qualitative(4)))
+round(check_separation(ag_qualitative(4)))
 # The closest pair among those four colours
-min(contrast_colors(ag_qualitative(4)), na.rm = TRUE)
+min(check_separation(ag_qualitative(4)), na.rm = TRUE)
 stocnet_theme(&quot;default&quot;)</code></pre>
 <script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":false,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
 </div>
@@ -1053,7 +1053,7 @@ order of the spectrum, since that fidelity is its point. A spectrum is
 not a colour-blind safe scheme: its reds and greens are the pair that
 red-green colour blindness cannot separate. Choose it where the order of
 your categories is itself meaningful, and check the result with
-<code>contrast_colors()</code>. Where you need particular colours in an
+<code>check_separation()</code>. Where you need particular colours in an
 institutional palette, <code>match_color()</code> finds the closest the
 palette has to those you ask for.</p>
 </div>
@@ -1109,7 +1109,7 @@ graphs can still be adjusted by appending
 <code>ggplot2::scale_fill_*()</code> functions — <code>_hue()</code> for
 a different palette, <code>_grey()</code> for print,
 <code>_manual()</code> for hand-picked colours — and
-<code>simulate_colorblind()</code> and <code>contrast_colors()</code>
+<code>simulate_colorblind()</code> and <code>check_separation()</code>
 check that your palette works for colour-blind viewers.</p>
 </div>
 </div>
@@ -3019,7 +3019,7 @@ learnr:::store_exercise_cache(structure(list(label = "cvdcheck", global_setup = 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "cvdcheck", code = "# A red and a green that look quite different to most viewers\ncontrast_colors(c(\"#B7352D\", \"#627313\"))\n# But not to everyone\nsimulate_colorblind(c(\"#B7352D\", \"#627313\"), \"deutan\")", 
+    setup = NULL, chunks = list(list(label = "cvdcheck", code = "# A red and a green that look quite different to most viewers\ncheck_separation(c(\"#B7352D\", \"#627313\"))\n# But not to everyone\nsimulate_colorblind(c(\"#B7352D\", \"#627313\"), \"deutan\")", 
         opts = list(label = "\"cvdcheck\"", exercise = "TRUE"), 
         engine = "r")), code_check = NULL, error_check = NULL, 
     check = NULL, solution = NULL, tests = NULL, options = list(
@@ -3040,7 +3040,7 @@ learnr:::store_exercise_cache(structure(list(label = "cvdcheck", global_setup = 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "cvdcheck", exercise = TRUE, 
         code = c("# A red and a green that look quite different to most viewers", 
-        "contrast_colors(c(\"#B7352D\", \"#627313\"))", "# But not to everyone", 
+        "check_separation(c(\"#B7352D\", \"#627313\"))", "# But not to everyone", 
         "simulate_colorblind(c(\"#B7352D\", \"#627313\"), \"deutan\")"
         ), out.width.px = 624, out.height.px = 384, params.src = "cvdcheck, exercise=TRUE", 
         fig.num = 0, exercise.df_print = "paged", exercise.checker = "NULL"), 
@@ -3103,7 +3103,7 @@ learnr:::store_exercise_cache(structure(list(label = "cvdpalette", global_setup 
 "library(autograph)", "library(netrics)", "library(patchwork)", 
 "stocnet_theme(\"default\")", "clear_glossary()", "knitr::opts_chunk$set(echo = FALSE)"
 ), chunk_opts = list(label = "setup", include = FALSE, purl = FALSE)), 
-    setup = NULL, chunks = list(list(label = "cvdpalette", code = "stocnet_theme(\"iheid\")\nround(contrast_colors(ag_qualitative(4)))\n# The closest pair among those four colours\nmin(contrast_colors(ag_qualitative(4)), na.rm = TRUE)\nstocnet_theme(\"default\")", 
+    setup = NULL, chunks = list(list(label = "cvdpalette", code = "stocnet_theme(\"iheid\")\nround(check_separation(ag_qualitative(4)))\n# The closest pair among those four colours\nmin(check_separation(ag_qualitative(4)), na.rm = TRUE)\nstocnet_theme(\"default\")", 
         opts = list(label = "\"cvdpalette\"", exercise = "TRUE"), 
         engine = "r")), code_check = NULL, error_check = NULL, 
     check = NULL, solution = NULL, tests = NULL, options = list(
@@ -3123,8 +3123,8 @@ learnr:::store_exercise_cache(structure(list(label = "cvdpalette", global_setup 
         message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
         engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
         max.print = 1000, label = "cvdpalette", exercise = TRUE, 
-        code = c("stocnet_theme(\"iheid\")", "round(contrast_colors(ag_qualitative(4)))", 
-        "# The closest pair among those four colours", "min(contrast_colors(ag_qualitative(4)), na.rm = TRUE)", 
+        code = c("stocnet_theme(\"iheid\")", "round(check_separation(ag_qualitative(4)))", 
+        "# The closest pair among those four colours", "min(check_separation(ag_qualitative(4)), na.rm = TRUE)", 
         "stocnet_theme(\"default\")"), out.width.px = 624, out.height.px = 384, 
         params.src = "cvdpalette, exercise=TRUE", fig.num = 0, 
         exercise.df_print = "paged", exercise.checker = "NULL"), 
