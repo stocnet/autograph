@@ -14,12 +14,12 @@
 #'   The two answer different questions, and a layout needs both answered.
 #'   `check_span()` asks whether the rows were well chosen,
 #'   and `check_offset()` asks whether the nodes were well placed within them.
-#'   The "hierarchy" layout minimises each in turn, and its `ranks` and
+#'   The "layered" layout minimises each in turn, and its `ranks` and
 #'   `alignment` arguments choose how.
 #'
 #'   Which axis holds the rows is read from the plot,
 #'   as the axis on which the nodes take fewer distinct positions.
-#'   This is the y axis for "hierarchy" and the x axis for "alluvial",
+#'   This is the y axis for "layered" and the x axis for "lineage",
 #'   so the same score can be compared across the two.
 #'   For a layout with no rows at all, such as "stress",
 #'   `check_span()` reports the distance in that axis' ranks,

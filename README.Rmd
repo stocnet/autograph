@@ -202,7 +202,7 @@ or other elements (e.g. font size) can be tweaked for a particular output.
 
 `graphr()` can use all the layout algorithms offered by packages such as `{igraph}`, `{ggraph}`, and `{graphlayouts}`.
 `{autograph}` also offers some additional layout algorithms for
-visualising partitions horizontally, vertically, or concentrically,
+visualising layers horizontally, vertically, or concentrically,
 conforming to configurational coordinates,
 or for snapping these layouts to a grid.
 

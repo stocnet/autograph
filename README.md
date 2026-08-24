@@ -120,9 +120,9 @@ plotting, axis labels can all be added on easily, or other elements
 
 `graphr()` can use all the layout algorithms offered by packages such as
 `{igraph}`, `{ggraph}`, and `{graphlayouts}`. `{autograph}` also offers
-some additional layout algorithms for visualising partitions
-horizontally, vertically, or concentrically, conforming to
-configurational coordinates, or for snapping these layouts to a grid.
+some additional layout algorithms for visualising layers horizontally,
+vertically, or concentrically, conforming to configurational
+coordinates, or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
@@ -251,10 +251,11 @@ palette pairs a warm pole with a cool one.
 
 `simulate_colorblind()` shows a set of colours as another viewer sees
 them, so mapping the simulated colours back onto a graph shows you their
-view of it. Here is the same network three times: in `{autograph}`’s
+view of it. Here is the same network four times: in `{autograph}`’s
 default palette as most readers see it, then as a reader with
-deuteranopia does, and then in the palette `{ggraph}` falls back on when
-`{autograph}` is not setting the colours, as that same reader sees it.
+deuteranopia does, then as a photocopier renders it, and then in the
+palette `{ggraph}` falls back on when `{autograph}` is not setting the
+colours, as that same reader with deuteranopia sees it.
 
 ``` r
 set_stocnet_theme("default")
@@ -265,23 +266,29 @@ as_seen <- function(colours, type, title){
 }
 as_seen(ag_qualitative(6), "normal", "autograph") |
   as_seen(ag_qualitative(6), "deutan", "autograph, deuteranopia") |
+  as_seen(ag_qualitative(6), "grey", "autograph, greyscale") |
   as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
 ```
 
-<img src="man/figures/README-cvd-1.png" alt="The same network seen with normal vision and with deuteranopia, in autograph's palette and in ggraph's" width="100%" />
+<img src="man/figures/README-cvd-1.png" alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's" width="100%" />
 
-The six races remain tellable apart in the middle panel, its closest
+The six races remain tellable apart in the second panel, its closest
 pair being Hobbits and Maiar. In the right-hand one, Elves and Ents have
-become the same olive. `contrast_colors()` puts a number on it, scoring
-how far apart colours are at their worst across normal vision and each
-type of colour blindness:
+become the same olive. The third panel is the harder case, and it is not
+one reordering can fix: a greyscale device keeps only the luminance of a
+colour, so two colours of the same lightness merge however different
+their hues. `check_separation()` reports that view beside its own score;
+where a figure has to print in black and white, use the `"bw"` theme or
+add a second channel such as `node_shape`. `check_separation()` puts a
+number on it, scoring how far apart colours are at their worst across
+normal vision and each type of colour blindness:
 
 ``` r
-round(min(contrast_colors(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
+round(min(check_separation(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
 #> [1] 13.5
-round(min(contrast_colors(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
+round(min(check_separation(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
 #> [1] 5.5
-round(min(contrast_colors(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
+round(min(check_separation(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
 #> [1] 16.2
 ```
 
@@ -295,6 +302,21 @@ reasons that were not legibility — and there the ordering is what stands
 between a brand palette and an unreadable graph. A palette with more
 colours to draw on has more room to gain: six categories score 29 under
 the `"hwu"` theme and 26 under `"oxf"`.
+
+Marks are only half of it. Text has to be read rather than told apart,
+which is a matter of contrast rather than of hue, and `check_contrast()`
+scores it against the thresholds of WCAG 2.1: 4.5 for body text, 3 for
+large text and for graphical objects. Every theme’s ink clears 4.5 on
+that theme’s own ground, and the test suite holds it there.
+
+<img src="man/figures/README-wcag-1.png" alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio" width="100%" />
+
+The medium is a separate question again. `stocnet_medium()` sizes the
+text for where the figure will be seen — `"screen"`, `"presentation"`,
+`"mobile"` — and `"print"` draws on white whatever ground the theme
+prefers, since a tinted ground costs ink and is often not reproduced.
+The theme is untouched by it, so one institutional palette carries from
+the desk to the slide to the page.
 
 If your institution or organisation is not included and you would like
 it to be, please just raise an issue on Github, along with a link to

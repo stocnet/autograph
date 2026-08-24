@@ -46,28 +46,27 @@ It can also be a diffusion model result from e.g.
 
 \item{layout}{An igraph, ggraph, or manynet layout algorithm.
 If not declared, defaults to "configuration" for networks of up to
-six nodes, "multilevel" for connected multilevel networks,
-"hierarchy" for other two mode networks,
+six nodes, "levels" for connected multilevel networks,
+"layered" for other two mode networks,
 and "stress" for all other networks.
-For "hierarchy" layout, one can further split graph by
+For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
 For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm one may declare the "level"
+For "levels" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically
 order categories.
 If "level" is missing, the levels are taken from a 'lvl' node attribute
 where there is one, or else from the two modes of a two mode network.
-The "lineage" layout ranks nodes in Y axis according to values.
-For "lineage" layout algorithm please declare the "rank"
-as extra argument.
-The "rank" argument expects either a quoted node attribute present
-in data or vector with the same length as nodes.}
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+accept a "ranks" argument, which takes either one of the methods named
+at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
+as a quoted attribute name or a vector with one value for each node.}
 
 \item{labels}{Which nodes to label, if the network is labelled.
 \code{TRUE} (the default) labels every node and \code{FALSE} none of them,
@@ -157,7 +156,7 @@ or to a larger value (e.g. \code{15}) for more spacing.
 Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
 (as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
 (as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").}
+sense, e.g. "circle"/"concentric", "railway", "lineage").}
 
 \item{label_repel}{Logical scalar, whether labels should be repelled away
 from each other and from nodes using \code{ggrepel}
@@ -207,7 +206,7 @@ When another \code{layout} is requested,
 a single static layout is computed on the aggregate
 (union of waves) network instead, so that positions remain constant.
 Unlike \code{graphr()}, \code{grapht()} uses this dynamic stress layout by default
-even for two-mode networks (rather than a hierarchy layout, which would
+even for two-mode networks (rather than a layered layout, which would
 collapse many nodes onto a line); the two modes remain distinguishable
 by node shape.
 For networks with more than 30 nodes, node labels are suppressed by
@@ -264,9 +263,14 @@ grapht(irps_wwi)
 }
 \seealso{
 Other mapping:
+\code{\link{check_layout}},
 \code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
-\code{\link{layout_partition}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}}
 }

@@ -61,9 +61,14 @@ or a mix, "both", of them.
 }
 \seealso{
 Other mapping:
+\code{\link{check_layout}},
 \code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
-\code{\link{layout_partition}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_grapht}}
 }

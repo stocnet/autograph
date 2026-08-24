@@ -36,12 +36,12 @@ A tie that drops straight down scores zero.
 The two answer different questions, and a layout needs both answered.
 \code{check_span()} asks whether the rows were well chosen,
 and \code{check_offset()} asks whether the nodes were well placed within them.
-The "hierarchy" layout minimises each in turn, and its \code{ranks} and
+The "layered" layout minimises each in turn, and its \code{ranks} and
 \code{alignment} arguments choose how.
 
 Which axis holds the rows is read from the plot,
 as the axis on which the nodes take fewer distinct positions.
-This is the y axis for "hierarchy" and the x axis for "alluvial",
+This is the y axis for "layered" and the x axis for "lineage",
 so the same score can be compared across the two.
 For a layout with no rows at all, such as "stress",
 \code{check_span()} reports the distance in that axis' ranks,
@@ -59,8 +59,12 @@ attr(check_offset(graphr(thrones)), "mean")
 \seealso{
 Other mapping:
 \code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
-\code{\link[=layout_tbl_graph_layered]{layout_tbl_graph_layered()}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},
 \code{\link{plot_grapht}}

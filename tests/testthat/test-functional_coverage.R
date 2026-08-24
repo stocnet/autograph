@@ -10,7 +10,7 @@ test_that("hierarchy centres on either mode, or on a named node", {
   # Each `center` takes its own branch through the coordinate construction,
   # and each normalises its rows with nrm()/rng().
   for (ctr in c("actors", "events")) {
-    coords <- as.data.frame(layout_tbl_graph_hierarchy(sw, center = ctr))
+    coords <- as.data.frame(layout_tbl_graph_layered(sw, center = ctr))
     expect_equal(nrow(coords), as.integer(manynet::net_nodes(sw)))
     expect_true(all(is.finite(coords$x)) && all(is.finite(coords$y)))
     # The centred mode sits between the two halves of the other one
@@ -18,7 +18,7 @@ test_that("hierarchy centres on either mode, or on a named node", {
   }
   # A node name centres on that node rather than on a mode
   nm <- manynet::node_names(sw)[1]
-  coords <- as.data.frame(layout_tbl_graph_hierarchy(sw, center = nm))
+  coords <- as.data.frame(layout_tbl_graph_layered(sw, center = nm))
   expect_equal(nrow(coords), as.integer(manynet::net_nodes(sw)))
   expect_true(all(is.finite(coords$x)))
 })
@@ -29,7 +29,7 @@ test_that("hierarchy refuses to centre a one-mode network", {
   # them. This is an abort rather than a substitution because the user can drop
   # the argument (see .layout_requirements() in R/graph_checks.R).
   expect_error(
-    layout_tbl_graph_hierarchy(manynet::ison_adolescents, center = "actors"),
+    layout_tbl_graph_layered(manynet::ison_adolescents, center = "actors"),
     "one-mode network")
 })
 
@@ -403,7 +403,7 @@ test_that("labels are nudged clear of the nodes when they cannot be repelled", {
   expect_gt(length(unique(layer[["position"]][["x"]])), 1)
   expect_buildable(graphr(manynet::ison_southern_women, layout = "bipartite",
                           labels = TRUE, label_repel = FALSE))
-  expect_buildable(graphr(manynet::ison_southern_women, layout = "hierarchy",
+  expect_buildable(graphr(manynet::ison_southern_women, layout = "layered",
                           labels = TRUE, label_repel = FALSE))
   # A node size mapped from an attribute is cut down to the labelled nodes
   sized <- manynet::add_node_attribute(manynet::ison_adolescents, "wt",
@@ -527,11 +527,11 @@ test_that("hierarchy centres on a node of either mode", {
   # The events are the second mode, and centring on one takes its own branch
   # from centring on an actor.
   event <- utils::tail(manynet::node_names(sw), 1)
-  coords <- as.data.frame(layout_tbl_graph_hierarchy(sw, center = event))
+  coords <- as.data.frame(layout_tbl_graph_layered(sw, center = event))
   expect_equal(nrow(coords), as.integer(manynet::net_nodes(sw)))
   expect_true(all(is.finite(coords$x)) && all(is.finite(coords$y)))
   # A name that is in neither mode names what was expected instead
-  expect_error(layout_tbl_graph_hierarchy(sw, center = "Nobody"), "Nobody")
+  expect_error(layout_tbl_graph_layered(sw, center = "Nobody"), "Nobody")
 })
 
 test_that("multilevel ignores weights it cannot read as distances", {

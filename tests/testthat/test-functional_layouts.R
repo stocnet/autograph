@@ -22,7 +22,7 @@ layout_argmakers <- list(
       rep(c("a", "b"), length.out = as.integer(manynet::net_nodes(net)))
     else NULL,
   level      = function(net) if (manynet::is_twomode(net)) "type" else NULL,
-  rank       = function(net) if (manynet::is_labelled(net))
+  ranks      = function(net) if (manynet::is_labelled(net))
     seq_len(as.integer(manynet::net_nodes(net))) else NULL
 )
 
@@ -48,7 +48,7 @@ layout_extra_args <- function(lay, net) {
   for (a in ag_required_args(fn)) {
     if (!is.null(layout_argmakers[[a]])) args[[a]] <- layout_argmakers[[a]](net)
   }
-  if (lay == "hierarchy") args <- c(args, layout_center_arg(net))
+  if (lay == "layered") args <- c(args, layout_center_arg(net))
   args
 }
 
@@ -69,7 +69,7 @@ layout_candidates <- function(lay, n_ok = 2, n_no = 1) {
       # where the layout declares a requirement the network also fails
       # (concentric and levels need two modes *or* an explicit partition),
       # graphr() substitutes before ever calling it, so this is a genuine
-      # inapplicable case. Where it declares none (lineage needs a `rank` that
+      # inapplicable case. Where it declares none (lineage needs a `ranks` that
       # an unlabelled network has nothing to give), the call would rightly
       # abort asking for the argument, so leave it out of the pool entirely.
       declared <- !is.null(autograph:::.layout_requirements()[[lay]])
@@ -191,11 +191,39 @@ test_that("every deprecated layout still draws, and is offered nowhere", {
     from = c("A", "A", "B", "C", "D", "F", "F", "E"),
     to   = c("B", "C", "D", "E", "E", "E", "G", "G"),
     stringsAsFactors = FALSE)
-  coords <- layout_tbl_graph_layered(ties, times = 6)
-  expect_equal(sort(rownames(coords)), sort(unique(c(ties$from, ties$to))))
-  expect_true(all(c("x", "y") %in% names(coords)))
-  # sources sit above sinks
-  expect_true(coords["A", "y"] > coords["G", "y"])
+  g <- igraph::graph_from_data_frame(ties, directed = TRUE)
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  retired <- autograph:::.deprecated_layouts()
+  expect_true(length(retired) > 0)
+  # A retired name is not offered as a completion, nor audited as a live layout.
+  expect_length(intersect(retired, autograph:::.autograph_layouts()), 0)
+  expect_length(intersect(paste0("layout_tbl_graph_", retired),
+                          ag_alive_functions("^layout_tbl_graph_")), 0)
+  for (lay in retired) {
+    fn <- get(paste0("layout_tbl_graph_", lay), envir = asNamespace("autograph"))
+    # A configurational layout needs a network of the size it is named for,
+    # and "levels" needs a network with levels, so each retired name is given
+    # one it can actually draw.
+    sizes <- c("dyad", "triad", "tetrad", "pentad", "hexad")
+    net <- if (lay %in% sizes) manynet::create_ring(match(lay, sizes) + 1L)
+      else if (lay == "multilevel") manynet::ison_southern_women else g
+    expect_message(coords <- fn(net), "deprecated", label = lay)
+    expect_true(all(c("x", "y") %in% names(coords)), label = lay)
+    expect_equal(nrow(coords), as.integer(manynet::net_nodes(net)), label = lay)
+  }
+})
+
+test_that("a deprecated layout name is renamed once, where it is checked", {
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  expect_message(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
+  expect_equal(lay, "layered")
+  expect_equal(suppressMessages(autograph:::.check_layout("alluvial")), "lineage")
+  expect_equal(suppressMessages(autograph:::.check_layout("multilevel")), "levels")
+  expect_equal(suppressMessages(autograph:::.check_layout("triad")), "configuration")
+  # A live name passes through untouched and says nothing.
+  expect_no_message(expect_equal(autograph:::.check_layout("layered"), "layered"))
 })
 
 test_that("matching layout aligns matched partners vertically", {

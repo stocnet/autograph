@@ -3,31 +3,167 @@
 \name{layout_layered}
 \alias{layout_layered}
 \alias{layout_tbl_graph_layered}
-\title{Layered layout}
+\alias{layout_lineage}
+\alias{layout_tbl_graph_lineage}
+\alias{layout_railway}
+\alias{layout_tbl_graph_railway}
+\alias{layout_ladder}
+\alias{layout_tbl_graph_ladder}
+\title{Layered layouts}
 \usage{
-layout_tbl_graph_layered(.data, center = NULL, circular = FALSE, times = 4)
+layout_layered(
+  .data,
+  center = NULL,
+  ranks = c("tight", "generation", "compact"),
+  alignment = c("straight", "rungs"),
+  circular = FALSE,
+  times = 1000
+)
+
+layout_tbl_graph_layered(
+  .data,
+  center = NULL,
+  ranks = c("tight", "generation", "compact"),
+  alignment = c("straight", "rungs"),
+  circular = FALSE,
+  times = 1000
+)
+
+layout_lineage(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  alignment = c("straight", "rungs"),
+  circular = FALSE,
+  times = 1000,
+  rank = NULL
+)
+
+layout_tbl_graph_lineage(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  alignment = c("straight", "rungs"),
+  circular = FALSE,
+  times = 1000,
+  rank = NULL
+)
+
+layout_railway(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  circular = FALSE,
+  times = 1000
+)
+
+layout_tbl_graph_railway(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  circular = FALSE,
+  times = 1000
+)
+
+layout_ladder(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  circular = FALSE,
+  times = 1000
+)
+
+layout_tbl_graph_ladder(
+  .data,
+  ranks = c("tight", "generation", "compact"),
+  circular = FALSE,
+  times = 1000
+)
 }
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{center, circular}{Extra parameters required for \code{{tidygraph}}
-compatibility.}
+\item{center}{Further split a "layered" layout by
+declaring the "center" argument as the "events", "actors",
+or by declaring a node name.
+Defaults to NULL.}
 
-\item{times}{Integer of sweeps that the algorithm will pass through.
-By default 4.}
+\item{ranks}{How the layers are assigned:
+"tight" (the default) chooses the layers that make the total tie length
+as short as possible, while still pointing every tie down at least one
+layer;
+"generation" ranks each node by its distance from a root, so that a layer
+is a generation, at the cost of some longer ties;
+"compact" asks \code{igraph::layout_with_sugiyama()} for the layers.
+The first two need an acyclic network, and fall back to "compact" where
+the network is not.
+Ignored for a two-mode network, whose layers are its modes.
+
+A node attribute can be given here instead, either as the name of a
+numeric node attribute or as a numeric vector as long as the network has
+nodes. Then the layers are those values, and nodes are placed along that
+axis in proportion to them rather than at even steps, so that a network
+of dated nodes is drawn as a timeline.}
+
+\item{alignment}{How each layer is spread out:
+"straight" (the default) draws the ties as close to straight as the
+ordering allows, which groups the nodes that belong together;
+"rungs" gives every layer the same integer spacing, so that the nodes
+line up across the layers.}
+
+\item{circular}{Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for \code{{ggraph}} compatibility.}
+
+\item{times}{Maximum number of iterations, where appropriate.
+Required for \code{{ggraph}} compatibility, and ignored by the layouts that
+do not iterate.}
+
+\item{rank}{Deprecated. Use \code{ranks} instead, which now takes a node
+attribute as well as a method.}
 }
 \value{
-Returns a table of coordinates.
+Returns a table of nodes' x and y coordinates.
 }
 \description{
-Layered layout
+These algorithms assign each node to a layer, which becomes one axis,
+and a position within that layer, which becomes the other.
+They are recommended for use with \code{graphr()} or \code{{ggraph}},
+and suit two-mode networks and directed acyclic networks.
+
+The four layouts are one engine drawn four ways,
+and differ only in which axis carries the layers
+and in how each layer is spread out:\tabular{lll}{
+    \tab Layers stacked flat \tab Layers standing up \cr
+   \code{alignment = "straight"} \tab "layered" \tab "lineage" \cr
+   \code{alignment = "rungs"} \tab "railway" \tab "ladder" \cr
+}
+
+
+That is, the "layered" layout places the first node set along the bottom
+and the second node set along the top,
+sequenced and spaced as necessary to minimise tie overlap.
+The "lineage" layout is the same layout with the axes exchanged,
+so that successive layers run left to right rather than bottom to top.
+The "railway" and "ladder" layouts are "layered" and "lineage"
+with every layer given the same spacing,
+so that the nodes line up across the layers
+like the rails and rungs the names describe.
 }
 \examples{
-ties <- data.frame(
-  from = c("A", "A", "B", "C", "D", "F", "F", "E"),
-  to   = c("B", "C", "D", "E", "E", "E", "G", "G"),
-  stringsAsFactors = FALSE)
-
-coords <- layout_tbl_graph_layered(ties, times = 6)
-coords
+#graphr(ison_southern_women, layout = "layered", center = "events",
+#           node_color = "type", node_size = 3)
+#graphr(ison_southern_women, layout = "lineage")
+# ison_adolescents |>
+#   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+#   graphr(layout = "lineage", ranks = "year")
 }
+\seealso{
+Other mapping:
+\code{\link{check_layout}},
+\code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
+\code{\link[=layout_configuration]{layout_configuration()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_valence]{layout_valence()}},
+\code{\link{plot_graphr}},
+\code{\link{plot_graphs}},
+\code{\link{plot_grapht}}
+}
+\concept{mapping}

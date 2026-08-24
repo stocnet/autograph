@@ -27,7 +27,7 @@
 #'   a single static layout is computed on the aggregate
 #'   (union of waves) network instead, so that positions remain constant.
 #'   Unlike `graphr()`, `grapht()` uses this dynamic stress layout by default
-#'   even for two-mode networks (rather than a hierarchy layout, which would
+#'   even for two-mode networks (rather than a layered layout, which would
 #'   collapse many nodes onto a line); the two modes remain distinguishable
 #'   by node shape.
 #'   For networks with more than 30 nodes, node labels are suppressed by
@@ -197,7 +197,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   # Layout ####
   # Default to the smooth dynamic stress layout regardless of mode or size:
   # grapht()'s purpose is seamless transitions, so unlike graphr() it does
-  # not fall back to a static hierarchy for two-mode networks (which collapses
+  # not fall back to a static layered layout for two-mode networks (which collapses
   # many nodes onto a line). The two modes remain distinguishable by shape.
   # An explicitly requested layout is still honoured (via a static fallback).
   layout <- .check_layout(layout)

@@ -72,7 +72,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     }
     p <- p + do.call(ggraph::geom_node_text, args) +
       ggplot2::coord_cartesian(xlim=c(-1.3,1.3), ylim=c(-1.3,1.3))
-  } else if (layout %in% c("bipartite", "railway") | layout == "hierarchy" &
+  } else if (layout %in% c("bipartite", "railway") | layout == "layered" &
              length(unique(p[["data"]][["y"]])) <= 2) {
     args <- list(mapping = label_aes, data = ldata,
                  angle = 90,
@@ -83,7 +83,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     if (label_repel) args$point.padding <- padding
     p <- p + do.call(ggraph::geom_node_text, args) +
       ggplot2::coord_cartesian(ylim=c(-0.2, 1.2))
-  } else if (layout == "hierarchy" & length(unique(p[["data"]][["y"]])) > 2) {
+  } else if (layout == "layered" & length(unique(p[["data"]][["y"]])) > 2) {
     args <- list(mapping = label_aes, data = ldata,
                  family = ag_font(),
                  size = ag_text_size(3), hjust = "inward", repel = label_repel)
@@ -126,7 +126,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
       args$segment.colour <- "grey70"
     }
     p <- p + do.call(ggraph::geom_node_text, args)
-  } else if (layout %in% c("alluvial", "lineage")) {
+  } else if (layout %in% c("lineage", "ladder")) {
     # An opaque fill matches ggrepel's own hardcoded label background
     # (`GeomLabelRepel$default_aes$fill`); without it, plain `GeomLabel`
     # resolves fill via the active theme and renders fully transparent here,

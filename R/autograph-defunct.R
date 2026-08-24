@@ -148,6 +148,31 @@ plot.result.goldfish <- function(x, ..., effects = 4) {
 #' @keywords internal
 NULL
 
+#' @rdname layout_deprecated
+#' @export
+layout_hierarchy <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val hierarchy} layout is deprecated.",
+    "Please use {.code layout = \"layered\"} instead, which draws the same networks the same way.")
+  layout_layered(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_hierarchy <- layout_hierarchy
+
+#' @rdname layout_deprecated
+#' @export
+layout_alluvial <- function(.data, ...) {
+  manynet::snet_warn(
+    "The {.val alluvial} layout is deprecated.",
+    "Please use {.code layout = \"lineage\"} instead, which draws the same networks the same way.")
+  layout_lineage(.data, ...)
+}
+
+#' @rdname layout_deprecated
+#' @export
+layout_tbl_graph_alluvial <- layout_alluvial
 
 #' @rdname layout_deprecated
 #' @export

@@ -28,10 +28,10 @@
 #' @param .data A manynet-consistent object.
 #' @param layout An igraph, ggraph, or manynet layout algorithm.
 #'   If not declared, defaults to "configuration" for networks of up to
-#'   "hierarchy" for other two mode networks,
 #'   six nodes, "levels" for connected multilevel networks,
+#'   "layered" for other two mode networks,
 #'   and "stress" for all other networks.
-#'   For "hierarchy" layout, one can further split graph by
+#'   For "layered" layout, one can further split graph by
 #'   declaring the "center" argument as the "events", "actors",
 #'   or by declaring a node name.
 #'   For "concentric" layout algorithm please declare the "membership" as an 
@@ -45,11 +45,10 @@
 #'   order categories.
 #'   If "level" is missing, the levels are taken from a 'lvl' node attribute
 #'   where there is one, or else from the two modes of a two mode network.
-#'   The "lineage" layout ranks nodes in Y axis according to values.
-#'   For "lineage" layout algorithm please declare the "rank"
-#'   as extra argument.
-#'   The "rank" argument expects either a quoted node attribute present
-#'   in data or vector with the same length as nodes.
+#'   The layered layouts ("layered", "lineage", "railway" and "ladder")
+#'   accept a "ranks" argument, which takes either one of the methods named
+#'   at `?layout_layered` or a numeric node attribute to lay the layers out by,
+#'   as a quoted attribute name or a vector with one value for each node.
 #' @param labels Which nodes to label, if the network is labelled.
 #'   `TRUE` (the default) labels every node and `FALSE` none of them,
 #'   but a label for every node of a large network hides the network behind
@@ -140,7 +139,7 @@
 #'   Only used when `labels = TRUE` and `label_repel = TRUE`
 #'   (as the padding passed to the repel algorithm) or `label_repel = FALSE`
 #'   (as a fixed nudge away from the node, in the layouts where this makes
-#'   sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").
+#'   sense, e.g. "circle"/"concentric", "railway", "lineage").
 #' @param label_repel Logical scalar, whether labels should be repelled away
 #'   from each other and from nodes using `ggrepel`
 #'   (via `ggraph`'s `repel` argument). Defaults to `TRUE`.
@@ -344,14 +343,19 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       layout <- "configuration"
     } else if (.ag_is_multilevel(g) && manynet::is_connected(g)) {
       # Checked before `is_twomode()`, which is also TRUE for these networks.
-      # A "hierarchy" layout would place each level along a single row, which
+      # A "layered" layout would place each level along a single row, which
       # collapses the within-level ties that make the network multilevel.
       # Only where the network is connected, since the levels layout
       # orients its levels by the distances between them and so cannot place
       # components that have no distance to each other.
       layout <- "levels"
     } else if (manynet::is_twomode(g)) {
-      layout <- "hierarchy"
+      layout <- "layered"
+    } else if (manynet::is_directed(g) && manynet::is_acyclic(g)) {
+      # A directed acyclic network ranks its nodes: every tie points from an
+      # earlier layer to a later one. A force-directed layout throws that
+      # away, so a parent can be drawn below its own child.
+      layout <- "layered"
     } else layout <- "stress"
   }
   layout

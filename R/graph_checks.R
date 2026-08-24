@@ -327,8 +327,10 @@
   }
   igraph_layouts <- sub("^layout_", "", grep("^layout_(as|in|with|on)_|^layout_(nicely|randomly|components)$",
                                              getNamespaceExports("igraph"), value = TRUE))
-  sort(unique(c(from_ns("ggraph"), .autograph_layouts(), igraph_layouts,
-                sub("^(as|in|with|on)_", "", igraph_layouts))))
+  # The retired names are still valid to give: `.rename_layout()` swaps each
+  # for its replacement below, rather than letting it fail as unknown.
+  sort(unique(c(from_ns("ggraph"), .autograph_layouts(), .deprecated_layouts(),
+                igraph_layouts, sub("^(as|in|with|on)_", "", igraph_layouts))))
 }
 
 .check_layout <- function(layout) {
@@ -349,27 +351,63 @@
   # counted, which is too many to list. Only autograph's own layouts are named,
   # since those are the ones not documented elsewhere, and the rest are pointed
   # to by package.
-  .match_name(layout, .valid_layouts(), "layout", what = "layout",
-              show = .autograph_layouts(),
-              extra_desc = paste("Layouts provided by {.pkg ggraph},",
-                                 "{.pkg graphlayouts} and {.pkg igraph},",
-                                 "such as {.val stress} or {.val fr},",
-                                 "can also be named here."))
+  layout <- .match_name(layout, .valid_layouts(), "layout", what = "layout",
+                        show = .autograph_layouts(),
+                        extra_desc = paste("Layouts provided by {.pkg ggraph},",
+                                           "{.pkg graphlayouts} and {.pkg igraph},",
+                                           "such as {.val stress} or {.val fr},",
+                                           "can also be named here."))
+  .rename_layout(layout)
+}
+
+# A retired layout name is swapped for its replacement here, once, rather than
+# where it is drawn. Every step after this one -- the applicability check, the
+# node sizes, the tie alpha, the labels -- compares the layout by name, and a
+# name each of them had to know two spellings of is a name each of them would
+# eventually be updated for only once.
+.rename_layout <- function(layout) {
+  renamed <- c(hierarchy = "layered", alluvial = "lineage",
+               multilevel = "levels", dyad = "configuration",
+               triad = "configuration", tetrad = "configuration",
+               pentad = "configuration", hexad = "configuration")
+  if (!layout %in% names(renamed)) return(layout)
+  manynet::snet_warn(
+    "The {.val {layout}} layout is deprecated.",
+    "Please use {.code layout = \"{renamed[[layout]]}\"} instead.")
+  unname(renamed[[layout]])
 }
 
 .autograph_layouts <- function() {
   nms <- tryCatch(ls(asNamespace("autograph"), all.names = TRUE),
                   error = function(e) character())
-  sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", nms, value = TRUE))
+  setdiff(sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", nms, value = TRUE)),
+          .deprecated_layouts())
+}
+
+# The layout names that still draw but should no longer be offered or audited.
+# Declared here rather than inferred from the shims, because a shim is an
+# ordinary function and nothing in its body reliably marks it as retired.
+# Every name here keeps its `.layout_requirements()` entry, so that the string
+# is still validated before it reaches the shim.
+.deprecated_layouts <- function() {
+  c("hierarchy", "alluvial", "multilevel",
+    "dyad", "triad", "tetrad", "pentad", "hexad")
+}
+
+# Layouts whose coordinates carry meaning -- a layer, a mode, a generation, a
+# date -- along one axis, which snapping to a square grid would collapse.
+.layered_layouts <- function() {
+  c("layered", "lineage", "railway", "ladder", "levels",
+    "hierarchy", "alluvial", "multilevel")
 }
 
 # Layout applicability ----
 
-# Several layouts only make sense for particular kinds of network: a ladder
-# pairs two equally sized modes off, the configurational layouts place an exact
-# number of nodes at fixed coordinates, and a layered layout ranks nodes by
-# path depth. Given anything else they used to either draw a meaningless plot
-# (railway, alluvial and hierarchy on one-mode input) or fail somewhere
+# Several layouts only make sense for particular kinds of network: the
+# configurational layouts place an exact number of nodes at fixed coordinates,
+# the valence layout needs signs to read, and a layered layout assigns nodes to
+# layers by path depth. Given anything else they used to either draw a
+# meaningless plot (the layered family on one-mode input) or fail somewhere
 # downstream with a message about the internals ("replacement has 5 rows, data
 # has 8"). Declaring the requirement here means graphr() can say what it needs
 # and fall back to a layout that works, and the test suite can read the same
@@ -381,12 +419,26 @@
   n_nodes <- function(g) as.integer(manynet::net_nodes(g))
   exactly <- function(n) list(check = function(g, ...) n_nodes(g) == n,
                               need = paste("a network of exactly", n, "nodes"))
-  twomode <- list(check = function(g, ...) manynet::is_twomode(g),
-                  need = "a two-mode (bipartite) network")
+  # The four layered layouts are one engine drawn four ways, and all assign
+  # layers to the nodes of a directed acyclic network as readily as they take
+  # the modes of a two-mode one, so all four carry the same requirement.
+  # Layers can also simply be given, as `ranks` values, in which case any
+  # network has them and there is nothing left to require.
+  layered <- list(
+    check = function(g, ranks = NULL, ...) .ranks_given(ranks) ||
+      manynet::is_twomode(g) ||
+      (manynet::is_directed(g) && manynet::is_acyclic(g)),
+    need = paste("a two-mode or a directed acyclic network,",
+                 "or a {.arg ranks} attribute to lay the layers out by"))
   list(
-    alluvial   = twomode,
-    railway    = twomode,
-    hierarchy  = twomode,
+    layered    = layered,
+    lineage    = layered,
+    railway    = layered,
+    ladder     = layered,
+    # Deprecated names, kept so that the string is still validated before it
+    # reaches the shim that forwards it. See `.deprecated_layouts()`.
+    hierarchy  = layered,
+    alluvial   = layered,
     # Being two-mode is not sufficient: manynet::to_matching() cannot pair off
     # every two-mode network, and where it fails it does so with a message
     # about differing numbers of rows. Probing it is cheap for the sizes these
@@ -431,7 +483,7 @@
   if (.layout_applies(g, layout, ...)) return(layout)
   need <- .layout_requirements()[[layout]]$need
   alt <- .infer_layout(g, NULL)
-  # The inferred fallback has its own requirement (e.g. "hierarchy" needs two
+  # The inferred fallback has its own requirement (e.g. "layered" needs two
   # modes), so guard against substituting one unusable layout for another.
   if (identical(alt, layout) || !.layout_applies(g, alt, ...)) alt <- "stress"
   manynet::snet_info(

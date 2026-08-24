@@ -19,6 +19,25 @@
 
 ## Layouts
 
+- Improved layered layouts
+  - Consolidated layered layouts onto one engine
+    - "layered" is now default layout for directed acyclic networks
+    - Deprecating "hierarchy" as "layered" is more consistent for two-mode networks
+    - "lineage" is now exactly "layered" with the axes exchanged
+    - Deprecating "alluvial" to free name for plot of changing membership composition
+    - "railway" and "ladder" unchanged, but are `alignment = "rungs"`
+    - Checks whether layout is appropriate for the network, and reverts to default if not
+  - Minimises two costs: tie length (`check_span()`) and nodal offset (`check_offset()`)
+  - Added `ranks=` to choose the layers:
+    - "compact" asks `igraph::layout_with_sugiyama()`
+    - "generation" ranks each node by its distance from a root
+    - "tight" (default) minimises total tie length while every tie points down at least one layer
+    - a numeric node attribute lays the layers out by its values, spaced in proportion to them, which is what "lineage" used to take a `rank` for
+  - Added `alignment=` to choose how a layer is spread out:
+    - "straight" (default) draws ties as close to straight as ordering allows
+    - "rungs" gives every layer same integer spacing
+  - Each weakly connected component now laid out on its own and packed beside others
+  - Fixed `layout_layered()` centring on a second mode node yet reading first mode labels
 - Improved multilevel layout
   - Renamed "multilevel" layout to "levels" to avoid potential future collisions
   - Fixed `layout_levels()` to identify modes without having to name a `level`
