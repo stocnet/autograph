@@ -19,3 +19,12 @@ test_that("concentric layout works when node names are missing", {
   expect_true(any(llabel$data$name == ""))
 })
 
+
+test_that("concentric refuses to draw a node in more than one circle", {
+  skip_on_cran()
+  # The circles are read from the node names, so two nodes of the same name
+  # are one node in two circles, which the layout cannot draw.
+  dupe <- manynet::as_igraph(ison_southern_women)
+  igraph::V(dupe)$name[2] <- igraph::V(dupe)$name[1]
+  expect_error(layout_concentric(dupe, membership = "type"), "one circle only")
+})

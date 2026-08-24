@@ -1183,56 +1183,60 @@ which is the same layout with the axes exchanged.
 graphr(ison_southern_women, layout = "lineage") + ggtitle("Lineage")
 ```
 
-These layouts serve directed acyclic networks as readily as two-mode ones.
-A parent-child network is the clearest case: every tie points from an earlier
-generation to a later one, and a force-directed layout throws that away.
-`graphr()` reaches for `"layered"` on its own here.
+These layouts serve both multimodal and directed acyclic networks.
+A genealogical network offers the clearest case: 
+every tie points from an earlier generation to a later one.
+Where a force-directed layout obscures this ordering,
+`graphr()` uses the `"layered"` layout to make it clear.
 **Draw the parent ties among the characters of Westeros.**
 
 ```{r thrones-default, fig.width=9, fig.height=6}
-thrones <- to_layer(fict_thrones, "parent")
+thrones <- to_uniplex(fict_thrones, "parent")
 graphr(thrones)
 ```
 
-Two things separate this from a plain Sugiyama layout, and both are costs the
-layout minimises. The first is which layer each node goes in. Ranking each node
+This layout tries to minimise two costs. 
+The first is which layer each node goes in. Ranking each node
 by its distance from a root sounds right — a row is then a generation — but it
 pins a parent whose only child is born several generations later to the top
-row, and manufactures a long tie to reach them. The `ranks` argument chooses
-the rule, and `check_span()` reports how many rows each tie crosses,
-so you can measure the difference rather than take our word for it.
+row, and manufactures a long tie to reach them. 
+The `ranks` argument chooses the rule, 
+and `check_span()` reports how many rows each tie crosses,
+so you can measure the difference.
 
 ```{r thrones-ranks}
-thrones <- to_layer(fict_thrones, "parent")
-spans <- sapply(c("tight", "generation", "compact"), function(r) {
+thrones <- to_uniplex(fict_thrones, "parent")
+spans <- sapply(c("generation", "compact", "tight"), function(r) {
   span <- check_span(graphr(thrones, ranks = r))
   c(total = attr(span, "total"), `over one row` = mean(span > 1), max = max(span))
 })
 round(t(spans), 3)
 ```
 
-`"generation"` is the distance-from-a-root rule and `"compact"` is the one
-`{igraph}` uses. `"tight"`, the default, chooses the layers that make the total
-as short as it can while still pointing every tie down at least one row.
-Note that the longest tie is the same under all three: it is the manufactured
-long ties that go, not the real ones, so a child really born three generations
-below their parent is still drawn that way.
+`"generation"` is the distance-from-a-root rule and 
+`"compact"` is the one `{igraph}` uses in its Sugiyama layout. 
+`"tight"`, the default, minimises total tie length while 
+still pointing every tie down at least one row.
+Note that the longest tie is the same under all three.
 
-The second cost is where each node sits within its row. `check_offset()`
-reports how far each tie travels sideways, as a share of the width of the
-drawing, so a tie that drops straight down scores zero.
+The second cost is where each node sits within its row. 
+`check_offset()` reports how far each tie travels sideways, 
+as a share of the width of the drawing, 
+so a tie that drops straight down scores zero.
+Again, you are wanting to minimise this, 
+and the `alignment` argument chooses the rule.
 **Compare the two alignments.**
 
 ```{r thrones-alignment}
-thrones <- to_layer(fict_thrones, "parent")
+thrones <- to_uniplex(fict_thrones, "parent")
 c(straight = attr(check_offset(graphr(thrones)), "mean"),
   rungs = attr(check_offset(graphr(thrones, alignment = "rungs")), "mean"))
 ```
 
-`alignment = "rungs"` gives every row the same spacing, which is what
-`"railway"` and `"ladder"` are for. The default, `"straight"`, pulls each node
-towards its parents and children instead, which is what makes the families
-read as families.
+`alignment = "rungs"` gives every row the same spacing, 
+which is what `"railway"` and `"ladder"` are for. 
+The default, `"straight"`, pulls each node towards its parents and children instead, 
+which is what makes the families read as families.
 
 `ranks` also accepts a node attribute, instead of one of those three rules.
 Then the layers are that attribute's values, and nodes are placed along the
@@ -1241,8 +1245,9 @@ so a network of dated nodes is drawn as a timeline.
 **Rank the adolescents by a year of your choosing.**
 
 ```{r lineage-ranks, fig.align='center'}
-ison_adolescents |>
-  mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+ison_adolescents |> as_stocnet() |> 
+  mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2),
+               label = paste0(label, " (", year, ")")) |>
   graphr(layout = "lineage", ranks = "year")
 ```
 
@@ -1298,7 +1303,7 @@ graphr(ison_southern_women, layout = "mds") + ggtitle("Multidimensional Scaling"
 
 Other such layouts include:
 
-- Pivot multidimensional scaling: `"pmds"`
+- Pivot multidimensional scaling: `"pmds"` (basically just a faster MDS for large networks)
 
 ::: {.callout}
 <span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.

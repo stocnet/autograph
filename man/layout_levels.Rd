@@ -10,6 +10,7 @@ layout_levels(
   level,
   method = c("all", "separate", "fix1", "fix2"),
   circular = FALSE,
+  times = 1,
   alpha = 25,
   beta = 45,
   FUN1 = graphlayouts::layout_with_stress,
@@ -21,6 +22,7 @@ layout_tbl_graph_levels(
   level,
   method = c("all", "separate", "fix1", "fix2"),
   circular = FALSE,
+  times = 1,
   alpha = 25,
   beta = 45,
   FUN1 = graphlayouts::layout_with_stress,
@@ -47,16 +49,16 @@ Note that all but "all" require ties within the levels they lay out.}
 representation. Only possible for some layouts. Defaults to FALSE.
 Required for \code{{ggraph}} compatibility.}
 
+\item{times}{Maximum number of iterations, where appropriate.
+Required for \code{{ggraph}} compatibility, and ignored by the layouts that
+do not iterate.}
+
 \item{alpha, beta}{The angles, in degrees, at which the levels
 are projected onto the plane.}
 
 \item{FUN1, FUN2}{The layout functions used for the first and second levels
 respectively by the "separate", "fix1" and "fix2" methods.
 By default both are \code{graphlayouts::layout_with_stress()}.}
-
-\item{times}{Maximum number of iterations, where appropriate.
-Required for \code{{ggraph}} compatibility, and ignored by the layouts that
-do not iterate.}
 }
 \value{
 Returns a table of nodes' x and y coordinates.

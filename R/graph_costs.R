@@ -34,7 +34,7 @@
 #'   `check_offset()` returns one number between 0 and 1 for each tie,
 #'   with a `mean` attribute.
 #' @examples
-#' thrones <- manynet::to_layer(manynet::fict_thrones, "parent")
+#' thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
 #' # How long are the ties of the default layout?
 #' attr(check_span(graphr(thrones)), "total")
 #' # And of the layers igraph would have chosen?

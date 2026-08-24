@@ -48,7 +48,7 @@ For a layout with no rows at all, such as "stress",
 which is not meaningful; the function is for layered layouts.
 }
 \examples{
-thrones <- manynet::to_layer(manynet::fict_thrones, "parent")
+thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
 # How long are the ties of the default layout?
 attr(check_span(graphr(thrones)), "total")
 # And of the layers igraph would have chosen?

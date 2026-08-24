@@ -111,6 +111,47 @@ test_that("the theme preference is written and forgotten on request", {
   expect_false(file.exists(f))
 })
 
+test_that("the medium preference is written, read back, and forgotten", {
+  # The medium persists the same way the theme does, so it is redirected the
+  # same way and never touches the real config.
+  tmp <- tempfile("agconfig")
+  dir.create(tmp)
+  old <- Sys.getenv("R_USER_CONFIG_DIR", unset = NA)
+  Sys.setenv(R_USER_CONFIG_DIR = tmp)
+  on.exit({
+    if (is.na(old)) Sys.unsetenv("R_USER_CONFIG_DIR")
+    else Sys.setenv(R_USER_CONFIG_DIR = old)
+    unlink(tmp, recursive = TRUE)
+    suppressMessages(stocnet_medium("screen"))
+  }, add = TRUE)
+
+  f <- autograph:::pref_file("medium")
+  suppressMessages(stocnet_medium("presentation", persist = TRUE))
+  expect_true(file.exists(f))
+  expect_equal(autograph:::read_medium_pref(), "presentation")
+  # Setting a medium without `persist` forgets the remembered one, so that the
+  # next session does not start in a medium the user has since left.
+  suppressMessages(stocnet_medium("screen"))
+  expect_false(file.exists(f))
+  expect_null(autograph:::read_medium_pref())
+  # A stored value that is not one of the media is discarded rather than set.
+  autograph:::write_pref("medium", "papyrus")
+  expect_null(autograph:::read_medium_pref())
+  autograph:::write_pref("medium", c("screen", "print"))
+  expect_null(autograph:::read_medium_pref())
+})
+
+test_that("stocnet_medium reports the medium and rejects a bad argument", {
+  on.exit(suppressMessages(stocnet_medium("screen")), add = TRUE)
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  suppressMessages(stocnet_medium("screen"))
+  expect_message(stocnet_medium(), "currently set to")
+  # The medium must be one string: a vector or a number names no medium.
+  expect_error(stocnet_medium(c("screen", "print")), "single medium")
+  expect_error(stocnet_medium(2), "single medium")
+})
+
 # Goodness-of-fit variants ----
 
 test_that("ergm gof plots each statistic it holds, and says so when it cannot", {

@@ -1266,14 +1266,14 @@ graphr(ison_southern_women, layout = "lineage") + ggtitle("Lineage")
 ```
 
 These layouts serve both multimodal and directed acyclic networks.
-A geneaological network offers the clearest case: 
+A genealogical network offers the clearest case: 
 every tie points from an earlier generation to a later one.
 Where a force-directed layout obscures this ordering,
 `graphr()` uses the `"layered"` layout to make it clear.
 **Draw the parent ties among the characters of Westeros.**
 
 ```{r thrones-default, exercise=TRUE, fig.width=9, fig.height=6}
-thrones <- to_layer(fict_thrones, "parent")
+thrones <- to_uniplex(fict_thrones, "parent")
 graphr(thrones)
 ```
 
@@ -1287,7 +1287,7 @@ and `check_span()` reports how many rows each tie crosses,
 so you can measure the difference.
 
 ```{r thrones-ranks, exercise=TRUE}
-thrones <- to_layer(fict_thrones, "parent")
+thrones <- to_uniplex(fict_thrones, "parent")
 spans <- sapply(c("generation", "compact", "tight"), function(r) {
   span <- check_span(graphr(thrones, ranks = r))
   c(total = attr(span, "total"), `over one row` = mean(span > 1), max = max(span))
@@ -1310,7 +1310,7 @@ and the `alignment` argument chooses the rule.
 **Compare the two alignments.**
 
 ```{r thrones-alignment, exercise=TRUE}
-thrones <- to_layer(fict_thrones, "parent")
+thrones <- to_uniplex(fict_thrones, "parent")
 c(straight = attr(check_offset(graphr(thrones)), "mean"),
   rungs = attr(check_offset(graphr(thrones, alignment = "rungs")), "mean"))
 ```

@@ -35,7 +35,7 @@
 #' @export
 layout_levels <- function(.data, level,
                               method = c("all", "separate", "fix1", "fix2"),
-                              circular = FALSE, alpha = 25, beta = 45,
+                              circular = FALSE, times = 1, alpha = 25, beta = 45,
                               FUN1 = graphlayouts::layout_with_stress,
                               FUN2 = graphlayouts::layout_with_stress) {
   method <- .check_choice(method, c("all", "separate", "fix1", "fix2"), "method")

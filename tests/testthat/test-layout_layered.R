@@ -49,7 +49,7 @@ test_that("default layered layout uses sugiyama for two-mode networks", {
 
 test_that("layered is the default layout for directed acyclic networks", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   expect_true(is_directed(thrones) && is_acyclic(thrones))
   expect_equal(graphr(thrones)$plot_env$layout, "layered")
   # ison_adolescents is acyclic but undirected, so it has no roots to hang
@@ -60,7 +60,7 @@ test_that("layered is the default layout for directed acyclic networks", {
 
 test_that("layered draws parents above their children", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   lo <- layout_layered(thrones)
   ties <- igraph::as_edgelist(as_igraph(thrones), names = FALSE)
   expect_true(all(lo$y[ties[, 1]] > lo$y[ties[, 2]]))
@@ -68,7 +68,7 @@ test_that("layered draws parents above their children", {
 
 test_that("layered places every node, isolates included", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   expect_equal(nrow(layout_layered(thrones)),
                as.integer(net_nodes(thrones)))
   # The retired "layered" layout dropped tie-less nodes, which failed here.
@@ -77,7 +77,7 @@ test_that("layered places every node, isolates included", {
 
 test_that("layered packs the components apart", {
   skip_on_cran()
-  thrones <- delete_isolates(to_layer(fict_thrones, "parent"))
+  thrones <- .ag_delete_isolates(to_uniplex(fict_thrones, "parent"))
   lo <- layout_layered(thrones)
   memb <- igraph::components(as_igraph(thrones), mode = "weak")$membership
   spans <- lapply(sort(unique(memb)), function(cc) range(lo$x[memb == cc]))
@@ -152,7 +152,7 @@ test_that("layered layout minimises edge crossings", {
 
 test_that("tight ranks shorten the ties", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   spans <- vapply(c("tight", "generation", "compact"), function(r)
     attr(check_span(graphr(thrones, ranks = r)), "total"), numeric(1))
   # Ranking by distance from a root pins a parent whose only child is several
@@ -169,7 +169,7 @@ test_that("tight ranks shorten the ties", {
 
 test_that("all three rank rules layer the same network alike but rank it differently", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   rows <- lapply(c("tight", "generation", "compact"), function(r)
     layout_layered(thrones, ranks = r)$y)
   expect_equal(length(unique(rows[[1]])), length(unique(rows[[2]])))
@@ -179,7 +179,7 @@ test_that("all three rank rules layer the same network alike but rank it differe
 
 test_that("straight alignment straightens the ties, rungs does not", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   straight <- attr(check_offset(graphr(thrones)), "mean")
   rungs <- attr(check_offset(graphr(thrones, alignment = "rungs")), "mean")
   expect_lt(straight, rungs)
@@ -200,7 +200,7 @@ test_that("the rank rules fall back where the network is not acyclic", {
 
 test_that("lineage is layered with the axes exchanged", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   h <- layout_layered(thrones)
   a <- layout_lineage(thrones)
   expect_equal(a$x, -h$y)
@@ -220,7 +220,7 @@ test_that("railway gives every layer the same spacing", {
 
 test_that(".tighten_layers keeps every tie pointing down and shortens them", {
   skip_on_cran()
-  g <- as_igraph(delete_isolates(to_layer(fict_thrones, "parent")))
+  g <- as_igraph(.ag_delete_isolates(to_uniplex(fict_thrones, "parent")))
   ties <- igraph::as_edgelist(g, names = FALSE)
   loose <- autograph:::.rank_layers(g)
   tight <- autograph:::.tighten_layers(g)
@@ -248,9 +248,9 @@ test_that(".place_layer respects the order and the separation", {
 
 test_that("check_span and check_offset read a graphr plot", {
   skip_on_cran()
-  thrones <- to_layer(fict_thrones, "parent")
+  thrones <- to_uniplex(fict_thrones, "parent")
   p <- graphr(thrones)
-  ties <- net_ties(delete_isolates(thrones))
+  ties <- net_ties(.ag_delete_isolates(thrones))
   span <- check_span(p)
   offset <- check_offset(p)
   expect_length(span, ties)

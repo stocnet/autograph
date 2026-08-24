@@ -171,7 +171,7 @@
 
 ## Tutorials
 
-- Moved the decorative gifs in the visualisation tutorial into quiz answer feedback, so that they reward an answer in the interactive tutorial rather than appearing in the static pkgdown article, which drops quiz chunks
+- Moved the decorative gifs in the visualisation tutorial into quiz answer feedback
 
 # autograph 1.1.2
 
