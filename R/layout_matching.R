@@ -3,17 +3,18 @@
 #' @description
 #'   This layout works to position nodes opposite their matching nodes.
 #'   See `manynet::to_matching()` for more details on the matching procedure.
-#' @param .data Some `{manynet}` compatible network data.
-#' @param center,circular,times Extra parameters required for `{tidygraph}`
-#'   compatibility.
-#' @returns Returns a table of nodes' x and y coordinates.
+#' @template param_ggraphlayouts
+#' @param center Required for `{ggraph}` compatibility, and not used here.
+#' @family mapping
 #' @export
-layout_tbl_graph_matching <- function(.data,
-                                      center = NULL,
-                                      circular = FALSE,
-                                      times = 1) {
-  hlay <- layout_tbl_graph_hierarchy(.data)
+layout_matching <- function(.data, center = NULL,
+                            circular = FALSE, times = 1) {
+  hlay <- layout_tbl_graph_layered(.data)
   matchd <- manynet::as_edgelist(manynet::to_unnamed(manynet::to_matching(.data)))
   hlay[matchd$to,"x"] <- hlay[matchd$from,"x"]
   hlay
 }
+
+#' @rdname layout_matching
+#' @export
+layout_tbl_graph_matching <- layout_matching

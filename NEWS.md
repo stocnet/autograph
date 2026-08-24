@@ -23,8 +23,8 @@
 - Added `method`, `alpha`, `beta`, `FUN1` and `FUN2` arguments to `layout_multilevel()`, exposing how `graphlayouts::layout_as_multilevel()` lays out and projects the levels
 - Fixed meaningless layout inference, e.g. `railway` for a one-mode network, by checking whether layout is appropriate and reverts to default if not
 - Fixed `layout_tbl_graph_layered()` returning `NA` coordinates for unrankable nodes, which failed at draw time with "missing value where TRUE/FALSE needed"; such nodes are now placed in a layer below the ranked ones
+- Added a `layout_matching()` alias so every layout has a short name
 - Removed unreachable `getNNvec()`
-- Fixed `layout_hierarchy()` centring on a node of the second mode yet reading first mode labels
 
 ## Graphing
 
