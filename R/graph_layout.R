@@ -37,13 +37,12 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
                                  guide = ggplot2::guide_legend("Group"))
   }
   if(snap){
-    # Layered layouts already encode meaning in their coordinates -- rank,
-    # mode, or generation along one axis -- which square-grid snapping would
-    # collapse. Skip snapping for those and keep the layout as computed.
-    layered_layouts <- c("hierarchy", "railway", "ladder", "alluvial",
-                         "multilevel", "lineage", "layered")
+    # Layered layouts already encode meaning in their coordinates -- a layer,
+    # a mode, a generation, or a date along one axis -- which square-grid
+    # snapping would collapse. Skip snapping for those and keep the layout as
+    # computed.
     is_layered <- is.character(layout) && length(layout) == 1L &&
-      layout %in% layered_layouts
+      layout %in% .layered_layouts()
     if (is_layered) {
       manynet::snet_info(paste0("Skipping snapping: the '", layout,
                                 "' layout is layered, so its coordinates ",
@@ -67,30 +66,3 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   }
   p
 }
-
-# Helper functions ----
-
-.rotate_layout <- function(layout, angle) {
-  rot <- matrix(c(cos(angle), -sin(angle),
-                  sin(angle),  cos(angle)), ncol = 2)
-  coords <- as.matrix(layout[, c("x", "y")])
-  newcoords <- coords %*% rot
-  layout$x <- newcoords[,1]
-  layout$y <- newcoords[,2]
-  layout
-}
-
-.edge_angle_deviation <- function(layout, graph) {
-  ed <- igraph::as_edgelist(graph)
-  dx <- layout$x[ed[,2]] - layout$x[ed[,1]]
-  dy <- layout$y[ed[,2]] - layout$y[ed[,1]]
-  ang <- atan2(dy, dx)
-  
-  # deviation from nearest multiple of 90°
-  dev <- abs((ang %% (pi/2)) - pi/4)
-  mean(dev)
-}
-
-
-
-
