@@ -22,3 +22,4 @@ vignettes/precompile\.R
 ^\.positai$
 ^\.claude$
 ^CLAUDE\.md$
+^man-roxygen$
