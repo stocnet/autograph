@@ -33,6 +33,15 @@ layout_concentric <- function(.data, membership, radius = NULL,
                               order.by = NULL,
                               circular = FALSE, times = 1000) {
   .data <- manynet::as_igraph(.data)
+  # An unlabelled network is given the names `manynet::node_names()` invents
+  # for it, so that the groups, the ordering and the coordinates all name a
+  # node the same way. Without this the groups are named while
+  # `manynet::is_labelled()` says they are not, and the two disagree: every
+  # node falls out of its own group and is drawn on a circle of its own.
+  # Only the coordinates are returned, so the invented names go no further.
+  if (!manynet::is_labelled(.data))
+    .data <- igraph::set_vertex_attr(.data, "name",
+                                     value = manynet::node_names(.data))
   if (any(igraph::vertex_attr(.data, "name") == "")) {
     ll <- unlist(lapply(seq_len(length(.data)), function(x) {
       ifelse(igraph::vertex_attr(.data, "name")[x] == "",
@@ -72,8 +81,15 @@ layout_concentric <- function(.data, membership, radius = NULL,
       radius <- radius[-length(radius)] else radius <- radius[-1]
   }
   if (!is.null(order.by)) {
-    order.values <- lapply(order.by, 
-                           function(b) manynet::node_attribute(.data, b))
+    order.by <- .match_name(order.by, igraph::vertex_attr_names(.data),
+                            "order.by", what = "node attribute")
+    values <- manynet::node_attribute(.data, order.by)
+    names(values) <- manynet::node_names(.data)
+    # `order.by` orders the nodes within each circle, not the circles
+    # themselves, so the circles are still taken smallest first, as they are
+    # by default. This keeps `radius` meaning the same either way.
+    order.values <- lapply(membership[order(sapply(membership, length))],
+                           function(g) g[order(values[g], decreasing = TRUE)])
   } else {
     if (manynet::is_twomode(.data) & length(membership) == 2) {
       xnet <- manynet::as_matrix(manynet::to_multilevel(.data))[membership[[2-1]], 
@@ -104,12 +120,18 @@ layout_tbl_graph_concentric <- layout_concentric
 # Helper functions --------------------------------------------------------
 
 # Turn a vector of memberships into a list of the nodes in each group.
+# A node whose membership is NA belongs to no group: `sort()` drops NA, so
+# such a node reaches none of the groups, and `layout_concentric()` gathers
+# whatever is left over onto a circle of its own. The groups are named from
+# the same values they are built from, which also keeps each name on its own
+# group where the values do not arrive in sorted order.
 .to_list <- function(members) {
-  out <- lapply(sort(unique(members)), function(x){
+  groups <- sort(unique(members))
+  out <- lapply(groups, function(x){
     y <- which(members==x)
     if(!is.null(names(y))) names(y) else y
   })
-  names(out) <- unique(members)
+  names(out) <- groups
   out
 }
 

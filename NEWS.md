@@ -47,6 +47,10 @@
 - Deprecated "dyad", "triad", "tetrad", "pentad" and "hexad" layout names
   - "configuration" already picks the one matching the number of nodes
   - The `layout_dyad()` to `layout_hexad()` functions themselves are unchanged
+- Fixed three broken paths in `layout_concentric()`
+  - Fixed drawing each node of an unlabelled network on a circle of its own
+  - Fixed erroring where a membership holds `NA`, now gathers `NA` nodes onto own circle
+  - Fixed `order.by=`, which errored on every network; now orders nodes around each circle by that attribute, decreasing
 - Added a `layout_matching()` alias so every layout has a short name
 - Removed unreachable `getNNvec()`
 
