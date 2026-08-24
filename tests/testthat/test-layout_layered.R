@@ -269,3 +269,64 @@ test_that("the checks say what they need", {
   expect_error(check_span(list(data = data.frame(a = 1))), "coordinates")
   expect_error(check_offset(list(data = data.frame(x = 1, y = 1))), "network")
 })
+
+test_that("ranks given as values run down the page and left to right", {
+  skip_on_cran()
+  years <- rep(c(1985, 1990, 1995, 2000), times = 2)
+  net <- manynet::add_node_attribute(ison_adolescents, "year", years)
+  # The layers the engine works out run down the page, and values given for
+  # them do too, so the earliest year is at the top and the latest at the
+  # bottom.
+  down <- layout_layered(net, ranks = "year")
+  expect_equal(down$y[years == 1985], rep(max(down$y), 2))
+  expect_equal(down$y[years == 2000], rep(min(down$y), 2))
+  expect_true(all(diff(down$y[order(years)]) <= 0))
+  # "lineage" is the same layout with the axes exchanged, so the earliest year
+  # is on the left.
+  across <- layout_lineage(net, ranks = "year")
+  expect_equal(across$x[years == 1985], rep(min(across$x), 2))
+  expect_equal(across$x[years == 2000], rep(max(across$x), 2))
+  # The values space the layers in proportion to themselves, and these years
+  # are evenly spaced.
+  expect_equal(diff(sort(unique(across$x))), rep(1/3, 3))
+})
+
+test_that("a layered label sits immediately to the right of its own node", {
+  skip_on_cran()
+  years <- rep(c(1985, 1990, 1995, 2000), times = 2)
+  net <- manynet::add_node_attribute(ison_adolescents, "year", years)
+  for (lo in c("lineage", "ladder", "layered")) {
+    p <- graphr(net, layout = lo, ranks = "year")
+    labels <- p[["layers"]][[length(p[["layers"]])]]
+    # Nothing is repelled, so where a label sits says which node it labels.
+    expect_false(inherits(labels[["geom"]], "GeomLabelRepel"))
+    expect_false(inherits(labels[["geom"]], "GeomTextRepel"))
+    # One offset for every label, to the right, and the text starts there.
+    expect_s3_class(labels[["position"]], "PositionNudge")
+    expect_length(unique(labels[["position"]][["x"]]), 1L)
+    expect_gt(labels[["position"]][["x"]], 0)
+    expect_equal(labels[["position"]][["y"]], 0)
+    expect_equal(labels[["aes_params"]][["hjust"]], 0)
+    # In these two the x axis carries the layers, and the offset is smaller
+    # than the gap between them, so a label cannot reach the layer beside it.
+    if (lo != "layered")
+      expect_lt(labels[["position"]][["x"]],
+                min(diff(sort(unique(p[["data"]][["x"]])))))
+  }
+  # `label_repel` is asked for by default, and these layouts do not take it.
+  expect_s3_class(graphr(net, layout = "lineage", ranks = "year",
+                         label_repel = FALSE)[["layers"]][[3]][["position"]],
+                  "PositionNudge")
+})
+
+test_that("the offset grows with the nodes and with label_dist", {
+  skip_on_cran()
+  years <- rep(c(1985, 1990, 1995, 2000), times = 2)
+  net <- manynet::add_node_attribute(ison_adolescents, "year", years)
+  nudge <- function(...) {
+    p <- graphr(net, layout = "lineage", ranks = "year", ...)
+    p[["layers"]][[length(p[["layers"]])]][["position"]][["x"]]
+  }
+  expect_gt(nudge(label_dist = 20), nudge(label_dist = 0))
+  expect_gt(nudge(node_size = 10), nudge(node_size = 2))
+})

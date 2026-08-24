@@ -42,6 +42,9 @@
 #'   nodes. Then the layers are those values, and nodes are placed along that
 #'   axis in proportion to them rather than at even steps, so that a network
 #'   of dated nodes is drawn as a timeline.
+#'   The values run in the same direction as the layers the engine works out:
+#'   down the page in a "layered" or "railway" layout, and left to right in a
+#'   "lineage" or "ladder" layout, so that the smallest value comes first.
 #' @param alignment How each layer is spread out:
 #'   "straight" (the default) draws the ties as close to straight as the
 #'   ordering allows, which groups the nodes that belong together;
@@ -137,11 +140,12 @@ layout_lineage <- function(.data,
   # The same coordinates as "layered", with the axes exchanged, so that the
   # layers run left to right rather than bottom to top.
   lo <- .layer_axes(.data, ranks = ranks, alignment = alignment, times = times)
-  if (.ranks_given(ranks)) {
-    # Values placed along the axis keep their direction, so that a later date
-    # is further right, and nodes sharing a value need nudging apart.
-    .check_dup(.to_lo(cbind(lo[, 2], lo[, 1])))
-  } else .to_lo(cbind(-lo[, 2], lo[, 1]))
+  # The layer axis is negated so that the layers run left to right, as they run
+  # top to bottom in "layered".
+  out <- .to_lo(cbind(-lo[, 2], lo[, 1]))
+  # Nodes the caller gave the same value land on the same coordinate, so they
+  # need nudging apart.
+  if (.ranks_given(ranks)) .check_dup(out) else out
 }
 
 #' @rdname layout_layered
@@ -247,8 +251,10 @@ layout_tbl_graph_ladder <- layout_ladder
     y <- y[ord]
   }
   # Values the caller gave are already in that order, and are placed in
-  # proportion to themselves rather than at even steps.
-  if (!is.null(spec$values)) y <- spec$values
+  # proportion to themselves rather than at even steps. They descend the page
+  # like the layers the engine works out, so that the smallest value -- the
+  # earliest date, the first generation -- is at the top.
+  if (!is.null(spec$values)) y <- -spec$values
   if (length(unique(x)) > 1) x <- .rescale(x)
   if (length(unique(y)) > 1) y <- .rescale(y)
   cbind(x, y)

@@ -98,7 +98,10 @@ A node attribute can be given here instead, either as the name of a
 numeric node attribute or as a numeric vector as long as the network has
 nodes. Then the layers are those values, and nodes are placed along that
 axis in proportion to them rather than at even steps, so that a network
-of dated nodes is drawn as a timeline.}
+of dated nodes is drawn as a timeline.
+The values run in the same direction as the layers the engine works out:
+down the page in a "layered" or "railway" layout, and left to right in a
+"lineage" or "ladder" layout, so that the smallest value comes first.}
 
 \item{alignment}{How each layer is spread out:
 "straight" (the default) draws the ties as close to straight as the

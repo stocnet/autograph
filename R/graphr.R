@@ -146,6 +146,10 @@
 #'   Set to `FALSE` to place labels at a fixed offset (see `label_dist`)
 #'   without the (sometimes slow, and non-deterministic between runs for
 #'   some layouts) repelling algorithm.
+#'   The layered layouts ("layered", "lineage", "railway" and "ladder")
+#'   place each node in a layer, which is where the reader looks for it,
+#'   so a repelled label there would say less about which node it labels
+#'   than a fixed offset does. They ignore this argument and always offset.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
 #' @param edge_bundle Edge bundling, off by default (`FALSE`). When `TRUE` (or
 #'   equivalently `"force"`), edges are bundled together using ggraph's

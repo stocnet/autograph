@@ -163,7 +163,11 @@ from each other and from nodes using \code{ggrepel}
 (via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
 Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
 without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.}
+some layouts) repelling algorithm.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+place each node in a layer, which is where the reader looks for it,
+so a repelled label there would say less about which node it labels
+than a fixed offset does. They ignore this argument and always offset.}
 
 \item{keep_isolates}{Deprecated. Use \code{isolates = "keep"} or
 \code{isolates = "fade"} instead.}

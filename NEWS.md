@@ -38,6 +38,8 @@
     - "rungs" gives every layer same integer spacing
   - Each weakly connected component now laid out on its own and packed beside others
   - Fixed `layout_layered()` centring on a second mode node yet reading first mode labels
+  - Fixed the direction of layers given as values to `ranks=`
+  - Fixed layered layout labels to ignore `label_repel`
 - Improved multilevel layout
   - Renamed "multilevel" layout to "levels" to avoid potential future collisions
   - Fixed `layout_levels()` to identify modes without having to name a `level`

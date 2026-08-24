@@ -1385,7 +1385,7 @@ graphr(ison_southern_women, layout = "mds") + ggtitle("Multidimensional Scaling"
 
 Other such layouts include:
 
-- Pivot multidimensional scaling: `"pmds"`
+- Pivot multidimensional scaling: `"pmds"` (basically just a faster MDS for large networks)
 
 ```{r spectralinterp-Q, echo=FALSE, purl = FALSE}
 question("Can we interpret the distance between nodes in spectral and MDS layouts?",

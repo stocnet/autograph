@@ -8,6 +8,11 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # away from them either).
   sel <- .infer_labels(g, labels)
   if (!any(sel)) return(p)
+  # These layouts put every node in a place that means something: a layer, a
+  # ring, a rank. A repelled label leaves that place, and the reader has to
+  # work out which node it belongs to. Each label is offset by a fixed amount
+  # instead, so that where a label sits says which node it labels.
+  if (.is_structured(layout)) label_repel <- FALSE
   ldata <- p[["data"]][sel, , drop = FALSE]
   # `node_size` arrives with one value per node when it was mapped from an
   # attribute, and has to be cut down to the labelled nodes alongside the data.
@@ -84,15 +89,17 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     p <- p + do.call(ggraph::geom_node_text, args) +
       ggplot2::coord_cartesian(ylim=c(-0.2, 1.2))
   } else if (layout == "layered" & length(unique(p[["data"]][["y"]])) > 2) {
+    # As for "lineage" below: the label goes immediately to the right of its
+    # own node, rather than anywhere the layers leave room.
     args <- list(mapping = label_aes, data = ldata,
-                 family = ag_font(),
-                 size = ag_text_size(3), hjust = "inward", repel = label_repel)
-    if (label_repel) {
-      args$point.padding <- padding
-    } else {
-      args$nudge_y <- -nudge_unit
-    }
-    p <- p + do.call(ggraph::geom_node_text, args)
+                 family = ag_font(), size = ag_text_size(3),
+                 repel = label_repel,
+                 hjust = 0, nudge_x = .axis_nudge(radius_pt + gap_pt,
+                                                  p[["data"]][["x"]]))
+    if (label_repel) args$point.padding <- padding
+    p <- p + do.call(ggraph::geom_node_text, args) +
+      ggplot2::scale_x_continuous(
+        expand = ggplot2::expansion(mult = c(0.05, 0.25)))
   } else if (layout == "levels") {
     # `geom_node_label()`, used below, boxes each label in white, which at the
     # density these networks tend to have would paper over the plot entirely.
@@ -133,13 +140,18 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     # making labels invisible wherever they sit over a node. The fill is the
     # theme's own ground rather than white, so that a dark theme does not
     # scatter white cards over its graph.
+    # The layers run left to right, so every label goes immediately to the
+    # right of its own node, where it reads as a name follows a thing named.
     args <- list(mapping = label_aes, data = ldata,
                  size = ag_text_size(3), fill = ag_ground_fill(), colour = ag_ink(),
                  family = ag_font(), repel = label_repel,
-                 nudge_x = ifelse(ldata[,1] == 1,
-                                  nudge_unit, -nudge_unit))
+                 hjust = 0, nudge_x = .axis_nudge(radius_pt + gap_pt,
+                                                  p[["data"]][["x"]]))
     if (label_repel) args$point.padding <- padding
-    p <- p + do.call(ggraph::geom_node_label, args)
+    p <- p + do.call(ggraph::geom_node_label, args) +
+      # Room on the right for the labels of the last layer.
+      ggplot2::scale_x_continuous(
+        expand = ggplot2::expansion(mult = c(0.05, 0.25)))
   } else {
     args <- list(mapping = label_aes, data = ldata,
                  family = ag_font(), fill = ag_ground_fill(),
@@ -154,6 +166,25 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     p <- p + do.call(ggraph::geom_node_label, args)
   }
   p
+}
+
+# The layered family places each node in a layer, which is where a reader looks
+# for it, so a label that moves is a label that misleads. `layout` may be a
+# matrix of coordinates rather than a name, which would make the comparison
+# error rather than simply not match.
+.is_structured <- function(layout) {
+  is.character(layout) && length(layout) == 1L &&
+    layout %in% c("layered", "lineage", "railway", "ladder")
+}
+
+# A nudge given in points, as `label_dist` and the node sizes are, has to reach
+# the geoms as a distance along an axis. The panel is not measured until the
+# plot is drawn, so the conversion takes a nominal panel of 500pt, about a
+# seven inch plot, and scales the offset with the span the axis covers.
+.axis_nudge <- function(pt, values) {
+  span <- diff(range(values, na.rm = TRUE))
+  if (!is.finite(span) || span == 0) span <- 1
+  pt / 500 * span
 }
 
 # Label selection ----
