@@ -399,7 +399,7 @@
 # square grid would collapse.
 .fixed_layouts <- function() {
   c("layered", "lineage", "railway", "ladder", "levels", "scaling",
-    "hierarchy", "alluvial", "multilevel")
+    "correspondence", "hierarchy", "alluvial", "multilevel")
 }
 
 # Layout applicability ----
@@ -416,6 +416,9 @@
 #
 # `check` is a predicate over manynet's marks; `need` completes the sentence
 # "The {layout} layout needs ...". Layouts with no entry are unconstrained.
+# `need` is plain text: it is substituted into the message as a value, and cli
+# does not read markup a second time, so a `{.arg x}` here would print as
+# written.
 .layout_requirements <- function() {
   n_nodes <- function(g) as.integer(manynet::net_nodes(g))
   exactly <- function(n) list(check = function(g, ...) n_nodes(g) == n,
@@ -430,7 +433,7 @@
       manynet::is_twomode(g) ||
       (manynet::is_directed(g) && manynet::is_acyclic(g)),
     need = paste("a two-mode or a directed acyclic network,",
-                 "or a {.arg ranks} attribute to lay the layers out by"))
+                 "or a `ranks` attribute to lay the layers out by"))
   list(
     layered    = layered,
     lineage    = layered,
@@ -454,6 +457,15 @@
     valence = list(
       check = function(g, ...) manynet::is_signed(g),
       need = "a signed network"),
+    # Correspondence analysis divides by the mass of each node, so a negative
+    # tie has no reading. `double` splits the signs into two nonnegative
+    # halves, and the layout then applies after all, which is why the
+    # predicate reads the layout's own argument.
+    correspondence = list(
+      check = function(g, double = FALSE, ...) isTRUE(double) ||
+        !manynet::is_signed(g),
+      need = paste("an unsigned network,",
+                   "or `double = TRUE` to split the signs")),
     # `concentric` and `levels` are deliberately absent. They also need
     # more than a bare one-mode network, but unlike the layouts above the user
     # can supply what is missing -- a `membership` or a `level` -- and

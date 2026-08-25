@@ -1293,6 +1293,8 @@ separate less similar nodes in two-dimensional space.
 graphr(ison_southern_women, layout = "eigen") + ggtitle("Eigenvector")
 ```
 
+#### Multidimensional scaling {#scaling}
+
 Of similar purpose are multidimensional scaling (MDS) techniques,
 which visualise the similarity between nodes in terms of their proximity
 in a two-dimensional (or more) space.
@@ -1370,7 +1372,119 @@ no arrangement of the nodes will draw the distances faithfully,
 and stress tells you how close to that floor this particular drawing gets.
 
 ::: {.callout}
-<span class="callout-label">**Try it yourself**:</span> This section includes interactive quizzes in the live tutorial — run `run_tute()` at the R console to try it.
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
+:::
+
+#### Correspondence analysis {#correspondence}
+
+Whereas scaling lays out nodes by their distances from each other,
+correspondence analysis (CA) lays them out by the similarity of their ties.
+This is useful where nodes may not be tied to each other at all, 
+but can be tied to the same others, such as in a two-mode network.
+Correspondence analysis takes a rectangular table --- 
+here the incidence matrix of the Southern Women dataset, 
+one row for each woman and one column for each event ---
+and places its rows and its columns in one space.
+
+```{r correspondence, fig.align='center'}
+graphr(ison_southern_women, layout = "correspondence") + ggtitle("Correspondence Analysis")
+```
+
+We can see the similarity to the eigenvector layout above, 
+but the axes are labelled with the share of the network's `r gloss("inertia")` they hold.
+Inertia is the CA analogue of variance in PCA.
+It measures the total dispersion of points (rows and columns) in the cloud around the centroid, 
+computed as the chi-square statistic of the table divided by the total sample size (N). 
+In other words, inertia tell us how far the ties depart from what one would expect
+if every woman attended events in the same proportion as every other.
+A network whose nodes all had much the same ties would have almost none.
+
+Each dimension extracted captures a share of this total inertia.
+Because it is a share of variance explained,
+and not a measure of fit like regression's R-squared,
+the scores depend on the number of dimensions.
+`ison_southern_women` has 12 dimensions, 
+and a total inertia of `r round(attr(layout_correspondence(ison_southern_women), "fit")$total, 2)`.
+The top two dimensions (in terms of variance explained) together account for 57% of this total inertia.
+
+Is this good? I.e. is this a presentation of the data that is worth interpreting?
+Well, if the inertia were spread evenly across these 12 dimensions,
+(any) 2 dimensions would jointly account for about 17% of the variance.
+57% is about 3.4 times better than this.
+But this flatters because inertia is never spread evenly (Jackson [1993](https://doi.org/10.2307/1939574)).
+The *broken stick* model offers a more demanding baseline,
+asking what two dimensions would hold if the inertia were divided randomly rather than evenly (here 1.3 times better):
+
+```{r inertiacompare, fig.align='center'}
+bstick <- function(K) sum(sapply(1:2, function(k) mean(1 / (k:K))))
+sapply(c("ison_southern_women", "ison_adolescents", "ison_networkers"),
+       function(x) {
+         fit <- attr(layout_correspondence(get(x)), "fit")
+         K <- length(fit$scree)
+         c(dimensions = K,
+           inertia_drawn = round(sum(fit$inertia), 2),
+           vs_even = round(sum(fit$inertia) / (2 / K), 1),
+           vs_random = round(sum(fit$inertia) / bstick(K), 1))
+       })
+```
+
+`ison_adolescents` looks the best summarised by two dimensions of three datasets considered at 60%.
+However, it is a small network with only seven dimensions to spread across,
+so two of them were always going to hold a good deal.
+Against the harder baseline it scores below 1,
+which is to say two dimensions hold *less* than dividing the inertia
+at random would have given them.
+By comparison, `ison_networkers` looks the worst at 36% and yet summarises best:
+it has 31 dimensions, and the top two beat either baseline.
+Note that these scores are not verdicts, 
+but help gauge whether the two dimensions presented are worth interpreting further.
+`graphr()` applies the stricter of the two baselines for you,
+noting at the console where two dimensions hold no more inertia
+than a random division would have given them.
+
+Since the two dimensions have different percentages here,
+we can see where we should put the emphasis of our interpretation.
+Because the first dimension holds twice as much,
+it suggests that what distinguishes nodes most runs along the x-axis rather than the y-axis.
+
+Two more things to note about correspondence analysis.
+First, while the distances among nodes of the same mode are interpretable,
+distances between nodes from different modes are not necessarily interpretable.
+That is, a woman drawn near an event is **not** necessarily an attendee of it.
+Only the distances *within* a mode can be read this way:
+two women drawn together attended similar events,
+and two events drawn together were attended by similar women.
+These plots are often misread this way.
+
+Second, some nodes are better represented by the top two dimensions than others.
+A plot can hold most of the network's inertia
+and still put one particular node nowhere near where it belongs.
+This representation is captured by a measure called `r gloss("cos2")`: 
+how much of its position the two dimensions drawn actually hold, from 0 to 1, 
+where lower is worse.
+A node the plane captures badly may be located near the centre of the plot,
+not because it is average, but because there is nowhere else to put it.
+`graphr()` names these nodes in the console when it draws the layout, 
+but you can recover the scores like so:
+
+```{r cos2, fig.align='center'}
+fit <- attr(layout_correspondence(ison_southern_women), "fit")
+round(sort(fit$cos2), 2)
+```
+
+For a directed network, each node has two profiles:
+who it sends ties to, and who it receives them from.
+By default the layout reads a tie in either direction,
+so that each node has one position;
+`direction = "out"` and `direction = "in"` read one profile or the other.
+For a signed network there is no correspondence analysis at all,
+since the method divides by the mass of each node
+and a negative tie has no such reading.
+`double = TRUE` splits each tie into a positive and a negative part,
+so that a node is placed by both who it likes and who it dislikes.
+
+::: {.callout}
+<span class="callout-label">**Try it yourself**:</span> This section includes an interactive quiz in the live tutorial — run `run_tute()` at the R console to try it.
 :::
 
 ### Grid layouts {#grid-layouts}
@@ -1433,7 +1547,8 @@ useful when readers need to compare them.
 ::: {.callout}
 <span class="callout-label">**Going further**:</span>
 `{autograph}` also provides its own special-purpose layouts —
-`"configuration"`, `"levels"`, `"matching"`, `"scaling"`, `"valence"`,
+`"configuration"`, `"correspondence"`, `"levels"`, `"matching"`,
+`"scaling"`, `"valence"`,
 and the layered family —
 documented at `?layout_layered` and friends.
 Several layouts take a layout-specific extra argument (passed through `...`)
@@ -1447,7 +1562,7 @@ name or a vector. See `?graphr` for the full list.
 force-directed (`"stress"`, `"fr"`, `"kk"`),
 layered (`"layered"`, `"railway"`, `"lineage"`),
 circular (`"concentric"`, `"circle"`),
-spectral (`"eigen"`, `"scaling"`),
+spectral (`"eigen"`, `"scaling"`, `"correspondence"`),
 and grid layouts.
 Force-directed layouts are illustrative — do not over-interpret distances;
 spectral/MDS layouts place nodes by measured similarity,

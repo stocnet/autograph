@@ -58,6 +58,11 @@
   - Drawn with labelled axes at a fixed ratio, since these coordinates can be read
   - Captioned with `check_stress()` for Kruskal's stress-1, and console-reported where poor, 
   as well as the share of distance variance two dimensions hold
+- Added a "correspondence" layout for correspondence analysis
+  - Places nodes by the similarity of their tie profiles
+  - Reads directed networks symmetrically by default, but "out" or "in" possible
+  - Refuses signed network, but `double=TRUE` an option
+  - Console-reports low broomstick ratio dimensions and low cos2 nodes 
 - Added a `layout_matching()` alias so every layout has a short name
 - Removed unreachable `getNNvec()`
 

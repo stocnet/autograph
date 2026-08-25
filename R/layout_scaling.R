@@ -123,7 +123,10 @@ layout_tbl_graph_scaling <- layout_scaling
 # layout so that graphr() can caption the plot with it rather than compute the
 # scaling a second time. `pivots` is NA where every node was scaled.
 .scaling_fit <- function(dis, crd, src, pivots) {
-  list(stress = .stress1(dis, crd, src),
+  # `type` names which fit this is, since graphr() reports each in its own
+  # terms. See `.note_fit()`.
+  list(type = "scaling",
+       stress = .stress1(dis, crd, src),
        # The decomposition the share of variance is read from is the very work
        # the pivot algorithm is used to avoid, so it is only reported where
        # every node was scaled in full.

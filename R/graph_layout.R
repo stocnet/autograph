@@ -1,3 +1,13 @@
+# The name of a drawn dimension. A layout that reports how much of the
+# network's inertia the dimension holds says so here, since an axis is where
+# a reader looks for the scale it is reading against.
+.dim_label <- function(k, fit) {
+  base <- paste("Dimension", k)
+  share <- fit[["inertia"]][k]
+  if (is.null(share) || !is.finite(share)) return(base)
+  paste0(base, " (", round(share * 100), "% of inertia)")
+}
+
 graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   name <- NULL
   dots <- list(...)
@@ -17,9 +27,13 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
   # "scaling" layout draws distances that mean something, so it keeps its axes,
   # and keeps them on one scale: a distance read off two axes of different
   # scales is not the distance the layout placed there.
-  if (identical(layout, "scaling")) {
+  # The "correspondence" layout draws distances that can be read in the same
+  # way, and names the share of inertia each of its dimensions holds.
+  if (is.character(layout) && length(layout) == 1L &&
+      layout %in% c("scaling", "correspondence")) {
+    fit <- attr(lo, "fit")
     p <- p + ag_theme_minimal() +
-      ggplot2::labs(x = "Dimension 1", y = "Dimension 2")
+      ggplot2::labs(x = .dim_label(1, fit), y = .dim_label(2, fit))
     # ggraph has already set a coordinate system, and ggplot2 announces the
     # replacement, which is not news to anyone here.
     p <- suppressMessages(p + ggplot2::coord_fixed())

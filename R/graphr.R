@@ -57,6 +57,14 @@
 #'   Note that those axes carry distances rather than named dimensions:
 #'   the drawing can be turned or mirrored without fitting the network
 #'   any better or any worse.
+#'   The "correspondence" layout places the nodes by correspondence analysis,
+#'   so that two nodes with similar ties are drawn together,
+#'   whether or not they are tied to each other.
+#'   It is the usual way to draw a two mode network, since it places both
+#'   modes against the same pair of axes, and it accepts a "direction"
+#'   argument for a directed network and a "double" argument for a signed
+#'   one; see `?layout_correspondence`.
+#'   Each axis names the share of the network's inertia that it holds.
 #' @param labels Which nodes to label, if the network is labelled.
 #'   `TRUE` (the default) labels every node and `FALSE` none of them,
 #'   but a label for every node of a large network hides the network behind
@@ -329,22 +337,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # A scaled layout draws distances that can be read, so how well two
   # dimensions hold those distances is part of the drawing rather than an
   # aside. See `check_stress()` for how to read the score.
-  if (!is.null(fit) && is.finite(fit[["stress"]])) {
-    txt <- paste0("Stress: ", round(fit[["stress"]] * 100), "%.")
-    if (!is.na(fit[["variance"]])) txt <- paste0(
-      txt, " Two dimensions hold ", round(fit[["variance"]] * 100),
-      "% of the distance variance.")
-    p <- .add_caption(p, txt)
-    # Kruskal read a stress of 20% as poor, but that figure was set for
-    # psychometric data: most pairs of nodes in a network sit two or three
-    # steps apart, which no plane holds well, so most networks would be
-    # reported on at 20% and the message would say nothing.
-    if (fit[["stress"]] > 0.3) manynet::snet_info(
-      "Two dimensions hold these path distances poorly",
-      "(stress: {round(fit[['stress']] * 100)}%),",
-      "so read the clusters rather than the distances.",
-      "See {.fn check_stress}.")
-  }
+  p <- .note_fit(p, fit)
   
   # Add legends ----
   p <- graph_legends(p, g, 
@@ -353,6 +346,81 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   
   # assign("last.warning", NULL, envir = baseenv()) # to avoid persistent ggrepel
   p
+}
+
+# A scaled layout draws distances that can be read, so how well two dimensions
+# hold what the layout scaled is part of the drawing rather than an aside.
+# Each layout that reports a fit says so in its own terms. See
+# `layout_scaling()` and `layout_correspondence()`.
+.note_fit <- function(p, fit) {
+  if (is.null(fit)) return(p)
+  switch(fit[["type"]] %||% "scaling",
+         scaling = .note_scaling_fit(p, fit),
+         correspondence = .note_corresp_fit(p, fit),
+         p)
+}
+
+.note_scaling_fit <- function(p, fit) {
+  if (!is.finite(fit[["stress"]])) return(p)
+  txt <- paste0("Stress: ", round(fit[["stress"]] * 100), "%.")
+  if (!is.na(fit[["variance"]])) txt <- paste0(
+    txt, " Two dimensions hold ", round(fit[["variance"]] * 100),
+    "% of the distance variance.")
+  p <- .add_caption(p, txt)
+  # Kruskal read a stress of 20% as poor, but that figure was set for
+  # psychometric data: most pairs of nodes in a network sit two or three
+  # steps apart, which no plane holds well, so most networks would be
+  # reported on at 20% and the message would say nothing.
+  if (fit[["stress"]] > 0.3) manynet::snet_info(
+    "Two dimensions hold these path distances poorly",
+    "(stress: {round(fit[['stress']] * 100)}%),",
+    "so read the clusters rather than the distances.",
+    "See {.fn check_stress}.")
+  p
+}
+
+# The share of inertia each dimension holds is already named on its axis, so
+# nothing is added to the caption here. What the axes cannot say is which
+# nodes those two dimensions place badly, and those are exactly the nodes a
+# reader would otherwise read too much into.
+.note_corresp_fit <- function(p, fit) {
+  .note_corresp_inertia(fit)
+  .note_corresp_cos2(fit)
+  p
+}
+
+# The axes name the share of inertia, but a share means nothing without the
+# number of dimensions it was won from, and an axis has no room for that. Two
+# dimensions of a small table hold a good deal whatever the network, so the
+# share is checked against what the same two dimensions would hold if the
+# inertia were divided at random. See `.broken_stick()`.
+.note_corresp_inertia <- function(fit) {
+  drawn <- sum(fit[["inertia"]])
+  k <- length(fit[["scree"]])
+  if (!is.finite(drawn) || k < 3L) return(invisible(NULL))
+  if (drawn > .broken_stick(k)) return(invisible(NULL))
+  manynet::snet_info(
+    "These two dimensions hold no more of the inertia than dividing it at",
+    "random would give them ({round(drawn * 100)}% of {k} dimensions),",
+    "so read the clusters rather than the positions.")
+}
+
+# The broken stick model: the share the first two of `k` dimensions would hold
+# if the inertia were broken at random into `k` pieces. A far harder baseline
+# than an even share, since inertia is never spread evenly, and the one worth
+# warning against (Jackson 1993, \doi{10.2307/1939574}).
+.broken_stick <- function(k) sum(vapply(1:2, function(i) mean(1 / (i:k)), 1))
+
+.note_corresp_cos2 <- function(fit) {
+  cos2 <- fit[["cos2"]]
+  poor <- names(cos2)[!is.na(cos2) & cos2 < 0.3]
+  # Only where more than one node is placed badly: a single one is as likely
+  # to be a node with few ties as a sign that the drawing is not to be read.
+  if (length(poor) < 2L) return(invisible(NULL))
+  shown <- if (length(poor) > 5) c(utils::head(poor, 5), "...") else poor
+  manynet::snet_info(
+    "{length(poor)} nodes sit far off the plane drawn",
+    "({.val {shown}}), so read their positions with care.")
 }
 
 # Helper functions for graphr() ----

@@ -74,7 +74,15 @@ with labelled axes on one scale, and captioned with how well two
 dimensions hold the distances; see \code{?layout_scaling} and \code{check_stress()}.
 Note that those axes carry distances rather than named dimensions:
 the drawing can be turned or mirrored without fitting the network
-any better or any worse.}
+any better or any worse.
+The "correspondence" layout places the nodes by correspondence analysis,
+so that two nodes with similar ties are drawn together,
+whether or not they are tied to each other.
+It is the usual way to draw a two mode network, since it places both
+modes against the same pair of axes, and it accepts a "direction"
+argument for a directed network and a "double" argument for a signed
+one; see \code{?layout_correspondence}.
+Each axis names the share of the network's inertia that it holds.}
 
 \item{labels}{Which nodes to label, if the network is labelled.
 \code{TRUE} (the default) labels every node and \code{FALSE} none of them,
@@ -279,6 +287,7 @@ Other mapping:
 \code{\link{completion}},
 \code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
 \code{\link[=layout_layered]{layout_layered()}},
 \code{\link[=layout_levels]{layout_levels()}},
 \code{\link[=layout_matching]{layout_matching()}},

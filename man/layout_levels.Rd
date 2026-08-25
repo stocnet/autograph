@@ -84,6 +84,7 @@ Other mapping:
 \code{\link{completion}},
 \code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
 \code{\link[=layout_layered]{layout_layered()}},
 \code{\link[=layout_matching]{layout_matching()}},
 \code{\link[=layout_scaling]{layout_scaling()}},
