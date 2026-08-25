@@ -97,15 +97,15 @@ test_that("a signed network needs its signs split", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
   expect_message(
-    p <- graphr(manynet::irps_tribes, layout = "correspondence"),
+    p <- graphr(manynet::ison_monks, layout = "correspondence"),
     "unsigned network")
   expect_equal(p$plot_env$layout, "stress")
-  lo <- layout_correspondence(manynet::irps_tribes, double = TRUE)
+  lo <- layout_correspondence(manynet::ison_monks, double = TRUE)
   expect_equal(nrow(lo),
-               as.integer(manynet::net_nodes(manynet::irps_tribes)))
+               as.integer(manynet::net_nodes(manynet::ison_monks)))
   expect_true(all(is.finite(as.matrix(lo))))
   p2 <- suppressMessages(
-    graphr(manynet::irps_tribes, layout = "correspondence", double = TRUE))
+    graphr(manynet::ison_monks, layout = "correspondence", double = TRUE))
   expect_equal(p2$plot_env$layout, "correspondence")
   expect_buildable(p2)
 })
