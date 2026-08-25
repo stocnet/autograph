@@ -51,6 +51,7 @@
   - Fixed drawing each node of an unlabelled network on a circle of its own
   - Fixed erroring where a membership holds `NA`, now gathers `NA` nodes onto own circle
   - Fixed `order.by=`, which errored on every network; now orders nodes around each circle by that attribute, decreasing
+- Fixed `graphr(snap = TRUE)` to use rotation and other improvements
 - Added a "scaling" layout for multidimensional scaling
   - Scales classically up to a hundred nodes, and by pivots above that
   - Scales unweighted path distances, so it can handle signed/weighted networks

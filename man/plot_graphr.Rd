@@ -158,7 +158,12 @@ If the default layout ("stress") is used,
 we recommend that the "legend" option is used to avoid isolates crowding
 out the giant component.}
 
-\item{snap}{Logical scalar, whether the layout should be snapped to a grid.}
+\item{snap}{Logical scalar, whether the layout should be snapped to a grid.
+Where the network repeats a structure, as a lattice does, the two steps it
+repeats are mapped onto the axes, which draws it as a rectangle of rows and
+columns. Where it does not, each node moves to the nearest vacant grid
+point. Layouts that already carry meaning in their coordinates, such as
+"layered" or "scaling", are left as they are.}
 
 \item{label_dist}{Numeric scalar, in points (pt), controlling the extra
 gap left between labels and node borders -- similar to \code{igraph}'s

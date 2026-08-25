@@ -167,6 +167,11 @@
 #'   so a repelled label there would say less about which node it labels
 #'   than a fixed offset does. They ignore this argument and always offset.
 #' @param snap Logical scalar, whether the layout should be snapped to a grid.
+#'   Where the network repeats a structure, as a lattice does, the two steps it
+#'   repeats are mapped onto the axes, which draws it as a rectangle of rows and
+#'   columns. Where it does not, each node moves to the nearest vacant grid
+#'   point. Layouts that already carry meaning in their coordinates, such as
+#'   "layered" or "scaling", are left as they are.
 #' @param edge_bundle Edge bundling, off by default (`FALSE`). When `TRUE` (or
 #'   equivalently `"force"`), edges are bundled together using ggraph's
 #'   force-directed edge bundling (`geom_edge_bundle_force()`), which pulls

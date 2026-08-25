@@ -74,19 +74,11 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
                                 "so they are kept as computed."))
     } else {
     manynet::snet_info("Snapping layout coordinates to grid.")
-    if(grepl("lattice", manynet::net_name(g), ignore.case = TRUE)){
-      
-      angles <- seq(0, pi/2, length.out = 180)
-      scores <- sapply(angles, function(a) {
-        lay2 <- .rotate_layout(lo, a)
-        .edge_angle_deviation(lay2, g)
-      })
-      
-      best_angle <- angles[which.min(scores)]
-      rotated_coords <- .rotate_layout(lo, best_angle)
-      # Make sure that the coordinates, if rounded to integers, are still unique
-      p$data[,c("x","y")] <- round(rotated_coords[,c("x","y")])
-    } else p$data[,c("x","y")] <- depth_first_recursive_search(p)
+    # Where the network repeats a structure -- a lattice, or anything else
+    # whose ties take a few steps over and over -- those steps map onto the
+    # axes and every node lands on its own grid point. Where it does not, each
+    # node moves to the nearest vacant point instead.
+    p$data[,c("x","y")] <- .snap_layout(p$data, g)
     }
   }
   p

@@ -9,11 +9,62 @@ test_that("snapping a layout to the grid yields integer-ish unique positions", {
   expect_false(any(duplicated(p$data[, c("x", "y")])))
 })
 
-test_that("lattice networks snap by rotation to align edges to the grid", {
+test_that("lattice networks snap onto a full rectangular grid", {
   skip_on_cran()
-  p <- suppressMessages(graphr(manynet::create_lattice(9), snap = TRUE))
+  # A lattice repeats two steps, which .snap_basis() maps onto the axes, so
+  # every node lands on its own point of a rectangle of rows and columns.
+  # create_lattice(12) is triangular (interior degree 6): its third family of
+  # ties is drawn as diagonals of that same square grid.
+  for (g in list(manynet::create_lattice(9),
+                 manynet::create_lattice(12),
+                 manynet::create_lattice(16),
+                 manynet::create_lattice(12, width = 4),
+                 manynet::create_lattice(20, width = 4))) {
+    p <- suppressMessages(graphr(g, snap = TRUE))
+    expect_buildable(p)
+    d <- p$data[, c("x", "y")]
+    expect_equal(d$x, round(d$x))
+    expect_equal(d$y, round(d$y))
+    expect_false(any(duplicated(d)))
+    # no gap in any row or column: the grid is filled exactly
+    expect_equal(length(unique(d$x)) * length(unique(d$y)), nrow(d))
+  }
+})
+
+test_that("networks without a repeating structure take the fallback", {
+  skip_on_cran()
+  # A ring and a tree have about as many ties as nodes and no repeating steps,
+  # so .snap_basis() declines them and depth_first_recursive_search() snaps
+  # them instead.
+  for (g in list(manynet::ison_adolescents, manynet::create_ring(12),
+                 manynet::create_tree(15))) {
+    lo <- ggraph::create_layout(manynet::as_tidygraph(g), "stress")
+    expect_null(.snap_basis(lo, manynet::as_igraph(g)))
+    p <- suppressMessages(graphr(g, snap = TRUE))
+    expect_buildable(p)
+    expect_false(any(duplicated(p$data[, c("x", "y")])))
+  }
+})
+
+test_that("snapping a named network reads its ties by position", {
+  skip_on_cran()
+  # Regression: .edge_angle_deviation() read the tie ends with
+  # igraph::as_edgelist(graph), which returns node names for a named network.
+  # Indexing the coordinates by name gave NA, and the rotation score with it.
+  p <- suppressMessages(graphr(manynet::fict_lotr, snap = TRUE))
   expect_buildable(p)
-  expect_true(all(p$data$x == round(p$data$x)))
+  expect_false(anyNA(p$data[, c("x", "y")]))
+})
+
+test_that("a cardinal rotation scores better than a diagonal one", {
+  skip_on_cran()
+  # Regression: the deviation was measured from 45 degrees, so which.min()
+  # picked the angle at which the fewest ties ran cardinally.
+  g <- manynet::as_igraph(manynet::create_lattice(12, width = 4))
+  lo <- ggraph::create_layout(manynet::as_tidygraph(g), "stress")
+  cardinal <- .snap_rotate(lo, g)
+  expect_lt(.edge_angle_deviation(cardinal, g),
+            .edge_angle_deviation(.rotate_layout(cardinal, pi/4), g))
 })
 
 test_that("snapping a two-mode (layered) layout falls back gracefully", {
