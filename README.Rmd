@@ -27,8 +27,11 @@ list_data <- function(string){
 # Set AUTOGRAPH_SITE_DIR to point at your own checkout of that site.
 site_dir <- Sys.getenv(
   "AUTOGRAPH_SITE_DIR",
-  unset = path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/manynet"))
+  unset = path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/autograph"))
 site_figure <- function(name) file.path(site_dir, name)
+# Chunks that show their code write their figures to the site directory through
+# knitr itself, by setting `fig.path` to this prefix and hiding the local link.
+site_prefix <- paste0(site_dir, "/README-")
 have_site <- dir.exists(site_dir)
 if (!have_site) {
   # written straight to stderr, since this chunk's messages are not shown
@@ -126,7 +129,7 @@ Second, it includes sensible defaults so that researchers can view their network
 or distribution quickly with a minimum of fuss.
 Compare the output from `{autograph}` with a similar default from `{igraph}`:
 
-<img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
+<img src="https://www.jameshollway.com/post/autograph/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
 ```{r layout-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
 compare_figure(
@@ -152,7 +155,7 @@ Where a default does not recognise a property of the network,
 that property is usually dropped silently.
 Compare the same signed network drawn by each package:
 
-<img src="https://www.jameshollway.com/post/manynet/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
+<img src="https://www.jameshollway.com/post/autograph/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
 
 ```{r signed-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
 compare_figure(
@@ -180,7 +183,7 @@ e.g. `node_color = "darkblue"` or `node_size = 6`,
 or indicating from which attribute it should inherit this information,
 e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
 ```{r more-options, echo = FALSE, message=FALSE, eval = have_site}
 p <- graphr(ison_lawfirm, node_color = "darkblue", node_size = 6) +
@@ -206,7 +209,7 @@ visualising layers horizontally, vertically, or concentrically,
 conforming to configurational coordinates,
 or for snapping these layouts to a grid.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
 ```{r more-layouts, echo = FALSE, message=FALSE, eval = have_site}
 p <- (graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric layout")) /
@@ -231,7 +234,7 @@ Holding the layout constant makes the panels comparable,
 so that what moves on the page is what changed in the data.
 `graphs()` also collects a single legend for the whole set.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
+<img src="https://www.jameshollway.com/post/autograph/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
 ```{r autographs, echo = FALSE, eval = have_site}
 p <- ison_adolescents |>
@@ -251,7 +254,7 @@ with node positions transitioning smoothly between waves
 and nodes fading in and out as they enter and exit the network.
 It really couldn't be easier.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
+<img src="https://www.jameshollway.com/post/autograph/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
 ```{r autographd, echo = FALSE, eval = have_site}
 p <- ison_adolescents |>
@@ -295,7 +298,7 @@ and that index is not meaningful.
 `netrics::node_by_degree()` returns a `node_measure`,
 which `{autograph}` plots as a themed distribution:
 
-<img src="https://www.jameshollway.com/post/manynet/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
+<img src="https://www.jameshollway.com/post/autograph/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
 
 ```{r result-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
 compare_figure(
@@ -314,7 +317,9 @@ in `{RSiena}` and an ERGM in `{ergm}`.
 (Note that neither the data nor the model are similar;
 this is just for illustrative purposes.)
 
-```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"}
+<img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/><img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/>
+
+```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 plot(siena_gof) + ggtitle("SAOM goodness-of-fit")
 plot(ergm_gof) + ggtitle("ERGM goodness-of-fit")
 ```
@@ -331,7 +336,7 @@ Then enter the chosen theme name in the function to set it.
 All plots created using `{autograph}` functions will then use this theme,
 until you change it again.
 
-```{r themeset, dpi = 300, fig.height=5, fig.alt="Themed figures"}
+```{r themeset, dpi = 300, fig.height=5, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 stocnet_theme()
 (plot(netrics::node_by_degree(ison_karateka)) + 
 plot(netrics::tie_by_betweenness(ison_karateka)))/
@@ -346,11 +351,15 @@ plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
+<img src="https://www.jameshollway.com/post/autograph/README-themeset-1.png" alt="Themed figures"/><img src="https://www.jameshollway.com/post/autograph/README-themeset-2.png" alt="Themed figures"/>
+
 There are a range of institutional and topical themes available,
 including `r autograph:::theme_opts`,
 with more on the way.
 
-```{r theme-opts, echo=FALSE, dpi = 300, fig.height=3, fig.width=8, fig.alt="Institutional themes"}
+<img src="https://www.jameshollway.com/post/autograph/README-theme-opts-1.png" alt="Institutional themes"/><img src="https://www.jameshollway.com/post/autograph/README-theme-opts-2.png" alt="Institutional themes"/>
+
+```{r theme-opts, echo=FALSE, dpi = 300, fig.height=3, fig.width=8, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 set_stocnet_theme("iheid")
 ai <- autograph:::ggpizza(ag_qualitative()) + ggtitle("IHEID") + 
   theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
@@ -394,7 +403,7 @@ then as a photocopier renders it,
 and then in the palette `{ggraph}` falls back on when `{autograph}` is not
 setting the colours, as that same reader with deuteranopia sees it.
 
-```{r cvd, message=FALSE, warning=FALSE, dpi = 300, fig.height=3, fig.width=12, fig.alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's"}
+```{r cvd, message=FALSE, warning=FALSE, dpi = 300, fig.height=3, fig.width=12, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 set_stocnet_theme("default")
 as_seen <- function(colours, type, title){
   graphr(fict_lotr, node_colour = "Race", node_size = 3, labels = FALSE) +
@@ -406,6 +415,8 @@ as_seen(ag_qualitative(6), "normal", "autograph") |
   as_seen(ag_qualitative(6), "grey", "autograph, greyscale") |
   as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
 ```
+
+<img src="https://www.jameshollway.com/post/autograph/README-cvd-1.png" alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's"/>
 
 The six races remain tellable apart in the second panel,
 its closest pair being Hobbits and Maiar.
@@ -446,7 +457,9 @@ and `check_contrast()` scores it against the thresholds of WCAG 2.1:
 Every theme's ink clears 4.5 on that theme's own ground,
 and the test suite holds it there.
 
-```{r wcag, echo=FALSE, dpi = 300, fig.height=2.2, fig.width=9, fig.alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio"}
+<img src="https://www.jameshollway.com/post/autograph/README-wcag-1.png" alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio"/>
+
+```{r wcag, echo=FALSE, dpi = 300, fig.height=2.2, fig.width=9, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 inks <- do.call(rbind, lapply(autograph:::theme_opts, function(t){
   set_stocnet_theme(t)
   bg <- getOption("snet_background")

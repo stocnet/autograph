@@ -73,7 +73,7 @@ network’s structure or distribution quickly with a minimum of fuss.
 Compare the output from `{autograph}` with a similar default from
 `{igraph}`:
 
-<img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
+<img src="https://www.jameshollway.com/post/autograph/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
 `{igraph}` requires the bipartite layout to be specified, has cumbersome
 node size defaults for all but the smallest graphs, and labels also very
@@ -89,7 +89,7 @@ This inference matters for more than tidiness. Where a default does not
 recognise a property of the network, that property is usually dropped
 silently. Compare the same signed network drawn by each package:
 
-<img src="https://www.jameshollway.com/post/manynet/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
+<img src="https://www.jameshollway.com/post/autograph/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
 
 `irps_tribes` records both alliance and antagonism between sixteen
 tribes, in equal number. `{igraph}` draws all of these ties identically,
@@ -108,7 +108,7 @@ e.g. `node_color = "darkblue"` or `node_size = 6`, or indicating from
 which attribute it should inherit this information,
 e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
 Legends are added by default when node or tie aesthetics are mapped to
 attributes, but can be removed with `show_legend = FALSE`. Since the
@@ -124,7 +124,7 @@ some additional layout algorithms for visualising layers horizontally,
 vertically, or concentrically, conforming to configurational
 coordinates, or for snapping these layouts to a grid.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
 ### More networks
 
@@ -141,7 +141,7 @@ that node has changed. Holding the layout constant makes the panels
 comparable, so that what moves on the page is what changed in the data.
 `graphs()` also collects a single legend for the whole set.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
+<img src="https://www.jameshollway.com/post/autograph/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
 ### More time
 
@@ -151,7 +151,7 @@ that visualises network changes over time, with node positions
 transitioning smoothly between waves and nodes fading in and out as they
 enter and exit the network. It really couldn’t be easier.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
+<img src="https://www.jameshollway.com/post/autograph/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
 <!-- provide a common set of tools that can be used to import, export, create, and manipulate network data in a wide variety of formats, -->
 
@@ -188,14 +188,14 @@ back to a scatterplot of the values against their index, and that index
 is not meaningful. `netrics::node_by_degree()` returns a `node_measure`,
 which `{autograph}` plots as a themed distribution:
 
-<img src="https://www.jameshollway.com/post/manynet/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
+<img src="https://www.jameshollway.com/post/autograph/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
 
 The same holds for the other result classes. Here are some further
 examples, using goodness-of-fit results from fitting a SAOM in
 `{RSiena}` and an ERGM in `{ergm}`. (Note that neither the data nor the
 model are similar; this is just for illustrative purposes.)
 
-<img src="man/figures/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" /><img src="man/figures/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm" width="100%" />
+<img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/><img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/>
 
 ### Setting a theme
 
@@ -215,11 +215,6 @@ plot(netrics::tie_by_betweenness(ison_karateka)))/
 (plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
-```
-
-<img src="man/figures/README-themeset-1.png" alt="Themed figures" width="100%" />
-
-``` r
 stocnet_theme("ethz")
 (plot(netrics::node_by_degree(ison_karateka)) + 
 plot(netrics::tie_by_betweenness(ison_karateka)))/
@@ -228,13 +223,13 @@ plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
-<img src="man/figures/README-themeset-2.png" alt="Themed figures" width="100%" />
+<img src="https://www.jameshollway.com/post/autograph/README-themeset-1.png" alt="Themed figures"/><img src="https://www.jameshollway.com/post/autograph/README-themeset-2.png" alt="Themed figures"/>
 
 There are a range of institutional and topical themes available,
 including default, bw, crisp, neon, clay, iheid, ethz, uzh, rug, unibe,
 oxf, unige, cmu, iast, hwu, rainbow, with more on the way.
 
-<img src="man/figures/README-theme-opts-1.png" alt="Institutional themes" width="100%" /><img src="man/figures/README-theme-opts-2.png" alt="Institutional themes" width="100%" />
+<img src="https://www.jameshollway.com/post/autograph/README-theme-opts-1.png" alt="Institutional themes"/><img src="https://www.jameshollway.com/post/autograph/README-theme-opts-2.png" alt="Institutional themes"/>
 
 ### Colours everyone can read
 
@@ -270,7 +265,7 @@ as_seen(ag_qualitative(6), "normal", "autograph") |
   as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
 ```
 
-<img src="man/figures/README-cvd-1.png" alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's" width="100%" />
+<img src="https://www.jameshollway.com/post/autograph/README-cvd-1.png" alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's"/>
 
 The six races remain tellable apart in the second panel, its closest
 pair being Hobbits and Maiar. In the right-hand one, Elves and Ents have
@@ -309,7 +304,7 @@ scores it against the thresholds of WCAG 2.1: 4.5 for body text, 3 for
 large text and for graphical objects. Every theme’s ink clears 4.5 on
 that theme’s own ground, and the test suite holds it there.
 
-<img src="man/figures/README-wcag-1.png" alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio" width="100%" />
+<img src="https://www.jameshollway.com/post/autograph/README-wcag-1.png" alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio"/>
 
 The medium is a separate question again. `stocnet_medium()` sizes the
 text for where the figure will be seen — `"screen"`, `"presentation"`,

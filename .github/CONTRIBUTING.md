@@ -474,6 +474,45 @@ pkgdown::build_site(preview = FALSE)  # everything else
 [prchecks.yml](workflows/prchecks.yml) runs both in the `website-builds` job,
 so a PR reports whether the site *can* be built without deploying it.
 
+### README figures
+
+`README.md` is knitted from [README.Rmd](../README.Rmd), and **its figures are
+hosted on jameshollway.com rather than committed to `man/figures`.**
+R installs `man/figures` into the installed package's `help` directory,
+so a README figure left there is shipped to every user and counted by
+`R CMD check`'s installed size note. The figures once held 3.3Mb of a
+5.2Mb installed package.
+
+The published figures live at `https://www.jameshollway.com/post/autograph/`,
+which is served from `content/post/autograph` in that site's own repository.
+Point `AUTOGRAPH_SITE_DIR` at your checkout of that directory:
+
+```sh
+export AUTOGRAPH_SITE_DIR=~/path/to/jameshollway.com/content/post/autograph
+```
+
+The setup chunk reads that variable, and sets `have_site` from whether the
+directory exists. Where it does not, as on CI and on CRAN, the figure chunks
+do not run, and `README.md` keeps pointing at the published copies.
+The knit is still correct; the figures are simply not refreshed.
+
+A new figure needs three things:
+
+1. Write the figure into the site directory rather than into `man/figures`.
+   A chunk whose code is hidden calls `ggsave(site_figure("README-<name>-1.png"), ...)`
+   and takes `echo = FALSE, eval = have_site`.
+   A chunk whose code is shown instead takes
+   `fig.path = site_prefix, fig.show = "hide", eval = have_site`,
+   which lets knitr write the file but suppresses the local link.
+2. Write the `<img>` tag into the prose by hand, with the published URL and an
+   `alt` text. `fig.alt` cannot do this, since the chunk emits no link.
+3. Copy the figure into the site repository, then commit and deploy it there.
+   **The image 404s on GitHub until that deploy lands.**
+
+Knit with `devtools::build_readme()`, and check that
+`grep 'man/figures/README' README.md` finds nothing.
+Only `man/figures/logo.png` belongs in `man/figures`.
+
 ### `NEWS.md` conventions
 
 `NEWS.md` groups each version's changes under `##` headings that mirror the website
