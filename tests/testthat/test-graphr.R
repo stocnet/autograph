@@ -564,3 +564,43 @@ test_that("graphs()/graphr() render signed longitudinal snapshots without error"
   ps <- graphs(waves)
   expect_buildable(ps)
 })
+
+# Room at the panel edge for the nodes drawn there ----
+
+test_that("the panel leaves room for the radius of the nodes at its edge", {
+  # A node is drawn at an absolute size but a scale is expanded by a share of
+  # its data range, so ggplot2's default 5% clips the nodes of a small network.
+  # See .pad_for_nodes(). ison_adolescents draws 8 nodes, the largest default.
+  p <- graphr(manynet::ison_adolescents)
+  built <- ggplot2::ggplot_build(p)
+  nsize <- autograph:::.default_nsize(manynet::net_nodes(manynet::ison_adolescents))
+  mult <- autograph:::.node_padding(nsize)
+  expect_gt(mult, 0.05)
+  for (axis in c("x", "y")) {
+    drawn <- range(built$data[[2]][[axis]])
+    panel <- built$layout$panel_params[[1]][[paste0(axis, ".range")]]
+    # Each side is given at least the share of the data range asked for.
+    room <- c(drawn[1] - panel[1], panel[2] - drawn[2])
+    expect_true(all(room >= mult * diff(drawn) - 1e-8))
+  }
+})
+
+test_that("a large network is padded no more than ggplot2 pads it", {
+  # A crowded network draws small nodes, which need no more room than the
+  # default, and widening every plot would waste the panel.
+  expect_equal(autograph:::.node_padding(autograph:::.default_nsize(200)), 0.05)
+})
+
+test_that("padding widens the room a layout asked for without replacing it", {
+  # "layered" sets its own expansion, to keep the right-hand side clear for the
+  # labels it puts there. That side must keep its 0.25.
+  expect_equal(autograph:::.widen_expand(c(0.05, 0, 0.25, 0), 0.12),
+               c(0.12, 0, 0.25, 0))
+  # A scale that set nothing is given the padding on both sides.
+  expect_equal(autograph:::.widen_expand(NULL, 0.12),
+               ggplot2::expansion(mult = 0.12))
+  thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
+  sc <- graphr(thrones)$scales$get_scales("x")
+  expect_equal(sc$expand[[4]], 0)
+  expect_equal(sc$expand[[3]], 0.25)
+})

@@ -319,6 +319,11 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                       labels = labels)
   }
   
+  # Give the edge nodes room ----
+  # After the labels, since a layered or lineage layout sets its own expansion
+  # there and this widens that rather than replacing it.
+  p <- .pad_for_nodes(p, .infer_nsize(g, node_size, layout))
+
   # Note isolates ----
   if(isolates == "legend"){
     if (length(isos) > 3) label_text <- paste(c(utils::head(isos, 3),"..."), collapse = "\n") else 

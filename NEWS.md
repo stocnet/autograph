@@ -68,6 +68,10 @@
 
 ## Graphing
 
+- Fixed `graphr()` clipping nodes at panel edges
+  - Nodes were drawn at absolute sizes, but scales are expanded by a share of data range, 
+  so `ggplot2`'s 5% left less room than the radius of a node in a small network
+  - Room is now taken from node size, so small networks are given more space
 - Improved `graphr()` to draw multilevel networks of interlocking one-mode and two-mode layers by default
   - Fixed tie opacity so that those between levels fade behind those within them
   - Fixed default node size in multilevel layout, which is now taken from how many nodes there are at each level rather than in the whole network

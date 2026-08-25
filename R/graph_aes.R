@@ -42,6 +42,53 @@
 
 .default_nsize <- function(n) min(20, (250 / n) / 2)
 
+# Room at the panel edge for the nodes drawn there.
+#
+# A node is drawn at an absolute size, in millimetres, but a scale is expanded
+# by a share of its data range. The two never meet, so a node on the edge of
+# the layout hangs over the panel edge and is clipped. `ggplot2`'s default
+# expansion of 5% is under half the radius of a node in a small network drawn
+# on a short panel: `ison_adolescents` draws its 8 nodes about 16mm across, and
+# 5% of a 3-inch panel is under 4mm against a radius of nearly 8mm.
+#
+# The room is therefore taken from the node size rather than left at a
+# constant. Dividing by 100 holds the radius of a node on a panel of about
+# 4 inches, which is the short side of a figure at the sizes these are drawn
+# at, and a large network needs nothing, since its nodes are already small.
+.node_padding <- function(nsize) {
+  nsize <- suppressWarnings(max(as.numeric(nsize), na.rm = TRUE))
+  if (!is.finite(nsize)) return(0.05)
+  max(0.05, nsize / 100)
+}
+
+# Widens whichever expansion a scale already carries, rather than replacing it.
+# A layered or lineage layout sets its own expansion, to leave room for labels
+# on one side, and that room must survive.
+.widen_expand <- function(expand, mult) {
+  if (is.null(expand) || inherits(expand, "waiver"))
+    return(ggplot2::expansion(mult = mult))
+  if (length(expand) == 2L) expand <- c(expand, expand)
+  expand[c(1L, 3L)] <- pmax(expand[c(1L, 3L)], mult)
+  expand
+}
+
+# Gives the nodes at the edge of the layout room to be drawn whole.
+# Called once the layout, the nodes and the labels are all in place, so that a
+# scale one of them set is widened rather than replaced; replacing it would
+# both warn and drop the room that scale was set to keep.
+.pad_for_nodes <- function(p, nsize) {
+  mult <- .node_padding(nsize)
+  for (axis in c("x", "y")) {
+    sc <- p[["scales"]]$get_scales(axis)
+    if (is.null(sc)) {
+      p <- p + if (axis == "x")
+        ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = mult))
+      else ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = mult))
+    } else sc[["expand"]] <- .widen_expand(sc[["expand"]], mult)
+  }
+  p
+}
+
 # The level each node is drawn at by a multilevel layout, or NULL where the
 # network is not being drawn that way. Only how the nodes are grouped matters
 # here, not which group ends up at which level, so unlike `.infer_level()` in
