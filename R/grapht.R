@@ -27,7 +27,7 @@
 #'   a single static layout is computed on the aggregate
 #'   (union of waves) network instead, so that positions remain constant.
 #'   Unlike `graphr()`, `grapht()` uses this dynamic stress layout by default
-#'   even for two-mode networks (rather than a hierarchy layout, which would
+#'   even for two-mode networks (rather than a layered layout, which would
 #'   collapse many nodes onto a line); the two modes remain distinguishable
 #'   by node shape.
 #'   For networks with more than 30 nodes, node labels are suppressed by
@@ -86,16 +86,26 @@
 #'   offset nudging labels away from their nodes, and `label_dist` scales the
 #'   size of that nudge rather than being used as repel padding.
 #'
+#'   `labels` can select which nodes to label here too, and the selection is
+#'   resolved once over all the waves so that the same nodes stay labelled from
+#'   frame to frame. Unlike `graphr()`, though, animations of more than 30 nodes
+#'   default to no labels at all rather than to a selection of them.
+#'
 #'   Some further `graphr()` features are not available in animations:
 #'   `node_group` hulls, edge bundling, curved arcs for reciprocated ties,
 #'   and self-loops (loops are not drawn; a note is printed if present).
+#'   Note too that, where no `layout` is named, `grapht()` defaults to
+#'   the "stress" layout for every network rather than choosing one by
+#'   the network's shape as `graphr()` does,
+#'   so that nodes move smoothly from one wave to the next.
+#'   A layout named explicitly is still used, computed on the aggregate network.
 #' @inheritParams plot_graphr
 #' @importFrom igraph as_data_frame vcount add_vertices permute
 #' @importFrom igraph vertex_attr_names delete_vertex_attr delete_edge_attr 
 #' @importFrom igraph set_vertex_attr graph_from_data_frame delete_graph_attr
 #' @importFrom ggplot2 ggplot geom_segment geom_point geom_text coord_fixed .data
 #' @importFrom ggplot2 scale_alpha_identity scale_linetype_identity theme_void 
-#' @importFrom dplyr mutate select distinct left_join %>%
+#' @importFrom dplyr mutate select distinct left_join
 #' @source https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with-gganimate/
 #' @return A `{ggplot2}`-compatible object with `{gganimate}` animation layers.
 #'   This object can be extended with additional `{ggplot2}` layers
@@ -168,6 +178,12 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
     labels <- FALSE
     manynet::snet_info("Suppressing node labels for a network with more than 30 nodes; set `labels = TRUE` to show them.")
   }
+  # Resolved once, against the reference wave, so that the same nodes stay
+  # labelled from frame to frame rather than the selection shifting as ties
+  # come and go. Kept as node names, which is what the frame data is keyed by.
+  labels <- .check_labels(g_ref, labels)
+  if (!isFALSE(labels))
+    labels <- manynet::node_names(g_ref)[.infer_labels(g_ref, labels)]
   # Checked against the reference wave, which spans the union of nodes and ties,
   # so an attribute present in only some waves still resolves.
   node_color <- .check_node_color(g_ref, node_color)
@@ -181,7 +197,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   # Layout ####
   # Default to the smooth dynamic stress layout regardless of mode or size:
   # grapht()'s purpose is seamless transitions, so unlike graphr() it does
-  # not fall back to a static hierarchy for two-mode networks (which collapses
+  # not fall back to a static layered layout for two-mode networks (which collapses
   # many nodes onto a line). The two modes remain distinguishable by shape.
   # An explicitly requested layout is still honoured (via a static fallback).
   layout <- .check_layout(layout)
@@ -259,7 +275,7 @@ print.grapht <- function(x, ...) {
   tlist <- lapply(tlist, manynet::as_tidygraph)
   frames <- if (is.null(names(tlist))) as.character(seq_along(tlist)) else names(tlist)
   # Ensure nodes are named so they can be matched across waves
-  has_names <- "name" %in% names(manynet::node_attribute(tlist[[1]]))
+  has_names <- "name" %in% manynet::net_node_attributes(tlist[[1]])
   if (!has_names) {
     for (i in seq_along(tlist)) {
       tlist[[i]] <- manynet::add_node_attribute(tlist[[i]], "name",
@@ -314,34 +330,69 @@ print.grapht <- function(x, ...) {
 }
 
 # Splits a changing/longitudinal network into waves via `manynet::to_waves()`,
-# guarding against a bug present through at least manynet 2.2.2 whereby a node
+# guarding against two bugs, each of which loses every wave rather than part of
+# one, and each of which is met by retrying the split another way. autograph
+# has an unversioned dependency on manynet, so `to_waves()` is always tried
+# unchanged first -- behaviour then tracks manynet once each bug is fixed
+# upstream -- and each guard is a response to the error actually raised.
+#
+# The first bug, present through at least manynet 2.2.2, is that a node
 # attribute that *changes* over time but is stored as a non-character vector
 # (e.g. the logical `active` flag, or numeric `height`/`mass`, in
 # `manynet::fict_starwars`) cannot be split. Internally `to_waves()` coalesces
 # each attribute against a character update vector built from the (always
 # character) changelist values; when the stored attribute is logical or numeric
 # this aborts with a vctrs "Can't combine <character> and <...>" error before
-# any wave is produced. autograph has an unversioned dependency on manynet, so
-# this must also work against the CRAN build that lacks any fix. We therefore
-# try `to_waves()` unchanged first -- so behaviour tracks manynet once it is
-# fixed upstream -- and only on that specific combine error coerce the changing
-# non-character node attributes to character (which is the type those columns
-# already take in the split output regardless) and retry.
+# any wave is produced. Those attributes are coerced to character (the type
+# those columns already take in the split output regardless) and the split
+# retried.
+#
+# The second bug, in manynet 2.3.0, is that `to_waves()` splits neither a panel
+# whose waves are recorded as a "time" tie attribute (as `ison_monks` now
+# records them, aborting with "object 'wave' not found") nor a changing network
+# with no tie attributes at all (as a diffusion result has, aborting with
+# "`name` must be a single string, not a character `NA`"). Both are met by
+# `to_times()`, which 2.3.0 added and which reads whichever way the network
+# records its moments. It is a fallback rather than the first choice because it
+# returns each moment with only the nodes present at it, where `to_waves()`
+# gives every wave the whole node set.
 .to_waves_safe <- function(x) {
-  tryCatch(
-    manynet::to_waves(x),
-    error = function(e) {
-      if (!grepl("Can't combine", conditionMessage(e), fixed = TRUE) ||
-          !manynet::is_changing(x)) stop(e)
-      changing <- tryCatch(unique(manynet::as_changelist(x)$var),
-                           error = function(...) character(0))
-      for (a in intersect(changing, names(manynet::node_attribute(x)))) {
-        old <- manynet::node_attribute(x, a)
-        if (!is.character(old))
-          x <- manynet::add_node_attribute(x, a, as.character(unclass(old)))
-      }
-      manynet::to_waves(x)
-    })
+  out <- tryCatch(manynet::to_waves(x), error = function(e) e)
+  if (inherits(out, "error") && manynet::is_changing(x) &&
+      grepl("Can't combine", conditionMessage(out), fixed = TRUE)) {
+    changing <- tryCatch(unique(manynet::as_changelist(x)$var),
+                         error = function(...) character(0))
+    for (a in intersect(changing, manynet::net_node_attributes(x))) {
+      old <- manynet::node_attribute(x, a)
+      if (!is.character(old))
+        x <- manynet::add_node_attribute(x, a, as.character(unclass(old)))
+    }
+    out <- tryCatch(manynet::to_waves(x), error = function(e) e)
+  }
+  if (inherits(out, "error")) {
+    if (.manynet_has("to_times")) {
+      alt <- tryCatch(.manynet_fn("to_times")(x), error = function(e) NULL)
+      if (manynet::is_list(alt) && length(alt) > 1) return(alt)
+    }
+    stop(out)
+  }
+  out
+}
+
+# Whether the installed manynet exports a function, so that a newer manynet is
+# used where it offers something an older one does not, without autograph
+# requiring that version. Tests for the function rather than for the version,
+# since a development build can carry a version string without the function.
+.manynet_has <- function(fn) {
+  isTRUE(fn %in% getNamespaceExports("manynet"))
+}
+
+# The function itself, fetched from the manynet namespace at run time. A
+# `manynet::to_times()` written out in full is a hard reference, which R CMD
+# check reports as a missing object against a manynet that does not export it
+# yet. Always guard a call to this with `.manynet_has()`.
+.manynet_fn <- function(fn) {
+  get(fn, envir = asNamespace("manynet"))
 }
 
 # A spell (interval) network records each tie's lifespan as `begin`/`end` tie
@@ -349,7 +400,7 @@ print.grapht <- function(x, ...) {
 # `manynet::is_dynamic()` is TRUE for both, but only the event form can be split
 # by `to_slices()`, so spell networks are detected and sliced separately here.
 .grapht_is_spell <- function(net) {
-  atts <- names(manynet::tie_attribute(net))
+  atts <- manynet::net_tie_attributes(net)
   "begin" %in% atts && "end" %in% atts && !("time" %in% atts)
 }
 
@@ -357,13 +408,19 @@ print.grapht <- function(x, ...) {
 # which some tie begins or ends), keeping the ties active during that spell
 # (begin <= t < end). Unlike the cumulative slices of an event network, these
 # show the network as it stood at each moment, so ties that dissolve disappear
-# again. `manynet::to_time()` gained this behaviour in manynet 2.2.2, so it is
-# used when available and reimplemented equivalently for older manynet. The
-# version guard is paired with a check that to_time() actually accepts a missing
-# `time` (its 2.2.2 signature), because a pre-release 2.2.2 dev build can carry
-# the version string without yet exposing the feature; the fallback is
-# behaviourally identical either way.
+# again. manynet splits this three ways depending on its version, so each is
+# tested for rather than assumed: `to_times()` from 2.3.0 returns one network
+# per moment (2.3.0 having made `to_time()` require the moment to scope to);
+# `to_time()` without a `time` did the same from 2.2.2; and older manynet is
+# reimplemented equivalently below. The version test is paired with a test of
+# the function itself, because a development build can carry a version string
+# without yet exposing the feature. All three are behaviourally identical.
 .grapht_spell_slices <- function(net) {
+  if (.manynet_has("to_times")) {
+    out <- .manynet_fn("to_times")(net)
+    if (!manynet::is_list(out)) out <- list(out)
+    return(out)
+  }
   if (utils::packageVersion("manynet") >= "2.2.2" &&
       !identical(formals(manynet::to_time)[["time"]], quote(expr = ))) {
     out <- manynet::to_time(net)
@@ -467,7 +524,7 @@ print.grapht <- function(x, ...) {
 # levels consistent across frames.
 .grapht_ncolor <- function(waves, node_color) {
   diffusion <- is.null(node_color) &&
-    "diffusion" %in% names(manynet::node_attribute(waves[[1]]))
+    "diffusion" %in% manynet::net_node_attributes(waves[[1]])
   if (diffusion) {
     vals <- vapply(waves, function(w)
       dplyr::recode_values(as.character(manynet::node_attribute(w, "diffusion")),
@@ -477,18 +534,18 @@ print.grapht <- function(x, ...) {
     return(list(mapped = TRUE, diffusion = TRUE, values = vals))
   }
   if (!is.null(node_color) &&
-      node_color %in% names(manynet::node_attribute(waves[[1]]))) {
+      node_color %in% manynet::net_node_attributes(waves[[1]])) {
     vals <- vapply(waves, function(w)
       as.character(manynet::node_attribute(w, node_color)),
       character(igraph::vcount(waves[[1]])))
     if (length(unique(stats::na.omit(as.vector(vals)))) == 1) {
       .inform_constant_color("node_color", node_color, "node")
-      return(list(mapped = FALSE, diffusion = FALSE, literal = "black"))
+      return(list(mapped = FALSE, diffusion = FALSE, literal = ag_ink()))
     }
     return(list(mapped = TRUE, diffusion = FALSE, values = vals))
   }
   list(mapped = FALSE, diffusion = FALSE,
-       literal = if (!is.null(node_color)) node_color else "black")
+       literal = if (!is.null(node_color)) node_color else ag_ink())
 }
 
 # One row per union node per frame, with stable coordinates, presence and
@@ -524,7 +581,7 @@ print.grapht <- function(x, ...) {
 .grapht_ecolor <- function(waves, edge_color) {
   g1 <- waves[[1]]
   attr_mapped <- !is.null(edge_color) &&
-    edge_color %in% names(manynet::tie_attribute(g1))
+    edge_color %in% manynet::net_tie_attributes(g1)
   signed <- is.null(edge_color) && manynet::is_signed(g1)
   if (attr_mapped) {
     raw <- lapply(waves, function(w)
@@ -534,12 +591,12 @@ print.grapht <- function(x, ...) {
       ifelse(as.numeric(manynet::tie_signs(w)) >= 0, "Positive", "Negative"))
   } else {
     return(list(mapped = FALSE,
-                literal = if (!is.null(edge_color)) edge_color else "black"))
+                literal = if (!is.null(edge_color)) edge_color else ag_ink()))
   }
   if (length(unique(stats::na.omit(unlist(raw)))) <= 1) {
     if (attr_mapped)
       .inform_constant_color("edge_color", edge_color, "tie")
-    return(list(mapped = FALSE, literal = "black"))
+    return(list(mapped = FALSE, literal = ag_ink()))
   }
   list(mapped = TRUE, signed = signed, raw = raw)
 }
@@ -746,7 +803,9 @@ print.grapht <- function(x, ...) {
                                            1 / n_union * 100))
 
   # --- Labels (drawn above nodes, as in graphr) ----
-  if (isTRUE(labels)) {
+  # `labels` arrives as the names of the nodes to label (or FALSE for none),
+  # already resolved against the reference wave by grapht().
+  if (!isFALSE(labels) && length(labels) > 0) {
     # No ggrepel-based repelling here (see @details in grapht()'s docs);
     # `label_repel` toggles a fixed offset instead, scaled by `label_dist`
     # when supplied (calibrated so graphr()'s default `label_dist` of 10
@@ -761,7 +820,8 @@ print.grapht <- function(x, ...) {
     p <- p + ggplot2::geom_text(
       ggplot2::aes(x = .data$x, y = .data$y, label = .data$name,
                    group = .data$name, alpha = .data$nalpha),
-      data = nodes_out, colour = ag_base(), family = ag_font(),
+      data = nodes_out[nodes_out$name %in% labels, , drop = FALSE],
+      colour = ag_base(), family = ag_font(),
       nudge_y = nudge, show.legend = FALSE)
   }
 
@@ -770,12 +830,8 @@ print.grapht <- function(x, ...) {
   # --- Legends and theme (consistent with graphr) ----
   p <- graph_legends(p, g_ref, node_color, node_shape, node_size,
                      edge_color, edge_size)
-  p <- p + ggplot2::theme_void() +
+  p <- p + ag_theme_void() +
     ggplot2::theme(legend.position = "bottom")
   if (directed) p <- p + ggplot2::coord_fixed()
-  if (getOption("snet_background", default = "#FFFFFF") != "#FFFFFF")
-    p <- p + ggplot2::theme(
-      panel.background = ggplot2::element_rect(
-        fill = getOption("snet_background", default = "#FFFFFF")))
   p
 }

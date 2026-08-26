@@ -22,3 +22,6 @@ vignettes/precompile\.R
 ^\.positai$
 ^\.claude$
 ^CLAUDE\.md$
+^man-roxygen$
+^inst/autograph_old\.png$
+^Rplots\.pdf$

@@ -124,3 +124,151 @@ test_that("dark backgrounds are applied to plots under the neon theme", {
   bg <- p$theme$panel.background$fill
   expect_equal(bg, "#070f23")
 })
+
+test_that("font detection sees system fonts and falls back cleanly", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
+  # list_fonts() must report more than the handful of device aliases that
+  # grDevices lists, otherwise a font a user installs for a theme can never
+  # be matched.
+  fonts <- list_fonts()
+  expect_type(fonts, "character")
+  expect_true(length(fonts) > 0)
+  expect_false(anyDuplicated(fonts) > 0)
+  expect_true(all(list_fonts("sans") %in% fonts))
+  # Themes that name no font get the sans-serif fallback without complaint.
+  suppressMessages(stocnet_theme("default"))
+  expect_equal(ag_font(), "sans")
+  # A theme that names fonts either matches one of them or falls back.
+  suppressMessages(stocnet_theme("clay"))
+  expect_true(ag_font() %in% c(autograph:::theme_fonts("clay"), "sans"))
+})
+
+test_that("palettes separate colours for colour-blind viewers", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
+  # Simulation is anchored on a pair that normal vision separates easily and
+  # red-green colour blindness does not.
+  expect_gt(check_separation(c("#B7352D", "#4575b4"))[1, 2], 40)
+  expect_lt(check_separation(c("#B7352D", "#627313"))[1, 2], 10)
+  expect_length(simulate_colorblind(c("#d73027", "#4575b4"), "deutan"), 2)
+  expect_error(simulate_colorblind("#d73027", "quadran"))
+  # A lower severity is anomalous trichromacy, which moves a colour less far
+  # than dichromacy does, and severity zero moves it not at all.
+  expect_identical(simulate_colorblind("#d73027", "deutan", severity = 0),
+                   simulate_colorblind("#d73027", "normal"))
+  expect_lt(check_separation(c("#B7352D", "#627313"))[1, 2],
+            check_separation(c(simulate_colorblind("#B7352D", "deutan", 0.4),
+                              simulate_colorblind("#627313", "deutan", 0.4)))[1, 2])
+  expect_error(simulate_colorblind("#d73027", "deutan", severity = 2))
+  # Greyscale keeps only the luminance, so a colour and its grey have the
+  # same relative luminance, and two colours of the same lightness merge.
+  expect_lt(min(attr(check_separation(c("#d73027", "#4575b4")), "grey"),
+                na.rm = TRUE),
+            check_separation(c("#d73027", "#4575b4"))[1, 2])
+
+  for (thm in autograph:::theme_opts) {
+    suppressMessages(stocnet_theme(thm))
+    # Each stored palette is already in the order colorblind_sort() would choose, so
+    # that a palette added later cannot ship in an order that hides colours
+    # from one another. The exception is a palette whose own order is the
+    # point, which is sampled across its length instead.
+    pal <- getOption("snet_cat")
+    if (thm %in% autograph:::colorblind_unsorted) {
+      expect_true(getOption("snet_cat_spread"), info = thm)
+    } else {
+      expect_false(getOption("snet_cat_spread"), info = thm)
+      expect_identical(autograph:::colorblind_sort(pal, getOption("snet_background")),
+                       pal, info = thm)
+    }
+    # The colours a plot of two to four categories gets must be separable by
+    # every viewer, not only by those with unaffected colour vision.
+    for (k in 2:4) {
+      if (k > length(pal)) next
+      cols <- ag_qualitative(k)
+      expect_gt(min(check_separation(cols)[upper.tri(diag(k))]), 10)
+    }
+    # Divergent poles must not be a red-green pair, and the two highlights
+    # must not be a pair only some viewers can tell apart.
+    dv <- getOption("snet_div")
+    expect_gt(check_separation(dv[c(1, length(dv))])[1, 2], 40, label = thm)
+    hl <- getOption("snet_highlight")
+    expect_gt(check_separation(hl)[1, 2], 20, label = thm)
+    # The ink must stay legible on the theme's own ground, whether that
+    # ground is white, ivory, or near-black. The distance says the two are
+    # different colours; the WCAG ratio says the text can actually be read,
+    # which is the question a reader is asking.
+    bg <- getOption("snet_background")
+    expect_gt(check_separation(c(ag_ink(), bg))[1, 2], 50, label = thm)
+    expect_gte(check_contrast(ag_ink(), bg)[1, 2], 4.5, label = thm)
+    # WCAG asks 3:1 of a graphical object. Two highlights are an institution's
+    # own colour on that institution's own ground, and repainting a brand is
+    # not something this package does -- see the Colour blindness section of
+    # ?ag_call -- so they are held to a lower floor, named here so that a
+    # palette added later cannot join them quietly.
+    hl_floor <- if (thm %in% c("clay", "oxf")) 2.5 else 3
+    expect_gte(check_contrast(ag_highlight(), bg)[1, 2], hl_floor, label = thm)
+    # The colour missing data recedes into must be visible on the ground and
+    # must not be read as one of the categories.
+    expect_gte(check_contrast(ag_missing(), bg)[1, 2], 3, label = thm)
+    expect_gt(min(check_separation(c(ag_missing(), pal))[1, -1]), 8, label = thm)
+  }
+  # Greyscale is reported, not enforced: an institutional palette that
+  # separates by hue collapses in print and should not fail for it. The "bw"
+  # theme is the one built for print, so it is held to the standard.
+  suppressMessages(stocnet_theme("bw"))
+  expect_gt(min(attr(check_separation(ag_qualitative(2)), "grey"), na.rm = TRUE),
+            25)
+})
+
+test_that("the medium scales text and prints on white", {
+  on.exit({
+    suppressMessages(stocnet_theme("default"))
+    suppressMessages(stocnet_medium("screen"))
+  }, add = TRUE)
+  suppressMessages(stocnet_medium("screen"))
+  expect_equal(ag_size(), 1)
+  expect_equal(autograph:::ag_text_size(3), 3)
+  suppressMessages(stocnet_medium("presentation"))
+  expect_gt(ag_size(), 1)
+  expect_equal(autograph:::ag_text_size(3), 3 * ag_size())
+  # The base size every plot is built from follows the medium.
+  small <- autograph:::ag_theme_minimal()$text$size
+  suppressMessages(stocnet_medium("mobile"))
+  expect_gt(autograph:::ag_theme_minimal()$text$size, small)
+  # A caller that sets its own base size still has it scaled, not overridden.
+  expect_equal(autograph:::ag_theme_minimal(base_size = 8)$text$size,
+               8 * ag_size())
+  # Print draws on white whatever the theme prefers, and the ink follows the
+  # ground rather than staying the light ink a dark theme chose.
+  suppressMessages(stocnet_theme("neon"))
+  expect_equal(getOption("snet_background"), "#070f23")
+  suppressMessages(stocnet_medium("print"))
+  expect_equal(autograph:::ag_ground_fill(), "#FFFFFF")
+  expect_gte(check_contrast(ag_ink())[1, 2], 4.5)
+  # The palettes are the theme's own in every medium.
+  expect_equal(ag_highlight(), "#fdfd54")
+  expect_error(stocnet_medium("papyrus"))
+})
+
+test_that("a theme's ground reaches every plot, not only the graphs", {
+  on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
+  suppressMessages(stocnet_theme("neon"))
+  # A dark theme used to ground graphr() alone, so every other plot drew the
+  # theme's bright colours on white.
+  p <- plot(netrics::node_by_degree(manynet::ison_adolescents))
+  expect_equal(p$theme$plot.background$fill, "#070f23")
+  expect_equal(p$theme$text$colour, ag_ink())
+  g <- graphr(manynet::ison_adolescents)
+  expect_equal(g$theme$panel.background$fill, "#070f23")
+  # Grounding a graph must not put back what theme_void() blanked: colouring
+  # the axis text drew coordinates and ticks onto graphs that have no use for
+  # them, and that the white-backed themes never showed.
+  expect_s3_class(g$theme$axis.text, "element_blank")
+  # Ties take the colour the theme writes with, so that a dark ground does
+  # not swallow them.
+  expect_equal(autograph:::.infer_ecolor(manynet::as_igraph(manynet::ison_adolescents),
+                                         NULL), ag_ink())
+  # A white-backed theme is left exactly as ggplot2 draws it.
+  suppressMessages(stocnet_theme("default"))
+  p <- plot(netrics::node_by_degree(manynet::ison_adolescents))
+  expect_null(p$theme$plot.background$fill)
+})

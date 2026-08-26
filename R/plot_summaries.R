@@ -23,7 +23,7 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
     "Check the {.arg seeds} given to {.fn manynet::play_diffusion},",
     "and that the network has ties.") else {
     data <- x
-    if(!all_steps) data <- data %>% 
+    if(!all_steps) data <- data |> 
         dplyr::filter(!(data$I==data$I[length(data$I)] *
                           duplicated(data$I==data$I[length(data$I)])))
     p <- ggplot2::ggplot(data) + 
@@ -33,7 +33,7 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
                          linewidth = 1.25) +
       ggplot2::geom_col(ggplot2::aes(x = time, y = I_new/n), 
                         alpha = 0.4) +
-      ggplot2::theme_minimal() + 
+      ag_theme_minimal() + 
       # using coord_cartesian to avoid printing warnings
       ggplot2::coord_cartesian(ylim = c(0,1)) + 
       ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
@@ -85,7 +85,7 @@ plot.diffs_model <- function(x, ...){
                          method = "loess", se=TRUE, level = .95, formula = 'y~x') +
     ggplot2::geom_smooth(ggplot2::aes(x = time, y = I/n, color = "C"), 
                          method = "loess", se=TRUE, level = .95, formula = 'y~x') +
-    ggplot2::theme_minimal() + 
+    ag_theme_minimal() + 
     ggplot2::coord_cartesian(ylim = c(0,1)) + # using coord_cartesion to avoid printing warnings
     ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
     ggplot2::ylab("Proportion") + ggplot2::xlab("Steps")
@@ -121,7 +121,7 @@ plot.learn_model <- function(x, ...){
   y <- as.data.frame.table(y)
   y$Step <- as.numeric(gsub("t", "", y$Var2))
   ggplot2::ggplot(y, ggplot2::aes(x = Step, y = Freq, color = Var1)) + 
-    ggplot2::geom_line(show.legend = FALSE) + ggplot2::theme_minimal() +
+    ggplot2::geom_line(show.legend = FALSE) + ag_theme_minimal() +
     ggplot2::scale_color_manual(values = ag_qualitative(ncol(x))) +
     ggplot2::ylab("Belief")
 }
@@ -145,7 +145,7 @@ plot.learn_model <- function(x, ...){
 #' NULL
 #' 
 #' #' @rdname plot_
-#' #' @importFrom dplyr %>% select mutate distinct rename
+#' #' @importFrom dplyr select mutate distinct rename
 #' #' @return A network of agreements' relations.
 #' #' @examples
 #' #' \donttest{
@@ -158,12 +158,12 @@ plot.learn_model <- function(x, ...){
 #'                             layout = "circle") {
 #'   manyID <- treatyID <- name <- NULL
 #'   if (key == "manyID") {
-#'     out <- dplyr::select(dataset, manyID) %>%
-#'       dplyr::rename(key = manyID) %>%
+#'     out <- dplyr::select(dataset, manyID) |>
+#'       dplyr::rename(key = manyID) |>
 #'       dplyr::distinct()
 #'   } else if (key == "treatyID") {
-#'     out <- dplyr::select(dataset, treatyID) %>%
-#'       dplyr::rename(key == treatyID) %>%
+#'     out <- dplyr::select(dataset, treatyID) |>
+#'       dplyr::rename(key == treatyID) |>
 #'       dplyr::distinct()
 #'   } else cli::cli_abort("Please declare either 'manyID' or 'treatyID'.")
 #'   if (!is.null(treaty_type)) {
@@ -177,14 +177,14 @@ plot.learn_model <- function(x, ...){
 #'   dplyr::mutate(out,
 #'                 link = ifelse(grepl(":", key), sapply(strsplit(key, ":"),
 #'                                                       "[", 2), "NA"),
-#'                 key = gsub("\\:.*", "", key)) %>%
-#'     as_tidygraph() %>%
-#'     dplyr::filter(name != "NA") %>%
+#'                 key = gsub("\\:.*", "", key)) |>
+#'     as_tidygraph() |>
+#'     dplyr::filter(name != "NA") |>
 #'     graphr(layout = layout)
 #' }
 #' 
 #' #' @rdname plot_
-#' #' @importFrom dplyr %>% select distinct all_of rename
+#' #' @importFrom dplyr select distinct all_of rename
 #' #' @return A network of agreements' memberships.
 #' #' @examples
 #' #' \donttest{
@@ -197,12 +197,12 @@ plot.learn_model <- function(x, ...){
 #'                             key = "manyID", layout = "bipartite") {
 #'   manyID <- treatyID <- name <- NULL
 #'   if (key == "manyID") {
-#'     out <- dplyr::select(dataset, manyID, dplyr::all_of(actor)) %>%
-#'       dplyr::rename(key = manyID) %>%
+#'     out <- dplyr::select(dataset, manyID, dplyr::all_of(actor)) |>
+#'       dplyr::rename(key = manyID) |>
 #'       dplyr::distinct()
 #'   } else if (key == "treatyID") {
-#'     out <- dplyr::select(dataset, treatyID, dplyr::all_of(actor)) %>%
-#'       dplyr::rename(key == treatyID) %>%
+#'     out <- dplyr::select(dataset, treatyID, dplyr::all_of(actor)) |>
+#'       dplyr::rename(key == treatyID) |>
 #'       dplyr::distinct()
 #'   } else cli::cli_abort("Please declare either 'manyID' or 'treatyID'.")
 #'   if (!is.null(treaty_type)) {
@@ -213,15 +213,15 @@ plot.learn_model <- function(x, ...){
 #'       out <- out[grep("-", out$key, invert = TRUE),]
 #'     }
 #'   }
-#'   stats::na.omit(out) %>%
-#'     as_tidygraph() %>%
+#'   stats::na.omit(out) |>
+#'     as_tidygraph() |>
 #'     mutate(type = ifelse(grepl("[0-9][0-9][0-9][0-9][A-Za-z]",
-#'                                         name), TRUE, FALSE)) %>%
+#'                                         name), TRUE, FALSE)) |>
 #'     graphr(layout = layout)
 #' }
 #' 
 #' #' @rdname plot_
-#' #' @importFrom dplyr %>% select mutate distinct filter rename
+#' #' @importFrom dplyr select mutate distinct filter rename
 #' #' @return A plot of agreements' lineages.
 #' #' @examples
 #' #' \donttest{
@@ -234,12 +234,12 @@ plot.learn_model <- function(x, ...){
 #'                          layout = "nicely") {
 #'   manyID <- treatyID <- name <- NULL
 #'   if (key == "manyID") {
-#'     out <- dplyr::select(dataset, manyID) %>%
-#'       dplyr::rename(key = manyID) %>%
+#'     out <- dplyr::select(dataset, manyID) |>
+#'       dplyr::rename(key = manyID) |>
 #'       dplyr::distinct()
 #'   } else if (key == "treatyID") {
-#'     out <- dplyr::select(dataset, treatyID) %>%
-#'       dplyr::rename(key == treatyID) %>%
+#'     out <- dplyr::select(dataset, treatyID) |>
+#'       dplyr::rename(key == treatyID) |>
 #'       dplyr::distinct()
 #'   } else cli::cli_abort("Please declare either 'manyID' or 'treatyID'.")
 #'   if (!is.null(treaty_type)) {
@@ -250,12 +250,12 @@ plot.learn_model <- function(x, ...){
 #'       out <- out[grep("-", out$key, invert = TRUE),]
 #'     }
 #'   }
-#'   out %>%
-#'     dplyr::filter(grepl(":", key)) %>%
+#'   out |>
+#'     dplyr::filter(grepl(":", key)) |>
 #'     dplyr::mutate(key1 = gsub(".*\\:", "", key),
-#'                   key = gsub("\\:.*", "", key)) %>%
-#'     dplyr::distinct() %>%
-#'     as_tidygraph() %>%
+#'                   key = gsub("\\:.*", "", key)) |>
+#'     dplyr::distinct() |>
+#'     as_tidygraph() |>
 #'     graphr(layout = "nicely")
 #' } 
 #' 
@@ -329,10 +329,10 @@ plot.learn_model <- function(x, ...){
 #'   ab[ab == ""] <- NA
 #'   cshapes <- dplyr::mutate(cshapes, stateID = unname(ab))
 #'   # Step 6: create edges with from/to lat/long
-#'   edges <- out %>%
-#'     dplyr::inner_join(cshapes, by = c("from" = "stateID")) %>%
-#'     dplyr::rename(x = .data$caplong, y = .data$caplat) %>%
-#'     dplyr::inner_join(cshapes, by = c("to" = "stateID")) %>%
+#'   edges <- out |>
+#'     dplyr::inner_join(cshapes, by = c("from" = "stateID")) |>
+#'     dplyr::rename(x = .data$caplong, y = .data$caplat) |>
+#'     dplyr::inner_join(cshapes, by = c("to" = "stateID")) |>
 #'     dplyr::rename(xend = .data$caplong, yend = .data$caplat)
 #'   # Step 7: Create plotted network from computed edges
 #'   g <- as_tidygraph(edges)
@@ -340,8 +340,8 @@ plot.learn_model <- function(x, ...){
 #'   country_shapes <- ggplot2::geom_sf(data = cshapes$geometry,
 #'                                      fill = countrycolor)
 #'   # Step 9: generate the point coordinates for capitals
-#'   cshapes_pos <- cshapes %>%
-#'     dplyr::filter(.data$stateID %in% node_names(g)) %>%
+#'   cshapes_pos <- cshapes |>
+#'     dplyr::filter(.data$stateID %in% node_names(g)) |>
 #'     dplyr::rename(x = .data$caplong, y = .data$caplat)
 #'   # Reorder things according to nodes in plotted network g
 #'   cshapes_pos <- cshapes_pos[match(node_names(g),

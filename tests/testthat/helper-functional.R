@@ -12,9 +12,14 @@
 # Exported functions in a family, excluding deprecated/defunct shims
 ag_alive_functions <- function(pattern) {
   fns <- sort(grep(pattern, getNamespaceExports("autograph"), value = TRUE))
+  # A retired layout is an ordinary function forwarding to its replacement, so
+  # nothing in its body marks it as retired. The package declares them instead,
+  # and this reads that declaration rather than keeping a second copy of it.
+  retired <- c(paste0("layout_tbl_graph_", autograph:::.deprecated_layouts()),
+               paste0("layout_", autograph:::.deprecated_layouts()))
   keep <- vapply(fns, function(f) {
     fun <- get(f, envir = asNamespace("autograph"))
-    is.function(fun) &&
+    is.function(fun) && !f %in% retired &&
       !grepl("Deprecated|Defunct",
              paste(deparse(body(fun)), collapse = " "))
   }, logical(1))
@@ -54,6 +59,24 @@ expect_buildable <- function(p) {
   invisible(built)
 }
 
+# `plot.goldfishFit()` composes its panels out of goldfish's own
+# diagnostics rather than out of the fit alone, so no precooked fixture can
+# stand in for them: without goldfish, or with one older than the 1.9.21 that
+# added them, every panel drops and the method prints and returns NULL. Tests
+# of what the composition contains are skipped there. The test is for the
+# functions rather than for the version string, matching the shims in
+# R/autograph-defunct.R, since a pre-release build can carry the version
+# without yet exporting them.
+skip_without_gf_diagnostics <- function() {
+  testthat::skip_if_not_installed("goldfish")
+  needed <- c("diagnose_outliers", "test_gof")
+  missing <- setdiff(needed, getNamespaceExports("goldfish"))
+  if (length(missing) > 0) {
+    testthat::skip(paste("goldfish does not export",
+                         paste(missing, collapse = ", ")))
+  }
+}
+
 # Standard grid of fixture networks covering the formats autograph's
 # layouts and graphr() aesthetics are expected to handle.
 ag_fixtures <- local({
@@ -72,4 +95,26 @@ ag_fixtures <- local({
     tree       = manynet::create_tree(10, directed = TRUE)
   )
 })
+
+# The candidate pool the layout audit selects from. ag_fixtures covers the
+# formats, but several layouts are declared (in .layout_requirements(), see
+# R/graph_checks.R) to need a particular size or shape that the grid has no
+# example of: the configurational layouts want exactly 2-6 nodes, and a ladder
+# wants two equally sized modes. Adding those here rather than pinning a
+# network per layout in the test means the audit picks its own fixtures, and a
+# new layout needs no test change at all.
+ag_layout_pool <- c(ag_fixtures, local({
+  set.seed(1234)
+  list(
+    dyadic     = manynet::create_ring(2),
+    triadic    = manynet::create_ring(3),
+    tetradic   = manynet::create_ring(4),
+    pentadic   = manynet::create_ring(5),
+    hexadic    = manynet::create_ring(6),
+    # Two-mode sizes are given as a vector; ison_southern_women is 18/14, so
+    # the pool needs an equally sized pair for the ladder layout
+    balanced   = manynet::create_ring(c(4, 4)),
+    acyclic    = manynet::create_tree(8, directed = TRUE)
+  )
+}))
 

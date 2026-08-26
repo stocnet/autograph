@@ -11,8 +11,46 @@ plot_fixture_registry <- list(
   ag_conv   = NULL, # internal wrapper class, exercised via traces.monan
   ag_gof    = NULL, # internal wrapper class, exercised via sienaGOF etc.
   grapht    = NULL, # print method for animations, tested in test-grapht.R
-  changepoints.goldfish = function() autograph::goldfish_changepoints,
-  outliers.goldfish     = function() autograph::goldfish_outliers,
+  goldfishChangepoints = function() autograph::goldfish_changepoints,
+  goldfishOutliers     = function() autograph::goldfish_outliers,
+  goldfishOnset        = function() autograph::goldfish_onset,
+  goldfishMargins      = function() autograph::goldfish_margins,
+  goldfishGOF          = function() autograph::goldfish_gof,
+  goldfishTimeTest     = function() autograph::goldfish_time,
+  # The aliases kept for the older class names. The fixture is the precooked
+  # object with an old class put back: an alias restores dispatch only, so what
+  # it must plot is an object of the current shape under the older name.
+  diagnose_outliers     = function() {
+    x <- autograph::goldfish_outliers
+    class(x)[1] <- "diagnose_outliers"
+    x
+  },
+  diagnose_changepoints = function() {
+    x <- autograph::goldfish_changepoints
+    class(x)[1] <- "diagnose_changepoints"
+    x
+  },
+  outliers.goldfish     = function() {
+    x <- autograph::goldfish_outliers
+    class(x)[1] <- "outliers.goldfish"
+    x
+  },
+  changepoints.goldfish = function() {
+    x <- autograph::goldfish_changepoints
+    class(x)[1] <- "changepoints.goldfish"
+    x
+  },
+  # The overview draws each panel from a goldfish diagnostic rather than from
+  # the fit alone, so with goldfish absent or older than 1.9.21 every panel
+  # drops and the method prints and returns NULL. The audit accepts that, so
+  # this fixture exercises the composition where goldfish can supply it and
+  # the message where it cannot.
+  goldfishFit           = function() autograph::goldfish_fit,
+  result.goldfish       = function() {
+    x <- autograph::goldfish_fit
+    class(x)[1] <- "result.goldfish"
+    x
+  },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
   learn_model = function() {
@@ -148,12 +186,15 @@ test_that("diffusion summaries plot for mnet and diff_model objects", {
 })
 
 test_that("goldfish diagnostics print a message when nothing is found", {
+  # Both flags are logical columns as goldfish 1.9.21 emits them: `outlier`
+  # replaces the old "YES"/"NO" strings, and `cpt` the old list of a data
+  # frame and a vector of break positions.
   quiet_outliers <- autograph::goldfish_outliers
-  quiet_outliers$outlier <- rep("NO", nrow(quiet_outliers))
+  quiet_outliers$outlier <- rep(FALSE, nrow(quiet_outliers))
   expect_output(out <- plot(quiet_outliers), "No outliers found")
   expect_null(out)
   quiet_cpts <- autograph::goldfish_changepoints
-  quiet_cpts$cpt_points <- NULL
+  quiet_cpts$cpt <- rep(FALSE, nrow(quiet_cpts))
   expect_output(out <- plot(quiet_cpts), "No regime changes found")
   expect_null(out)
 })
@@ -190,6 +231,68 @@ test_that("graphs() shares layouts across waves and selects waves", {
                   "patchwork")
   expect_s3_class(graphs(nets, waves = c(1, 2), based_on = "both"),
                   "patchwork")
+})
+
+# One scale per aesthetic across the panels, so that `patchwork` collects the
+# guides into one legend and the same value is drawn the same way in each panel
+# (stocnet/autograph#15).
+
+test_that("graphs() shares continuous scales across panels", {
+  skip_on_cran()
+  m0 <- matrix(c(0, 0, 0, 2, 0,
+                 0, 0, 4, 0, 0,
+                 0, 4, 0, 0, 0,
+                 2, 0, 0, 0, 1,
+                 0, 0, 0, 1, 0), 5, 5,
+               dimnames = list(letters[1:5], letters[1:5]))
+  m1 <- m0
+  m1[4, 5] <- 0
+  m1[5, 4] <- 0
+  p <- suppressMessages(graphs(list(manynet::as_igraph(m0),
+                                    manynet::as_igraph(m1))))
+  breaks <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("edge_width")$get_breaks())
+  expect_equal(breaks[[1]], breaks[[2]])
+  # The lighter network holds no tie of weight 1, but is still scaled for one
+  expect_equal(p[[2]]$scales$get_scales("edge_width")$limits, c(1, 4))
+  gt <- suppressMessages(patchwork::patchworkGrob(p))
+  expect_length(grep("guide-box", gt$layout$name), 1)
+})
+
+test_that("graphs() shares categorical scales across panels", {
+  skip_on_cran()
+  ties <- matrix(c(0, 1, 1, 0,
+                   1, 0, 1, 0,
+                   1, 1, 0, 1,
+                   0, 0, 1, 0), 4, 4,
+                 dimnames = list(letters[1:4], letters[1:4]))
+  n0 <- manynet::mutate_ties(manynet::as_igraph(ties),
+                             type = c("a", "b", "c", "a"))
+  fewer <- ties
+  fewer[3, 4] <- 0
+  fewer[4, 3] <- 0
+  n1 <- manynet::mutate_ties(manynet::as_igraph(fewer),
+                             type = c("a", "b", "a"))
+  p <- suppressMessages(graphs(list(n0, n1), edge_color = "type"))
+  labels <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("edge_colour")$get_labels())
+  expect_equal(labels[[1]], labels[[2]])
+  expect_equal(labels[[1]], c("a", "b", "c"))
+  # "a" is drawn in the same colour in both panels, although only one of them
+  # holds all three types
+  drawn <- lapply(1:2, function(i)
+    suppressMessages(ggplot2::ggplot_build(p[[i]]))$data[[1]]$edge_colour[1])
+  expect_equal(drawn[[1]], drawn[[2]])
+})
+
+test_that("graphs() shares the diffusion scale across waves", {
+  skip_on_cran()
+  set.seed(2)
+  diff <- manynet::play_diffusion(manynet::ison_adolescents)
+  p <- suppressMessages(graphs(diff))
+  labels <- lapply(1:2, function(i)
+    p[[i]]$scales$get_scales("fill")$get_labels())
+  expect_equal(labels[[1]], labels[[2]])
 })
 
 test_that("graphs() handles ego networks and changing networks", {
@@ -232,7 +335,8 @@ test_that("graphs() splits a longitudinal network with non-character changing at
   # "Can't combine <character> and <logical>" error; .to_waves_safe() coerces
   # them and retries. See .split_time_network()/.to_waves_safe() in R/grapht.R.
   expect_true(manynet::is_changing(manynet::fict_starwars))
-  expect_true("active" %in% names(manynet::node_attribute(manynet::fict_starwars)))
+  expect_true("active" %in%
+                manynet::net_node_attributes(manynet::fict_starwars))
   expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
   expect_s3_class(suppressMessages(graphs(manynet::fict_starwars)), "patchwork")
 })

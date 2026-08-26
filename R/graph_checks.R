@@ -172,6 +172,118 @@
               what = "node attribute")
 }
 
+# Labels ----
+
+# `labels` is more than a switch: it can also select *which* nodes to label,
+# by rank on a measure, by a mark or logical attribute, or by naming nodes
+# outright. This resolves any of those into one of four normalised forms --
+# FALSE, TRUE, a rank depth carrying the criterion to rank by, or a character
+# vector of node names -- which .infer_labels() then turns into a selection.
+# Node names are the normal form for an explicit selection because graphr()
+# drops isolates after this check, which would shift every node's position.
+
+.label_criteria <- function() c("degree", "betweenness", "cutpoints", "random")
+
+.label_desc <- paste(
+  "A number of ranks to label, such as {.code labels = 5},",
+  "a measure to rank nodes by ({.val degree}, {.val betweenness},",
+  "{.val cutpoints} or {.val random}), or the names of the nodes to label,",
+  "can also be given here.")
+
+.check_labels <- function(g, labels, arg = "labels") {
+  # Without node names there is nothing to draw, whatever was asked for.
+  if (!manynet::is_labelled(g)) return(FALSE)
+  if (is.null(labels)) return(FALSE)
+  n <- as.numeric(manynet::net_nodes(g))
+  nms <- manynet::node_names(g)
+  len <- length(labels)
+  if (is.logical(labels)) {
+    if (len == 1L) {
+      if (is.na(labels)) .abort_labels_type(labels, arg)
+      return(labels)
+    }
+    if (len != n)
+      manynet::snet_abort(
+        "{.arg {arg}} should be a single value or one value for each of the",
+        "{n} nodes in the network, but {len} value{?s} {?was/were} given.")
+    return(nms[!is.na(labels) & labels])
+  }
+  if (is.numeric(labels)) {
+    if (len == 1L) {
+      if (is.na(labels) || labels <= 0 || labels != round(labels))
+        manynet::snet_abort(
+          "{.arg {arg}} should be a positive whole number of ranks to label,",
+          "as in {.code {arg} = 5}, but {.val {labels}} was given.")
+      # Asking for more ranks than there are nodes asks for all of them.
+      if (labels >= n) return(TRUE)
+      crit <- names(labels)
+      crit <- if (is.null(crit) || !nzchar(crit)) "degree" else
+        .check_choice(crit, .label_criteria(), arg)
+      return(structure(as.integer(labels), criterion = crit))
+    }
+    bad <- labels[is.na(labels) | labels < 1 | labels > n |
+                    labels != round(labels)]
+    n_bad <- length(bad)
+    if (n_bad)
+      manynet::snet_abort(
+        "{.arg {arg}} should be the positions of the nodes to label, between",
+        "1 and {n}, the number of nodes in the network,",
+        "but {n_bad} of the values given {?is/are} not: {.val {bad}}.")
+    return(nms[unique(labels)])
+  }
+  if (is.character(labels)) {
+    if (len == 1L) {
+      # A node attribute takes precedence over a criterion, and a criterion over
+      # a node name, as .check_node_color() prefers an attribute to a colour.
+      value <- .match_name(labels, igraph::vertex_attr_names(g), arg,
+                           what = "node attribute",
+                           extra = unique(c(.label_criteria(), nms)),
+                           show = igraph::vertex_attr_names(g),
+                           extra_desc = .label_desc)
+      if (value %in% igraph::vertex_attr_names(g))
+        return(.labels_from_attribute(g, value, arg))
+      if (value %in% .label_criteria())
+        # Every criterion but "random" has a maximum to take, so one rank is
+        # enough; a random selection has to be given a size instead.
+        return(structure(if (value == "random") min(10L, as.integer(n)) else 1L,
+                         criterion = value))
+      return(value)
+    }
+    unknown <- setdiff(labels, nms)
+    n_unknown <- length(unknown)
+    if (n_unknown) {
+      suggestion <- .suggest_name(unknown[1], nms)
+      msg <- paste("{.arg {arg}} should name nodes in the network, but",
+                   "{n_unknown} of the names given {?was/were} not found",
+                   "among them: {.val {unknown}}.")
+      if (!is.null(suggestion))
+        msg <- paste(msg, "Did you mean {.val {suggestion}}?")
+      manynet::snet_abort(msg)
+    }
+    return(labels)
+  }
+  .abort_labels_type(labels, arg)
+}
+
+.labels_from_attribute <- function(g, attribute, arg) {
+  vals <- manynet::node_attribute(g, attribute)
+  if (!is.logical(vals))
+    manynet::snet_abort(
+      "{.arg {arg}} can name a node attribute marking which nodes to label,",
+      "but {.val {attribute}} holds {.cls {class(vals)}} values rather than",
+      "{.cls logical} ones.",
+      "A measure can be given instead, as in {.code {arg} = \"degree\"}.")
+  manynet::node_names(g)[!is.na(vals) & vals]
+}
+
+.abort_labels_type <- function(labels, arg) {
+  manynet::snet_abort(
+    "{.arg {arg}} should be {.code TRUE} or {.code FALSE}, a number of ranks",
+    "to label, the name of a node attribute or measure, or a vector selecting",
+    "which nodes to label, but a value of class {.cls {class(labels)}}",
+    "was given.")
+}
+
 # Layout arguments ----
 
 # Several of autograph's layouts need one value per node -- a membership, a
@@ -215,8 +327,10 @@
   }
   igraph_layouts <- sub("^layout_", "", grep("^layout_(as|in|with|on)_|^layout_(nicely|randomly|components)$",
                                              getNamespaceExports("igraph"), value = TRUE))
-  sort(unique(c(from_ns("ggraph"), .autograph_layouts(), igraph_layouts,
-                sub("^(as|in|with|on)_", "", igraph_layouts))))
+  # The retired names are still valid to give: `.rename_layout()` swaps each
+  # for its replacement below, rather than letting it fail as unknown.
+  sort(unique(c(from_ns("ggraph"), .autograph_layouts(), .deprecated_layouts(),
+                igraph_layouts, sub("^(as|in|with|on)_", "", igraph_layouts))))
 }
 
 .check_layout <- function(layout) {
@@ -237,16 +351,157 @@
   # counted, which is too many to list. Only autograph's own layouts are named,
   # since those are the ones not documented elsewhere, and the rest are pointed
   # to by package.
-  .match_name(layout, .valid_layouts(), "layout", what = "layout",
-              show = .autograph_layouts(),
-              extra_desc = paste("Layouts provided by {.pkg ggraph},",
-                                 "{.pkg graphlayouts} and {.pkg igraph},",
-                                 "such as {.val stress} or {.val fr},",
-                                 "can also be named here."))
+  layout <- .match_name(layout, .valid_layouts(), "layout", what = "layout",
+                        show = .autograph_layouts(),
+                        extra_desc = paste("Layouts provided by {.pkg ggraph},",
+                                           "{.pkg graphlayouts} and {.pkg igraph},",
+                                           "such as {.val stress} or {.val fr},",
+                                           "can also be named here."))
+  .rename_layout(layout)
+}
+
+# A retired layout name is swapped for its replacement here, once, rather than
+# where it is drawn. Every step after this one -- the applicability check, the
+# node sizes, the tie alpha, the labels -- compares the layout by name, and a
+# name each of them had to know two spellings of is a name each of them would
+# eventually be updated for only once.
+.rename_layout <- function(layout) {
+  renamed <- c(hierarchy = "layered", alluvial = "lineage",
+               multilevel = "levels", dyad = "configuration",
+               triad = "configuration", tetrad = "configuration",
+               pentad = "configuration", hexad = "configuration")
+  if (!layout %in% names(renamed)) return(layout)
+  manynet::snet_warn(
+    "The {.val {layout}} layout is deprecated.",
+    "Please use {.code layout = \"{renamed[[layout]]}\"} instead.")
+  unname(renamed[[layout]])
 }
 
 .autograph_layouts <- function() {
   nms <- tryCatch(ls(asNamespace("autograph"), all.names = TRUE),
                   error = function(e) character())
-  sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", nms, value = TRUE))
+  setdiff(sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", nms, value = TRUE)),
+          .deprecated_layouts())
+}
+
+# The layout names that still draw but should no longer be offered or audited.
+# Declared here rather than inferred from the shims, because a shim is an
+# ordinary function and nothing in its body reliably marks it as retired.
+# Every name here keeps its `.layout_requirements()` entry, so that the string
+# is still validated before it reaches the shim.
+.deprecated_layouts <- function() {
+  c("hierarchy", "alluvial", "multilevel",
+    "dyad", "triad", "tetrad", "pentad", "hexad")
+}
+
+# Layouts whose coordinates carry meaning -- a layer, a mode, a generation, a
+# date along one axis, or a scaled distance along both -- which snapping to a
+# square grid would collapse.
+.fixed_layouts <- function() {
+  c("layered", "lineage", "railway", "ladder", "levels", "scaling",
+    "correspondence", "hierarchy", "alluvial", "multilevel")
+}
+
+# Layout applicability ----
+
+# Several layouts only make sense for particular kinds of network: the
+# configurational layouts place an exact number of nodes at fixed coordinates,
+# the valence layout needs signs to read, and a layered layout assigns nodes to
+# layers by path depth. Given anything else they used to either draw a
+# meaningless plot (the layered family on one-mode input) or fail somewhere
+# downstream with a message about the internals ("replacement has 5 rows, data
+# has 8"). Declaring the requirement here means graphr() can say what it needs
+# and fall back to a layout that works, and the test suite can read the same
+# table rather than keeping its own copy of this knowledge.
+#
+# `check` is a predicate over manynet's marks; `need` completes the sentence
+# "The {layout} layout needs ...". Layouts with no entry are unconstrained.
+# `need` is plain text: it is substituted into the message as a value, and cli
+# does not read markup a second time, so a `{.arg x}` here would print as
+# written.
+.layout_requirements <- function() {
+  n_nodes <- function(g) as.integer(manynet::net_nodes(g))
+  exactly <- function(n) list(check = function(g, ...) n_nodes(g) == n,
+                              need = paste("a network of exactly", n, "nodes"))
+  # The four layered layouts are one engine drawn four ways, and all assign
+  # layers to the nodes of a directed acyclic network as readily as they take
+  # the modes of a two-mode one, so all four carry the same requirement.
+  # Layers can also simply be given, as `ranks` values, in which case any
+  # network has them and there is nothing left to require.
+  layered <- list(
+    check = function(g, ranks = NULL, ...) .ranks_given(ranks) ||
+      manynet::is_twomode(g) ||
+      (manynet::is_directed(g) && manynet::is_acyclic(g)),
+    need = paste("a two-mode or a directed acyclic network,",
+                 "or a `ranks` attribute to lay the layers out by"))
+  list(
+    layered    = layered,
+    lineage    = layered,
+    railway    = layered,
+    ladder     = layered,
+    # Deprecated names, kept so that the string is still validated before it
+    # reaches the shim that forwards it. See `.deprecated_layouts()`.
+    hierarchy  = layered,
+    alluvial   = layered,
+    # Being two-mode is not sufficient: manynet::to_matching() cannot pair off
+    # every two-mode network, and where it fails it does so with a message
+    # about differing numbers of rows. Probing it is cheap for the sizes these
+    # layouts are used at, and a plot beats that error. Note the network need
+    # not have a *perfect* matching -- ison_southern_women has none but lays
+    # out fine -- so is_perfect_matching() is not the test.
+    matching = list(
+      check = function(g, ...) manynet::is_twomode(g) &&
+        !inherits(tryCatch(manynet::to_matching(g), error = function(e) e),
+                  "error"),
+      need = "a two-mode network that a matching can be found for"),
+    valence = list(
+      check = function(g, ...) manynet::is_signed(g),
+      need = "a signed network"),
+    # Correspondence analysis divides by the mass of each node, so a negative
+    # tie has no reading. `double` splits the signs into two nonnegative
+    # halves, and the layout then applies after all, which is why the
+    # predicate reads the layout's own argument.
+    correspondence = list(
+      check = function(g, double = FALSE, ...) isTRUE(double) ||
+        !manynet::is_signed(g),
+      need = paste("an unsigned network,",
+                   "or `double = TRUE` to split the signs")),
+    # `concentric` and `levels` are deliberately absent. They also need
+    # more than a bare one-mode network, but unlike the layouts above the user
+    # can supply what is missing -- a `membership` or a `level` -- and
+    # .abort_layout_arg() already says exactly how. Substituting would replace
+    # that instruction with a worse message. Substitute only where no argument
+    # could rescue the layout; where one could, ask for it.
+    configuration = list(
+      check = function(g, ...) n_nodes(g) >= 2L && n_nodes(g) <= 6L,
+      need = "a network of between 2 and 6 nodes"),
+    dyad = exactly(2), triad = exactly(3), tetrad = exactly(4),
+    pentad = exactly(5), hexad = exactly(6)
+  )
+}
+
+# Does `layout` apply to `g`? TRUE when nothing is declared for it.
+.layout_applies <- function(g, layout, ...) {
+  req <- .layout_requirements()[[layout]]
+  if (is.null(req)) return(TRUE)
+  isTRUE(tryCatch(req$check(g, ...), error = function(e) FALSE))
+}
+
+# Return the layout to actually use. Where the requested one does not apply,
+# fall back to whatever graphr() would have chosen unasked, and say so, rather
+# than failing downstream or drawing something meaningless.
+.check_layout_applies <- function(g, layout, ...) {
+  if (is.null(layout) || !is.character(layout) || length(layout) != 1L)
+    return(layout)
+  if (.layout_applies(g, layout, ...)) return(layout)
+  need <- .layout_requirements()[[layout]]$need
+  alt <- .infer_layout(g, NULL)
+  # The inferred fallback has its own requirement (e.g. "layered" needs two
+  # modes), so guard against substituting one unusable layout for another.
+  if (identical(alt, layout) || !.layout_applies(g, alt, ...)) alt <- "stress"
+  manynet::snet_info(
+    "The {.val {layout}} layout needs {need}, so {.val {alt}} is used instead.",
+    "Use {.code layout = \"{alt}\"} to choose this explicitly,",
+    "or see {.fn graphr} for the other layouts available.")
+  alt
 }

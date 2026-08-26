@@ -90,7 +90,7 @@ test_that("weighted, unsigned, directed networks graph correctly", {
 test_that("fancy node mods graph correctly", {
   skip_on_cran()
   # one-mode network
-  fmrg <- dplyr::mutate(fmrg, nodesize = Appearances/1000)
+  fmrg <- dplyr::mutate(ag_net(fmrg), nodesize = Appearances/1000)
   testcolnodes <- graphr(fmrg, node_color = "Gender",
                          node_size = "Appearances", 
                          node_shape = "Attractive")
@@ -112,9 +112,9 @@ test_that("fancy node mods graph correctly", {
 
 test_that("edge colours and edge size graph correctly", {
   skip_on_cran()
-  ison_brandes2 <- ison_brandes %>%
+  ison_brandes2 <- ison_brandes |>
     add_tie_attribute("tiecolour",
-                      c("A", "B", "A", "B", "B", "B", "B", "B", "B", "B", "B", "B")) %>%
+                      c("A", "B", "A", "B", "B", "B", "B", "B", "B", "B", "B", "B")) |>
     add_tie_attribute("weight", c(rep(1:6, 2)))
   test_brandes2 <- graphr(ison_brandes2, edge_color = "tiecolour", edge_size = "weight")
   expect_false(is.null(test_brandes2$layers[[1]]$mapping$edge_colour))
@@ -137,6 +137,34 @@ test_that("node_group works correctly", {
                graphr(ison_lawfirm, node_group = "gender"))
 })
 
+test_that("node_group draws overlapping hulls from a membership matrix", {
+  skip_on_cran()
+  skip_if_not_installed("netrics", "1.0.0")
+  skip_if_not_installed("ggforce")
+  cliques <- netrics::node_x_clique(ison_adolescents)
+  p <- graphr(ison_adolescents, node_group = netrics::node_x_clique())
+  hulls <- p[["layers"]][[1]][["data"]]
+  # One row for each membership, so a node in two cliques appears twice.
+  expect_equal(nrow(hulls), sum(cliques > 0))
+  expect_equal(levels(hulls[["node_group"]]), colnames(cliques))
+  # Naming the network, or a matrix calculated beforehand, gives the same plot.
+  expect_equal(graphr(ison_adolescents, node_group = cliques)[["layers"]][[1]][["data"]],
+               hulls)
+  expect_error(graphr(ison_adolescents, node_group = matrix(1, 3, 2)),
+               "8 nodes")
+})
+
+test_that("node_group accepts a membership vector", {
+  skip_on_cran()
+  skip_if_not_installed("ggforce")
+  memb <- c(1, 1, 1, 2, 2, 2, 3, 3)
+  expect_equal(graphr(ison_adolescents, node_group = memb)[["layers"]][[1]][["data"]][["node_group"]],
+               graphr(ison_adolescents |> dplyr::mutate(grp = memb),
+                      node_group = "grp")[["layers"]][[1]][["data"]][["node_group"]])
+  expect_error(graphr(ison_adolescents, node_group = c(1, 2)),
+               "membership vector")
+})
+
 test_that("unquoted arguments plot correctly", {
   skip_on_cran()
   expect_equal(graphr(ison_lawfirm, node_color = "gender"),
@@ -148,10 +176,12 @@ test_that("nodes use fill aesthetic instead of colour", {
   skip_on_cran()
   # Default node uses fill parameter
   p <- graphr(ison_brandes)
-  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], "black")
+  # The default node fill is the colour the theme writes with, which is a
+  # near-black on a white ground and a near-white on a dark one.
+  expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], ag_ink())
   # Mapped node_color uses fill in aes
-  p2 <- ison_brandes %>%
-    dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) %>%
+  p2 <- ison_brandes |>
+    dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) |>
     graphr(node_color = color)
   expect_false(is.null(p2[["layers"]][[2]][["mapping"]][["fill"]]))
 })
@@ -159,8 +189,8 @@ test_that("nodes use fill aesthetic instead of colour", {
 test_that("node_color with multiple values uses fill scale", {
   skip_on_cran()
   # More than 2 colors triggers scale_fill_manual with qualitative palette
-  p <- ison_brandes %>%
-    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) %>%
+  p <- ison_brandes |>
+    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
   # Check that fill scale is used (not colour)
@@ -179,11 +209,95 @@ test_that("two-mode networks get correct node shapes", {
   expect_false(is.null(node_layer[["mapping"]][["shape"]]))
 })
 
+test_that("two-mode shape legends name the modes where the network does", {
+  skip_on_cran()
+  # "One" and "Two" say nothing that the shapes do not already say.
+  expect_equal(levels(.infer_nshape(ag_net(fict_marvel), NULL)),
+               c("characters", "teams"))
+  expect_equal(levels(.infer_nshape(ag_net(ison_southern_women), NULL)),
+               c("women", "social events"))
+  # A factor rather than a character vector, so that the first mode keeps the
+  # first shape: "social events" would otherwise sort before "women" and the
+  # two modes would swap symbols.
+  shapes <- .infer_nshape(ag_net(ison_southern_women), NULL)
+  expect_s3_class(shapes, "factor")
+  expect_equal(as.character(shapes[!manynet::node_is_mode(ison_southern_women)][1]),
+               "women")
+  # Networks that do not record their modes keep the old labels.
+  expect_null(manynet::mode_names(irps_revere))
+  expect_equal(levels(.infer_nshape(ag_net(irps_revere), NULL)),
+               c("One", "Two"))
+  # One-mode networks are unaffected: mode_names() gives them a single name.
+  expect_equal(.infer_nshape(ag_net(ison_adolescents), NULL), 21)
+})
+
+test_that("multiplex networks are coloured by layer rather than by sign", {
+  skip_on_cran()
+  # fict_marvel's affiliation ties carry no sign, and were coloured "Negative"
+  # while being drawn solid, so colour and linetype disagreed about which ties
+  # were negative. Layer is what every tie has, and sign is left to linetype.
+  marvel <- ag_net(fict_marvel)
+  colours <- .infer_ecolor(marvel, NULL)
+  expect_setequal(levels(colours), c("affiliation", "relationship"))
+  expect_equal(.infer_ecolor_title(marvel, NULL), "Layer")
+  # Whether there are layers to draw is how many the ties are divided between,
+  # which is 1 for a network whose ties are not divided at all.
+  expect_equal(manynet::net_layers(ison_adolescents), 1L)
+  expect_false(.has_layers(ag_net(ison_adolescents)))
+  expect_gt(manynet::net_layers(fict_marvel), 1)
+  expect_true(.has_layers(ag_net(ison_algebra)))
+  # Not `is_multiplex()`, which is TRUE for a network with no layers to draw.
+  expect_true(manynet::is_multiplex(ison_monks))
+  expect_true(.has_layers(ag_net(ison_monks)))
+  # Signed networks without layers still show their signs, and now treat an
+  # absent sign as positive, as the linetype always did.
+  signed <- ag_net(manynet::to_uniplex(fict_marvel, "relationship"))
+  expect_equal(manynet::net_layers(signed), 1L)
+  expect_false(.has_layers(signed))
+  expect_setequal(levels(.infer_ecolor(signed, NULL)), c("Positive", "Negative"))
+  expect_equal(.infer_ecolor_title(signed, NULL), "Sign")
+  # The affiliation ties are the ties that carry no sign: manynet 2.2.3 leaves
+  # their sign missing, and 2.3.0 weights them positively. Either way they are
+  # drawn solid, as only a negative tie is dashed.
+  unsigned_ties <- manynet::tie_attribute(marvel, .layer_attribute(marvel)) ==
+    "affiliation"
+  expect_equal(as.character(.infer_line_type(marvel)[unsigned_ties][1]),
+               "solid")
+  # An explicitly named attribute still titles the legend after itself.
+  expect_equal(.infer_ecolor_title(marvel, .layer_attribute(marvel)),
+               .layer_attribute(marvel))
+  # Which tie attribute records the layer is read from the network rather than
+  # assumed, since manynet spells it "type" through 2.2.3 and "layer" from
+  # 2.3.0, and networks of both spellings are in circulation.
+  expect_true(.layer_attribute(marvel) %in% c("type", "layer"))
+  expect_equal(.layer_attribute(ag_net(ison_algebra)), "type")
+  expect_true(is.na(.layer_attribute(ag_net(ison_adolescents))))
+})
+
+test_that("signs are given a legend wherever the colours no longer carry them", {
+  skip_on_cran()
+  # The linetype is drawn through an identity scale, which shows no legend of
+  # its own. That was right while the colours said "Sign" too, but leaves the
+  # dashes unexplained now that the colours of a multiplex network say "Layer".
+  guide_titles <- function(p) {
+    vapply(ggplot2::ggplot_build(p)$plot$scales$scales, function(s) {
+      nm <- s$name
+      if (is.null(nm) || !is.character(nm)) NA_character_ else nm
+    }, character(1))
+  }
+  expect_true("Sign" %in% guide_titles(graphr(fict_marvel)))
+  # A signed network without layers is coloured by sign, so a second legend
+  # saying the same thing is not drawn.
+  signed <- manynet::to_giant(manynet::to_uniplex(fict_marvel, "relationship"))
+  expect_false("Sign" %in% guide_titles(signed |> graphr()))
+  expect_buildable(graphr(fict_marvel))
+})
+
 test_that("color legend uses fillable shape when node_shape is also mapped", {
   skip_on_cran()
-  p <- ison_brandes %>%
+  p <- ison_brandes |>
     dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b"),
-                  cat = c(rep(c("x", "y"), 5), "x")) %>%
+                  cat = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp, node_shape = cat)
   # The fill guide should override shape to 21 so colors render in legend
   fill_guide <- p[["guides"]][["guides"]][["fill"]]
@@ -192,8 +306,8 @@ test_that("color legend uses fillable shape when node_shape is also mapped", {
 
 test_that("node_color with 2 values uses highlight palette", {
   skip_on_cran()
-  p <- ison_brandes %>%
-    dplyr::mutate(grp = c(rep(c("x", "y"), 5), "x")) %>%
+  p <- ison_brandes |>
+    dplyr::mutate(grp = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
   # Should use scale_fill_manual with highlight defaults
@@ -239,6 +353,119 @@ test_that("labels stay clear of larger nodes (#13)", {
   built_big <- ggplot2::ggplot_build(big)
   n <- length(small$layers)
   expect_gt(mean(built_big$data[[n]]$point.size), mean(built_small$data[[n]]$point.size))
+})
+
+# Which nodes get labelled. The label layer now carries its own `data` (the
+# selected rows) rather than inheriting the plot's, so the selection can be
+# read straight off it. Found by its geom rather than by position, since an
+# isolates legend can be added after it.
+label_layer_of <- function(p) {
+  geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
+  at <- which(geoms %in% c("GeomLabelRepel", "GeomLabel",
+                           "GeomTextRepel", "GeomText"))
+  if (!length(at)) return(NULL)
+  p[["layers"]][[at[1]]]
+}
+label_names <- function(p) sort(as.character(label_layer_of(p)[["data"]][["name"]]))
+
+test_that("labels selects nodes by rank on a measure", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  net <- ison_adolescents
+  nms <- manynet::node_names(net)
+  expect_length(label_names(graphr(net)), length(nms))
+  # A rank depth labels fewer than all of them, and a bare criterion (one rank)
+  # fewer still, nested within the deeper selection.
+  top <- label_names(graphr(net, labels = 3))
+  most <- label_names(graphr(net, labels = "degree"))
+  expect_lt(length(top), length(nms))
+  expect_lte(length(most), length(top))
+  expect_true(all(most %in% top))
+  # Each criterion selects what netrics itself says is maximal
+  expect_setequal(most, nms[as.logical(netrics::node_is_max(
+    netrics::node_by_degree(net, normalized = FALSE)))])
+  expect_setequal(label_names(graphr(net, labels = c(betweenness = 1))),
+                  nms[as.logical(netrics::node_is_max(
+                    netrics::node_by_betweenness(net)))])
+  expect_setequal(label_names(graphr(net, labels = "cutpoints")),
+                  nms[as.logical(netrics::node_is_cutpoint(net))])
+})
+
+test_that("labels accepts an explicit selection of nodes", {
+  skip_on_cran()
+  net <- ison_adolescents
+  nms <- manynet::node_names(net)
+  expect_setequal(label_names(graphr(net, labels = c("Alice", "Betty"))),
+                  c("Alice", "Betty"))
+  expect_setequal(label_names(graphr(net, labels = nms %in% c("Betty", "Carol"))),
+                  c("Betty", "Carol"))
+  expect_setequal(label_names(graphr(net, labels = c(2, 5))), nms[c(2, 5)])
+  # A logical attribute, e.g. a netrics node_mark stored on the network
+  marked <- manynet::add_node_attribute(net, "mark",
+                                        nms %in% c("Alice", "Tina"))
+  expect_setequal(label_names(graphr(marked, labels = "mark")),
+                  c("Alice", "Tina"))
+})
+
+test_that("an empty selection draws no label layer at all", {
+  skip_on_cran()
+  net <- ison_adolescents
+  expect_null(label_layer_of(graphr(net, labels = FALSE)))
+  expect_null(label_layer_of(graphr(net, labels = rep(FALSE, 8))))
+  expect_false(is.null(label_layer_of(graphr(net))))
+})
+
+test_that("a selection is measured against the network as given, isolates and all", {
+  skip_on_cran()
+  # Isolates are dropped before the plot is laid out, which shifts every later
+  # node's position, so a selection has to be resolved before that happens.
+  net <- manynet::add_nodes(ison_adolescents, 2, list(name = c("Ivy", "Jo")))
+  nms <- manynet::node_names(net)
+  expect_setequal(label_names(graphr(net, labels = nms %in% c("Carol", "Tina"))),
+                  c("Carol", "Tina"))
+  expect_setequal(label_names(graphr(net, labels = which(nms %in% c("Carol", "Tina")))),
+                  c("Carol", "Tina"))
+  # A single number is a depth of ranks, never one node's position, so a lone
+  # node has to be named (or marked) rather than numbered
+  expect_gt(length(label_names(graphr(net, labels = 8))), 1)
+  expect_setequal(label_names(graphr(net, labels = "Tina")), "Tina")
+})
+
+test_that("a selection keeps node sizes aligned with the labelled nodes", {
+  skip_on_cran()
+  net <- manynet::add_node_attribute(ison_adolescents, "num",
+                                     c(1, 20, rep(1, 6)))
+  p <- graphr(net, node_size = "num", labels = "Sue")
+  geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
+  built <- ggplot2::ggplot_build(p)
+  point_size <- built[["data"]][[which(geoms == "GeomLabelRepel")]][["point.size"]]
+  # Sue is the second node, so hers is the size that should have come through
+  expect_length(point_size, 1)
+  expect_equal(point_size, 20 * ggplot2::.pt)
+})
+
+test_that("large networks label only their most central nodes by default", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  set.seed(123)
+  net <- manynet::to_named(manynet::generate_random(60, 0.08))
+  auto <- label_names(graphr(net, isolates = "keep"))
+  expect_gt(length(auto), 0)
+  expect_lt(length(auto), 60)
+  # Asking for labels outright still labels every node
+  expect_length(label_names(graphr(net, labels = TRUE, isolates = "keep")), 60)
+})
+
+test_that("selections on a two-mode network span both modes", {
+  skip_on_cran()
+  skip_if_not_installed("netrics")
+  net <- ison_southern_women
+  nms <- manynet::node_names(net)
+  modes <- igraph::V(manynet::as_igraph(net))$type
+  sel <- label_names(graphr(net, labels = 3))
+  expect_lt(length(sel), length(nms))
+  expect_true(any(sel %in% nms[!modes]))
+  expect_true(any(sel %in% nms[modes]))
 })
 
 test_that("graphr() works on a stocnet-class object", {
@@ -328,10 +555,121 @@ test_that("graphs()/graphr() render signed longitudinal snapshots without error"
   # parameter), otherwise geom_edge_arc's point expansion length-checks the
   # linetype vector against the expanded data and fails ("Aesthetics must be
   # either length 1 or the same as the data").
-  waves <- manynet::to_waves(manynet::ison_monks)
+  # Split the way graphs() splits it, since which manynet function does that
+  # depends on the manynet version. See .split_time_network().
+  waves <- .split_time_network(manynet::ison_monks)
   expect_true(manynet::is_signed(waves[[1]]))
   p1 <- graphr(waves[[1]])
   expect_buildable(p1)
   ps <- graphs(waves)
   expect_buildable(ps)
+})
+
+# Room at the panel edge for the nodes drawn there ----
+
+test_that("the panel leaves room for the radius of the nodes at its edge", {
+  # A node is drawn at an absolute size but a scale is expanded by a share of
+  # its data range, so ggplot2's default 5% clips the nodes of a small network.
+  # See .pad_for_nodes(). ison_adolescents draws 8 nodes, the largest default.
+  p <- graphr(manynet::ison_adolescents)
+  built <- ggplot2::ggplot_build(p)
+  nsize <- autograph:::.default_nsize(manynet::net_nodes(manynet::ison_adolescents))
+  mult <- autograph:::.node_padding(nsize)
+  expect_gt(mult, 0.05)
+  for (axis in c("x", "y")) {
+    drawn <- range(built$data[[2]][[axis]])
+    panel <- built$layout$panel_params[[1]][[paste0(axis, ".range")]]
+    # Each side is given at least the share of the data range asked for.
+    room <- c(drawn[1] - panel[1], panel[2] - drawn[2])
+    expect_true(all(room >= mult * diff(drawn) - 1e-8))
+  }
+})
+
+test_that("a large network is padded no more than ggplot2 pads it", {
+  # A crowded network draws small nodes, which need no more room than the
+  # default, and widening every plot would waste the panel.
+  expect_equal(autograph:::.node_padding(autograph:::.default_nsize(200)), 0.05)
+})
+
+test_that("padding widens the room a layout asked for without replacing it", {
+  # "layered" sets its own expansion, to keep the right-hand side clear for the
+  # labels it puts there. That side must keep its 0.25.
+  expect_equal(autograph:::.widen_expand(c(0.05, 0, 0.25, 0), 0.12),
+               c(0.12, 0, 0.25, 0))
+  # A scale that set nothing is given the padding on both sides.
+  expect_equal(autograph:::.widen_expand(NULL, 0.12),
+               ggplot2::expansion(mult = 0.12))
+  thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
+  sc <- graphr(thrones)$scales$get_scales("x")
+  expect_equal(sc$expand[[4]], 0)
+  expect_equal(sc$expand[[3]], 0.25)
+})
+
+test_that("parallel ties are fanned apart", {
+  # Two ties between the same two nodes are drawn along the same line by
+  # `geom_edge_link0()`, and by a single arc, so one hides the other. Where the
+  # network holds such ties, they are drawn by `geom_edge_fan()` instead, which
+  # gives each tie in a group its own side of the pair.
+  #
+  # `irps_corruption`, which reported this, belongs to manynet 2.3.0, so the
+  # networks here are built from a dataset both versions carry.
+  .deviation <- function(p) {
+    d <- ggplot2::ggplot_build(p)$data[[1]]
+    vapply(split(d[, c("x", "y")], d$group), function(s) {
+      from <- as.numeric(s[1, ]); to <- as.numeric(s[nrow(s), ])
+      v <- to - from
+      len <- sqrt(sum(v^2))
+      if (len == 0) return(0)
+      max(abs(as.matrix(sweep(as.matrix(s), 2, from)) %*% (c(-v[2], v[1])/len)))
+    }, numeric(1))
+  }
+  # An undirected network without parallel ties is drawn as it was before.
+  expect_false(autograph:::.has_parallel_ties(manynet::ison_adolescents))
+  plain <- suppressMessages(graphr(manynet::ison_adolescents))
+  expect_s3_class(plain$layers[[1]]$geom, "GeomEdgeSegment")
+  # Repeating one tie fans that pair apart and leaves every other tie straight.
+  par <- manynet::as_igraph(manynet::ison_adolescents)
+  par <- igraph::add_edges(par, igraph::as_edgelist(par, names = FALSE)[1, ])
+  expect_true(autograph:::.has_parallel_ties(par))
+  p <- suppressMessages(graphr(par, labels = FALSE))
+  expect_s3_class(p$layers[[1]]$geom, "GeomEdgePath")
+  expect_no_warning(ggplot2::ggplot_build(p))
+  # A straight path deviates by rounding noise rather than by exactly zero.
+  dev <- .deviation(p)
+  expect_equal(sum(dev > 1e-6), 2)
+  # A directed network keeps its arcs until two ties run the same way, which
+  # `which_mutual()` does not tell apart but `which_multiple()` does.
+  dir <- manynet::as_igraph(manynet::ison_networkers)
+  expect_false(autograph:::.has_parallel_ties(dir))
+  dpar <- igraph::add_edges(dir, igraph::as_edgelist(dir, names = FALSE)[1, ])
+  expect_true(autograph:::.has_parallel_ties(dpar))
+  q <- suppressMessages(graphr(dpar, labels = FALSE))
+  expect_no_warning(ggplot2::ggplot_build(q))
+  # The arrowheads are still stopped short of the node they point to.
+  expect_true("end_cap" %in% names(q$layers[[1]]$mapping))
+})
+
+test_that("an arc is drawn for every tie the arc stat keeps", {
+  # `geom_edge_arc()` drops every tie whose two ends sit at one point, and its
+  # `strength` is a parameter rather than an aesthetic, so it has to leave the
+  # same ties out. The "scaling" layout draws two nodes that hold the same
+  # distances to every other node at one point, which used to leave `strength`
+  # two ties longer than the ties it was measured against.
+  net <- manynet::ison_networkers
+  p <- suppressMessages(graphr(net, layout = "scaling", labels = FALSE))
+  drawn <- sum(!autograph:::.tie_is_coincident(net, p))
+  expect_lt(drawn, manynet::net_ties(net))
+  expect_length(autograph:::.infer_arc_strength(net, p), drawn)
+  expect_no_warning(ggplot2::ggplot_build(p))
+  # A network drawn with every node in its own place keeps every tie.
+  q <- suppressMessages(graphr(net, layout = "stress", labels = FALSE))
+  expect_length(autograph:::.infer_arc_strength(net, q), manynet::net_ties(net))
+  expect_no_warning(ggplot2::ggplot_build(q))
+  # A self-loop sits at one point by definition, and is drawn by
+  # `geom_edge_loop0()` instead.
+  loops <- manynet::as_igraph(manynet::ison_adolescents)
+  loops <- igraph::add_edges(loops, c(1, 1))
+  lp <- suppressMessages(graphr(loops))
+  expect_true(utils::tail(autograph:::.tie_is_coincident(loops, lp), 1))
+  expect_no_warning(ggplot2::ggplot_build(lp))
 })

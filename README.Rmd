@@ -1,5 +1,7 @@
 ---
-output: github_document
+output:
+  github_document:
+    html_preview: false
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -22,9 +24,44 @@ list_data <- function(string){
 # Several README figures are hosted on jameshollway.com rather than in man/figures,
 # to keep the package tarball small. The chunks below regenerate them in place,
 # but only where that site's checkout is present (i.e. not on CI or CRAN).
-site_dir <- path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/manynet")
+# Set AUTOGRAPH_SITE_DIR to point at your own checkout of that site.
+site_dir <- Sys.getenv(
+  "AUTOGRAPH_SITE_DIR",
+  unset = path.expand("~/Library/CloudStorage/Dropbox/Sites/jameshollway.com/content/post/autograph"))
 site_figure <- function(name) file.path(site_dir, name)
+# Chunks that show their code write their figures to the site directory through
+# knitr itself, by setting `fig.path` to this prefix and hiding the local link.
+site_prefix <- paste0(site_dir, "/README-")
 have_site <- dir.exists(site_dir)
+if (!have_site) {
+  # written straight to stderr, since this chunk's messages are not shown
+  cat("NOTE: no jameshollway.com checkout at ", site_dir, ".\n",
+      "  Hosted figures were not regenerated, and README.md keeps pointing at\n",
+      "  the published copies, so the knit is still correct. Set AUTOGRAPH_SITE_DIR\n",
+      "  or knit from a machine with that checkout to refresh them, and to see\n",
+      "  whether the defaults have drifted.\n", sep = "", file = stderr())
+}
+# Comparison figures pair a base-graphics call against a ggplot, so they are
+# written with an explicit device rather than ggsave(). Both plots are passed
+# unevaluated and forced inside, once the device and viewport are set up.
+# Knitting regenerates each figure from the current defaults, so that drift
+# shows up in the published image even though the chunks themselves are hidden.
+library(igraph)
+library(gridBase)
+library(grid)
+compare_figure <- function(name, base_plot, gg_plot,
+                           mai = c(0, 0, 0.5, 0),
+                           width = 12, height = 4, res = 250) {
+  grDevices::png(site_figure(name),
+                 width = width, height = height, units = "in", res = res)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  par(mfrow = c(1, 2), mai = mai)
+  base_plot                       # forced here, into the left panel
+  plot.new()                      # the ggplot is drawn over the right panel
+  pushViewport(baseViewports()$figure)
+  print(gg_plot, vp = plotViewport(c(1.8, 1, 0, 1)))
+  invisible(name)
+}
 ```
 
 # autograph <img src="man/figures/logo.png" align="right" alt="autograph logo" width="150"/>
@@ -92,29 +129,15 @@ Second, it includes sensible defaults so that researchers can view their network
 or distribution quickly with a minimum of fuss.
 Compare the output from `{autograph}` with a similar default from `{igraph}`:
 
-<img src="https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
+<img src="https://www.jameshollway.com/post/autograph/README-layout-comparison-1.png" alt="Example illustrating differences in default igraph and autograph graphs"/>
 
-```{r layout-comparison, echo = FALSE, message=FALSE, eval = have_site, fig.show="hide"}
-library(autograph)
-library(igraph)
-library(gridBase)
-library(grid)
-
-# base graphics, so written with an explicit device rather than ggsave()
-png(site_figure("README-layout-comparison-1.png"),
-    width = 12, height = 4, units = "in", res = 250)
-
-par(mfrow=c(1, 2), mai = c(0,0,0.5,0))
-plot(as_igraph(ison_southern_women), layout = layout_as_bipartite, main = "{igraph} bipartite")
-## the last one is the current plot
-plot.new()              ## suggested by @Josh
-vps <- baseViewports()
-pushViewport(vps$figure) ##   I am in the space of the autocorrelation plot
-vp1 <-plotViewport(c(1.8,1,0,1)) ## create new vp with margins, you play with this values
-p <- graphr(ison_southern_women) + ggtitle("{autograph} twomode") + guides(shape = "none")
-print(p,vp = vp1)
-
-dev.off()
+```{r layout-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-layout-comparison-1.png",
+  plot(as_igraph(ison_southern_women), layout = layout_as_bipartite,
+       main = "{igraph} bipartite"),
+  graphr(ison_southern_women) + ggtitle("{autograph} twomode") +
+    guides(shape = "none"))
 ```
 
 `{igraph}` requires the bipartite layout to be specified, 
@@ -127,6 +150,30 @@ It also recognises that the network contains names for the nodes and
 prints them vertically so that they are legible in this layout.
 Other 'clever' features include automatic node sizing and more.
 
+This inference matters for more than tidiness.
+Where a default does not recognise a property of the network,
+that property is usually dropped silently.
+Compare the same signed network drawn by each package:
+
+<img src="https://www.jameshollway.com/post/autograph/README-signed-comparison-1.png" alt="Example illustrating that igraph's default draws positive and negative ties identically"/>
+
+```{r signed-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-signed-comparison-1.png",
+  plot(as_igraph(irps_tribes), main = "{igraph} default"),
+  graphr(irps_tribes) + ggtitle("{autograph} signed"))
+```
+
+`irps_tribes` records both alliance and antagonism between sixteen tribes,
+in equal number.
+`{igraph}` draws all of these ties identically,
+so the distinction that motivates the data is not visible.
+`graphr()` recognises the network as signed and
+maps the sign to both colour and linetype, with a legend.
+The same applies to weights, to self-ties, and to direction:
+`graphr()` reads these from the network rather than
+requiring you to know to ask for them.
+
 ### More options
 
 All of `graphr()`'s adjustments can be overridden, however...
@@ -136,7 +183,7 @@ e.g. `node_color = "darkblue"` or `node_size = 6`,
 or indicating from which attribute it should inherit this information,
 e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-options-1.png" alt="Graph illustrating automatic and manual use of node color and size"/>
 
 ```{r more-options, echo = FALSE, message=FALSE, eval = have_site}
 p <- graphr(ison_lawfirm, node_color = "darkblue", node_size = 6) +
@@ -158,16 +205,16 @@ or other elements (e.g. font size) can be tweaked for a particular output.
 
 `graphr()` can use all the layout algorithms offered by packages such as `{igraph}`, `{ggraph}`, and `{graphlayouts}`.
 `{autograph}` also offers some additional layout algorithms for
-visualising partitions horizontally, vertically, or concentrically,
+visualising layers horizontally, vertically, or concentrically,
 conforming to configurational coordinates,
 or for snapping these layouts to a grid.
 
-<img src="https://www.jameshollway.com/post/manynet/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
+<img src="https://www.jameshollway.com/post/autograph/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
 ```{r more-layouts, echo = FALSE, message=FALSE, eval = have_site}
 p <- (graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric layout")) /
-  ((graphr(to_unnamed(create_explicit(A-+B-+C, A-+C))) + ggtitle("Triad layout")) |
-  (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Quad layout")))
+  ((graphr(to_unnamed(create_explicit(A-+B-+C, A-+C))) + ggtitle("Triad configuration")) |
+  (graphr(to_unnamed(create_explicit(A-+C, A-+D, B-+C, B-+D))) + ggtitle("Tetrad configuration")))
 ggsave(site_figure("README-more-layouts-1.png"), p, width = 7, height = 5, dpi = 250)
 ```
 
@@ -179,12 +226,20 @@ This can be useful for ego networks or network panels.
 `{patchwork}` is used to help arrange individual plots together,
 and is used throughout the package to help arrange plots together informatively.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
+`graphs()` computes one layout and holds it across every panel.
+Plotting each network separately gives each panel its own layout,
+so a node can appear in a different position in each panel
+even where nothing about that node has changed.
+Holding the layout constant makes the panels comparable,
+so that what moves on the page is what changed in the data.
+`graphs()` also collects a single legend for the whole set.
+
+<img src="https://www.jameshollway.com/post/autograph/README-autographs-1.png" alt="Example of graphs() used on longitudinal data"/>
 
 ```{r autographs, echo = FALSE, eval = have_site}
-p <- ison_adolescents %>%
-  mutate_ties(wave = c(rep(1995, 5), rep(1998, 5))) %>%
-  to_waves(attribute = "wave", panels = c(1995, 1998)) %>%
+p <- ison_adolescents |>
+  mutate_ties(wave = c(rep(1995, 5), rep(1998, 5))) |>
+  to_waves(attribute = "wave", panels = c(1995, 1998)) |>
   graphs()
 ggsave(site_figure("README-autographs-1.png"), p, width = 7, height = 3, dpi = 250)
 ```
@@ -199,11 +254,11 @@ with node positions transitioning smoothly between waves
 and nodes fading in and out as they enter and exit the network.
 It really couldn't be easier.
 
-<img src="https://www.jameshollway.com/post/manynet/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
+<img src="https://www.jameshollway.com/post/autograph/README-autographd-1.gif" alt="Example of grapht() on longitudinal data"/>
 
 ```{r autographd, echo = FALSE, eval = have_site}
-p <- ison_adolescents %>%
-  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) %>%
+p <- ison_adolescents |>
+  mutate_ties(wave = sample(1995:1998, 10, replace = TRUE)) |>
   grapht()
 # a gif, so rendered with gganimate rather than ggsave(); the animate() arguments
 # mirror those in print.grapht() so the saved file matches what users see
@@ -235,12 +290,36 @@ To keep things simple, all users need to remember is a single, generic function:
 `plot()`.
 Method dispatching takes care of the rest,
 so you can concentrate on exploring and interpreting your results.
-Here are some examples, using goodness-of-fit results from fitting a SAOM
+
+Dispatching works because the results carry a class.
+`igraph::degree()` and `sna::degree()` each return a bare numeric vector,
+so `plot()` falls back to a scatterplot of the values against their index,
+and that index is not meaningful.
+`netrics::node_by_degree()` returns a `node_measure`,
+which `{autograph}` plots as a themed distribution:
+
+<img src="https://www.jameshollway.com/post/autograph/README-result-comparison-1.png" alt="Example illustrating that plotting a bare vector of degree scores gives an index scatterplot, where plotting a node_measure gives a distribution"/>
+
+```{r result-comparison, echo = FALSE, message=FALSE, warning=FALSE, results="hide", eval = have_site, fig.show="hide"}
+compare_figure(
+  "README-result-comparison-1.png",
+  plot(igraph::degree(as_igraph(ison_karateka)),
+       ylab = "igraph::degree(ison_karateka)",
+       main = "plot() of a numeric vector"),
+  plot(netrics::node_by_degree(ison_karateka)) +
+    ggtitle("plot() of a node_measure"),
+  mai = c(0.8, 0.8, 0.5, 0.2))
+```
+
+The same holds for the other result classes.
+Here are some further examples, using goodness-of-fit results from fitting a SAOM
 in `{RSiena}` and an ERGM in `{ergm}`. 
 (Note that neither the data nor the model are similar;
 this is just for illustrative purposes.)
 
-```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"}
+<img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/><img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/>
+
+```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 plot(siena_gof) + ggtitle("SAOM goodness-of-fit")
 plot(ergm_gof) + ggtitle("ERGM goodness-of-fit")
 ```
@@ -257,7 +336,7 @@ Then enter the chosen theme name in the function to set it.
 All plots created using `{autograph}` functions will then use this theme,
 until you change it again.
 
-```{r themeset, dpi = 300, fig.height=5, fig.alt="Themed figures"}
+```{r themeset, dpi = 300, fig.height=5, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 stocnet_theme()
 (plot(netrics::node_by_degree(ison_karateka)) + 
 plot(netrics::tie_by_betweenness(ison_karateka)))/
@@ -272,11 +351,15 @@ plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
+<img src="https://www.jameshollway.com/post/autograph/README-themeset-1.png" alt="Themed figures"/><img src="https://www.jameshollway.com/post/autograph/README-themeset-2.png" alt="Themed figures"/>
+
 There are a range of institutional and topical themes available,
 including `r autograph:::theme_opts`,
 with more on the way.
 
-```{r theme-opts, echo=FALSE, dpi = 300, fig.height=3, fig.width=8, fig.alt="Institutional themes"}
+<img src="https://www.jameshollway.com/post/autograph/README-theme-opts-1.png" alt="Institutional themes"/><img src="https://www.jameshollway.com/post/autograph/README-theme-opts-2.png" alt="Institutional themes"/>
+
+```{r theme-opts, echo=FALSE, dpi = 300, fig.height=3, fig.width=8, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 set_stocnet_theme("iheid")
 ai <- autograph:::ggpizza(ag_qualitative()) + ggtitle("IHEID") + 
   theme(plot.title = ggplot2::element_text(colour = ag_highlight()))
@@ -298,6 +381,111 @@ ac <- autograph:::ggpizza(ag_qualitative()) + ggtitle("CMU") +
 ai | au | ae
 ar | as | ac
 ```
+
+### Colours everyone can read
+
+About one man in twelve, and one woman in two hundred, sees colour differently.
+A palette that separates its categories for most readers can collapse for them,
+and the classic offender is the red-green pair that so many palettes hold.
+
+`{autograph}` does something about this without asking you to give up a palette.
+Every theme's categorical palette is reordered when the theme is set,
+so that the colours a graph reaches for first are those that stay distinct
+under each type of colour blindness,
+and each divergent palette pairs a warm pole with a cool one.
+
+`simulate_colorblind()` shows a set of colours as another viewer sees them,
+so mapping the simulated colours back onto a graph shows you their view of it.
+Here is the same network four times:
+in `{autograph}`'s default palette as most readers see it,
+then as a reader with deuteranopia does,
+then as a photocopier renders it,
+and then in the palette `{ggraph}` falls back on when `{autograph}` is not
+setting the colours, as that same reader with deuteranopia sees it.
+
+```{r cvd, message=FALSE, warning=FALSE, dpi = 300, fig.height=3, fig.width=12, fig.path = site_prefix, fig.show = "hide", eval = have_site}
+set_stocnet_theme("default")
+as_seen <- function(colours, type, title){
+  graphr(fict_lotr, node_colour = "Race", node_size = 3, labels = FALSE) +
+    ggplot2::scale_fill_manual(values = simulate_colorblind(colours, type)) +
+    ggtitle(title)
+}
+as_seen(ag_qualitative(6), "normal", "autograph") |
+  as_seen(ag_qualitative(6), "deutan", "autograph, deuteranopia") |
+  as_seen(ag_qualitative(6), "grey", "autograph, greyscale") |
+  as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
+```
+
+<img src="https://www.jameshollway.com/post/autograph/README-cvd-1.png" alt="The same network seen with normal vision, with deuteranopia, and in greyscale, in autograph's palette, and with deuteranopia in ggraph's"/>
+
+The six races remain tellable apart in the second panel,
+its closest pair being Hobbits and Maiar.
+In the right-hand one, Elves and Ents have become the same olive.
+The third panel is the harder case, and it is not one reordering can fix:
+a greyscale device keeps only the luminance of a colour,
+so two colours of the same lightness merge however different their hues.
+`check_separation()` reports that view beside its own score;
+where a figure has to print in black and white,
+use the `"bw"` theme or add a second channel such as `node_shape`.
+`check_separation()` puts a number on it,
+scoring how far apart colours are at their worst
+across normal vision and each type of colour blindness:
+
+```{r cvdscore}
+round(min(check_separation(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
+round(min(check_separation(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
+round(min(check_separation(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
+```
+
+Below 10 two colours are easily confused, above 25 they are comfortably distinct.
+`{igraph}`'s categorical palette is the Okabe-Ito scheme,
+which was designed for this and scores accordingly:
+where you are free to choose any colours at all, such a scheme is hard to beat,
+and `graphr()` will happily take it.
+The harder case is the one `{autograph}` is built for —
+colours chosen by somebody else, for reasons that were not legibility —
+and there the ordering is what stands between a brand palette and an
+unreadable graph.
+A palette with more colours to draw on has more room to gain:
+six categories score 29 under the `"hwu"` theme and 26 under `"oxf"`.
+
+Marks are only half of it.
+Text has to be read rather than told apart,
+which is a matter of contrast rather than of hue,
+and `check_contrast()` scores it against the thresholds of WCAG 2.1:
+4.5 for body text, 3 for large text and for graphical objects.
+Every theme's ink clears 4.5 on that theme's own ground,
+and the test suite holds it there.
+
+<img src="https://www.jameshollway.com/post/autograph/README-wcag-1.png" alt="Each theme's name written in that theme's ink on that theme's ground, annotated with its WCAG contrast ratio"/>
+
+```{r wcag, echo=FALSE, dpi = 300, fig.height=2.2, fig.width=9, fig.path = site_prefix, fig.show = "hide", eval = have_site}
+inks <- do.call(rbind, lapply(autograph:::theme_opts, function(t){
+  set_stocnet_theme(t)
+  bg <- getOption("snet_background")
+  data.frame(theme = t, ink = ag_ink(), ground = bg,
+             ratio = round(check_contrast(ag_ink(), bg)[1, 2], 1))
+}))
+set_stocnet_theme("default")
+inks$x <- (seq_len(nrow(inks)) - 1) %% 8
+inks$y <- -((seq_len(nrow(inks)) - 1) %/% 8)
+ggplot(inks, aes(x, y)) +
+  ggplot2::geom_tile(aes(fill = ground), width = 0.96, height = 0.9,
+                     colour = "grey80") +
+  ggplot2::geom_text(aes(label = theme, colour = ink), nudge_y = 0.13, size = 4) +
+  ggplot2::geom_text(aes(label = paste0(ratio, ":1"), colour = ink),
+                     nudge_y = -0.17, size = 3) +
+  ggplot2::scale_fill_identity() + ggplot2::scale_colour_identity() +
+  ggplot2::coord_equal() + ggplot2::theme_void()
+```
+
+The medium is a separate question again.
+`stocnet_medium()` sizes the text for where the figure will be seen —
+`"screen"`, `"presentation"`, `"mobile"` — and `"print"` draws on white
+whatever ground the theme prefers, since a tinted ground costs ink
+and is often not reproduced.
+The theme is untouched by it, so one institutional palette carries
+from the desk to the slide to the page.
 
 If your institution or organisation is not included and you would like it to be,
 please just raise an issue on Github, 

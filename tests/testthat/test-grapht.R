@@ -123,6 +123,23 @@ test_that("labels are suppressed by default for large networks", {
   expect_true("GeomText" %in% geoms2)
 })
 
+test_that("grapht() labels the same selection of nodes in every frame", {
+  skip_if_not_installed("netrics")
+  w1 <- manynet::ison_adolescents
+  p <- grapht(list(t1 = w1, t2 = w1), labels = 2)
+  text_layer <- p$layers[[which(vapply(p$layers,
+                                       function(l) class(l$geom)[1],
+                                       character(1)) == "GeomText")]]
+  labelled <- unique(as.character(text_layer$data$name))
+  expect_gt(length(labelled), 0)
+  expect_lt(length(labelled), manynet::net_nodes(w1))
+  # one selection across both frames, rather than one per frame
+  frames <- unique(text_layer$data$frame)
+  for (f in frames)
+    expect_setequal(as.character(text_layer$data$name[text_layer$data$frame == f]),
+                    labelled)
+})
+
 test_that("dense frames fade present edges below the sparse-network default", {
   set.seed(2)
   make_dense <- function() {

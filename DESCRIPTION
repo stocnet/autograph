@@ -1,6 +1,6 @@
 Package: autograph
 Title: Automatic Plotting and Theming of Many Graphs
-Version: 1.1.2
+Version: 1.2.0
 Description: Visual exploration and presentation of networks should not be difficult.
    This package includes functions for plotting networks and network-related metrics with sensible and pretty defaults.
    It includes 'ggplot2'-based plot methods for many popular network package classes.
@@ -13,7 +13,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 4.1.0),
-    manynet (>= 2.2.1)
+    manynet (>= 2.2.3)
 Imports:
     dplyr (>= 1.1.0),
     ggraph (>= 2.2.0),
@@ -27,10 +27,12 @@ Suggests:
     gifski,
     methods,
     migraph,
-    netrics,
+    netrics (>= 0.4.0),
+    systemfonts,
     testthat (>= 3.0.0)
 Enhances:
     ergm,
+    goldfish,
     RSiena
 Authors@R: 
     c(person(given = "James",
@@ -55,4 +57,4 @@ Config/Needs/website:
     pkgdown
 Config/testthat/parallel: true
 Config/testthat/edition: 3
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

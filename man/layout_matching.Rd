@@ -5,13 +5,22 @@
 \alias{layout_tbl_graph_matching}
 \title{Matching layout}
 \usage{
+layout_matching(.data, center = NULL, circular = FALSE, times = 1)
+
 layout_tbl_graph_matching(.data, center = NULL, circular = FALSE, times = 1)
 }
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{center, circular, times}{Extra parameters required for \code{{tidygraph}}
-compatibility.}
+\item{center}{Required for \code{{ggraph}} compatibility, and not used here.}
+
+\item{circular}{Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for \code{{ggraph}} compatibility.}
+
+\item{times}{Maximum number of iterations, where appropriate.
+Required for \code{{ggraph}} compatibility, and ignored by the layouts that
+do not iterate.}
 }
 \value{
 Returns a table of nodes' x and y coordinates.
@@ -20,3 +29,19 @@ Returns a table of nodes' x and y coordinates.
 This layout works to position nodes opposite their matching nodes.
 See \code{manynet::to_matching()} for more details on the matching procedure.
 }
+\seealso{
+Other mapping:
+\code{\link{check_layout}},
+\code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
+\code{\link[=layout_configuration]{layout_configuration()}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
+\code{\link[=layout_valence]{layout_valence()}},
+\code{\link{plot_graphr}},
+\code{\link{plot_graphs}},
+\code{\link{plot_grapht}}
+}
+\concept{mapping}

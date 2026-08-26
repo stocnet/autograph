@@ -3,7 +3,7 @@
 \name{layout_valence}
 \alias{layout_valence}
 \alias{layout_tbl_graph_valence}
-\title{Valence-based layout}
+\title{Valence layout}
 \usage{
 layout_valence(
   .data,
@@ -26,11 +26,15 @@ layout_tbl_graph_valence(
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{times}{Integer of sweeps that the algorithm will pass through.
-By default 4.}
+\item{times}{Maximum number of iterations, where appropriate.
+Required for \code{{ggraph}} compatibility, and ignored by the layouts that
+do not iterate.}
 
-\item{center, circular}{Extra parameters required for \code{{tidygraph}}
-compatibility.}
+\item{center}{Required for \code{{ggraph}} compatibility, and not used here.}
+
+\item{circular}{Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for \code{{ggraph}} compatibility.}
 
 \item{repulsion_coef}{Coefficient for global repulsion force.
 Default is 1.}
@@ -38,8 +42,12 @@ Default is 1.}
 \item{attraction_coef}{Coefficient for edge-based attraction/repulsion force.
 Default is 0.05.}
 }
+\value{
+Returns a table of nodes' x and y coordinates.
+}
 \description{
-Valence-based layout
+The "valence" layout places the nodes of a signed network so that
+positively tied nodes are drawn together and negatively tied nodes apart.
 }
 \examples{
 edges <- data.frame(
@@ -50,3 +58,19 @@ edges <- data.frame(
   )
 graphr(as_igraph(edges), layout="valence")
 }
+\seealso{
+Other mapping:
+\code{\link{check_layout}},
+\code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
+\code{\link[=layout_configuration]{layout_configuration()}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
+\code{\link{plot_graphr}},
+\code{\link{plot_graphs}},
+\code{\link{plot_grapht}}
+}
+\concept{mapping}

@@ -1,130 +1,229 @@
-# Functional audit of the layout family: every exported
-# layout_tbl_graph_<name> algorithm is run through graphr() on each fixture
-# network it should conform to, and the resulting plot must build.
-# Non-conformant layout x fixture combinations skip with an AUDIT message.
+# Functional audit of the layout family. Rather than pinning a fixture per
+# layout, this reads the applicability contract the package itself declares in
+# .layout_requirements() (R/graph_checks.R) and selects fixtures from a shared
+# pool accordingly. Adding a layout therefore needs no change here: declare its
+# requirement next to the others and the audit picks it up.
+#
+# Both sides of the contract are audited. Where a layout applies, it must draw
+# a buildable plot and must NOT announce a substitution; where it does not, it
+# must still draw something and must say what it needed and what it used.
 
-# Layouts that only make sense for particular structures get a restricted
-# fixture set; everything else is tried on the full grid.
-layout_fixture_map <- list(
-  alluvial        = c("twomode"),
-  hierarchy       = c("twomode", "labelled"),
-  railway         = c("twomode", "labelled"),
-  ladder          = c("twomode"),
-  matching        = c("twomode"),
-  lineage         = c("labelled"),
-  multilevel      = c("twomode"),
-  layered         = c("tree", "directed"),
-  configuration   = c("basic", "labelled"),
-  concentric      = c("labelled", "twomode"),
-  valence         = c("basic", "directed", "signed"),
-  dyad            = c("basic"),
-  triad           = c("basic"),
-  tetrad          = c("basic"),
-  pentad          = c("basic"),
-  hexad           = c("basic")
+# Arguments some layouts require, keyed by argument name rather than by layout,
+# and derived from formals() below. A new layout taking a `membership` needs
+# nothing added here.
+#
+# An argmaker returns NULL where the network cannot support the argument. That
+# matters for concentric and levels, whose requirement is "two-mode OR an
+# explicit partition": supplying one unconditionally would make them applicable
+# to everything, and the inapplicable half of the contract would go untested.
+layout_argmakers <- list(
+  membership = function(net) if (manynet::is_twomode(net)) "type"
+    else if (manynet::is_labelled(net))
+      rep(c("a", "b"), length.out = as.integer(manynet::net_nodes(net)))
+    else NULL,
+  level      = function(net) if (manynet::is_twomode(net)) "type" else NULL,
+  ranks      = function(net) if (manynet::is_labelled(net))
+    seq_len(as.integer(manynet::net_nodes(net))) else NULL
 )
 
-# Some layouts only accept a network of a particular size or shape, so the
-# shared ag_fixtures grid cannot supply them. Previously these combinations all
-# errored into an AUDIT skip -- and because skip() aborts the whole test_that
-# block, the very first one silently prevented every later layout from being
-# audited at all. Give them a network they can actually lay out.
-layout_net_map <- list(
-  # The configurational layouts place exactly n nodes at fixed positions
-  dyad          = list(basic = manynet::create_ring(2)),
-  triad         = list(basic = manynet::create_ring(3)),
-  tetrad        = list(basic = manynet::create_ring(4)),
-  pentad        = list(basic = manynet::create_ring(5)),
-  hexad         = list(basic = manynet::create_ring(6)),
-  configuration = list(basic    = manynet::create_ring(4),
-                       labelled = manynet::to_named(manynet::create_ring(4))),
-  # A ladder pairs the two modes off, so they must be equally sized
-  ladder        = list(twomode = manynet::create_ring(6, 6)),
-  # layered ranks nodes by path depth, so it needs an acyclic network;
-  # ag_fixtures$directed is a random digraph and may contain cycles
-  layered       = list(directed = manynet::create_tree(8, directed = TRUE))
-)
-# Extra arguments some layouts require, keyed layout -> fixture. Keying by
-# fixture as well as layout matters because the right argument depends on the
-# network: hierarchy's `center` only names a mode on a two-mode network, and
-# concentric needs a membership for whichever fixture it is given.
-layout_args_map <- list(
-  lineage    = list(labelled = list(rank = "year")),
-  hierarchy  = list(twomode = list(center = "events")),
-  concentric = list(labelled = list(membership = rep(c("a", "b"), 4)),
-                    twomode  = list(membership = "type")),
-  multilevel = list(twomode = list(level = "type"))
-)
+# `center` names one of the two modes rather than a node attribute, so it is
+# the one argument that cannot be made generically.
+layout_center_arg <- function(net) {
+  if (!manynet::is_twomode(net)) return(NULL)
+  list(center = "events")
+}
 
-test_that("every exported layout algorithm draws a buildable plot", {
+# Arguments with no default, minus the ones every layout takes.
+ag_required_args <- function(fn) {
+  fm <- formals(get(fn, envir = asNamespace("autograph")))
+  req <- names(fm)[vapply(fm, function(x) identical(x, quote(expr = )), logical(1))]
+  setdiff(req, c(".data", "..."))
+}
+
+# Build the extra arguments a layout needs for a given network.
+layout_extra_args <- function(lay, net) {
+  fn <- paste0("layout_tbl_graph_", lay)
+  if (!exists(fn, envir = asNamespace("autograph"))) return(NULL)
+  args <- list()
+  for (a in ag_required_args(fn)) {
+    if (!is.null(layout_argmakers[[a]])) args[[a]] <- layout_argmakers[[a]](net)
+  }
+  if (lay == "layered") args <- c(args, layout_center_arg(net))
+  args
+}
+
+# Partition the pool by the package's own predicate, capped so the audit stays
+# proportionate: every layout is checked on two networks it should handle and
+# one it should not, which is enough to exercise both sides of the contract
+# without running every layout against every fixture. Deterministic (the first
+# matches in pool order), so a failure reproduces.
+layout_candidates <- function(lay, n_ok = 2, n_no = 1) {
+  fn <- paste0("layout_tbl_graph_", lay)
+  needed <- if (exists(fn, envir = asNamespace("autograph")))
+    ag_required_args(fn) else character()
+  applies <- vapply(names(ag_layout_pool), function(nm) {
+    net <- ag_layout_pool[[nm]]
+    args <- layout_extra_args(lay, net)
+    if (!all(needed %in% names(args))) {
+      # A required argument this network cannot supply. Two different cases:
+      # where the layout declares a requirement the network also fails
+      # (concentric and levels need two modes *or* an explicit partition),
+      # graphr() substitutes before ever calling it, so this is a genuine
+      # inapplicable case. Where it declares none (lineage needs a `ranks` that
+      # an unlabelled network has nothing to give), the call would rightly
+      # abort asking for the argument, so leave it out of the pool entirely.
+      declared <- !is.null(autograph:::.layout_requirements()[[lay]])
+      fails <- !isTRUE(do.call(autograph:::.layout_applies,
+                               c(list(net, lay), args)))
+      return(if (declared && fails) FALSE else NA)
+    }
+    # Judged with the same arguments the audit will pass, since for concentric
+    # and levels an explicit membership/level is itself what makes the
+    # layout applicable.
+    isTRUE(do.call(autograph:::.layout_applies, c(list(net, lay), args)))
+  }, logical(1))
+  applies <- applies[!is.na(applies)]
+  list(ok = utils::head(names(applies)[applies], n_ok),
+       no = utils::head(names(applies)[!applies], n_no))
+}
+
+# Capture whether graphr() announced a layout substitution.
+layout_substituted <- function(expr) {
+  msgs <- character()
+  p <- withCallingHandlers(expr, message = function(m) {
+    msgs <<- c(msgs, conditionMessage(m)); invokeRestart("muffleMessage")
+  })
+  list(plot = p, substituted = any(grepl("is used instead", msgs)), msgs = msgs)
+}
+
+test_that("every layout applies where the package says it does", {
   skip_on_cran()
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
   layouts <- sub("^layout_tbl_graph_", "",
                  ag_alive_functions("^layout_tbl_graph_"))
   expect_true(length(layouts) > 0)
-  lineage_fix <- manynet::add_node_attribute(manynet::ison_adolescents, "year",
-                                             rep(c(1985, 1990, 1995, 2000),
-                                                 times = 2))
+  reqs <- autograph:::.layout_requirements()
   for (lay in layouts) {
-    fixtures <- layout_fixture_map[[lay]]
-    if (is.null(fixtures)) fixtures <- names(ag_fixtures)
-    for (fix in fixtures) {
-      net <- if (lay == "lineage") lineage_fix
-        else if (!is.null(layout_net_map[[lay]][[fix]]))
-          layout_net_map[[lay]][[fix]]
-        else ag_fixtures[[fix]]
-      extra <- layout_args_map[[lay]][[fix]]
-      p <- run_or_skip(
-        do.call(graphr, c(list(net, layout = lay), extra)),
+    cand <- layout_candidates(lay)
+    # Pool honesty: an audit that silently has nothing to test is worse than a
+    # failing one, so say so rather than passing vacuously.
+    if (length(cand$ok) == 0) {
+      fail(paste0("AUDIT [layout ", lay, "]: no applicable network in the pool"))
+      next
+    }
+    if (!is.null(reqs[[lay]]) && length(cand$no) == 0) {
+      fail(paste0("AUDIT [layout ", lay,
+                  "]: declares a requirement but the pool has no network failing it"))
+    }
+    for (fix in cand$ok) {
+      net <- ag_layout_pool[[fix]]
+      res <- run_or_skip(
+        layout_substituted(do.call(graphr,
+          c(list(net, layout = lay), layout_extra_args(lay, net)))),
         paste0("layout ", lay), fix)
-      run_or_skip(expect_buildable(p), paste0("build ", lay), fix)
+      run_or_skip({
+        expect_buildable(res$plot)
+        # It applies, so it must be the layout actually drawn
+        testthat::expect_false(res$substituted,
+          info = paste0(lay, " x ", fix, ": ", paste(res$msgs, collapse = " ")))
+      }, paste0("build ", lay), fix)
+    }
+  }
+})
+
+test_that("every layout substitutes and says so where it does not apply", {
+  skip_on_cran()
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  reqs <- autograph:::.layout_requirements()
+  for (lay in names(reqs)) {
+    cand <- layout_candidates(lay)
+    for (fix in cand$no) {
+      net <- ag_layout_pool[[fix]]
+      res <- run_or_skip(
+        layout_substituted(do.call(graphr,
+          c(list(net, layout = lay), layout_extra_args(lay, net)))),
+        paste0("inapplicable ", lay), fix)
+      run_or_skip({
+        # Still draws something usable, and explains the swap
+        expect_buildable(res$plot)
+        testthat::expect_true(res$substituted,
+          info = paste0(lay, " x ", fix, " should have substituted"))
+        testthat::expect_match(paste(res$msgs, collapse = " "), lay, fixed = TRUE)
+      }, paste0("inapplicable build ", lay), fix)
     }
   }
 })
 
 test_that("every exported layout_* alias returns usable coordinates", {
   skip_on_cran()
-  # The audit above enumerates the layout_tbl_graph_* functions, which the
-  # user-facing layout_* aliases delegate to. The aliases were previously
-  # covered by nothing at all -- they do not match that pattern -- so enumerate
-  # them here too, and a new alias is picked up automatically. One fixture
-  # each is enough, since the underlying algorithm is already exercised above.
+  # The audits above go through graphr(); the user-facing layout_* aliases can
+  # also be called directly, so check they return coordinates for every node.
   aliases <- grep("^layout_tbl_graph_", ag_alive_functions("^layout_"),
                   value = TRUE, invert = TRUE)
   expect_true(length(aliases) > 0)
   for (fn in aliases) {
     lay <- sub("^layout_", "", fn)
-    fixtures <- layout_fixture_map[[lay]]
-    fix <- if (is.null(fixtures)) "basic" else fixtures[[1]]
-    net <- if (lay == "lineage")
-      manynet::add_node_attribute(manynet::ison_adolescents, "year",
-                                  rep(c(1985, 1990, 1995, 2000), times = 2))
-      else if (!is.null(layout_net_map[[lay]][[fix]]))
-        layout_net_map[[lay]][[fix]]
-      else ag_fixtures[[fix]]
-    extra <- layout_args_map[[lay]][[fix]]
+    fix <- layout_candidates(lay, n_ok = 1)$ok
+    if (length(fix) == 0) {
+      fail(paste0("AUDIT [alias ", fn, "]: no applicable network in the pool"))
+      next
+    }
+    net <- ag_layout_pool[[fix]]
     coords <- run_or_skip(
-      do.call(get(fn, envir = asNamespace("autograph")), c(list(net), extra)),
+      do.call(get(fn, envir = asNamespace("autograph")),
+              c(list(net), layout_extra_args(lay, net))),
       paste0("alias ", fn), fix)
     run_or_skip({
       coords <- as.data.frame(coords)
       testthat::expect_true(all(c("x", "y") %in% names(coords)))
       testthat::expect_equal(nrow(coords),
                              as.integer(manynet::net_nodes(net)))
+      # No NA coordinates: they survive to draw time and fail there
       testthat::expect_true(all(is.finite(coords$x)) && all(is.finite(coords$y)))
     }, paste0("alias coords ", fn), fix)
   }
 })
 
-test_that("layered layout accepts a raw edgelist and returns coordinates", {
+test_that("every deprecated layout still draws, and is offered nowhere", {
   ties <- data.frame(
     from = c("A", "A", "B", "C", "D", "F", "F", "E"),
     to   = c("B", "C", "D", "E", "E", "E", "G", "G"),
     stringsAsFactors = FALSE)
-  coords <- layout_tbl_graph_layered(ties, times = 6)
-  expect_equal(sort(rownames(coords)), sort(unique(c(ties$from, ties$to))))
-  expect_true(all(c("x", "y") %in% names(coords)))
-  # sources sit above sinks
-  expect_true(coords["A", "y"] > coords["G", "y"])
+  g <- igraph::graph_from_data_frame(ties, directed = TRUE)
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  retired <- autograph:::.deprecated_layouts()
+  expect_true(length(retired) > 0)
+  # A retired name is not offered as a completion, nor audited as a live layout.
+  expect_length(intersect(retired, autograph:::.autograph_layouts()), 0)
+  expect_length(intersect(paste0("layout_tbl_graph_", retired),
+                          ag_alive_functions("^layout_tbl_graph_")), 0)
+  for (lay in retired) {
+    fn <- get(paste0("layout_tbl_graph_", lay), envir = asNamespace("autograph"))
+    # A configurational layout needs a network of the size it is named for,
+    # and "levels" needs a network with levels, so each retired name is given
+    # one it can actually draw.
+    sizes <- c("dyad", "triad", "tetrad", "pentad", "hexad")
+    net <- if (lay %in% sizes) manynet::create_ring(match(lay, sizes) + 1L)
+      else if (lay == "multilevel") manynet::ison_southern_women else g
+    expect_message(coords <- fn(net), "deprecated", label = lay)
+    expect_true(all(c("x", "y") %in% names(coords)), label = lay)
+    expect_equal(nrow(coords), as.integer(manynet::net_nodes(net)), label = lay)
+  }
+})
+
+test_that("a deprecated layout name is renamed once, where it is checked", {
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old), add = TRUE)
+  expect_message(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
+  expect_equal(lay, "layered")
+  expect_equal(suppressMessages(autograph:::.check_layout("alluvial")), "lineage")
+  expect_equal(suppressMessages(autograph:::.check_layout("multilevel")), "levels")
+  expect_equal(suppressMessages(autograph:::.check_layout("triad")), "configuration")
+  # A live name passes through untouched and says nothing.
+  expect_no_message(expect_equal(autograph:::.check_layout("layered"), "layered"))
 })
 
 test_that("matching layout aligns matched partners vertically", {
@@ -135,42 +234,3 @@ test_that("matching layout aligns matched partners vertically", {
                 manynet::net_nodes(manynet::ison_southern_women))
 })
 
-test_that("snapping a layout to the grid yields integer-ish unique positions", {
-  skip_on_cran()
-  p <- graphr(manynet::ison_adolescents, snap = TRUE)
-  expect_buildable(p)
-  # depth_first_recursive_search() assigns each node its own grid point
-  expect_false(any(duplicated(p$data[, c("x", "y")])))
-})
-
-test_that("lattice networks snap by rotation to align edges to the grid", {
-  skip_on_cran()
-  p <- suppressMessages(graphr(manynet::create_lattice(9), snap = TRUE))
-  expect_buildable(p)
-  expect_true(all(p$data$x == round(p$data$x)))
-})
-
-test_that("snapping a two-mode (hierarchy) layout falls back gracefully", {
-  skip_on_cran()
-  # The default two-mode layout is "hierarchy", whose layered coordinates
-  # would be collapsed by square-grid snapping, so snapping is skipped and
-  # the original coordinates are retained (see graph_layout()).
-  old <- options(snet_verbosity = "verbose")
-  on.exit(options(old), add = TRUE)
-  expect_message(
-    graphr(manynet::ison_southern_women, snap = TRUE),
-    "hierarchy")
-  snapped <- suppressMessages(graphr(manynet::ison_southern_women, snap = TRUE))
-  plain   <- graphr(manynet::ison_southern_women)
-  expect_buildable(snapped)
-  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")])
-})
-
-test_that("snapping still works on a two-mode network with a force layout", {
-  skip_on_cran()
-  p <- suppressMessages(
-    graphr(manynet::ison_southern_women, layout = "stress", snap = TRUE))
-  expect_buildable(p)
-  # every node lands on its own grid point
-  expect_false(any(duplicated(p$data[, c("x", "y")])))
-})

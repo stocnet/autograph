@@ -4,15 +4,10 @@
 \alias{layout_configuration}
 \alias{layout_tbl_graph_configuration}
 \alias{layout_dyad}
-\alias{layout_tbl_graph_dyad}
 \alias{layout_triad}
-\alias{layout_tbl_graph_triad}
 \alias{layout_tetrad}
-\alias{layout_tbl_graph_tetrad}
 \alias{layout_pentad}
-\alias{layout_tbl_graph_pentad}
 \alias{layout_hexad}
-\alias{layout_tbl_graph_hexad}
 \title{Layout algorithms based on configurational positions}
 \usage{
 layout_configuration(.data, circular = TRUE, times = 1)
@@ -21,31 +16,27 @@ layout_tbl_graph_configuration(.data, circular = TRUE, times = 1)
 
 layout_dyad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_dyad(.data, circular = TRUE, times = 1)
-
 layout_triad(.data, circular = TRUE, times = 1)
-
-layout_tbl_graph_triad(.data, circular = TRUE, times = 1)
 
 layout_tetrad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_tetrad(.data, circular = TRUE, times = 1)
-
 layout_pentad(.data, circular = TRUE, times = 1)
 
-layout_tbl_graph_pentad(.data, circular = TRUE, times = 1)
-
 layout_hexad(.data, circular = TRUE, times = 1)
-
-layout_tbl_graph_hexad(.data, circular = TRUE, times = 1)
 }
 \arguments{
 \item{.data}{Some \code{{manynet}} compatible network data.}
 
-\item{circular}{Logical, required for \code{{ggraph}} compatibility, default TRUE.}
+\item{circular}{Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for \code{{ggraph}} compatibility.}
 
-\item{times}{Integer, how many times to run the algorithm.
-Required by for \code{{ggraph}} compatibility, but not used here, so default = 1.}
+\item{times}{Maximum number of iterations, where appropriate.
+Required for \code{{ggraph}} compatibility, and ignored by the layouts that
+do not iterate.}
+}
+\value{
+Returns a table of nodes' x and y coordinates.
 }
 \description{
 Configurational layouts locate nodes at symmetric coordinates
@@ -57,14 +48,20 @@ layout automatically.
 \examples{
 # "configuration" picks the layout matching the number of nodes
 graphr(manynet::create_ring(4), layout = "configuration")
-# or a specific configuration can be named
-graphr(manynet::create_ring(3), layout = "triad")
-# the layout functions can also be called directly for their coordinates
+# the specific configurations are also available as functions
 layout_tetrad(manynet::create_ring(4))
 }
 \seealso{
 Other mapping:
-\code{\link{layout_partition}},
+\code{\link{check_layout}},
+\code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
+\code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}},
 \code{\link{plot_grapht}}

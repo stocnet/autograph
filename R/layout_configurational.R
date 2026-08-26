@@ -9,16 +9,11 @@
 #' 
 #' @name layout_configuration
 #' @family mapping
-#' @inheritParams layout_partition
-#' @param circular Logical, required for `{ggraph}` compatibility, default TRUE.
-#' @param times Integer, how many times to run the algorithm.
-#'   Required by for `{ggraph}` compatibility, but not used here, so default = 1.
+#' @template param_ggraphlayouts
 #' @examples
 #' # "configuration" picks the layout matching the number of nodes
 #' graphr(manynet::create_ring(4), layout = "configuration")
-#' # or a specific configuration can be named
-#' graphr(manynet::create_ring(3), layout = "triad")
-#' # the layout functions can also be called directly for their coordinates
+#' # the specific configurations are also available as functions
 #' layout_tetrad(manynet::create_ring(4))
 NULL
 
@@ -27,15 +22,15 @@ NULL
 layout_configuration <- function(.data,
                                  circular = TRUE, times = 1){
   if (manynet::net_nodes(.data) == 2) {
-    layout_tbl_graph_dyad(.data, circular = circular, times = times)
+    layout_dyad(.data, circular = circular, times = times)
   } else if (manynet::net_nodes(.data) == 3) {
-    layout_tbl_graph_triad(.data, circular = circular, times = times)
+    layout_triad(.data, circular = circular, times = times)
   } else if (manynet::net_nodes(.data) == 4) {
-    layout_tbl_graph_tetrad(.data, circular = circular, times = times)
+    layout_tetrad(.data, circular = circular, times = times)
   } else if (manynet::net_nodes(.data) == 5) {
-    layout_tbl_graph_pentad(.data, circular = circular, times = times)
+    layout_pentad(.data, circular = circular, times = times)
   } else if (manynet::net_nodes(.data) == 6) {
-    layout_tbl_graph_hexad(.data, circular = circular, times = times)
+    layout_hexad(.data, circular = circular, times = times)
   }
 }
 
@@ -54,10 +49,6 @@ layout_dyad <- function(.data,
 
 #' @rdname layout_configuration
 #' @export
-layout_tbl_graph_dyad <- layout_dyad
-
-#' @rdname layout_configuration
-#' @export
 layout_triad <- function(.data,
                          circular = TRUE, times = 1){
   res <- matrix(c(0,0,
@@ -65,10 +56,6 @@ layout_triad <- function(.data,
                   4,0), 3, 2, byrow = TRUE)
   .to_lo(res)  
 }
-
-#' @rdname layout_configuration
-#' @export
-layout_tbl_graph_triad <- layout_triad
 
 #' @rdname layout_configuration
 #' @export
@@ -80,10 +67,6 @@ layout_tetrad <- function(.data,
                   1,1), 4, 2, byrow = TRUE)
   .to_lo(res)  
 }
-
-#' @rdname layout_configuration
-#' @export
-layout_tbl_graph_tetrad <- layout_tetrad
 
 #' @rdname layout_configuration
 #' @export
@@ -99,10 +82,6 @@ layout_pentad <- function(.data,
 
 #' @rdname layout_configuration
 #' @export
-layout_tbl_graph_pentad <- layout_pentad
-
-#' @rdname layout_configuration
-#' @export
 layout_hexad <- function(.data,
                          circular = TRUE, times = 1){
   res <- matrix(c(1,0,
@@ -114,6 +93,3 @@ layout_hexad <- function(.data,
   .to_lo(res)  
 }
 
-#' @rdname layout_configuration
-#' @export
-layout_tbl_graph_hexad <- layout_hexad

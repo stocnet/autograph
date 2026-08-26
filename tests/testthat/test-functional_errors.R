@@ -25,12 +25,11 @@ test_that("graphr() handles degenerate node counts", {
   expect_buildable(graphr(manynet::create_empty(0)))
   expect_buildable(graphr(manynet::create_empty(2)))
 
-  # KNOWN GAP: a single-node network errors with "invalid indexing" from inside
-  # the layout code -- note that both 0 and 2 nodes work, so this is an
-  # off-by-one in the layout path rather than an unsupported case. It should
-  # draw one isolate. Pinned here so the crash is documented and regression-
-  # tested; tighten to expect_buildable() once fixed.
-  expect_error(graphr(manynet::create_empty(1)), "invalid indexing")
+  # A single-node network used to error with "invalid indexing" from inside the
+  # layout code. It now draws: the default layout for a network this small is
+  # "configuration", which declares that it needs 2-6 nodes, so one node falls
+  # back to "stress" instead of reaching the off-by-one.
+  expect_buildable(graphr(manynet::create_empty(1)))
 })
 
 test_that("graphr() rejects a nonexistent node attribute name", {
@@ -97,6 +96,41 @@ test_that("graphr() accepts out-of-range numeric aesthetics without erroring", {
   expect_buildable(graphr(net, edge_size = -1))
 })
 
+test_that("graphr() rejects an unusable labels selection", {
+  net <- manynet::add_node_attribute(manynet::ison_adolescents,
+                                     "wealth", seq_len(8))
+  # A name that is neither an attribute, a measure, nor a node
+  expect_error(graphr(net, labels = "nosuchthing"), "labels")
+  expect_error(graphr(net, labels = "wealthh"), "Did you mean")
+  # A selection has to be the right length, or within range
+  expect_error(graphr(net, labels = c(TRUE, FALSE, TRUE)), "8 nodes")
+  expect_error(graphr(net, labels = c(2, 99)), "between 1 and 8")
+  # Ranks are counted, not measured
+  expect_error(graphr(net, labels = -2), "positive whole number")
+  expect_error(graphr(net, labels = c(nosuchmeasure = 5)), "labels")
+  # An attribute can mark which nodes to label, but only a logical one can
+  expect_error(graphr(net, labels = "wealth"), "logical")
+  # Named nodes must exist
+  expect_error(graphr(net, labels = c("Alice", "Nobody")), "Nobody")
+  expect_error(graphr(net, labels = c("Nobody", "NoOne")), "were not found")
+})
+
+test_that("graphr() labels without netrics installed to rank nodes by", {
+  # netrics is only suggested, and labelling is too incidental to a plot to
+  # stop it: the selection graphr() makes on its own falls back to a random
+  # sample, while one asked for by name says what is missing.
+  testthat::local_mocked_bindings(.has_netrics = function() FALSE)
+  set.seed(123)
+  big <- manynet::to_named(manynet::generate_random(60, 0.08))
+  p <- graphr(big, isolates = "keep")
+  labelled <- p[["layers"]][[length(p[["layers"]])]][["data"]][["name"]]
+  expect_gt(length(labelled), 0)
+  expect_lt(length(labelled), 60)
+  expect_error(graphr(big, labels = "betweenness"), "netrics")
+  # A selection that needs no ranking is unaffected
+  expect_buildable(graphr(big, labels = "random", isolates = "keep"))
+})
+
 test_that("graphr() rejects an unknown layout by name", {
   net <- manynet::ison_adolescents
   expect_error(graphr(net, layout = "notalayout"), "layout")
@@ -114,7 +148,7 @@ test_that("graphr() explains that a layout is named, not passed as a function", 
 test_that("graphr() validates isolates whether or not there are isolates", {
   # `match.arg()` used to sit inside .infer_isolates(), which does not always
   # force its argument, so this was caught or ignored depending on the network.
-  with_isolates <- manynet::create_empty(4) %>%
+  with_isolates <- manynet::create_empty(4) |>
     manynet::add_ties(c(1, 2))
   expect_error(graphr(manynet::ison_adolescents, isolates = "drop"), "isolates")
   expect_error(graphr(with_isolates, isolates = "drop"), "isolates")
@@ -137,8 +171,12 @@ test_that("graphs() rejects waves outside the range available", {
 
 test_that("layouts that need an extra argument say how to give it", {
   net <- manynet::ison_adolescents
-  # Previously "argument \"rank\" is missing, with no default".
-  expect_error(graphr(net, layout = "lineage"), "rank")
-  expect_error(graphr(net, layout = "lineage"), "for each node")
+  # `ranks` is not one of them: the layered layouts work the layers out for
+  # themselves where none are given, and only a `ranks` that names something
+  # the network does not hold is an error.
+  expect_no_error(suppressMessages(graphr(net, layout = "lineage")))
+  expect_error(graphr(net, layout = "lineage", ranks = "nope"),
+               "among the node attributes")
   expect_error(graphr(net, layout = "concentric"), "membership")
+  expect_error(graphr(net, layout = "concentric"), "for each node")
 })

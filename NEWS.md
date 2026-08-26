@@ -1,3 +1,205 @@
+# autograph 1.2.0
+
+## Package
+
+- Removed the CRAN version check from `.onAttach()`, making `library(autograph)` faster to attach
+  - Fixed `.onAttach()` not applying the ink of a persisted theme
+- Added `{goldfish}` to `Enhances`
+- Added `{systemfonts}` to `Suggests`
+- Added a `website-builds` job to `prchecks.yml`, reporting whether the site builds
+  - `count_pages()` was missing from the reference index, which stopped it
+- Updated CONTRIBUTING with conventions for function names, `NEWS.md` bullets,
+  the website reference index, and keeping tutorials and articles in step
+- Added `stocnet_completion()` to offer values an argument accepts as RStudio completions
+  - `graphr(fict_lotr, node_color =` Tab lists the node variables `fict_lotr` holds
+  - Covers node and tie variables, layouts, label criteria, themes, and defaults such as `isolates`
+  - Off unless asked for, since it replaces/encapsulates one of RStudio's internal functions; `stocnet_completion(FALSE)` restores it
+  - A `persist` argument remembers the choice, as `stocnet_theme()` does
+  - Values labelled with its class and its categories or range; a layout with the package that draws it
+
+## Layouts
+
+- Improved layered layouts
+  - Consolidated layered layouts onto one engine
+    - "layered" is now default layout for directed acyclic networks
+    - Deprecating "hierarchy" as "layered" is more consistent for two-mode networks
+    - "lineage" is now exactly "layered" with the axes exchanged
+    - Deprecating "alluvial" to free name for plot of changing membership composition
+    - "railway" and "ladder" unchanged, but are `alignment = "rungs"`
+    - Checks whether layout is appropriate for the network, and reverts to default if not
+  - Minimises two costs: tie length (`check_span()`) and nodal offset (`check_offset()`)
+  - Added `ranks=` to choose the layers:
+    - "compact" asks `igraph::layout_with_sugiyama()`
+    - "generation" ranks each node by its distance from a root
+    - "tight" (default) minimises total tie length while every tie points down at least one layer
+    - a numeric node attribute lays the layers out by its values, spaced in proportion to them, which is what "lineage" used to take a `rank` for
+  - Added `alignment=` to choose how a layer is spread out:
+    - "straight" (default) draws ties as close to straight as ordering allows
+    - "rungs" gives every layer same integer spacing
+  - Each weakly connected component now laid out on its own and packed beside others
+  - Fixed `layout_layered()` centring on a second mode node yet reading first mode labels
+  - Fixed the direction of layers given as values to `ranks=`
+  - Fixed layered layout labels to ignore `label_repel`
+- Improved multilevel layout
+  - Renamed "multilevel" layout to "levels" to avoid potential future collisions
+  - Fixed `layout_levels()` to identify modes without having to name a `level`
+  - Exposed `method`, `alpha`, `beta`, `FUN1` and `FUN2` arguments
+- Deprecated "dyad", "triad", "tetrad", "pentad" and "hexad" layout names
+  - "configuration" already picks the one matching the number of nodes
+  - The `layout_dyad()` to `layout_hexad()` functions themselves are unchanged
+- Fixed three broken paths in `layout_concentric()`
+  - Fixed drawing each node of an unlabelled network on a circle of its own
+  - Fixed erroring where a membership holds `NA`, now gathers `NA` nodes onto own circle
+  - Fixed `order.by=`, which errored on every network; now orders nodes around each circle by that attribute, decreasing
+- Fixed `graphr(snap = TRUE)` to use rotation and other improvements
+- Added a "scaling" layout for multidimensional scaling
+  - Scales classically up to a hundred nodes, and by pivots above that
+  - Scales unweighted path distances, so it can handle signed/weighted networks
+  - Lays each component out separately, where "pmds" refuses disconnected networks outright
+  - Drawn with labelled axes at a fixed ratio, since these coordinates can be read
+  - Captioned with `check_stress()` for Kruskal's stress-1, and console-reported where poor, 
+  as well as the share of distance variance two dimensions hold
+- Added a "correspondence" layout for correspondence analysis
+  - Places nodes by the similarity of their tie profiles
+  - Reads directed networks symmetrically by default, but "out" or "in" possible
+  - Refuses signed network, but `double=TRUE` an option
+  - Console-reports low broomstick ratio dimensions and low cos2 nodes 
+- Added a `layout_matching()` alias so every layout has a short name
+- Removed unreachable `getNNvec()`
+
+## Graphing
+
+- Fixed `graphr()` clipping nodes at panel edges
+  - Nodes were drawn at absolute sizes, but scales are expanded by a share of data range, 
+  so `ggplot2`'s 5% left less room than the radius of a node in a small network
+  - Room is now taken from node size, so small networks are given more space
+- Added `backbone=` to `graphr()` for drawing dense, hairball "stress", "fr", "drl", "kk" networks 
+  - By default, networks with 50+ nodes and a mean degree ≥8 use backbones
+  - `TRUE`/`FALSE` force, or specify filter/threshold (see `manynet::tie_is_backbone()`)
+- Improved `graphr()` to draw multilevel networks of interlocking one-mode and two-mode layers by default
+  - Fixed tie opacity so that those between levels fade behind those within them
+  - Fixed default node size in multilevel layout, which is now taken from how many nodes there are at each level rather than in the whole network
+  - Fixed labelling to be plain text nudged away instead of white-boxed labels
+- Fixed arcs drawn on layout that places two nodes at one point, 
+  e.g. `graphr(ison_networkers, layout = "scaling")`
+- Fixed `graphr()` to draw parallel ties as a fan instead of one on top of another
+- Fixed tie colouring in multiplex networks to color layers not signs by default
+  - Signs are still drawn as linetypes
+  - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing
+- Improved node shape legend to name modes where two-mode network records them instead of default "One" and "Two"
+- Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit
+- Improved `node_group` to draw overlapping hulls (closes #51)
+  - e.g. `graphr(ison_adolescents, node_group = netrics::node_x_clique())`
+- Improved `graphr()` to note when a colour/shape legend grows past about 7 keys
+- Fixed `graphs()` to collect guides even where panels held different ranges or categories (closes #15)
+
+## Theming
+
+- Added `persist=` to `stocnet_theme()`
+  - `persist = TRUE` writes it to `tools::R_user_dir("autograph", "config")`
+  - Nothing written to disk unless passed explicitly
+  - Setting a theme without it clears any choice persisted earlier
+- Improved font detection in `stocnet_theme()` via `{systemfonts}`
+  - Added `list_fonts()` for listing the font families R can see
+- Added `stocnet_medium()` for standardising output to the expected medium: 
+  - "screen" (default), "presentation", "mobile", and "print"
+  - `ag_size()` scales text, not node size or anything else
+  - "print" draws on white irrespective of theme grounding
+- Improved theme backgrounds to reach every plot, not only the graphs
+  - Plot themes are now built with the `ag_theme_*()` wrappers
+  - Blanked elements stay blank, so a graph keeps no axis text or coordinates
+  - Ties, nodes, and labels with no colour take `ag_ink()` and the ground
+- Added `simulate_colorblind()`, `check_separation()` and `check_contrast()` for checking palettes
+  - Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)
+  - Scores a pair by its worst case across those and normal vision
+  - Added `severity=` to view anomalous trichromacy (deuteranomaly, protanomaly)
+  - Added "grey" type to show a palette as print and photocopy may render it
+- Added `check_span()` for scoring how far each tie travels down the page
+- Added `check_offset()` for scoring how far each tie is from its ideal straight line
+- Added `ag_ink()` for the colour a theme writes with
+  - Used by axis text and reference lines, clearing 4.5:1 from the ground
+  - Frees `ag_base()` to be light where that sets it off from the highlight
+- Added `ag_missing()` for the neutral that data recedes into: 
+  - missing values, isolates, and any "other" remainder
+- Improved `ag_qualitative()` to note when a palette is asked for more colours than it holds
+- Improved every theme's categorical palette for colour-blind viewers
+  - `ag_qualitative()` uses most distinct, own colors first not mixtures
+  - Samples across the palette only where it holds too few colours
+  - Kept "rainbow" in its own order, since fidelity to a spectrum is its point
+- Improved some highlight pairs
+  - Fixed "neon" highlight pair, a cyan and a green 12.7 apart
+  - Fixed "ethz" and "cmu" highlight pairs by lightening their greys
+- Fixed divergent palettes pairing a red pole with a green or teal one, such as in "ethz"
+- Added a "clay" theme inspired by palette and fonts of Anthropic's Claude
+
+## Plotting
+
+- Added `plot.goldfishFit()` for the four diagnostic panels a fit can supply
+  - Deviance trace, Schoenfeld smooths, score processes, and waiting times
+  - Draws only from what the fit stores, leaving a missing panel out
+  - Draws the waiting-time panel for exact-time models only
+  - Draws the compact term strings the test itself carries, which do not
+    repeat where an effect appears over two networks
+  - Reports how many terms the Schoenfeld panel dropped
+  - Fixed the Schoenfeld panel to select terms by column position
+    - The labels it matched on intersect the effect names on the intercept
+      alone, so it drew one term where four were asked for
+- Added `plot.goldfishGOF()` for each effect's cumulative score process
+  - Draws the Brownian-bridge bands the effect's p-value was read from
+  - Draws x on the object's own process time, named for the clock it records
+  - Inverts the distribution the event-clock p-value comes from
+- Added `plot.goldfishTimeTest()` for the scaled Schoenfeld residuals
+  - Draws a smooth per effect, with the fitted estimate as the reference
+  - Colours the scatter by period under `method = "periods"`
+- Added `plot.goldfishOnset()` for the parameter path and information accrual
+  - Windows both panels on the excursion, so each coefficient gets its scales
+  - Draws the proportional diagonal, the departure from which is the finding
+  - Added `view = c("both", "path", "accrual")` to select a single panel
+- Added `plot.goldfishMargins()` for observed against expected activity
+  - Draws martingale residuals where the model class defines a compensator
+  - Draws the calibration ratio where it does not, from the recorded scales
+  - Draws the `top` actors furthest from the reference, and counts the rest
+  - Draws level against shape where goldfish supplies `dispersion`
+  - Names both omissions: under two completed spans, and beyond `top`
+- Added a `page` argument to `plot()` on the per-term diagnostics
+  - Applies to `goldfishGOF`, `goldfishTimeTest`, and `goldfishOnset`
+  - Added `count_pages()`, reporting the count without rendering
+  - Renamed from `ag_pages()`, since `ag_` is for the theme accessors
+  - Errors with the page count where `page` is past the last
+  - Leaves each figure as it was where `page` is omitted
+- Renamed the goldfish classes to a package prefix and a camelCase noun
+  - `goldfishOutliers`, `goldfishChangepoints`, `goldfishOnset`,
+    `goldfishMargins`, `goldfishGOF`, `goldfishTimeTest`, `goldfishScoreTest`,
+    and `goldfishFit`
+  - A name such as `test_gof` is what a sibling package would pick too, and
+    two packages emitting one class string cannot be told apart by dispatch
+  - Renamed the dispatch methods and the precooked fixtures to match
+  - Kept the older class names as aliases, so such objects plot as before
+  - Documented the convention in CONTRIBUTING, for the whole ecosystem
+- Improved `plot.goldfishOutliers()` and `plot.goldfishChangepoints()`
+  - Renamed from `plot.outliers.goldfish()` and `plot.changepoints.goldfish()`
+  - Read the metadata each object carries rather than inferring it
+  - Plot the `.series` column, so a diagnostic called with `effect =` is
+    drawn as that term's series rather than as a log-likelihood trace
+  - Fixed both to facet on process, so no line crosses a process boundary
+  - Fixed `plot.goldfishChangepoints()` to draw each process's own breaks
+  - Fixed `plot.goldfishOutliers()` to read the now-logical `outlier` column
+  - Rewrote `plot.goldfishChangepoints()` for the tibble with a `cpt` column
+    - Labels the axis with break times only where they are numbers,
+      so a dated event stream keeps its date scale
+- Added precooked `goldfish_margins`, `goldfish_gof`, `goldfish_time`,
+  and `goldfish_onset`, and refreshed the two older fixtures
+  - Each is stamped with the goldfish version that produced it, 1.9.21
+  - `goldfish_outliers` comes from a receiver-choice model of the calls
+  - The others come from event models of the `fisheries_treaties` layer
+- Replaced `cli::cli_abort()` in `gf_facet_paged()` with `snet_abort()`
+- Replaced em dashes in `R/plot_diagnostics.R` since only ASCII is portable
+- Fixed signed branch of `plot.matrix()` hard-coding its poles
+
+## Tutorials
+
+- Moved the decorative gifs in the visualisation tutorial into quiz answer feedback
+
 # autograph 1.1.2
 
 ## Package
@@ -29,6 +231,13 @@
 
 ## Graphing
 
+- Improved `graphr()`'s `labels` argument to label a *selection* of the nodes, where previously the only alternative to labelling every node was labelling none
+  - `labels` now also accepts a depth of ranks (`labels = 5`), a measure to rank by (`labels = "betweenness"`, or `labels = c(betweenness = 5)` for both), the name of a logical node attribute, or a logical/name/position vector of the nodes to label
+  - Selection is by rank rather than by headcount, so nodes tied at the cut are labelled together, using `netrics::node_is_max()`; a two-mode or multilevel network is ranked within each mode or level, so a dense level cannot crowd the others out of the labelling
+  - Networks of more than 30 nodes now label only their most central nodes by default, reporting how many; `labels = TRUE` still labels every node. `manynet::fict_marvel` went from 194 overlapping labels to 10
+  - Labels are drawn from the selected rows rather than by blanking the rest, so no space is reserved (and nothing is repelled away from) labels that are not drawn
+  - `grapht()` resolves the selection once across all waves, so the same nodes stay labelled from frame to frame, and `graphs()` resolves it once for all its panels; `grapht()`'s own default above 30 nodes remains no labels at all
+  - `{netrics}` is only suggested, so an automatic selection falls back to a random sample when it is not installed, and a measure asked for by name says what to install
 - Fixed `graphs()`/`grapht()` erroring ("Can't combine `..1` <character> and `..2` <logical>") on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical `active` flag and numeric height/mass in `fict_starwars`)
   - Such networks now split into waves via a guarded `to_waves()` that coerces the offending attributes when `{manynet}`'s splitter cannot combine them
 - Fixed `graphr(..., snap = TRUE)` erroring ("'-' only defined for equally-sized data frames") whenever a node sat exactly on a grid point
@@ -72,7 +281,15 @@
 
 ## Tutorials
 
+- Added a colour blindness section to the visualisation tutorial
+  - Covers `simulate_colorblind()`, `check_separation()`, and how palettes are ordered
+  - Notes that the "rainbow" theme is not a colour-blind safe scheme
+- Added a note on installing a theme's fonts to the visualisation tutorial
+- Updated the README with the case for colour-blind readable palettes
 - Updated visualization tutorial to use colour/color consistently
+- Updated the Labels section of the visualisation tutorial to cover selecting which nodes to label, replacing the `mutate(name = ifelse(...))` workaround it used to recommend
+  - `fict_lotr`, the tutorial's running example, has 36 nodes, so its graphs now name only its most central characters; the surrounding prose says so and shows how to choose otherwise
+  - Regenerated `vignettes/articles/visualising-networks.Rmd` and the pre-rendered tutorial HTML to match
 
 # autograph 1.1.1
 

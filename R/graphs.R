@@ -88,11 +88,40 @@ graphs <- function(netlist, waves,
       netlist <- netlist[waves]
   }
   if (is.null(names(netlist))) names(netlist) <- rep("", length(netlist))
+  # Each panel is a plot of its own, so each would otherwise scale its
+  # aesthetics against its own network alone. The ranges and categories found
+  # across the whole list are worked out once here and passed down to every
+  # panel, so that `patchwork` can collect the guides into one legend and the
+  # same value is drawn the same way in each panel. See `.shared_aes()`.
+  shared <- .shared_aes_from_dots(netlist, list(...))
   if (length(unique(lapply(netlist, length))) == 1) {
     # Sharing a layout requires every panel to draw every node, so isolates
     # are kept unless the user explicitly asks otherwise
     dots <- list(...)
+    dots$.shared <- shared
     if (!"isolates" %in% names(dots)) dots$isolates <- "keep"
+    # Every panel draws the same nodes, so which of them to label is settled
+    # once here, against the network the layout is based on, and passed down as
+    # names. Left to each panel, `graphr()` would rank the nodes of each network
+    # separately and the labels would jump from panel to panel.
+    ref <- manynet::as_tidygraph(
+      netlist[[if (based_on == "last") length(netlist) else 1]])
+    if (manynet::is_labelled(ref)) {
+      labels_given <- "labels" %in% names(dots)
+      lab <- .check_labels(ref, if (labels_given) dots$labels else TRUE)
+      n_ref <- as.numeric(manynet::net_nodes(ref))
+      if (isTRUE(lab) && !labels_given && n_ref > 30)
+        lab <- structure(5L, criterion = "degree", automatic = TRUE)
+      if (!isTRUE(lab) && !isFALSE(lab)) {
+        dots$labels <- manynet::node_names(ref)[.infer_labels(ref, lab)]
+        n_lab <- length(dots$labels)
+        if (!labels_given) manynet::snet_info(
+          "Labelling the {n_lab} most central of {n_ref} nodes in each panel.",
+          "Use {.code labels = TRUE} to label all of them,",
+          "{.code labels = 25} to label more,",
+          "or {.code labels = FALSE} for none.")
+      }
+    }
     shared_graphr <- function(net, extra = NULL)
       do.call(graphr, c(list(net), dots, extra))
     if (based_on == "first") {
@@ -118,23 +147,49 @@ graphs <- function(netlist, waves,
     thisRequires("methods")
     if (!methods::hasArg("layout") & is_ego_network(netlist)) {
       gs <- lapply(1:length(netlist), function(i)
-        graphr(netlist[[i]], layout = "star", center = names(netlist)[[i]], ...) + 
+        graphr(netlist[[i]], layout = "star", center = names(netlist)[[i]],
+               .shared = shared, ...) +
           ggtitle(names(netlist)[i]))
     } else {
       manynet::snet_info(
         "Giving each network its own layout, since not all nodes appear in",
         "every one of them, so a shared layout would place them differently.")
       gs <- lapply(1:length(netlist), function(i)
-        graphr(netlist[[i]], ...) + ggtitle(names(netlist)[i]))
+        graphr(netlist[[i]], .shared = shared, ...) + ggtitle(names(netlist)[i]))
     }
   }
-  # if (all(c("Infected", "Exposed", "Recovered") %in% names(gs[[1]]$data))) {
-  #   gs <- .collapse_guides(gs)
-  # }
   do.call(patchwork::wrap_plots, c(gs, list(guides = "collect")))
 }
 
 # `graphs()` helper functions
+
+# The aesthetic arguments reach `graphs()` through `...`, where they are values
+# rather than the expressions `graphr()` reads with `substitute()`, and either
+# spelling of the two colour arguments may be used. Pulled out here so that
+# `.shared_aes()` is given the same argument each panel will be drawn with.
+.shared_aes_from_dots <- function(netlist, dots) {
+  pick <- function(...) {
+    nms <- c(...)
+    for (nm in nms) if (nm %in% names(dots)) {
+      out <- dots[[nm]]
+      # A colour or a size given outright ("red", 3) maps nothing, and only an
+      # attribute name can be resolved against every network in the list.
+      if (is.character(out) && length(out) == 1) return(out)
+      return(NULL)
+    }
+    NULL
+  }
+  tryCatch(
+    .shared_aes(netlist,
+                node_color = pick("node_color", "node_colour"),
+                node_shape = pick("node_shape"),
+                node_size = pick("node_size"),
+                edge_color = pick("edge_color", "edge_colour"),
+                edge_size = pick("edge_size"),
+                layout = if (is.character(dots[["layout"]])) dots[["layout"]]),
+    error = function(e) NULL)
+}
+
 is_ego_network <- function(nlist) {
   if (all(unique(names(nlist)) != "")) {
     all_names <- unique(unlist(unname(lapply(nlist, manynet::node_names))))

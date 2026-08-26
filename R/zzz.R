@@ -2,48 +2,42 @@
 .onAttach <- function(...) {
 
   # suppressMessages(suppressPackageStartupMessages(library("manynet", warn.conflicts = FALSE)))
+  
+  # A theme the user chose with `stocnet_theme(persist = TRUE)` becomes the
+  # default, but an option set in this session still wins.
+  saved_theme <- read_theme_pref()
+  options(stocnet_theme = getOption("stocnet_theme",
+                                    if (is.null(saved_theme)) "default" else saved_theme))
+  # Apply the palettes too, so a persisted theme takes effect on the first plot
+  # rather than only after `stocnet_theme()` is called again.
+  if (!is.null(saved_theme)) {
+    set_highlight_theme(saved_theme)
+    # The ink was missing here, so a persisted dark theme -- "neon" above all
+    # -- came back with its near-black ground and the default dark ink.
+    set_ink_theme(saved_theme)
+    set_divergent_theme(saved_theme)
+    set_background_theme(saved_theme)
+    set_categorical_theme(saved_theme)
+    set_missing_theme(saved_theme)
+    set_font_theme(saved_theme)
+  }
+
+  # The medium is remembered separately from the theme, and says where the
+  # plot will be seen rather than how it should look. See ?stocnet_medium.
+  saved_medium <- read_medium_pref()
+  options(stocnet_medium = getOption("stocnet_medium",
+                                     if (is.null(saved_medium)) "screen" else saved_medium))
+
   if (!interactive()) return()
-  
-  # options(manynet_verbosity = getOption("manynet_verbosity", "verbose"))
-  options(stocnet_theme = getOption("stocnet_theme", "default"))
-  # options(cli.theme = manynet_console_theme())
-  # options(cli.progress_clear = TRUE)
-  
-  # pkgs <- as.data.frame(utils::available.packages(utils::contrib.url(getOption("repos"))))
-  # 
-  # cran_version <- pkgs[pkgs$Package == "manynet","Version"]
 
   local_version <- utils::packageVersion("autograph")
   snet_info("You are using {.auto autograph} version {.version {local_version}}.")
-  old.list <- as.data.frame(utils::old.packages())
-  behind_cran <- "autograph" %in% old.list$Package
-  curr_theme <- getOption('stocnet_theme')
-  
-  greet_startup_cli <- function() {
-    tips <- c(
-      # "i" = "Theming graphs and plots is straightforward with `stocnet_theme()`",
-      "i" = "Theme set to {.code {getOption('stocnet_theme')}}. Use {.fn stocnet_theme} to change the theme."
-      # "i" = "Please share bugs, issues, or feature requests at {.url https://github.com/stocnet/autograph/issues}.",
-      # "i" = "To eliminate package startup messages, use: `suppressPackageStartupMessages(library({.pkg autograph}))`.",
-      # "i" = "If there are too many messages in the console, run `options(manynet_verbosity = 'quiet')`",
-      # "i" = "Visit the website to learn more: {.url https://stocnet.github.io/autograph/}."
-      # "i" = "We recommend the 'Function Overview' page online to discover new analytic opportunities: {.url https://stocnet.github.io/autograph/reference/index.html}.",
-    )
-    snet_info(sample(tips, 1))
-  }
+  snet_info(c("i" = "Theme set to {.code {getOption('stocnet_theme')}}. Use {.fn stocnet_theme} to change the theme."))
 
-  if (interactive()) {
-    if (behind_cran) {
-      msg <- "A new version of autograph is available with bug fixes and new features."
-      packageStartupMessage(msg, "\nWould you like to install it?")
-      if (utils::menu(c("Yes", "No")) == 1) {
-        utils::update.packages("autograph")
-      }
-    } else {
-      greet_startup_cli()
-    }
-  }
-
+  # Only after the interactive() guard above: a script or a check run should
+  # never reach into the IDE, whatever is remembered.
+  if (isTRUE(read_pref("completion")) && .completion_activate())
+    snet_info("Completion of argument values is on. Use {.fn stocnet_completion} to switch it off.")
 }
 # nocov end
 

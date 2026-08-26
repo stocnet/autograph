@@ -51,7 +51,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
       ggplot2::ylab("Density")
   }
   p +
-    ggplot2::theme_classic(base_family = ag_font()) +
+    ag_theme_classic() +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -88,7 +88,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
                             linewidth = 1.5) +
       ggplot2::ylab("Density")
   }
-  p + ggplot2::theme_classic(base_family = ag_font()) +
+  p + ag_theme_classic() +
     ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"))
 }
 
@@ -99,7 +99,7 @@ plot.tie_measure <- function(x, type = c("h", "d"), ...) {
 plot.network_measures <- function(x, ...) {
   ggplot2::ggplot(data = x, ggplot2::aes(x = .data$time, y = .data$value)) +
     ggplot2::geom_line(colour = ag_highlight()) +
-    ggplot2::theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal() +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
 }
@@ -139,32 +139,32 @@ plot.node_member <- function(x, ...) {
     ggraph::geom_node_text(
       ggplot2::aes(filter = .data$leaf, label = .data$label,
                    colour = .data$label),
-      hjust = 1, nudge_y = -max(hc$height) / 60, size = 3.5,
+      hjust = 1, nudge_y = -max(hc$height) / 60, size = ag_text_size(3.5),
       family = ag_font(), show.legend = FALSE) +
     ggplot2::scale_colour_manual(
       values = stats::setNames(colors, hc$labels[hc$order])) +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0.22, 0.02))) +
     ggplot2::coord_flip() +
-    ggplot2::theme_minimal(base_family = ag_font()) +
+    ag_theme_minimal() +
     ggplot2::theme(axis.title = ggplot2::element_blank(),
                    axis.text.y = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(colour = ag_base()),
+                   axis.text.x = ggplot2::element_text(colour = ag_ink()),
                    panel.grid = ggplot2::element_blank())
 }
 
 # #' @export
 # plot.node_members <- function(x, ...) {
-#   df <- x %>% dplyr::mutate(wave = dplyr::row_number())
-#   df_long <- df %>%
+#   df <- x |> dplyr::mutate(wave = dplyr::row_number())
+#   df_long <- df |>
 #     tidyr::pivot_longer(-wave, names_to = "person", values_to = "group")
-# group_counts <- df_long %>%
-#   dplyr::group_by(wave, group) %>%
+# group_counts <- df_long |>
+#   dplyr::group_by(wave, group) |>
 #   dplyr::summarise(n = dplyr::n(), .groups = "drop")
 #
 # # Step 1: Reshape to wide format: one row per person, one column per wave
-# df_wide <- df_long %>%
-#   dplyr::mutate(wave = paste0("wave", wave)) %>%
+# df_wide <- df_long |>
+#   dplyr::mutate(wave = paste0("wave", wave)) |>
 #   tidyr::pivot_wider(names_from = wave, values_from = group)
 #
 # # Step 2: Create a vector of wave columns for use as axes
@@ -182,7 +182,7 @@ plot.node_member <- function(x, ...) {
 #   ggplot2::geom_text(stat = "stratum",
 #                      ggplot2::aes(label = ggplot2::after_stat(stratum))) +
 #   ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
-#   ggplot2::theme_minimal()
+#   ag_theme_minimal()
 
 #   # Step 1: Reshape to wide format with one row per person
 #   df_wide <- df_long |>
@@ -208,7 +208,7 @@ plot.node_member <- function(x, ...) {
 #       size = 3
 #     ) +
 #     ggplot2::scale_x_discrete(labels = paste("Wave", seq_along(wave_cols))) +
-#     ggplot2::theme_minimal()
+#     ag_theme_minimal()
 # 
 # }
 
@@ -258,20 +258,20 @@ plot.matrix <- function(x, ..., membership = NULL) {
                            manynet::node_names(blocked_data))
   all_nodes <- data.frame(from = all_nodes$Var1, to = all_nodes$Var2,
                           weight = 0)
-  plot_data <- rbind(plot_data, all_nodes) %>% 
+  plot_data <- rbind(plot_data, all_nodes) |> 
     dplyr::distinct(from, to, .keep_all = TRUE)
   g <- ggplot2::ggplot(plot_data, ggplot2::aes(to, from)) +
-    ggplot2::theme_grey(base_size = 9) +
+    ag_theme_grey(base_size = 9) +
     ggplot2::labs(x = "", y = "") +
     ggplot2::theme(
       legend.position = "none",
       axis.ticks = ggplot2::element_blank(),
       axis.text.y = ggplot2::element_text(
-        size = 9 * 0.8,
+        size = ag_text_size(9 * 0.8),
         colour = ag_base()
       ),
       axis.text.x = ggplot2::element_text(
-        size = 9 * 0.8,
+        size = ag_text_size(9 * 0.8),
         angle = 30, hjust = 0,
         colour = ag_base()
       )
@@ -284,9 +284,12 @@ plot.matrix <- function(x, ..., membership = NULL) {
   # Color for signed networks
   if (manynet::is_signed(x)) {
     g <- g +
-      ggplot2::scale_fill_gradient2(high = "#003049",
-                                    mid = "white",
-                                    low = "#d62828")
+      # These poles were hard-coded, so this was the one signed plot that
+      # ignored the theme -- and the one that missed the repair of the
+      # red-green divergent pairs. See ?ag_call.
+      ggplot2::scale_fill_gradient2(high = ag_positive(),
+                                    mid = ag_ground_fill(),
+                                    low = ag_negative())
   } else {
     g <- g +
       ggplot2::scale_fill_gradient(

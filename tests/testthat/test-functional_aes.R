@@ -19,7 +19,7 @@ aes_fixture <- local({
 graphr_arg_values <- list(
   .data       = NULL, # the fixture itself
   layout      = NULL, # audited exhaustively in test-functional_layouts.R
-  labels      = list(TRUE, FALSE),
+  labels      = list(TRUE, FALSE, 3, "degree", "random"),
   node_color  = list("grp", "num", "darkred"),
   node_colour = NULL, # alias of node_color
   node_shape  = list("grp", "square"),
@@ -31,8 +31,10 @@ graphr_arg_values <- list(
   edge_bundle = list("force"),
   isolates    = list("legend", "caption", "keep"),
   snap        = NULL, # exercised in test-functional_layouts.R
+  backbone    = list(TRUE, FALSE, "simmelian", 0.1), # also test-graph_backbone.R
   label_dist  = list(0.5),
   label_repel = list(TRUE, FALSE),
+  .shared     = NULL, # internal, set by graphs(); exercised in test-functional_plots.R
   ...         = NULL
 )
 

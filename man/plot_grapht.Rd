@@ -45,31 +45,79 @@ It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.}
 
 \item{layout}{An igraph, ggraph, or manynet layout algorithm.
-If not declared, defaults to "triad" for networks with 3 nodes,
-"quad" for networks with 4 nodes,
-"stress" for all other one mode networks,
-or "hierarchy" for two mode networks.
-For "hierarchy" layout, one can further split graph by
+If not declared, defaults to "configuration" for networks of up to
+six nodes, "levels" for connected multilevel networks,
+"layered" for other two mode networks,
+and "stress" for all other networks.
+For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
 For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm please declare the "level"
+For "levels" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically
 order categories.
-If "level" is missing, function will look for 'lvl' node attribute in data.
-The "lineage" layout ranks nodes in Y axis according to values.
-For "lineage" layout algorithm please declare the "rank"
-as extra argument.
-The "rank" argument expects either a quoted node attribute present
-in data or vector with the same length as nodes.}
+If "level" is missing, the levels are taken from a 'lvl' node attribute
+where there is one, or else from the two modes of a two mode network.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+accept a "ranks" argument, which takes either one of the methods named
+at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
+as a quoted attribute name or a vector with one value for each node.
+The "scaling" layout places the nodes by multidimensional scaling,
+so that the distance between two nodes approximates the number of steps
+between them. Since those coordinates can be read, this layout is drawn
+with labelled axes on one scale, and captioned with how well two
+dimensions hold the distances; see \code{?layout_scaling} and \code{check_stress()}.
+Note that those axes carry distances rather than named dimensions:
+the drawing can be turned or mirrored without fitting the network
+any better or any worse.
+The "correspondence" layout places the nodes by correspondence analysis,
+so that two nodes with similar ties are drawn together,
+whether or not they are tied to each other.
+It is the usual way to draw a two mode network, since it places both
+modes against the same pair of axes, and it accepts a "direction"
+argument for a directed network and a "double" argument for a signed
+one; see \code{?layout_correspondence}.
+Each axis names the share of the network's inertia that it holds.}
 
-\item{labels}{Logical, whether to print node names
-as labels if present.}
+\item{labels}{Which nodes to label, if the network is labelled.
+\code{TRUE} (the default) labels every node and \code{FALSE} none of them,
+but a label for every node of a large network hides the network behind
+them, so a \emph{selection} of the nodes can be given instead:
+\itemize{
+\item a number, e.g. \code{labels = 5}, labels the nodes within the top five ranks
+by degree. Note that this is a depth of ranks rather than a count of
+nodes: nodes tied at the cut are labelled together, so more than five
+labels may appear.
+\item a measure to rank by, e.g. \code{labels = "betweenness"}, labels just the
+node or nodes that measure singles out. \code{"degree"}, \code{"betweenness"},
+\code{"cutpoints"} (every node the mark flags) and \code{"random"}
+(a small random sample) are available.
+The two can be combined by naming the number,
+as in \code{labels = c(betweenness = 5)}.
+\item the name of a logical node attribute, e.g. \code{labels = "is_broker"},
+labels the nodes it marks.
+\item a logical vector, one value per node, e.g.
+\code{labels = netrics::node_is_cutpoint(net)};
+or the names or positions of the nodes to label,
+e.g. \code{labels = c("Alice", "Betty")}.
+}
+
+Where a length-one string could mean more than one of these,
+a node attribute is preferred to a measure, and a measure to a node name.
+A single number is always read as a depth of ranks rather than as one
+node's position, so a lone node is best named, as in \code{labels = "Alice"}.
+For networks of more than 30 nodes, \code{labels} defaults to a selection
+rather than to every node; pass \code{labels = TRUE} for all of them.
+Ranking nodes uses the \code{{netrics}} package, which is suggested rather than
+required: without it installed, an automatic selection falls back to a
+random sample.
+Two-mode and multilevel networks are ranked within each mode or level,
+so that every level is labelled and not just the densest.}
 
 \item{node_color, node_colour}{Node variable to be used for coloring the nodes.
 It is easiest if this is added as a node attribute to
@@ -124,14 +172,18 @@ or to a larger value (e.g. \code{15}) for more spacing.
 Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
 (as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
 (as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").}
+sense, e.g. "circle"/"concentric", "railway", "lineage").}
 
 \item{label_repel}{Logical scalar, whether labels should be repelled away
 from each other and from nodes using \code{ggrepel}
 (via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
 Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
 without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.}
+some layouts) repelling algorithm.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+place each node in a layer, which is where the reader looks for it,
+so a repelled label there would say less about which node it labels
+than a fixed offset does. They ignore this argument and always offset.}
 
 \item{keep_isolates}{Deprecated. Use \code{isolates = "keep"} or
 \code{isolates = "fade"} instead.}
@@ -174,7 +226,7 @@ When another \code{layout} is requested,
 a single static layout is computed on the aggregate
 (union of waves) network instead, so that positions remain constant.
 Unlike \code{graphr()}, \code{grapht()} uses this dynamic stress layout by default
-even for two-mode networks (rather than a hierarchy layout, which would
+even for two-mode networks (rather than a layered layout, which would
 collapse many nodes onto a line); the two modes remain distinguishable
 by node shape.
 For networks with more than 30 nodes, node labels are suppressed by
@@ -206,9 +258,19 @@ across animation frames), so \code{label_repel} here instead toggles a fixed
 offset nudging labels away from their nodes, and \code{label_dist} scales the
 size of that nudge rather than being used as repel padding.
 
+\code{labels} can select which nodes to label here too, and the selection is
+resolved once over all the waves so that the same nodes stay labelled from
+frame to frame. Unlike \code{graphr()}, though, animations of more than 30 nodes
+default to no labels at all rather than to a selection of them.
+
 Some further \code{graphr()} features are not available in animations:
 \code{node_group} hulls, edge bundling, curved arcs for reciprocated ties,
 and self-loops (loops are not drawn; a note is printed if present).
+Note too that, where no \code{layout} is named, \code{grapht()} defaults to
+the "stress" layout for every network rather than choosing one by
+the network's shape as \code{graphr()} does,
+so that nodes move smoothly from one wave to the next.
+A layout named explicitly is still used, computed on the aggregate network.
 }
 \examples{
 # A dynamic signed network of shifting European alliances 1872-1918,
@@ -221,8 +283,16 @@ grapht(irps_wwi)
 }
 \seealso{
 Other mapping:
+\code{\link{check_layout}},
+\code{\link{completion}},
+\code{\link[=layout_concentric]{layout_concentric()}},
 \code{\link[=layout_configuration]{layout_configuration()}},
-\code{\link{layout_partition}},
+\code{\link[=layout_correspondence]{layout_correspondence()}},
+\code{\link[=layout_layered]{layout_layered()}},
+\code{\link[=layout_levels]{layout_levels()}},
+\code{\link[=layout_matching]{layout_matching()}},
+\code{\link[=layout_scaling]{layout_scaling()}},
+\code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphr}},
 \code{\link{plot_graphs}}
 }
