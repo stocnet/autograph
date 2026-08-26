@@ -1,4 +1,5 @@
 test_that("valence layout works", {
+  set.seed(123)
   edges <- data.frame(from = c("A", "B"),
                       to   = c("B", "C"),
                       weight = c(3, 3),

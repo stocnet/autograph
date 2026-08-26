@@ -1,3 +1,22 @@
+## Resubmission
+
+This is a resubmission of 1.2.0, which failed the incoming checks with a test error
+on Windows and on Debian. Both are fixed here.
+
+* `layout_valence()` started its nodes at random points, and a start that placed two
+  nodes close together gave a force large enough to spoil the layout. The nodes now
+  start on a circle, the force is bounded, and the test sets a seed.
+* On Windows, the tutorial test failed on a deprecation warning that the tutorial code
+  does not raise itself: `netrics::tie_by_closeness()` (0.4.1) calls
+  `manynet::to_ties()`, which manynet deprecates in 2.3.0. netrics 1.0.0, to be
+  submitted, calls the current function. The test now fails only if the tutorial calls
+  a deprecated function itself, so it passes with either netrics version.
+
+The full test suite passes with each of these three pairs: manynet 2.2.3 with
+netrics 0.4.0, manynet 2.3.1 with netrics 0.4.1 (the pair that failed on Windows),
+and manynet 2.3.0 with netrics 1.0.0. manynet 2.3.1 and netrics 1.0.0 are to be
+submitted; this version does not require either of them.
+
 ## Test environments
 
 * local R installation, aarch64-apple-darwin20, R 4.5.1

@@ -1,3 +1,17 @@
+# autograph 1.2.1
+
+## Layouts
+
+- Fixed "valence" layout returning a poor layout for some random starts
+  - The nodes now start on a circle, so one run resembles the next
+  - The repulsion force between two close nodes is now bounded
+  - Each step is now capped and cools over the iterations
+
+## Tests
+
+- Fixed the tutorial test failing on a deprecation warning that the tutorial code does not raise itself
+- Fixed the "valence" layout test depending on the random seed
+
 # autograph 1.2.0
 
 ## Package
