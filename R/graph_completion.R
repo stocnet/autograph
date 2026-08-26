@@ -55,6 +55,7 @@
       .completion_frame(
         if (!is.null(g) && manynet::is_labelled(g)) manynet::node_labels(g),
         "node")),
+    "backbone" = .completion_frame(.backbone_filters(), "filter"),
     "layout" = .completion_layout_values(),
     "theme" = .completion_frame(theme_opts, "theme"),
     # An argument whose default is a vector of choices, as `isolates` and

@@ -182,6 +182,28 @@
 #'   when a network has enough edges; for directed networks arrowheads are
 #'   retained, but the slight reciprocal-tie curvature used for unbundled edges
 #'   does not apply.
+#' @param backbone How to treat the network's backbone: the ties that a local
+#'   null model keeps, because they carry more weight, or sit in more
+#'   triangles, than chance alone would put there.
+#'   Where a backbone is used, those ties are drawn as the shortest, so that
+#'   the layout pulls apart the groups they hold together, and every tie is
+#'   still drawn, with the ties the filter does not keep faded well back.
+#'   This is what to reach for when a network is dense enough to draw as a
+#'   hairball.
+#'   By default (`NULL`) this is decided by the network: a network of at least
+#'   50 nodes and a mean degree of at least 8 is drawn this way, and reported.
+#'   `FALSE` draws every tie alike, and `TRUE` asks for a backbone whatever the
+#'   network's size.
+#'   One of `manynet`'s filters can be named instead: "disparity", "lans",
+#'   "noise", "mlf", or "simmelian". Where none is named, `manynet` uses "lans"
+#'   for a weighted network and "simmelian" for an unweighted one.
+#'   A number between 0 and 1 sets the threshold instead of the filter:
+#'   a smaller number keeps fewer ties.
+#'   Only the layouts that read tie lengths -- "stress" (the default), "fr",
+#'   "drl" and "kk" -- are laid out this way. Every other layout, including
+#'   those that already carry meaning in their coordinates such as "layered"
+#'   or "scaling", keeps its coordinates and only fades its ties.
+#'   Requires `manynet` 2.3.0 or later, and does not apply to signed networks.
 #' @param .shared Internal. A list of the aesthetic ranges and categories found
 #'   across a list of networks, which `graphs()` uses to draw and label each of
 #'   its panels against the same scales. Not intended to be set by hand.
@@ -208,13 +230,15 @@
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+#' graphr(manynet::generate_random(80, 0.2), backbone = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
                    edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
                    label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
-                   .shared = NULL, ..., node_colour, edge_colour) {
+                   backbone = NULL, .shared = NULL, ...,
+                   node_colour, edge_colour) {
   # A list of networks is handed to graphs(). The call is forwarded as written,
   # rather than argument by argument, because the aesthetic arguments have no
   # defaults: naming them here would force promises that are still missing.
@@ -307,14 +331,20 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (missing(edge_size)) edge_size <- NULL else if (!is.numeric(edge_size)) {
     edge_size <- .check_edge_size(g, as.character(substitute(edge_size)))
   }
+  # Find the backbone ----
+  # After the layout is settled, since a layout that carries meaning in its
+  # coordinates keeps them and fades its ties only, and after the isolates are
+  # dropped, so that the filter reads the network that is drawn.
+  backbone <- .infer_backbone(g, .check_backbone(backbone), layout, edge_bundle,
+                              manual = all(c("x", "y") %in% names(list(...))))
   # Add layout ----
-  p <- graph_layout(g, layout, labels, node_group, snap, ...)
+  p <- graph_layout(g, layout, labels, node_group, snap, backbone, ...)
   # Read where the layout left it, since the later steps have no use for it
   # and no reason to carry it. See `layout_scaling()`.
   fit <- attr(p[["data"]], "fit")
   # Add edges ----
   p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout,
-                   .shared)
+                   .shared, backbone)
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size, layout, .shared)
   # Add labels ----

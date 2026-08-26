@@ -31,6 +31,7 @@ graphr_arg_values <- list(
   edge_bundle = list("force"),
   isolates    = list("legend", "caption", "keep"),
   snap        = NULL, # exercised in test-functional_layouts.R
+  backbone    = list(TRUE, FALSE, "simmelian", 0.1), # also test-graph_backbone.R
   label_dist  = list(0.5),
   label_repel = list(TRUE, FALSE),
   .shared     = NULL, # internal, set by graphs(); exercised in test-functional_plots.R

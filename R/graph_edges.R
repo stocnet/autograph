@@ -1,16 +1,18 @@
 graph_edges <- function(p, g, edge_color, edge_size, node_size,
-                        edge_bundle = FALSE, layout = NULL, shared = NULL) {
+                        edge_bundle = FALSE, layout = NULL, shared = NULL,
+                        backbone = NULL) {
   bundle_geom <- .infer_bundle_geom(edge_bundle)
   if (manynet::is_directed(g)) {
     out <- .infer_directed_edge_mapping(g, edge_color, edge_size, node_size,
-                                        layout, shared)
+                                        layout, shared, backbone)
     if (is.null(bundle_geom)) {
       p <- .map_directed_edges(p, g, out)
     } else {
       p <- .map_bundled_edges(p, g, out, bundle_geom, directed = TRUE)
     }
   } else {
-    out <- .infer_edge_mapping(g, edge_color, edge_size, layout, shared)
+    out <- .infer_edge_mapping(g, edge_color, edge_size, layout, shared,
+                               backbone)
     if (is.null(bundle_geom)) {
       p <- .map_edges(p, g, out)
     } else {
@@ -72,20 +74,21 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # Helper functions for .graph_edges()
 
 .infer_directed_edge_mapping <- function(g, edge_color, edge_size, node_size,
-                                         layout = NULL, shared = NULL) {
+                                         layout = NULL, shared = NULL,
+                                         backbone = NULL) {
   list("ecolor" = .infer_ecolor(g, edge_color, shared[["ecolor"]]),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g),
-       "ealpha" = .infer_ealpha(g, layout),
+       "ealpha" = .infer_ealpha(g, layout, backbone),
        "end_cap" = .infer_end_cap(g, node_size, layout))
 }
 
 .infer_edge_mapping <- function(g, edge_color, edge_size, layout = NULL,
-                               shared = NULL) {
+                               shared = NULL, backbone = NULL) {
   list("ecolor" = .infer_ecolor(g, edge_color, shared[["ecolor"]]),
        "esize" = .infer_esize(g, edge_size),
        "line_type" = .infer_line_type(g),
-       "ealpha" = .infer_ealpha(g, layout))
+       "ealpha" = .infer_ealpha(g, layout, backbone))
 }
 
 # .infer_ecolor/.infer_esize/.infer_arrow/.infer_line_type live in
@@ -118,10 +121,17 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # they curtain over both planes, so they are faded well back, and the ties
 # within each level brought forward, so that the structure of each level and
 # the shape of the interlock can both be seen.
-.infer_ealpha <- function(g, layout = NULL) {
-  if (identical(layout, "levels") && manynet::is_twomode(g) &&
-      manynet::net_ties(g) > 0)
+#
+# A backbone works the same way and is applied on top: a tie the filter does
+# not keep is drawn at a fifth of whatever it would have been drawn at, which
+# takes the usual 0.4 down to the same 0.08. A tie the filter keeps is left
+# alone, so that a backbone changes what is faded rather than what is normal.
+.infer_ealpha <- function(g, layout = NULL, backbone = NULL) {
+  out <- if (identical(layout, "levels") && manynet::is_twomode(g) &&
+             manynet::net_ties(g) > 0)
     ifelse(manynet::tie_is_twomode(g), 0.08, 0.5) else 0.4
+  if (is.null(backbone)) return(out)
+  out * ifelse(backbone, 1, 0.2)
 }
 
 .infer_end_cap <- function(g, node_size, layout = NULL) {

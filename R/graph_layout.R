@@ -8,13 +8,26 @@
   paste0(base, " (", round(share * 100), "% of inertia)")
 }
 
-graph_layout <- function(g, layout, labels, node_group, snap, ...) {
+graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
+                         ...) {
   name <- NULL
   dots <- list(...)
   if ("x" %in% names(dots) & "y" %in% names(dots)) {
     lo <- ggraph::create_layout(g, layout = "manual",
                                 x = dots[["x"]], y = dots[["y"]])
-  } else lo <- suppressWarnings(ggraph::create_layout(g, layout, ...))
+  } else {
+    args <- c(list(graph = g, layout = layout), dots)
+    # The backbone ties are given the length that draws them shortest, so that
+    # the groups they hold together are what the layout pulls apart. A layout
+    # that carries meaning in its coordinates, or that reads no tie lengths, is
+    # left as it is, and its ties are only faded. A length the user gave
+    # themselves is theirs. See `.backbone_layout_weights()`.
+    if (!is.null(backbone) && !"weights" %in% names(dots)) {
+      weights <- .backbone_layout_weights(g, layout, backbone)
+      if (!is.null(weights)) args[["weights"]] <- weights
+    }
+    lo <- suppressWarnings(do.call(ggraph::create_layout, args))
+  }
   if ("graph" %in% names(attributes(lo))) {
     if (!setequal(names(as.data.frame(attr(lo, "graph"))), names(lo))) {
       for (n in setdiff(names(as.data.frame(attr(lo, "graph"))), names(lo))) {
@@ -66,9 +79,7 @@ graph_layout <- function(g, layout, labels, node_group, snap, ...) {
     # mode, a generation, or a date along one axis, a scaled distance along
     # both -- which square-grid snapping would collapse. Skip snapping for
     # those and keep the layout as computed.
-    is_fixed <- is.character(layout) && length(layout) == 1L &&
-      layout %in% .fixed_layouts()
-    if (is_fixed) {
+    if (.is_fixed_layout(layout)) {
       manynet::snet_info(paste0("Skipping snapping: the '", layout,
                                 "' layout carries meaning in its coordinates, ",
                                 "so they are kept as computed."))

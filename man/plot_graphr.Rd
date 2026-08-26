@@ -20,6 +20,7 @@ graphr(
   label_dist = NULL,
   label_repel = TRUE,
   edge_bundle = FALSE,
+  backbone = NULL,
   .shared = NULL,
   ...,
   node_colour,
@@ -199,6 +200,29 @@ when a network has enough edges; for directed networks arrowheads are
 retained, but the slight reciprocal-tie curvature used for unbundled edges
 does not apply.}
 
+\item{backbone}{How to treat the network's backbone: the ties that a local
+null model keeps, because they carry more weight, or sit in more
+triangles, than chance alone would put there.
+Where a backbone is used, those ties are drawn as the shortest, so that
+the layout pulls apart the groups they hold together, and every tie is
+still drawn, with the ties the filter does not keep faded well back.
+This is what to reach for when a network is dense enough to draw as a
+hairball.
+By default (\code{NULL}) this is decided by the network: a network of at least
+50 nodes and a mean degree of at least 8 is drawn this way, and reported.
+\code{FALSE} draws every tie alike, and \code{TRUE} asks for a backbone whatever the
+network's size.
+One of \code{manynet}'s filters can be named instead: "disparity", "lans",
+"noise", "mlf", or "simmelian". Where none is named, \code{manynet} uses "lans"
+for a weighted network and "simmelian" for an unweighted one.
+A number between 0 and 1 sets the threshold instead of the filter:
+a smaller number keeps fewer ties.
+Only the layouts that read tie lengths -- "stress" (the default), "fr",
+"drl" and "kk" -- are laid out this way. Every other layout, including
+those that already carry meaning in their coordinates such as "layered"
+or "scaling", keeps its coordinates and only fades its ties.
+Requires \code{manynet} 2.3.0 or later, and does not apply to signed networks.}
+
 \item{.shared}{Internal. A list of the aesthetic ranges and categories found
 across a list of networks, which \code{graphs()} uses to draw and label each of
 its panels against the same scales. Not intended to be set by hand.}
@@ -248,6 +272,7 @@ graphr(ison_southern_women, labels = 2)
 graphr(ison_southern_women, labels = "betweenness")
 graphr(ison_adolescents, labels = c("Alice", "Betty"))
 graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+graphr(manynet::generate_random(80, 0.2), backbone = TRUE)
 }
 \seealso{
 Other mapping:
