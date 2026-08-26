@@ -7,7 +7,13 @@ Functions for tailoring graphs with themes, scales, and palettes.
 - [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
   [`set_stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
   : Setting a consistent theme for all plots
+- [`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+  [`set_stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+  [`ag_size()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+  : Setting the medium a plot is made for
 - [`ag_base()`](https://stocnet.github.io/autograph/reference/ag_call.md)
+  [`ag_ink()`](https://stocnet.github.io/autograph/reference/ag_call.md)
+  [`ag_missing()`](https://stocnet.github.io/autograph/reference/ag_call.md)
   [`ag_highlight()`](https://stocnet.github.io/autograph/reference/ag_call.md)
   [`ag_positive()`](https://stocnet.github.io/autograph/reference/ag_call.md)
   [`ag_negative()`](https://stocnet.github.io/autograph/reference/ag_call.md)
@@ -16,6 +22,12 @@ Functions for tailoring graphs with themes, scales, and palettes.
   [`ag_divergent()`](https://stocnet.github.io/autograph/reference/ag_call.md)
   [`ag_font()`](https://stocnet.github.io/autograph/reference/ag_call.md)
   : Consistent palette calls
+- [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md)
+  : Listing the fonts available to R
+- [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  : Checking colours for colour blindness, print, and legibility
 - [`match_color()`](https://stocnet.github.io/autograph/reference/theme_match.md)
   [`is_dark()`](https://stocnet.github.io/autograph/reference/theme_match.md)
   : Matching colors across palettes
@@ -37,6 +49,9 @@ do the same for multiple networks and dynamic networks, respectively.
 - [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
   [`print(`*`<grapht>`*`)`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
   : Easily animate dynamic networks with sensible defaults
+- [`stocnet_completion()`](https://stocnet.github.io/autograph/reference/completion.md)
+  [`set_completion()`](https://stocnet.github.io/autograph/reference/completion.md)
+  : Completing argument values as you type
 
 ## Plotting
 
@@ -62,8 +77,16 @@ for results and other objects for stocnet packages.
   : Plotting diffusion models
 - [`plot(`*`<network_test>`*`)`](https://stocnet.github.io/autograph/reference/plot.network_test.md)
   : Plotting methods for CUG and QAP tests
-- [`plot(`*`<outliers.goldfish>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+- [`plot(`*`<diagnose_outliers>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<outliers.goldfish>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<diagnose_changepoints>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
   [`plot(`*`<changepoints.goldfish>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishOutliers>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishChangepoints>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishMargins>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishGOF>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishTimeTest>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
+  [`plot(`*`<goldfishOnset>`*`)`](https://stocnet.github.io/autograph/reference/plot_adequacy.md)
   : Plotting adequacy diagnostics
 - [`plot(`*`<ag_conv>`*`)`](https://stocnet.github.io/autograph/reference/plot_convergence.md)
   [`plot(`*`<traces.monan>`*`)`](https://stocnet.github.io/autograph/reference/plot_convergence.md)
@@ -75,6 +98,9 @@ for results and other objects for stocnet packages.
   [`plot(`*`<sienaGOF>`*`)`](https://stocnet.github.io/autograph/reference/plot_gof.md)
   [`plot(`*`<gof.ergm>`*`)`](https://stocnet.github.io/autograph/reference/plot_gof.md)
   : Plotting goodness-of-fit results
+- [`plot(`*`<result.goldfish>`*`)`](https://stocnet.github.io/autograph/reference/plot_goldfish_fit.md)
+  [`plot(`*`<goldfishFit>`*`)`](https://stocnet.github.io/autograph/reference/plot_goldfish_fit.md)
+  : Plotting a goldfish model fit at a glance
 - [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
   : Easily graph networks with sensible defaults
 - [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
@@ -85,6 +111,8 @@ for results and other objects for stocnet packages.
 - [`plot(`*`<selectionTable>`*`)`](https://stocnet.github.io/autograph/reference/plot_interp.md)
   [`plot(`*`<influenceTable>`*`)`](https://stocnet.github.io/autograph/reference/plot_interp.md)
   : Plotting effects interpretation
+- [`count_pages()`](https://stocnet.github.io/autograph/reference/count_pages.md)
+  : How many pages a paged diagnostic figure has
 
 ## Layouts
 
@@ -93,41 +121,45 @@ improved or additional layouts to those offered in
 [igraph](https://r.igraph.org/) and
 [ggraph](https://ggraph.data-imaginist.com) by default.
 
+- [`layout_concentric()`](https://stocnet.github.io/autograph/reference/layout_concentric.md)
+  [`layout_tbl_graph_concentric()`](https://stocnet.github.io/autograph/reference/layout_concentric.md)
+  : Concentric layout
 - [`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_tbl_graph_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_dyad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
-  [`layout_tbl_graph_dyad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_triad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
-  [`layout_tbl_graph_triad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_tetrad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
-  [`layout_tbl_graph_tetrad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_pentad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
-  [`layout_tbl_graph_pentad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   [`layout_hexad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
-  [`layout_tbl_graph_hexad()`](https://stocnet.github.io/autograph/reference/layout_configuration.md)
   : Layout algorithms based on configurational positions
-- [`layout_tbl_graph_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
-  : Layered layout
-- [`layout_tbl_graph_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md)
+- [`layout_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md)
+  [`layout_tbl_graph_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md)
+  : Correspondence layout
+- [`layout_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_tbl_graph_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_lineage()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_tbl_graph_lineage()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_railway()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_tbl_graph_railway()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_ladder()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  [`layout_tbl_graph_ladder()`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  : Layered layouts
+- [`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md)
+  [`layout_tbl_graph_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md)
+  : Levels layout
+- [`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md)
+  [`layout_tbl_graph_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md)
   : Matching layout
-- [`layout_concentric()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_concentric()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_multilevel()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_multilevel()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_lineage()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_lineage()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_hierarchy()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_hierarchy()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_alluvial()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_alluvial()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_railway()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_railway()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_ladder()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  [`layout_tbl_graph_ladder()`](https://stocnet.github.io/autograph/reference/layout_partition.md)
-  : Layout algorithms based on bi- or other partitions
+- [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
+  [`layout_tbl_graph_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
+  : Scaling layout
 - [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
   [`layout_tbl_graph_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
-  : Valence-based layout
+  : Valence layout
+- [`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  : Checking how well a layout draws its ties
 
 ## Results objects from other packages
 
@@ -143,4 +175,9 @@ improved or additional layouts to those offered in
   [`ergm_gof`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   [`goldfish_outliers`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   [`goldfish_changepoints`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`goldfish_margins`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`goldfish_gof`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`goldfish_time`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`goldfish_onset`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`goldfish_fit`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   : Precooked results for demonstrating plotting

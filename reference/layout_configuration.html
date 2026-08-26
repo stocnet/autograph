@@ -15,7 +15,7 @@ layout automatically.'><meta property="og:image" content="https://stocnet.github
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,23 +68,13 @@ layout automatically.</p>
 <span></span>
 <span><span class="fu">layout_dyad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">layout_tbl_graph_dyad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">layout_triad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">layout_tbl_graph_triad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">layout_tetrad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">layout_tbl_graph_tetrad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
 <span><span class="fu">layout_pentad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">layout_tbl_graph_pentad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">layout_hexad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">layout_tbl_graph_hexad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">layout_hexad</span><span class="op">(</span><span class="va">.data</span>, circular <span class="op">=</span> <span class="cn">TRUE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -96,18 +86,33 @@ layout automatically.</p>
 
 
 <dt id="arg-circular">circular<a class="anchor" aria-label="anchor" href="#arg-circular"></a></dt>
-<dd><p>Logical, required for <code>{ggraph}</code> compatibility, default TRUE.</p></dd>
+<dd><p>Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for <code>{ggraph}</code> compatibility.</p></dd>
 
 
 <dt id="arg-times">times<a class="anchor" aria-label="anchor" href="#arg-times"></a></dt>
-<dd><p>Integer, how many times to run the algorithm.
-Required by for <code>{ggraph}</code> compatibility, but not used here, so default = 1.</p></dd>
+<dd><p>Maximum number of iterations, where appropriate.
+Required for <code>{ggraph}</code> compatibility, and ignored by the layouts that
+do not iterate.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>Returns a table of nodes' x and y coordinates.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other mapping:
-<code><a href="layout_partition.html">layout_partition</a></code>,
+<code><a href="check_layout.html">check_layout</a></code>,
+<code><a href="completion.html">completion</a></code>,
+<code><a href="layout_concentric.html">layout_concentric()</a></code>,
+<code><a href="layout_correspondence.html">layout_correspondence()</a></code>,
+<code><a href="layout_layered.html">layout_layered()</a></code>,
+<code><a href="layout_levels.html">layout_levels()</a></code>,
+<code><a href="layout_matching.html">layout_matching()</a></code>,
+<code><a href="layout_scaling.html">layout_scaling()</a></code>,
+<code><a href="layout_valence.html">layout_valence()</a></code>,
 <code><a href="plot_graphr.html">plot_graphr</a></code>,
 <code><a href="plot_graphs.html">plot_graphs</a></code>,
 <code><a href="plot_grapht.html">plot_grapht</a></code></p></div>
@@ -118,10 +123,7 @@ Required by for <code>{ggraph}</code> compatibility, but not used here, so defau
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># "configuration" picks the layout matching the number of nodes</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="plot_graphr.html">graphr</a></span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_create.html" class="external-link">create_ring</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, layout <span class="op">=</span> <span class="st">"configuration"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="layout_configuration-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="co"># or a specific configuration can be named</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="plot_graphr.html">graphr</a></span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_create.html" class="external-link">create_ring</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, layout <span class="op">=</span> <span class="st">"triad"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="layout_configuration-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="co"># the layout functions can also be called directly for their coordinates</span></span></span>
+<span class="r-in"><span><span class="co"># the specific configurations are also available as functions</span></span></span>
 <span class="r-in"><span><span class="fu">layout_tetrad</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_create.html" class="external-link">create_ring</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   x y</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0 0</span>

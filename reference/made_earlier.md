@@ -29,6 +29,16 @@ data(ergm_gof)
 data(goldfish_outliers)
 
 data(goldfish_changepoints)
+
+data(goldfish_margins)
+
+data(goldfish_gof)
+
+data(goldfish_time)
+
+data(goldfish_onset)
+
+data(goldfish_fit)
 ```
 
 ## Format
@@ -57,8 +67,20 @@ An object of class `gof.stats.monan` of length 2.
 
 An object of class `gof.ergm` (inherits from `gof`) of length 30.
 
-An object of class `outliers.goldfish` (inherits from
-`dependent.goldfish`, `data.frame`) with 12 rows and 7 columns.
+An object of class `goldfishOutliers` (inherits from `tbl_df`, `tbl`,
+`data.frame`) with 439 rows and 11 columns.
 
-An object of class `changepoints.goldfish` (inherits from `list`) of
-length 2.
+An object of class `goldfishChangepoints` (inherits from `tbl_df`,
+`tbl`, `data.frame`) with 115 rows and 10 columns.
+
+An object of class `goldfishMargins` (inherits from `tbl_df`, `tbl`,
+`data.frame`) with 308 rows and 5 columns.
+
+An object of class `goldfishGOF` (inherits from `list`) of length 3.
+
+An object of class `goldfishTimeTest` (inherits from `list`) of length
+3.
+
+An object of class `goldfishOnset` (inherits from `list`) of length 3.
+
+An object of class `goldfishFit` of length 31.

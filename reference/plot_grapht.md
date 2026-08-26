@@ -25,10 +25,10 @@ single static layout is computed on the aggregate (union of waves)
 network instead, so that positions remain constant. Unlike
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 `grapht()` uses this dynamic stress layout by default even for two-mode
-networks (rather than a hierarchy layout, which would collapse many
-nodes onto a line); the two modes remain distinguishable by node shape.
-For networks with more than 30 nodes, node labels are suppressed by
-default to keep frames legible; pass `labels = TRUE` to force them.
+networks (rather than a layered layout, which would collapse many nodes
+onto a line); the two modes remain distinguishable by node shape. For
+networks with more than 30 nodes, node labels are suppressed by default
+to keep frames legible; pass `labels = TRUE` to force them.
 
 `grapht()` returns a `{ggplot2}`-compatible object that can be extended
 with additional layers such as
@@ -107,27 +107,80 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 - layout:
 
   An igraph, ggraph, or manynet layout algorithm. If not declared,
-  defaults to "triad" for networks with 3 nodes, "quad" for networks
-  with 4 nodes, "stress" for all other one mode networks, or "hierarchy"
-  for two mode networks. For "hierarchy" layout, one can further split
-  graph by declaring the "center" argument as the "events", "actors", or
-  by declaring a node name. For "concentric" layout algorithm please
-  declare the "membership" as an extra argument. The "membership"
-  argument expects either a quoted node attribute present in data or
-  vector with the same length as nodes to draw concentric circles. For
-  "multilevel" layout algorithm please declare the "level" as extra
-  argument. The "level" argument expects either a quoted node attribute
-  present in data or vector with the same length as nodes to
-  hierarchically order categories. If "level" is missing, function will
-  look for 'lvl' node attribute in data. The "lineage" layout ranks
-  nodes in Y axis according to values. For "lineage" layout algorithm
-  please declare the "rank" as extra argument. The "rank" argument
-  expects either a quoted node attribute present in data or vector with
-  the same length as nodes.
+  defaults to "configuration" for networks of up to six nodes, "levels"
+  for connected multilevel networks, "layered" for other two mode
+  networks, and "stress" for all other networks. For "layered" layout,
+  one can further split graph by declaring the "center" argument as the
+  "events", "actors", or by declaring a node name. For "concentric"
+  layout algorithm please declare the "membership" as an extra argument.
+  The "membership" argument expects either a quoted node attribute
+  present in data or vector with the same length as nodes to draw
+  concentric circles. For "levels" layout algorithm one may declare the
+  "level" as extra argument. The "level" argument expects either a
+  quoted node attribute present in data or vector with the same length
+  as nodes to hierarchically order categories. If "level" is missing,
+  the levels are taken from a 'lvl' node attribute where there is one,
+  or else from the two modes of a two mode network. The layered layouts
+  ("layered", "lineage", "railway" and "ladder") accept a "ranks"
+  argument, which takes either one of the methods named at
+  [`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  or a numeric node attribute to lay the layers out by, as a quoted
+  attribute name or a vector with one value for each node. The "scaling"
+  layout places the nodes by multidimensional scaling, so that the
+  distance between two nodes approximates the number of steps between
+  them. Since those coordinates can be read, this layout is drawn with
+  labelled axes on one scale, and captioned with how well two dimensions
+  hold the distances; see
+  [`?layout_scaling`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
+  and
+  [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md).
+  Note that those axes carry distances rather than named dimensions: the
+  drawing can be turned or mirrored without fitting the network any
+  better or any worse. The "correspondence" layout places the nodes by
+  correspondence analysis, so that two nodes with similar ties are drawn
+  together, whether or not they are tied to each other. It is the usual
+  way to draw a two mode network, since it places both modes against the
+  same pair of axes, and it accepts a "direction" argument for a
+  directed network and a "double" argument for a signed one; see
+  [`?layout_correspondence`](https://stocnet.github.io/autograph/reference/layout_correspondence.md).
+  Each axis names the share of the network's inertia that it holds.
 
 - labels:
 
-  Logical, whether to print node names as labels if present.
+  Which nodes to label, if the network is labelled. `TRUE` (the default)
+  labels every node and `FALSE` none of them, but a label for every node
+  of a large network hides the network behind them, so a *selection* of
+  the nodes can be given instead:
+
+  - a number, e.g. `labels = 5`, labels the nodes within the top five
+    ranks by degree. Note that this is a depth of ranks rather than a
+    count of nodes: nodes tied at the cut are labelled together, so more
+    than five labels may appear.
+
+  - a measure to rank by, e.g. `labels = "betweenness"`, labels just the
+    node or nodes that measure singles out. `"degree"`, `"betweenness"`,
+    `"cutpoints"` (every node the mark flags) and `"random"` (a small
+    random sample) are available. The two can be combined by naming the
+    number, as in `labels = c(betweenness = 5)`.
+
+  - the name of a logical node attribute, e.g. `labels = "is_broker"`,
+    labels the nodes it marks.
+
+  - a logical vector, one value per node, e.g.
+    `labels = netrics::node_is_cutpoint(net)`; or the names or positions
+    of the nodes to label, e.g. `labels = c("Alice", "Betty")`.
+
+  Where a length-one string could mean more than one of these, a node
+  attribute is preferred to a measure, and a measure to a node name. A
+  single number is always read as a depth of ranks rather than as one
+  node's position, so a lone node is best named, as in
+  `labels = "Alice"`. For networks of more than 30 nodes, `labels`
+  defaults to a selection rather than to every node; pass
+  `labels = TRUE` for all of them. Ranking nodes uses the `{netrics}`
+  package, which is suggested rather than required: without it
+  installed, an automatic selection falls back to a random sample.
+  Two-mode and multilevel networks are ranked within each mode or level,
+  so that every level is labelled and not just the densest.
 
 - node_color, node_colour:
 
@@ -190,8 +243,8 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   value (e.g. `15`) for more spacing. Only used when `labels = TRUE` and
   `label_repel = TRUE` (as the padding passed to the repel algorithm) or
   `label_repel = FALSE` (as a fixed nudge away from the node, in the
-  layouts where this makes sense, e.g. "circle"/"concentric",
-  "bipartite"/"railway", "alluvial").
+  layouts where this makes sense, e.g. "circle"/"concentric", "railway",
+  "lineage").
 
 - label_repel:
 
@@ -199,7 +252,11 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   and from nodes using `ggrepel` (via `ggraph`'s `repel` argument).
   Defaults to `TRUE`. Set to `FALSE` to place labels at a fixed offset
   (see `label_dist`) without the (sometimes slow, and non-deterministic
-  between runs for some layouts) repelling algorithm.
+  between runs for some layouts) repelling algorithm. The layered
+  layouts ("layered", "lineage", "railway" and "ladder") place each node
+  in a layer, which is where the reader looks for it, so a repelled
+  label there would say less about which node it labels than a fixed
+  offset does. They ignore this argument and always offset.
 
 - keep_isolates:
 
@@ -233,17 +290,37 @@ frames), so `label_repel` here instead toggles a fixed offset nudging
 labels away from their nodes, and `label_dist` scales the size of that
 nudge rather than being used as repel padding.
 
+`labels` can select which nodes to label here too, and the selection is
+resolved once over all the waves so that the same nodes stay labelled
+from frame to frame. Unlike
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+though, animations of more than 30 nodes default to no labels at all
+rather than to a selection of them.
+
 Some further
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 features are not available in animations: `node_group` hulls, edge
 bundling, curved arcs for reciprocated ties, and self-loops (loops are
-not drawn; a note is printed if present).
+not drawn; a note is printed if present). Note too that, where no
+`layout` is named, `grapht()` defaults to the "stress" layout for every
+network rather than choosing one by the network's shape as
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+does, so that nodes move smoothly from one wave to the next. A layout
+named explicitly is still used, computed on the aggregate network.
 
 ## See also
 
 Other mapping:
+[`check_layout`](https://stocnet.github.io/autograph/reference/check_layout.md),
+[`completion`](https://stocnet.github.io/autograph/reference/completion.md),
+[`layout_concentric()`](https://stocnet.github.io/autograph/reference/layout_concentric.md),
 [`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
-[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`layout_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md),
+[`layout_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md),
+[`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
+[`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md),
+[`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 [`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
 

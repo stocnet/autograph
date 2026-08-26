@@ -9,7 +9,7 @@ testing and demonstrating how autograph plots look."><meta property="og:image" c
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,17 @@ testing and demonstrating how autograph plots look.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_outliers</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_changepoints</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_changepoints</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_margins</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_gof</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_time</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_onset</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">goldfish_fit</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -90,8 +100,13 @@ testing and demonstrating how autograph plots look.</p>
 <p>An object of class <code>traces.monan</code> of length 3.</p>
 <p>An object of class <code>gof.stats.monan</code> of length 2.</p>
 <p>An object of class <code>gof.ergm</code> (inherits from <code>gof</code>) of length 30.</p>
-<p>An object of class <code>outliers.goldfish</code> (inherits from <code>dependent.goldfish</code>, <code>data.frame</code>) with 12 rows and 7 columns.</p>
-<p>An object of class <code>changepoints.goldfish</code> (inherits from <code>list</code>) of length 2.</p>
+<p>An object of class <code>goldfishOutliers</code> (inherits from <code>tbl_df</code>, <code>tbl</code>, <code>data.frame</code>) with 439 rows and 11 columns.</p>
+<p>An object of class <code>goldfishChangepoints</code> (inherits from <code>tbl_df</code>, <code>tbl</code>, <code>data.frame</code>) with 115 rows and 10 columns.</p>
+<p>An object of class <code>goldfishMargins</code> (inherits from <code>tbl_df</code>, <code>tbl</code>, <code>data.frame</code>) with 308 rows and 5 columns.</p>
+<p>An object of class <code>goldfishGOF</code> (inherits from <code>list</code>) of length 3.</p>
+<p>An object of class <code>goldfishTimeTest</code> (inherits from <code>list</code>) of length 3.</p>
+<p>An object of class <code>goldfishOnset</code> (inherits from <code>list</code>) of length 3.</p>
+<p>An object of class <code>goldfishFit</code> of length 31.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

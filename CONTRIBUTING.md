@@ -183,11 +183,131 @@ themes — see the comment in
 longitudinal/dynamic network over time using
 [gganimate](https://gganimate.com)/[gifski](https://r-rust.r-universe.dev/gifski).
 
+### Layout names and files
+
 Custom layout algorithms not provided by igraph/ggraph/graphlayouts live
-in their own `layout_*.R` files (`layout_configurational.R`,
-`layout_grid.R`, `layout_layered.R`, `layout_matching.R`,
-`layout_partition.R`, `layout_valence.R`) and follow the
-`layout_tbl_graph_*()` naming convention.
+in their own `layout_*.R` files and follow the `layout_tbl_graph_*()`
+naming convention. There is one file for each *family*:
+`layout_layered.R` (`layered`, `lineage`, `railway`, `ladder`),
+`layout_concentric.R`, `layout_levels.R`, `layout_configurational.R`,
+`layout_valence.R` and `layout_matching.R`.
+
+**One family, one file, one man page, one `@name`.** A file named
+`layout_*.R` registers at least one `layout_tbl_graph_*`. A file that
+registers none is not a layout file: put the helper beside its only
+caller. This rule exists because two files broke it — `layout_grid.R`
+held the grid-snapping engine (now
+[R/graph_snap.R](https://stocnet.github.io/R/graph_snap.R)), and
+`layout_engine.R` held only the layered engine (now the second half of
+[R/layout_layered.R](https://stocnet.github.io/R/layout_layered.R)).
+
+**Each layout file is self-contained** — its exports, its
+`layout_tbl_graph_*` aliases, and the private engine those exports
+share. A private helper used by exactly one family lives in that
+family’s file; one used by two or more goes to
+[R/autograph_utilities.R](https://stocnet.github.io/R/autograph_utilities.R).
+`.rescale()` was copied into two files instead, and drifted out of sight
+of both.
+
+#### Choosing a name
+
+**Reserved names, never usable.** `ggraph:::layout_to_table.character()`
+tests `is.igraphlayout()` *before* it looks for a `layout_tbl_graph_*`
+function, so a layout named with any of these is unreachable through
+`layout =`, and nothing warns:
+
+> `bipartite`, `star`, `tree`, `circle`, `nicely`, `dh`, `drl`, `gem`,
+> `graphopt`, `grid`, `mds`, `sugiyama`, `sphere`, `randomly`, `fr`,
+> `kk`, `lgl`
+
+**Taken names** — `ggraph`’s own `layout_tbl_graph_*`:
+
+> `auto`, `backbone`, `cactustree`, `centrality`, `circlepack`,
+> `dendrogram`, `eigen`, `fabric`, `focus`, `hive`, `htree`, `igraph`,
+> `linear`, `manual`, `matrix`, `metro`, `partition`, `pmds`, `sf`,
+> `sparse_stress`, `stress`, `treemap`, `unrooted`
+
+**Reserved in waiting** — in `graphlayouts` but not yet wrapped by
+`ggraph`. A name here resolves to autograph today and would be silently
+shadowed the day ggraph wraps it, because ggraph’s namespace is searched
+first. Treat them as taken:
+
+> `multilevel`, `umap`, `dynamic`, `stress3D`, `constrained_stress`,
+> `fixed_coords`, `centrality_group`, `focus_group`, `metromap`,
+> `tree_unrooted`
+
+This is what retired `multilevel` in favour of `levels`.
+
+**Reserved by us** — `alluvial` is held for a plot of changing
+membership composition over time, not for a layout.
+
+Check a candidate against all three namespaces before committing to it:
+
+``` r
+Rscript -e 'nm <- "yourname"; print(nm %in% c(sub("^layout_tbl_graph_", "", grep("^layout_tbl_graph_", ls(asNamespace("ggraph")), value = TRUE)), sub("^layout_(as|with|in|on)_", "", grep("^layout_", getNamespaceExports("graphlayouts"), value = TRUE)), sub("^layout_(as|with|in|on)_", "", grep("^layout_", getNamespaceExports("igraph"), value = TRUE))))'
+```
+
+**Name the shape, not the meaning or the algorithm.** A layout name is a
+single lowercase English noun for what the drawing looks like:
+`layered`, `lineage`, `railway`, `ladder`, `concentric`, `valence`.
+Never the algorithm or its author (`sugiyama`), and not a claim the data
+may not support — `hierarchy` was retired because a two-mode network has
+two layers and no hierarchy between them. Where a layout takes the
+attribute it is named for, keep the two in agreement
+(`layout = "levels"` takes `level = "lvl"`).
+
+**A name is for the drawing; an argument is for the variation — but a
+common drawing earns a name.** `railway` and `ladder` are
+`alignment = "rungs"` applied to `layered` and `lineage`, and they keep
+their names: making a user learn an argument to reach a common figure
+defeats the point of an *auto*-graph. Add a name when a user would look
+for that word; do not add one for every argument value. The
+counter-example is `dyad`…`hexad`, which were retired because
+`configuration` already picks the one matching the number of nodes, so
+no user had a reason to type them.
+
+**Prefer overloading an argument to adding one.** An argument that takes
+a keyword should also take a node attribute name or vector where that
+makes sense, as `ranks=` and `node_size=` do. That is how `lineage`
+absorbed a layout of its own that only differed in where the layers came
+from.
+
+#### Adding a layout
+
+1.  Export `layout_<name>()` and alias
+    `layout_tbl_graph_<name> <- layout_<name>`.
+2.  Tag it `@family mapping` and `@template param_ggraphlayouts`
+    ([man-roxygen/param_ggraphlayouts.R](https://stocnet.github.io/man-roxygen/param_ggraphlayouts.R)
+    holds `.data`, `circular`, `times` and the return value, which every
+    layout shares).
+3.  Declare what it needs in `.layout_requirements()`
+    ([R/graph_checks.R](https://stocnet.github.io/R/graph_checks.R)), so
+    [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+    can substitute and say why instead of failing downstream. Declare
+    nothing where an argument could rescue the layout —
+    `.abort_layout_arg()` asks for it.
+4.  Add it to `.layered_layouts()` if its coordinates carry meaning
+    along an axis that grid snapping would collapse.
+5.  Add a mirroring `test-layout_<name>.R`. The functional audit in
+    `test-functional_layouts.R` enumerates from the namespace, so it
+    picks the layout up with no further change.
+
+#### Retiring a layout name
+
+1.  Add a shim to
+    [R/autograph-defunct.R](https://stocnet.github.io/R/autograph-defunct.R)
+    under `@rdname layout_deprecated`, forwarding to the replacement
+    after
+    [`manynet::snet_warn()`](https://stocnet.github.io/manynet/reference/interface.html).
+2.  Add the name to `.deprecated_layouts()` and its replacement to
+    `.rename_layout()`. `.rename_layout()` swaps the name once, where
+    the layout is checked, so that every step after it — applicability,
+    node sizes, tie alpha, labels — knows only the current name.
+3.  Keep its `.layout_requirements()` entry, so the string is still
+    validated before the swap.
+4.  Nothing else needs updating: `.deprecated_layouts()` is what keeps
+    the name out of the RStudio completions and out of the functional
+    audit.
 
 ### Plot-method dispatch (`plot_*.R`)
 
@@ -202,38 +322,214 @@ object*, not by source package:
 | `plot_analysis.R` | node/tie/network measures, motifs, memberships (`node_measure`, `tie_measure`, `network_measures`, `node_member`, `node_motif`, `network_motif`, `matrix`) |
 | `plot_summaries.R` | diffusion/learning model summaries (`diff_model`, `diffs_model`, `learn_model`, `mnet`) |
 | `plot_gof.R` | goodness-of-fit objects (`gof.ergm`, `sienaGOF`, `gof.stats.monan`, autograph’s own `ag_gof`) |
-| `plot_convergence.R`, `plot_diagnostics.R`, `plot_tests.R`, `plot_interp.R` | model diagnostics, convergence traces, statistical tests, and interpretation plots for `netlm`/`netlogit`/`ergm` etc. |
-| `plot_manydata.R` | goldfish `changepoints`/`outliers` and other longitudinal data objects |
+| `plot_diagnostics.R` | adequacy diagnostics and model fits, currently goldfish’s (`goldfishOutliers`, `goldfishChangepoints`, `goldfishOnset`, `goldfishMargins`, `goldfishGOF`, `goldfishTimeTest`, `goldfishFit`) |
+| `plot_convergence.R`, `plot_tests.R`, `plot_interp.R` | convergence traces, statistical tests, and interpretation plots for `netlm`/`netlogit`/`ergm` etc. |
+| `plot_manydata.R` | ‘many’ data plots; the whole file is commented out at present |
 
 New `plot.*` methods must be registered in NAMESPACE via roxygen
 `@method`/`@export` tags — run
 [`devtools::document()`](https://devtools.r-lib.org/reference/document.html)
 after adding one. Suggestions for new plot methods are welcome.
 
+### Class names across the stocnet ecosystem
+
+S3 dispatch matches exact class strings, so two packages that emit the
+same class string collide: `autograph` cannot tell the objects apart,
+and neither can a user’s
+[`inherits()`](https://rdrr.io/r/base/class.html) check. A name such as
+`test_gof` or `margin_table` is the name any sibling package would pick
+for the same idea, so it is not safe.
+
+The rule for every stocnet package is: **name a class after the package
+plus a noun, in camelCase** (`<pkg><Thing>`), following RSiena’s
+`sienaFit`, `sienaGOF` and `sienaAlgorithm`. camelCase keeps a class
+visually distinct from the snake_case user-facing functions.
+
+Two things the convention does not use:
+
+- **No dot suffix.** A dot in a class string creates no inheritance. R
+  dispatches on exact class strings, and all S3 inheritance comes from
+  the class vector, so `foo.goldfish` does not match an object of class
+  `"diagnose_outliers.goldfish"`. A suffix such as `.goldfish` is
+  convention only.
+- **No shared parent class.** `autograph` draws a different figure for
+  each diagnostic, so a fallback method would have nothing to do.
+  `autograph` standardises by coercion instead, as it already does for
+  other objects.
+
+The goldfish diagnostic classes follow this rule. Five older class names
+remain in
+[R/autograph-defunct.R](https://stocnet.github.io/R/autograph-defunct.R)
+as aliases forwarding to the renamed methods, so that an object classed
+the way an earlier autograph expected still plots: `diagnose_outliers`
+and `diagnose_changepoints` (the names goldfish 1.9.21 stamps),
+`outliers.goldfish` and `changepoints.goldfish` (the two the draft
+methods were written against), and `result.goldfish` (the fit class
+every goldfish stamps, back to the version on CRAN). An alias restores
+dispatch, not the old column contract: each forwards to a method that
+reads the current columns. Delete each alias once the oldest supported
+goldfish is past the rename.
+
+### Function names
+
+Two naming families, and they do not mix:
+
+- **User-facing functions are snake_case, and usually `verb_noun`**:
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+  [`match_color()`](https://stocnet.github.io/autograph/reference/theme_match.md),
+  [`is_dark()`](https://stocnet.github.io/autograph/reference/theme_match.md),
+  [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+  [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md),
+  [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md).
+  This is the convention across the stocnet suite, so a user meets one
+  style everywhere.
+- **The `ag_` prefix is for the theme accessors only**:
+  [`ag_base()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+  [`ag_ink()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+  [`ag_highlight()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+  [`ag_positive()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+  [`ag_negative()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+  `ag_qualitative(n)`, `ag_sequential(n)`, `ag_divergent(n)`,
+  [`ag_font()`](https://stocnet.github.io/autograph/reference/ag_call.md).
+  Each returns the autograph-specific value the current theme holds for
+  one role, and each reads an `snet_*` option. Do not give `ag_` to a
+  function that does something else, even a small one: a new verb
+  belongs in the snake_case family. Internal helpers may take `ag_`
+  where they build such a value (`ag_ground()`, `ag_theme_*()`).
+- **`check_*` scores, `.check_*` guards**: the exported
+  [`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md),
+  [`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md),
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  and
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  each measure a drawing and return the score, so that a user can
+  compare one layout or palette with another. The private
+  `.check_layout()`, `.check_layout_applies()`, `.layout_applies()` and
+  `.check_dup()` validate an argument and abort or substitute, reading
+  the tables `.layout_requirements()` and `.deprecated_layouts()`. The
+  two do different jobs, so keep the dot: it is what tells them apart.
+
 ### Theming
 
-[R/theme_set.R](https://stocnet.github.io/R/theme_set.R) implements
+[R/theme_palette_set.R](https://stocnet.github.io/R/theme_palette_set.R)
+implements
 [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
 (alias
 [`set_stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)),
 which sets an R option (`stocnet_theme`, default `"default"`) read by
 every plotting function in the package. Institutional and stylistic
-palettes (`default`, `bw`, `crisp`, `neon`, `iheid`, `ethz`, `uzh`,
-`rug`, `unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`) are
-defined in
-[R/theme_palettes.R](https://stocnet.github.io/R/theme_palettes.R) and
-exposed via consistent accessor functions
-([`ag_base()`](https://stocnet.github.io/autograph/reference/ag_call.md),
-[`ag_highlight()`](https://stocnet.github.io/autograph/reference/ag_call.md),
-[`ag_positive()`](https://stocnet.github.io/autograph/reference/ag_call.md),
-[`ag_negative()`](https://stocnet.github.io/autograph/reference/ag_call.md),
-`ag_qualitative(n)`, `ag_sequential(n)`, `ag_divergent(n)`,
-[`ag_font()`](https://stocnet.github.io/autograph/reference/ag_call.md))
-documented together under `ag_call`. Users can override individual
-palette colours via [`options()`](https://rdrr.io/r/base/options.html)
+palettes (`default`, `bw`, `crisp`, `neon`, `clay`, `iheid`, `ethz`,
+`uzh`, `rug`, `unibe`, `oxf`, `unige`, `cmu`, `iast`, `hwu`, `rainbow`)
+are defined in
+[R/theme_palette_set.R](https://stocnet.github.io/R/theme_palette_set.R)
+and exposed via the `ag_` accessors listed above, documented together
+under `ag_call`. Users can override individual palette colours via
+[`options()`](https://rdrr.io/r/base/options.html)
 (e.g. `options(snet_highlight = ...)`) rather than editing theme code.
 [R/theme_match.R](https://stocnet.github.io/R/theme_match.R) maps a
 plot/result object to its appropriate theme treatment.
+
+Three roles, kept separate, because they pull in different directions:
+the **base** is an unhighlighted mark, and may be light where that is
+what separates it from a dark brand highlight; the **ink**
+([`ag_ink()`](https://stocnet.github.io/autograph/reference/ag_call.md))
+is what a plot writes with, and must stay legible; the **highlight** is
+the brand colour. Reference lines, axis text, and other chrome take
+[`ag_ink()`](https://stocnet.github.io/autograph/reference/ag_call.md),
+never
+[`ag_base()`](https://stocnet.github.io/autograph/reference/ag_call.md).
+
+Every plot is drawn on the theme’s ground. Build plot themes with the
+`ag_theme_*()` wrappers in
+[R/theme_palette_set.R](https://stocnet.github.io/R/theme_palette_set.R)
+(`ag_theme_minimal()`, `ag_theme_void()`, and so on) rather than calling
+[`ggplot2::theme_minimal()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+directly, so that a theme with a background other than white reaches
+every plot and not only the graphs.
+
+[R/theme_colorblind.R](https://stocnet.github.io/R/theme_colorblind.R)
+holds the colour-checking tools:
+[`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+and the internal `colorblind_sort()` that each theme’s categorical
+palette passes through when the theme is set. The three answer three
+different questions and none substitutes for another:
+[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+asks whether two marks can be told apart (CIELAB distance, worst case
+across normal and colour-blind vision),
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+asks whether text can be read on what it sits on (WCAG 2.1 relative
+luminance), and `simulate_colorblind(type = "grey")` asks whether either
+survives a photocopier. Greyscale is reported beside
+[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)’s
+score rather than folded into it: two colours that differ only in hue
+collapse in greyscale however well they serve a colour-blind reader, so
+a worst case that included it would condemn nearly every institutional
+palette. A palette added to a theme therefore does not need
+hand-ordering, but it does need to survive the audit in
+`tests/testthat/test-functional_themes.R`, which requires the first few
+colours to stay apart under each type of colour blindness. A palette
+whose own order carries meaning is exempted by adding it to
+`colorblind_unsorted`; `"rainbow"` is the only member, and is sampled
+across its length instead of taken from the front.
+
+The **medium** is separate from the theme, and lives in
+[R/theme_medium.R](https://stocnet.github.io/R/theme_medium.R):
+[`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+says where a plot will be seen (`"screen"`, `"presentation"`,
+`"mobile"`, `"print"`), not how it should look. It scales text through
+[`ag_size()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+and `ag_text_size()`, and `"print"` overrides the ground to white. Text
+set on a geom or on a theme element directly does not pass through
+`base_size`, so wrap it in `ag_text_size()`; marks are deliberately left
+unscaled, since a node’s size is relative to its layout.
+
+#### Adding a theme or palette
+
+1.  Add the name to `theme_opts` in
+    [R/theme_palette_set.R](https://stocnet.github.io/R/theme_palette_set.R).
+2.  Give it a branch in each `set_*_theme()` it needs: background, ink,
+    highlight, divergent, categorical, font. Omitting one leaves the
+    theme on that setter’s default, which is usually right.
+    `set_missing_theme()` needs nothing: it derives
+    [`ag_missing()`](https://stocnet.github.io/autograph/reference/ag_call.md)
+    from the ground and the palette.
+3.  Store the categorical palette in the order `colorblind_sort()` gives
+    it, not the order the brand guide lists it in. The test suite
+    asserts that the stored palette is already a fixed point of the
+    sort, so a hand-ordered palette will fail.
+4.  Run `tests/testthat/test-functional_themes.R`. It holds every theme
+    to: the first few categorical colours staying apart under each type
+    of colour blindness, divergent poles that are not a red-green pair,
+    a highlight pair that every viewer can separate, and ink that clears
+    WCAG’s 4.5:1 on the theme’s own ground.
+
+Reorder a palette; do not repaint it. An institution’s colours are that
+institution’s, and the point of `colorblind_sort()` is that the order is
+ours to choose while the colours are not. Where a brand colour genuinely
+cannot meet a floor — the `"clay"` and `"oxf"` highlights fall just
+under WCAG’s 3:1 — name the exception in the test rather than adjusting
+the colour or dropping the assertion.
+
+Tools worth checking a candidate palette with before it is added:
+
+- [ColorBrewer](https://colorbrewer2.org) for whether a scheme should be
+  qualitative, sequential or diverging, and for its colour-blind safe,
+  print-friendly and photocopy-safe filters.
+- [Viz Palette](https://projects.susielu.com/viz-palette) for seeing a
+  set of hexcodes at once under each type of colour vision deficiency.
+- Datawrapper’s [notes on colour in a data-vis style
+  guide](https://www.datawrapper.de/blog/colors-for-data-vis-style-guides)
+  for why a palette needs to vary in lightness and not only in hue, and
+  for the case for a de-emphasis colour
+  ([`ag_missing()`](https://stocnet.github.io/autograph/reference/ag_call.md)
+  here).
+- The [`{GGenemy}`](https://cran.r-project.org/package=GGenemy) and
+  [`{colorify}`](https://cran.r-project.org/package=colorify) packages,
+  for auditing a finished `ggplot2` figure and for generating candidate
+  palettes respectively. Neither is a dependency.
 
 Because `autograph` re-exports several `ggplot2` symbols (see
 [R/reexports_ggplot2.R](https://stocnet.github.io/R/reexports_ggplot2.R)),
@@ -270,14 +566,28 @@ code paths depending on them should guard with
 [R/autograph_utilities.R](https://stocnet.github.io/R/autograph_utilities.R))
 or be skipped gracefully when unavailable.
 
+The declared minimum of each `stocnet` dependency is the version on
+CRAN, so that CI can install it. Where `autograph` needs something that
+only a newer, unreleased version has, reach it through a shim in
+[R/autograph_utilities.R](https://stocnet.github.io/R/autograph_utilities.R)
+rather than by raising the minimum. Test for the function with
+`.ag_has_manynet()` rather than for the version string, because a
+pre-release development build can carry the version without yet
+exporting the function. Call the function with
+[`getExportedValue()`](https://rdrr.io/r/base/ns-reflect.html) and not
+`::`, because `R CMD check` resolves a `::` call against the installed
+package and reports the newer name as missing even where the call is
+never reached. Delete each shim once the minimum is raised past the
+version that added the function.
+
 ### Tests
 
 `tests/testthat/` uses testthat edition 3 with parallel execution
 (`Config/testthat/parallel: true` in DESCRIPTION). `tests/testthat.R`
 sets `stocnet_theme("default")` before running the suite so theme state
 doesn’t leak between runs. Test files are organised by the same grouping
-as the `R/` source files (e.g. `test-graphr.R`,
-`test-layout_partition.R`, `test-theme_match.R`).
+as the `R/` source files (e.g. `test-graphr.R`, `test-layout_layered.R`,
+`test-theme_match.R`).
 
 In addition, the `test-functional_*.R` files implement *functional*
 (family-enumerating) testing, mirroring the approach in
@@ -298,6 +608,115 @@ extracts and evaluates the code chunks of the learnr tutorials in
 warning fails the suite (rendering the tutorials themselves is
 deliberately not tested).
 
+### Tutorials and articles
+
+The learnr tutorials in `inst/tutorials/` are the source.
+`vignettes/articles/*.Rmd` are their static pkgdown twins, and are
+*generated* from them by
+[data-raw/build_tutorial_articles.R](https://stocnet.github.io/data-raw/build_tutorial_articles.R).
+Never edit an article by hand: the next regeneration discards the edit,
+and
+[prchecks.yml](https://stocnet.github.io/autograph/workflows/prchecks.yml)
+fails the PR for drift meanwhile.
+
+After adding or changing functionality, ask whether a reader learning
+the package would meet it, and if so:
+
+1.  Edit the tutorial in `inst/tutorials/<tute>/*.Rmd`. Add the new
+    function to the topic it belongs to, in an `exercise=TRUE` chunk,
+    with a sentence saying what it is for. New sections need an entry in
+    that topic’s page-toc, and are worth a line in its closing “In
+    brief” callout.
+2.  Re-render the tutorial HTML in place
+    ([`rmarkdown::render()`](https://pkgs.rstudio.com/rmarkdown/reference/render.html)
+    on the tutorial `.Rmd`), and commit it.
+3.  Re-run `Rscript data-raw/build_tutorial_articles.R`, and commit the
+    regenerated article.
+4.  Run
+    `testthat::test_file("tests/testthat/test-tutorials_autograph.R")`,
+    which purls and evaluates every chunk, so new tutorial code is
+    tested.
+
+Where the change is worth showing off rather than only teaching, it also
+belongs in `README.Rmd` — which is knit to `README.md` with
+[`devtools::build_readme()`](https://devtools.r-lib.org/reference/build_readme.html),
+never edited directly — and its figures land in `man/figures/`, from
+where the website serves them.
+
+### Website
+
+The site is built by [pkgdown](https://pkgdown.r-lib.org/) from
+[pkgdown/\_pkgdown.yml](https://stocnet.github.io/pkgdown/_pkgdown.yml)
+and deployed from
+[pushrelease.yml](https://stocnet.github.io/autograph/workflows/pushrelease.yml)
+on a merge to `main`.
+
+**Every exported function must appear in the `reference:` index.** A
+topic left out of it fails the build, so the site stops updating. Add a
+new function to the section it belongs to, or add a new section where it
+starts a family, and prefer naming the topic (`theme_colorblind`) over
+widening a `starts_with()` pattern. A helper that users are not meant to
+call takes `@keywords internal` instead. The `reference:` titles are
+also the headings used in `NEWS.md` (see below), so keep the two in
+step.
+
+Check before opening a PR:
+
+``` r
+
+pkgdown::check_pkgdown()          # every topic is in the index
+pkgdown::build_site(preview = FALSE)  # everything else
+```
+
+[prchecks.yml](https://stocnet.github.io/autograph/workflows/prchecks.yml)
+runs both in the `website-builds` job, so a PR reports whether the site
+*can* be built without deploying it.
+
+### README figures
+
+`README.md` is knitted from
+[README.Rmd](https://stocnet.github.io/README.Rmd), and **its figures
+are hosted on jameshollway.com rather than committed to `man/figures`.**
+R installs `man/figures` into the installed package’s `help` directory,
+so a README figure left there is shipped to every user and counted by
+`R CMD check`’s installed size note. The figures once held 3.3Mb of a
+5.2Mb installed package.
+
+The published figures live at
+`https://www.jameshollway.com/post/autograph/`, which is served from
+`content/post/autograph` in that site’s own repository. Point
+`AUTOGRAPH_SITE_DIR` at your checkout of that directory:
+
+``` sh
+export AUTOGRAPH_SITE_DIR=~/path/to/jameshollway.com/content/post/autograph
+```
+
+The setup chunk reads that variable, and sets `have_site` from whether
+the directory exists. Where it does not, as on CI and on CRAN, the
+figure chunks do not run, and `README.md` keeps pointing at the
+published copies. The knit is still correct; the figures are simply not
+refreshed.
+
+A new figure needs three things:
+
+1.  Write the figure into the site directory rather than into
+    `man/figures`. A chunk whose code is hidden calls
+    `ggsave(site_figure("README-<name>-1.png"), ...)` and takes
+    `echo = FALSE, eval = have_site`. A chunk whose code is shown
+    instead takes
+    `fig.path = site_prefix, fig.show = "hide", eval = have_site`, which
+    lets knitr write the file but suppresses the local link.
+2.  Write the `<img>` tag into the prose by hand, with the published URL
+    and an `alt` text. `fig.alt` cannot do this, since the chunk emits
+    no link.
+3.  Copy the figure into the site repository, then commit and deploy it
+    there. **The image 404s on GitHub until that deploy lands.**
+
+Knit with
+[`devtools::build_readme()`](https://devtools.r-lib.org/reference/build_readme.html),
+and check that `grep 'man/figures/README' README.md` finds nothing. Only
+`man/figures/logo.png` belongs in `man/figures`.
+
 ### `NEWS.md` conventions
 
 `NEWS.md` groups each version’s changes under `##` headings that mirror
@@ -317,7 +736,31 @@ Start each bullet with a verb matching the change type:
 - `Improved ...` — functional updates to existing behaviour
 - `Updated ...` — documentation changes
 
+Any of these verbs can also lead a sub-bullet.
+
+Keep every bullet to one line of fewer than 81 characters ideally (a few
+more or less is fine). If a bullet wraps, it holds too much: shorten it,
+or split it into a lead bullet and sub-bullets. Each bullet stands on
+its own, and states what changed, not why or how unless there is space
+for context. Explanation belongs in the function documentation or the
+vignettes.
+
+Where several bullets describe parallel changes, reuse the sentence
+structure, so that a reader sees the parallelism at a glance. Use one
+word for one thing throughout a version’s entries, rather than varying
+the wording for effect.
+
 If a cited GitHub issue was **not** authored by @jhollway, thank the
 author with an `@`-tag in the bullet. Cluster related changes
 (e.g. several fixes to the same function, or sub-points of one feature)
 as indented sub-bullets under a lead bullet, to improve readability.
+Where several changes concern one function, lead with an `Improved ...`
+bullet that names the function, and put the individual
+`Fixed ...`/`Added ...` points beneath it, so the cluster groups by
+function rather than by change type. Under an `Improved ...` lead
+bullet, do not name the function again in the sub-bullets, since the
+lead bullet already carries it. Sub-bullets indent by two spaces, and
+nest at most one level further (four spaces). A sub-bullet does not need
+a verb: it can state the consequence, the previous behaviour, or an
+example call. The more entries a version holds, the more this structure
+matters, so group first and only then write the bullets.

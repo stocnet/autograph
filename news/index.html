@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,262 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.2" id="autograph-112">autograph 1.1.2<a class="anchor" aria-label="anchor" href="#autograph-112"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.0" id="autograph-120">autograph 1.2.0<a class="anchor" aria-label="anchor" href="#autograph-120"></a></h2>
+<div class="section level3">
+<h3 id="package-1-2-0">Package<a class="anchor" aria-label="anchor" href="#package-1-2-0"></a></h3>
+<ul><li>Removed the CRAN version check from <code>.onAttach()</code>, making <code><a href="https://stocnet.github.io/autograph/">library(autograph)</a></code> faster to attach
+<ul><li>Fixed <code>.onAttach()</code> not applying the ink of a persisted theme</li>
+</ul></li>
+<li>Added <a href="https://stocnet.github.io/goldfish/" class="external-link">goldfish</a> to <code>Enhances</code>
+</li>
+<li>Added <a href="https://github.com/r-lib/systemfonts" class="external-link">systemfonts</a> to <code>Suggests</code>
+</li>
+<li>Added a <code>website-builds</code> job to <code>prchecks.yml</code>, reporting whether the site builds
+<ul><li>
+<code><a href="../reference/count_pages.html">count_pages()</a></code> was missing from the reference index, which stopped it</li>
+</ul></li>
+<li>Updated CONTRIBUTING with conventions for function names, <code>NEWS.md</code> bullets, the website reference index, and keeping tutorials and articles in step</li>
+<li>Added <code><a href="../reference/completion.html">stocnet_completion()</a></code> to offer values an argument accepts as RStudio completions
+<ul><li>
+<code>graphr(fict_lotr, node_color =</code> Tab lists the node variables <code>fict_lotr</code> holds</li>
+<li>Covers node and tie variables, layouts, label criteria, themes, and defaults such as <code>isolates</code>
+</li>
+<li>Off unless asked for, since it replaces/encapsulates one of RStudio’s internal functions; <code>stocnet_completion(FALSE)</code> restores it</li>
+<li>A <code>persist</code> argument remembers the choice, as <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> does</li>
+<li>Values labelled with its class and its categories or range; a layout with the package that draws it</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-1-2-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-2-0"></a></h3>
+<ul><li>Improved layered layouts
+<ul><li>Consolidated layered layouts onto one engine
+<ul><li>“layered” is now default layout for directed acyclic networks</li>
+<li>Deprecating “hierarchy” as “layered” is more consistent for two-mode networks</li>
+<li>“lineage” is now exactly “layered” with the axes exchanged</li>
+<li>Deprecating “alluvial” to free name for plot of changing membership composition</li>
+<li>“railway” and “ladder” unchanged, but are <code>alignment = "rungs"</code>
+</li>
+<li>Checks whether layout is appropriate for the network, and reverts to default if not</li>
+</ul></li>
+<li>Minimises two costs: tie length (<code><a href="../reference/check_layout.html">check_span()</a></code>) and nodal offset (<code><a href="../reference/check_layout.html">check_offset()</a></code>)</li>
+<li>Added <code>ranks=</code> to choose the layers:
+<ul><li>“compact” asks <code><a href="https://r.igraph.org/reference/layout_with_sugiyama.html" class="external-link">igraph::layout_with_sugiyama()</a></code>
+</li>
+<li>“generation” ranks each node by its distance from a root</li>
+<li>“tight” (default) minimises total tie length while every tie points down at least one layer</li>
+<li>a numeric node attribute lays the layers out by its values, spaced in proportion to them, which is what “lineage” used to take a <code>rank</code> for</li>
+</ul></li>
+<li>Added <code>alignment=</code> to choose how a layer is spread out:
+<ul><li>“straight” (default) draws ties as close to straight as ordering allows</li>
+<li>“rungs” gives every layer same integer spacing</li>
+</ul></li>
+<li>Each weakly connected component now laid out on its own and packed beside others</li>
+<li>Fixed <code><a href="../reference/layout_layered.html">layout_layered()</a></code> centring on a second mode node yet reading first mode labels</li>
+<li>Fixed the direction of layers given as values to <code>ranks=</code>
+</li>
+<li>Fixed layered layout labels to ignore <code>label_repel</code>
+</li>
+</ul></li>
+<li>Improved multilevel layout
+<ul><li>Renamed “multilevel” layout to “levels” to avoid potential future collisions</li>
+<li>Fixed <code><a href="../reference/layout_levels.html">layout_levels()</a></code> to identify modes without having to name a <code>level</code>
+</li>
+<li>Exposed <code>method</code>, <code>alpha</code>, <code>beta</code>, <code>FUN1</code> and <code>FUN2</code> arguments</li>
+</ul></li>
+<li>Deprecated “dyad”, “triad”, “tetrad”, “pentad” and “hexad” layout names
+<ul><li>“configuration” already picks the one matching the number of nodes</li>
+<li>The <code><a href="../reference/layout_configuration.html">layout_dyad()</a></code> to <code><a href="../reference/layout_configuration.html">layout_hexad()</a></code> functions themselves are unchanged</li>
+</ul></li>
+<li>Fixed three broken paths in <code><a href="../reference/layout_concentric.html">layout_concentric()</a></code>
+<ul><li>Fixed drawing each node of an unlabelled network on a circle of its own</li>
+<li>Fixed erroring where a membership holds <code>NA</code>, now gathers <code>NA</code> nodes onto own circle</li>
+<li>Fixed <code>order.by=</code>, which errored on every network; now orders nodes around each circle by that attribute, decreasing</li>
+</ul></li>
+<li>Fixed <code>graphr(snap = TRUE)</code> to use rotation and other improvements</li>
+<li>Added a “scaling” layout for multidimensional scaling
+<ul><li>Scales classically up to a hundred nodes, and by pivots above that</li>
+<li>Scales unweighted path distances, so it can handle signed/weighted networks</li>
+<li>Lays each component out separately, where “pmds” refuses disconnected networks outright</li>
+<li>Drawn with labelled axes at a fixed ratio, since these coordinates can be read</li>
+<li>Captioned with <code><a href="../reference/check_layout.html">check_stress()</a></code> for Kruskal’s stress-1, and console-reported where poor, as well as the share of distance variance two dimensions hold</li>
+</ul></li>
+<li>Added a “correspondence” layout for correspondence analysis
+<ul><li>Places nodes by the similarity of their tie profiles</li>
+<li>Reads directed networks symmetrically by default, but “out” or “in” possible</li>
+<li>Refuses signed network, but <code>double=TRUE</code> an option</li>
+<li>Console-reports low broomstick ratio dimensions and low cos2 nodes</li>
+</ul></li>
+<li>Added a <code><a href="../reference/layout_matching.html">layout_matching()</a></code> alias so every layout has a short name</li>
+<li>Removed unreachable <code>getNNvec()</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-1-2-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-2-0"></a></h3>
+<ul><li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> clipping nodes at panel edges
+<ul><li>Nodes were drawn at absolute sizes, but scales are expanded by a share of data range, so <code>ggplot2</code>’s 5% left less room than the radius of a node in a small network</li>
+<li>Room is now taken from node size, so small networks are given more space</li>
+</ul></li>
+<li>Added <code>backbone=</code> to <code><a href="../reference/plot_graphr.html">graphr()</a></code> for drawing dense, hairball “stress”, “fr”, “drl”, “kk” networks
+<ul><li>By default, networks with 50+ nodes and a mean degree ≥8 use backbones</li>
+<li>
+<code>TRUE</code>/<code>FALSE</code> force, or specify filter/threshold (see <code>manynet::tie_is_backbone()</code>)</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> to draw multilevel networks of interlocking one-mode and two-mode layers by default
+<ul><li>Fixed tie opacity so that those between levels fade behind those within them</li>
+<li>Fixed default node size in multilevel layout, which is now taken from how many nodes there are at each level rather than in the whole network</li>
+<li>Fixed labelling to be plain text nudged away instead of white-boxed labels</li>
+</ul></li>
+<li>Fixed arcs drawn on layout that places two nodes at one point, e.g. <code>graphr(ison_networkers, layout = "scaling")</code>
+</li>
+<li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> to draw parallel ties as a fan instead of one on top of another</li>
+<li>Fixed tie colouring in multiplex networks to color layers not signs by default
+<ul><li>Signs are still drawn as linetypes</li>
+<li>Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing</li>
+</ul></li>
+<li>Improved node shape legend to name modes where two-mode network records them instead of default “One” and “Two”</li>
+<li>Fixed size of self-loops to draw as a fraction of how far the layout spreads rather than at a fixed diameter of one coordinate unit</li>
+<li>Improved <code>node_group</code> to draw overlapping hulls (closes <a href="https://github.com/stocnet/autograph/issues/51" class="external-link">#51</a>)
+<ul><li>e.g. <code>graphr(ison_adolescents, node_group = netrics::node_x_clique())</code>
+</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> to note when a colour/shape legend grows past about 7 keys</li>
+<li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code> to collect guides even where panels held different ranges or categories (closes <a href="https://github.com/stocnet/autograph/issues/15" class="external-link">#15</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-1-2-0">Theming<a class="anchor" aria-label="anchor" href="#theming-1-2-0"></a></h3>
+<ul><li>Added <code>persist=</code> to <code><a href="../reference/theme_set.html">stocnet_theme()</a></code>
+<ul><li>
+<code>persist = TRUE</code> writes it to <code>tools::R_user_dir("autograph", "config")</code>
+</li>
+<li>Nothing written to disk unless passed explicitly</li>
+<li>Setting a theme without it clears any choice persisted earlier</li>
+</ul></li>
+<li>Improved font detection in <code><a href="../reference/theme_set.html">stocnet_theme()</a></code> via <a href="https://github.com/r-lib/systemfonts" class="external-link">systemfonts</a>
+<ul><li>Added <code><a href="../reference/list_fonts.html">list_fonts()</a></code> for listing the font families R can see</li>
+</ul></li>
+<li>Added <code><a href="../reference/theme_medium.html">stocnet_medium()</a></code> for standardising output to the expected medium:
+<ul><li>“screen” (default), “presentation”, “mobile”, and “print”</li>
+<li>
+<code><a href="../reference/theme_medium.html">ag_size()</a></code> scales text, not node size or anything else</li>
+<li>“print” draws on white irrespective of theme grounding</li>
+</ul></li>
+<li>Improved theme backgrounds to reach every plot, not only the graphs
+<ul><li>Plot themes are now built with the <code>ag_theme_*()</code> wrappers</li>
+<li>Blanked elements stay blank, so a graph keeps no axis text or coordinates</li>
+<li>Ties, nodes, and labels with no colour take <code><a href="../reference/ag_call.html">ag_ink()</a></code> and the ground</li>
+</ul></li>
+<li>Added <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/theme_colorblind.html">check_separation()</a></code> and <code><a href="../reference/theme_colorblind.html">check_contrast()</a></code> for checking palettes
+<ul><li>Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)</li>
+<li>Scores a pair by its worst case across those and normal vision</li>
+<li>Added <code>severity=</code> to view anomalous trichromacy (deuteranomaly, protanomaly)</li>
+<li>Added “grey” type to show a palette as print and photocopy may render it</li>
+</ul></li>
+<li>Added <code><a href="../reference/check_layout.html">check_span()</a></code> for scoring how far each tie travels down the page</li>
+<li>Added <code><a href="../reference/check_layout.html">check_offset()</a></code> for scoring how far each tie is from its ideal straight line</li>
+<li>Added <code><a href="../reference/ag_call.html">ag_ink()</a></code> for the colour a theme writes with
+<ul><li>Used by axis text and reference lines, clearing 4.5:1 from the ground</li>
+<li>Frees <code><a href="../reference/ag_call.html">ag_base()</a></code> to be light where that sets it off from the highlight</li>
+</ul></li>
+<li>Added <code><a href="../reference/ag_call.html">ag_missing()</a></code> for the neutral that data recedes into:
+<ul><li>missing values, isolates, and any “other” remainder</li>
+</ul></li>
+<li>Improved <code><a href="../reference/ag_call.html">ag_qualitative()</a></code> to note when a palette is asked for more colours than it holds</li>
+<li>Improved every theme’s categorical palette for colour-blind viewers
+<ul><li>
+<code><a href="../reference/ag_call.html">ag_qualitative()</a></code> uses most distinct, own colors first not mixtures</li>
+<li>Samples across the palette only where it holds too few colours</li>
+<li>Kept “rainbow” in its own order, since fidelity to a spectrum is its point</li>
+</ul></li>
+<li>Improved some highlight pairs
+<ul><li>Fixed “neon” highlight pair, a cyan and a green 12.7 apart</li>
+<li>Fixed “ethz” and “cmu” highlight pairs by lightening their greys</li>
+</ul></li>
+<li>Fixed divergent palettes pairing a red pole with a green or teal one, such as in “ethz”</li>
+<li>Added a “clay” theme inspired by palette and fonts of Anthropic’s Claude</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-1-2-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-2-0"></a></h3>
+<ul><li>Added <code><a href="../reference/plot_goldfish_fit.html">plot.goldfishFit()</a></code> for the four diagnostic panels a fit can supply
+<ul><li>Deviance trace, Schoenfeld smooths, score processes, and waiting times</li>
+<li>Draws only from what the fit stores, leaving a missing panel out</li>
+<li>Draws the waiting-time panel for exact-time models only</li>
+<li>Draws the compact term strings the test itself carries, which do not repeat where an effect appears over two networks</li>
+<li>Reports how many terms the Schoenfeld panel dropped</li>
+<li>Fixed the Schoenfeld panel to select terms by column position
+<ul><li>The labels it matched on intersect the effect names on the intercept alone, so it drew one term where four were asked for</li>
+</ul></li>
+</ul></li>
+<li>Added <code><a href="../reference/plot_adequacy.html">plot.goldfishGOF()</a></code> for each effect’s cumulative score process
+<ul><li>Draws the Brownian-bridge bands the effect’s p-value was read from</li>
+<li>Draws x on the object’s own process time, named for the clock it records</li>
+<li>Inverts the distribution the event-clock p-value comes from</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot_adequacy.html">plot.goldfishTimeTest()</a></code> for the scaled Schoenfeld residuals
+<ul><li>Draws a smooth per effect, with the fitted estimate as the reference</li>
+<li>Colours the scatter by period under <code>method = "periods"</code>
+</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot_adequacy.html">plot.goldfishOnset()</a></code> for the parameter path and information accrual
+<ul><li>Windows both panels on the excursion, so each coefficient gets its scales</li>
+<li>Draws the proportional diagonal, the departure from which is the finding</li>
+<li>Added <code>view = c("both", "path", "accrual")</code> to select a single panel</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot_adequacy.html">plot.goldfishMargins()</a></code> for observed against expected activity
+<ul><li>Draws martingale residuals where the model class defines a compensator</li>
+<li>Draws the calibration ratio where it does not, from the recorded scales</li>
+<li>Draws the <code>top</code> actors furthest from the reference, and counts the rest</li>
+<li>Draws level against shape where goldfish supplies <code>dispersion</code>
+</li>
+<li>Names both omissions: under two completed spans, and beyond <code>top</code>
+</li>
+</ul></li>
+<li>Added a <code>page</code> argument to <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> on the per-term diagnostics
+<ul><li>Applies to <code>goldfishGOF</code>, <code>goldfishTimeTest</code>, and <code>goldfishOnset</code>
+</li>
+<li>Added <code><a href="../reference/count_pages.html">count_pages()</a></code>, reporting the count without rendering</li>
+<li>Renamed from <code>ag_pages()</code>, since <code>ag_</code> is for the theme accessors</li>
+<li>Errors with the page count where <code>page</code> is past the last</li>
+<li>Leaves each figure as it was where <code>page</code> is omitted</li>
+</ul></li>
+<li>Renamed the goldfish classes to a package prefix and a camelCase noun
+<ul><li>
+<code>goldfishOutliers</code>, <code>goldfishChangepoints</code>, <code>goldfishOnset</code>, <code>goldfishMargins</code>, <code>goldfishGOF</code>, <code>goldfishTimeTest</code>, <code>goldfishScoreTest</code>, and <code>goldfishFit</code>
+</li>
+<li>A name such as <code>test_gof</code> is what a sibling package would pick too, and two packages emitting one class string cannot be told apart by dispatch</li>
+<li>Renamed the dispatch methods and the precooked fixtures to match</li>
+<li>Kept the older class names as aliases, so such objects plot as before</li>
+<li>Documented the convention in CONTRIBUTING, for the whole ecosystem</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_adequacy.html">plot.goldfishOutliers()</a></code> and <code><a href="../reference/plot_adequacy.html">plot.goldfishChangepoints()</a></code>
+<ul><li>Renamed from <code><a href="../reference/plot_adequacy.html">plot.outliers.goldfish()</a></code> and <code><a href="../reference/plot_adequacy.html">plot.changepoints.goldfish()</a></code>
+</li>
+<li>Read the metadata each object carries rather than inferring it</li>
+<li>Plot the <code>.series</code> column, so a diagnostic called with <code>effect =</code> is drawn as that term’s series rather than as a log-likelihood trace</li>
+<li>Fixed both to facet on process, so no line crosses a process boundary</li>
+<li>Fixed <code><a href="../reference/plot_adequacy.html">plot.goldfishChangepoints()</a></code> to draw each process’s own breaks</li>
+<li>Fixed <code><a href="../reference/plot_adequacy.html">plot.goldfishOutliers()</a></code> to read the now-logical <code>outlier</code> column</li>
+<li>Rewrote <code><a href="../reference/plot_adequacy.html">plot.goldfishChangepoints()</a></code> for the tibble with a <code>cpt</code> column
+<ul><li>Labels the axis with break times only where they are numbers, so a dated event stream keeps its date scale</li>
+</ul></li>
+</ul></li>
+<li>Added precooked <code>goldfish_margins</code>, <code>goldfish_gof</code>, <code>goldfish_time</code>, and <code>goldfish_onset</code>, and refreshed the two older fixtures
+<ul><li>Each is stamped with the goldfish version that produced it, 1.9.21</li>
+<li>
+<code>goldfish_outliers</code> comes from a receiver-choice model of the calls</li>
+<li>The others come from event models of the <code>fisheries_treaties</code> layer</li>
+</ul></li>
+<li>Replaced <code><a href="https://cli.r-lib.org/reference/cli_abort.html" class="external-link">cli::cli_abort()</a></code> in <code>gf_facet_paged()</code> with <code><a href="https://stocnet.github.io/manynet/reference/interface.html" class="external-link">snet_abort()</a></code>
+</li>
+<li>Replaced em dashes in <code>R/plot_diagnostics.R</code> since only ASCII is portable</li>
+<li>Fixed signed branch of <code><a href="../reference/map_member.html">plot.matrix()</a></code> hard-coding its poles</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorials-1-2-0">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-2-0"></a></h3>
+<ul><li>Moved the decorative gifs in the visualisation tutorial into quiz answer feedback</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.2" id="autograph-112">autograph 1.1.2<a class="anchor" aria-label="anchor" href="#autograph-112"></a></h2><p class="text-muted">CRAN release: 2026-07-31</p>
 <div class="section level3">
 <h3 id="package-1-1-2">Package<a class="anchor" aria-label="anchor" href="#package-1-1-2"></a></h3>
 <ul><li>Improved the declared dependencies
@@ -79,7 +334,18 @@
 </ul></div>
 <div class="section level3">
 <h3 id="graphing-1-1-2">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-1-2"></a></h3>
-<ul><li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code>/<code><a href="../reference/plot_grapht.html">grapht()</a></code> erroring (“Can’t combine <code>..1</code> <character> and <code>..2</code> <logical>”) on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical <code>active</code> flag and numeric height/mass in <code>fict_starwars</code>)
+<ul><li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>labels</code> argument to label a <em>selection</em> of the nodes, where previously the only alternative to labelling every node was labelling none
+<ul><li>
+<code>labels</code> now also accepts a depth of ranks (<code>labels = 5</code>), a measure to rank by (<code>labels = "betweenness"</code>, or <code>labels = c(betweenness = 5)</code> for both), the name of a logical node attribute, or a logical/name/position vector of the nodes to label</li>
+<li>Selection is by rank rather than by headcount, so nodes tied at the cut are labelled together, using <code><a href="https://stocnet.github.io/netrics/reference/mark_select_node.html" class="external-link">netrics::node_is_max()</a></code>; a two-mode or multilevel network is ranked within each mode or level, so a dense level cannot crowd the others out of the labelling</li>
+<li>Networks of more than 30 nodes now label only their most central nodes by default, reporting how many; <code>labels = TRUE</code> still labels every node. <code><a href="https://stocnet.github.io/manynet/reference/fict_marvel.html" class="external-link">manynet::fict_marvel</a></code> went from 194 overlapping labels to 10</li>
+<li>Labels are drawn from the selected rows rather than by blanking the rest, so no space is reserved (and nothing is repelled away from) labels that are not drawn</li>
+<li>
+<code><a href="../reference/plot_grapht.html">grapht()</a></code> resolves the selection once across all waves, so the same nodes stay labelled from frame to frame, and <code><a href="../reference/plot_graphs.html">graphs()</a></code> resolves it once for all its panels; <code><a href="../reference/plot_grapht.html">grapht()</a></code>’s own default above 30 nodes remains no labels at all</li>
+<li>
+<a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> is only suggested, so an automatic selection falls back to a random sample when it is not installed, and a measure asked for by name says what to install</li>
+</ul></li>
+<li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code>/<code><a href="../reference/plot_grapht.html">grapht()</a></code> erroring (“Can’t combine <code>..1</code> <character> and <code>..2</code> <logical>”) on a longitudinal network whose changing node attributes are stored as non-character vectors (e.g. the logical <code>active</code> flag and numeric height/mass in <code>fict_starwars</code>)
 <ul><li>Such networks now split into waves via a guarded <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">to_waves()</a></code> that coerces the offending attributes when <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>’s splitter cannot combine them</li>
 </ul></logical></character></li>
 <li>Fixed <code>graphr(..., snap = TRUE)</code> erroring (“‘-’ only defined for equally-sized data frames”) whenever a node sat exactly on a grid point
@@ -133,7 +399,18 @@
 </ul></div>
 <div class="section level3">
 <h3 id="tutorials-1-1-2">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-2"></a></h3>
-<ul><li>Updated visualization tutorial to use colour/color consistently</li>
+<ul><li>Added a colour blindness section to the visualisation tutorial
+<ul><li>Covers <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/theme_colorblind.html">check_separation()</a></code>, and how palettes are ordered</li>
+<li>Notes that the “rainbow” theme is not a colour-blind safe scheme</li>
+</ul></li>
+<li>Added a note on installing a theme’s fonts to the visualisation tutorial</li>
+<li>Updated the README with the case for colour-blind readable palettes</li>
+<li>Updated visualization tutorial to use colour/color consistently</li>
+<li>Updated the Labels section of the visualisation tutorial to cover selecting which nodes to label, replacing the <code>mutate(name = ifelse(...))</code> workaround it used to recommend
+<ul><li>
+<code>fict_lotr</code>, the tutorial’s running example, has 36 nodes, so its graphs now name only its most central characters; the surrounding prose says so and shows how to choose otherwise</li>
+<li>Regenerated <code>vignettes/articles/visualising-networks.Rmd</code> and the pre-rendered tutorial HTML to match</li>
+</ul></li>
 </ul></div>
 </div>
     <div class="section level2">

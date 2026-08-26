@@ -39,6 +39,8 @@ graphr(
   label_dist = NULL,
   label_repel = TRUE,
   edge_bundle = FALSE,
+  backbone = NULL,
+  .shared = NULL,
   ...,
   node_colour,
   edge_colour
@@ -54,27 +56,80 @@ graphr(
 - layout:
 
   An igraph, ggraph, or manynet layout algorithm. If not declared,
-  defaults to "triad" for networks with 3 nodes, "quad" for networks
-  with 4 nodes, "stress" for all other one mode networks, or "hierarchy"
-  for two mode networks. For "hierarchy" layout, one can further split
-  graph by declaring the "center" argument as the "events", "actors", or
-  by declaring a node name. For "concentric" layout algorithm please
-  declare the "membership" as an extra argument. The "membership"
-  argument expects either a quoted node attribute present in data or
-  vector with the same length as nodes to draw concentric circles. For
-  "multilevel" layout algorithm please declare the "level" as extra
-  argument. The "level" argument expects either a quoted node attribute
-  present in data or vector with the same length as nodes to
-  hierarchically order categories. If "level" is missing, function will
-  look for 'lvl' node attribute in data. The "lineage" layout ranks
-  nodes in Y axis according to values. For "lineage" layout algorithm
-  please declare the "rank" as extra argument. The "rank" argument
-  expects either a quoted node attribute present in data or vector with
-  the same length as nodes.
+  defaults to "configuration" for networks of up to six nodes, "levels"
+  for connected multilevel networks, "layered" for other two mode
+  networks, and "stress" for all other networks. For "layered" layout,
+  one can further split graph by declaring the "center" argument as the
+  "events", "actors", or by declaring a node name. For "concentric"
+  layout algorithm please declare the "membership" as an extra argument.
+  The "membership" argument expects either a quoted node attribute
+  present in data or vector with the same length as nodes to draw
+  concentric circles. For "levels" layout algorithm one may declare the
+  "level" as extra argument. The "level" argument expects either a
+  quoted node attribute present in data or vector with the same length
+  as nodes to hierarchically order categories. If "level" is missing,
+  the levels are taken from a 'lvl' node attribute where there is one,
+  or else from the two modes of a two mode network. The layered layouts
+  ("layered", "lineage", "railway" and "ladder") accept a "ranks"
+  argument, which takes either one of the methods named at
+  [`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+  or a numeric node attribute to lay the layers out by, as a quoted
+  attribute name or a vector with one value for each node. The "scaling"
+  layout places the nodes by multidimensional scaling, so that the
+  distance between two nodes approximates the number of steps between
+  them. Since those coordinates can be read, this layout is drawn with
+  labelled axes on one scale, and captioned with how well two dimensions
+  hold the distances; see
+  [`?layout_scaling`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
+  and
+  [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md).
+  Note that those axes carry distances rather than named dimensions: the
+  drawing can be turned or mirrored without fitting the network any
+  better or any worse. The "correspondence" layout places the nodes by
+  correspondence analysis, so that two nodes with similar ties are drawn
+  together, whether or not they are tied to each other. It is the usual
+  way to draw a two mode network, since it places both modes against the
+  same pair of axes, and it accepts a "direction" argument for a
+  directed network and a "double" argument for a signed one; see
+  [`?layout_correspondence`](https://stocnet.github.io/autograph/reference/layout_correspondence.md).
+  Each axis names the share of the network's inertia that it holds.
 
 - labels:
 
-  Logical, whether to print node names as labels if present.
+  Which nodes to label, if the network is labelled. `TRUE` (the default)
+  labels every node and `FALSE` none of them, but a label for every node
+  of a large network hides the network behind them, so a *selection* of
+  the nodes can be given instead:
+
+  - a number, e.g. `labels = 5`, labels the nodes within the top five
+    ranks by degree. Note that this is a depth of ranks rather than a
+    count of nodes: nodes tied at the cut are labelled together, so more
+    than five labels may appear.
+
+  - a measure to rank by, e.g. `labels = "betweenness"`, labels just the
+    node or nodes that measure singles out. `"degree"`, `"betweenness"`,
+    `"cutpoints"` (every node the mark flags) and `"random"` (a small
+    random sample) are available. The two can be combined by naming the
+    number, as in `labels = c(betweenness = 5)`.
+
+  - the name of a logical node attribute, e.g. `labels = "is_broker"`,
+    labels the nodes it marks.
+
+  - a logical vector, one value per node, e.g.
+    `labels = netrics::node_is_cutpoint(net)`; or the names or positions
+    of the nodes to label, e.g. `labels = c("Alice", "Betty")`.
+
+  Where a length-one string could mean more than one of these, a node
+  attribute is preferred to a measure, and a measure to a node name. A
+  single number is always read as a depth of ranks rather than as one
+  node's position, so a lone node is best named, as in
+  `labels = "Alice"`. For networks of more than 30 nodes, `labels`
+  defaults to a selection rather than to every node; pass
+  `labels = TRUE` for all of them. Ranking nodes uses the `{netrics}`
+  package, which is suggested rather than required: without it
+  installed, an automatic selection falls back to a random sample.
+  Two-mode and multilevel networks are ranked within each mode or level,
+  so that every level is labelled and not just the densest.
 
 - node_color, node_colour:
 
@@ -101,7 +156,15 @@ graphr(
   Node variable to be used for grouping the nodes. It is easiest if this
   is added as a hull over groups before plotting. Group variables should
   have a minimum of 3 nodes, if less, number groups will be reduced by
-  merging categories with lower counts into one called "other".
+  merging categories with lower counts into one called "other". A
+  membership vector can also be given here. Where nodes belong to
+  several groups at once, as they can to several cliques, give a
+  membership matrix instead: one row for each node, one column for each
+  group, and a one wherever the node belongs to the group. One hull is
+  then drawn for each column, and the hulls overlap where the groups do.
+  A measure that returns such a matrix, such as
+  `netrics::node_x_clique()`, can be named without its network, which is
+  taken to be the network being drawn.
 
 - edge_color, edge_colour:
 
@@ -129,7 +192,12 @@ graphr(
 
 - snap:
 
-  Logical scalar, whether the layout should be snapped to a grid.
+  Logical scalar, whether the layout should be snapped to a grid. Where
+  the network repeats a structure, as a lattice does, the two steps it
+  repeats are mapped onto the axes, which draws it as a rectangle of
+  rows and columns. Where it does not, each node moves to the nearest
+  vacant grid point. Layouts that already carry meaning in their
+  coordinates, such as "layered" or "scaling", are left as they are.
 
 - label_dist:
 
@@ -142,8 +210,8 @@ graphr(
   value (e.g. `15`) for more spacing. Only used when `labels = TRUE` and
   `label_repel = TRUE` (as the padding passed to the repel algorithm) or
   `label_repel = FALSE` (as a fixed nudge away from the node, in the
-  layouts where this makes sense, e.g. "circle"/"concentric",
-  "bipartite"/"railway", "alluvial").
+  layouts where this makes sense, e.g. "circle"/"concentric", "railway",
+  "lineage").
 
 - label_repel:
 
@@ -151,7 +219,11 @@ graphr(
   and from nodes using `ggrepel` (via `ggraph`'s `repel` argument).
   Defaults to `TRUE`. Set to `FALSE` to place labels at a fixed offset
   (see `label_dist`) without the (sometimes slow, and non-deterministic
-  between runs for some layouts) repelling algorithm.
+  between runs for some layouts) repelling algorithm. The layered
+  layouts ("layered", "lineage", "railway" and "ladder") place each node
+  in a layer, which is where the reader looks for it, so a repelled
+  label there would say less about which node it labels than a fixed
+  offset does. They ignore this argument and always offset.
 
 - edge_bundle:
 
@@ -165,6 +237,37 @@ graphr(
   difference when a network has enough edges; for directed networks
   arrowheads are retained, but the slight reciprocal-tie curvature used
   for unbundled edges does not apply.
+
+- backbone:
+
+  How to treat the network's backbone: the ties that a local null model
+  keeps, because they carry more weight, or sit in more triangles, than
+  chance alone would put there. Where a backbone is used, those ties are
+  drawn as the shortest, so that the layout pulls apart the groups they
+  hold together, and every tie is still drawn, with the ties the filter
+  does not keep faded well back. This is what to reach for when a
+  network is dense enough to draw as a hairball. By default (`NULL`)
+  this is decided by the network: a network of at least 50 nodes and a
+  mean degree of at least 8 is drawn this way, and reported. `FALSE`
+  draws every tie alike, and `TRUE` asks for a backbone whatever the
+  network's size. One of `manynet`'s filters can be named instead:
+  "disparity", "lans", "noise", "mlf", or "simmelian". Where none is
+  named, `manynet` uses "lans" for a weighted network and "simmelian"
+  for an unweighted one. A number between 0 and 1 sets the threshold
+  instead of the filter: a smaller number keeps fewer ties. Only the
+  layouts that read tie lengths – "stress" (the default), "fr", "drl"
+  and "kk" – are laid out this way. Every other layout, including those
+  that already carry meaning in their coordinates such as "layered" or
+  "scaling", keeps its coordinates and only fades its ties. Requires
+  `manynet` 2.3.0 or later, and does not apply to signed networks.
+
+- .shared:
+
+  Internal. A list of the aesthetic ranges and categories found across a
+  list of networks, which
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  uses to draw and label each of its panels against the same scales. Not
+  intended to be set by hand.
 
 - ...:
 
@@ -180,8 +283,16 @@ object. The last plot can be saved to the file system using
 ## See also
 
 Other mapping:
+[`check_layout`](https://stocnet.github.io/autograph/reference/check_layout.md),
+[`completion`](https://stocnet.github.io/autograph/reference/completion.md),
+[`layout_concentric()`](https://stocnet.github.io/autograph/reference/layout_concentric.md),
 [`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
-[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`layout_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md),
+[`layout_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md),
+[`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
+[`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md),
+[`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
 [`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 
@@ -190,10 +301,10 @@ Other mapping:
 ``` r
 graphr(ison_adolescents)
 
-ison_adolescents %>%
+ison_adolescents |>
   mutate(color = rep(c("introvert","extrovert"), times = 4),
-         size = ifelse(netrics::node_is_cutpoint(ison_adolescents), 6, 3)) %>%
-  mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) %>%
+         size = ifelse(netrics::node_is_cutpoint(ison_adolescents), 6, 3)) |>
+  mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
   graphr(node_color = "color", node_size = "size",
          edge_size = 1.5, edge_color = "ecolor")
 
@@ -201,5 +312,14 @@ graphr(ison_southern_women, labels = TRUE, label_dist = 10)
 
 graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
 
+# Label a selection of the nodes rather than all of them
+graphr(ison_southern_women, labels = 2)
+
+graphr(ison_southern_women, labels = "betweenness")
+
+graphr(ison_adolescents, labels = c("Alice", "Betty"))
+
 graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+
+graphr(manynet::generate_random(80, 0.2), backbone = TRUE)
 ```

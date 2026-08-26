@@ -41,7 +41,7 @@ try run_tute("Visualisation").'><meta property="og:image" content="https://stocn
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,6 +116,8 @@ try <code>run_tute("Visualisation")</code>.</p>
 <span>  label_dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label_repel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  edge_bundle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  backbone <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  .shared <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  <span class="va">node_colour</span>,</span>
 <span>  <span class="va">edge_colour</span></span>
@@ -132,33 +134,77 @@ try <code>run_tute("Visualisation")</code>.</p>
 
 <dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
 <dd><p>An igraph, ggraph, or manynet layout algorithm.
-If not declared, defaults to "triad" for networks with 3 nodes,
-"quad" for networks with 4 nodes,
-"stress" for all other one mode networks,
-or "hierarchy" for two mode networks.
-For "hierarchy" layout, one can further split graph by
+If not declared, defaults to "configuration" for networks of up to
+six nodes, "levels" for connected multilevel networks,
+"layered" for other two mode networks,
+and "stress" for all other networks.
+For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
 For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm please declare the "level"
+For "levels" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically
 order categories.
-If "level" is missing, function will look for 'lvl' node attribute in data.
-The "lineage" layout ranks nodes in Y axis according to values.
-For "lineage" layout algorithm please declare the "rank"
-as extra argument.
-The "rank" argument expects either a quoted node attribute present
-in data or vector with the same length as nodes.</p></dd>
+If "level" is missing, the levels are taken from a 'lvl' node attribute
+where there is one, or else from the two modes of a two mode network.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+accept a "ranks" argument, which takes either one of the methods named
+at <code><a href="layout_layered.html">?layout_layered</a></code> or a numeric node attribute to lay the layers out by,
+as a quoted attribute name or a vector with one value for each node.
+The "scaling" layout places the nodes by multidimensional scaling,
+so that the distance between two nodes approximates the number of steps
+between them. Since those coordinates can be read, this layout is drawn
+with labelled axes on one scale, and captioned with how well two
+dimensions hold the distances; see <code><a href="layout_scaling.html">?layout_scaling</a></code> and <code><a href="check_layout.html">check_stress()</a></code>.
+Note that those axes carry distances rather than named dimensions:
+the drawing can be turned or mirrored without fitting the network
+any better or any worse.
+The "correspondence" layout places the nodes by correspondence analysis,
+so that two nodes with similar ties are drawn together,
+whether or not they are tied to each other.
+It is the usual way to draw a two mode network, since it places both
+modes against the same pair of axes, and it accepts a "direction"
+argument for a directed network and a "double" argument for a signed
+one; see <code><a href="layout_correspondence.html">?layout_correspondence</a></code>.
+Each axis names the share of the network's inertia that it holds.</p></dd>
 
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
-<dd><p>Logical, whether to print node names
-as labels if present.</p></dd>
+<dd><p>Which nodes to label, if the network is labelled.
+<code>TRUE</code> (the default) labels every node and <code>FALSE</code> none of them,
+but a label for every node of a large network hides the network behind
+them, so a <em>selection</em> of the nodes can be given instead:</p><ul><li><p>a number, e.g. <code>labels = 5</code>, labels the nodes within the top five ranks
+by degree. Note that this is a depth of ranks rather than a count of
+nodes: nodes tied at the cut are labelled together, so more than five
+labels may appear.</p></li>
+<li><p>a measure to rank by, e.g. <code>labels = "betweenness"</code>, labels just the
+node or nodes that measure singles out. <code>"degree"</code>, <code>"betweenness"</code>,
+<code>"cutpoints"</code> (every node the mark flags) and <code>"random"</code>
+(a small random sample) are available.
+The two can be combined by naming the number,
+as in <code>labels = c(betweenness = 5)</code>.</p></li>
+<li><p>the name of a logical node attribute, e.g. <code>labels = "is_broker"</code>,
+labels the nodes it marks.</p></li>
+<li><p>a logical vector, one value per node, e.g.
+<code>labels = netrics::node_is_cutpoint(net)</code>;
+or the names or positions of the nodes to label,
+e.g. <code>labels = c("Alice", "Betty")</code>.</p></li>
+</ul><p>Where a length-one string could mean more than one of these,
+a node attribute is preferred to a measure, and a measure to a node name.
+A single number is always read as a depth of ranks rather than as one
+node's position, so a lone node is best named, as in <code>labels = "Alice"</code>.
+For networks of more than 30 nodes, <code>labels</code> defaults to a selection
+rather than to every node; pass <code>labels = TRUE</code> for all of them.
+Ranking nodes uses the <code>{netrics}</code> package, which is suggested rather than
+required: without it installed, an automatic selection falls back to a
+random sample.
+Two-mode and multilevel networks are ranked within each mode or level,
+so that every level is labelled and not just the densest.</p></dd>
 
 
 <dt id="arg-node-color-node-colour">node_color, node_colour<a class="anchor" aria-label="anchor" href="#arg-node-color-node-colour"></a></dt>
@@ -190,7 +236,16 @@ It is easiest if this is added as a hull over
 groups before plotting.
 Group variables should have a minimum of 3 nodes,
 if less, number groups will be reduced by
-merging categories with lower counts into one called "other".</p></dd>
+merging categories with lower counts into one called "other".
+A membership vector can also be given here.
+Where nodes belong to several groups at once, as they can to several
+cliques, give a membership matrix instead: one row for each node,
+one column for each group, and a one wherever the node belongs to
+the group. One hull is then drawn for each column, and the hulls
+overlap where the groups do.
+A measure that returns such a matrix, such as
+<code>netrics::node_x_clique()</code>, can be named without its network,
+which is taken to be the network being drawn.</p></dd>
 
 
 <dt id="arg-edge-color-edge-colour">edge_color, edge_colour<a class="anchor" aria-label="anchor" href="#arg-edge-color-edge-colour"></a></dt>
@@ -221,7 +276,12 @@ out the giant component.</p></dd>
 
 
 <dt id="arg-snap">snap<a class="anchor" aria-label="anchor" href="#arg-snap"></a></dt>
-<dd><p>Logical scalar, whether the layout should be snapped to a grid.</p></dd>
+<dd><p>Logical scalar, whether the layout should be snapped to a grid.
+Where the network repeats a structure, as a lattice does, the two steps it
+repeats are mapped onto the axes, which draws it as a rectangle of rows and
+columns. Where it does not, each node moves to the nearest vacant grid
+point. Layouts that already carry meaning in their coordinates, such as
+"layered" or "scaling", are left as they are.</p></dd>
 
 
 <dt id="arg-label-dist">label_dist<a class="anchor" aria-label="anchor" href="#arg-label-dist"></a></dt>
@@ -235,7 +295,7 @@ or to a larger value (e.g. <code>15</code>) for more spacing.
 Only used when <code>labels = TRUE</code> and <code>label_repel = TRUE</code>
 (as the padding passed to the repel algorithm) or <code>label_repel = FALSE</code>
 (as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").</p></dd>
+sense, e.g. "circle"/"concentric", "railway", "lineage").</p></dd>
 
 
 <dt id="arg-label-repel">label_repel<a class="anchor" aria-label="anchor" href="#arg-label-repel"></a></dt>
@@ -244,7 +304,11 @@ from each other and from nodes using <code>ggrepel</code>
 (via <code>ggraph</code>'s <code>repel</code> argument). Defaults to <code>TRUE</code>.
 Set to <code>FALSE</code> to place labels at a fixed offset (see <code>label_dist</code>)
 without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.</p></dd>
+some layouts) repelling algorithm.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+place each node in a layer, which is where the reader looks for it,
+so a repelled label there would say less about which node it labels
+than a fixed offset does. They ignore this argument and always offset.</p></dd>
 
 
 <dt id="arg-edge-bundle">edge_bundle<a class="anchor" aria-label="anchor" href="#arg-edge-bundle"></a></dt>
@@ -260,6 +324,37 @@ retained, but the slight reciprocal-tie curvature used for unbundled edges
 does not apply.</p></dd>
 
 
+<dt id="arg-backbone">backbone<a class="anchor" aria-label="anchor" href="#arg-backbone"></a></dt>
+<dd><p>How to treat the network's backbone: the ties that a local
+null model keeps, because they carry more weight, or sit in more
+triangles, than chance alone would put there.
+Where a backbone is used, those ties are drawn as the shortest, so that
+the layout pulls apart the groups they hold together, and every tie is
+still drawn, with the ties the filter does not keep faded well back.
+This is what to reach for when a network is dense enough to draw as a
+hairball.
+By default (<code>NULL</code>) this is decided by the network: a network of at least
+50 nodes and a mean degree of at least 8 is drawn this way, and reported.
+<code>FALSE</code> draws every tie alike, and <code>TRUE</code> asks for a backbone whatever the
+network's size.
+One of <code>manynet</code>'s filters can be named instead: "disparity", "lans",
+"noise", "mlf", or "simmelian". Where none is named, <code>manynet</code> uses "lans"
+for a weighted network and "simmelian" for an unweighted one.
+A number between 0 and 1 sets the threshold instead of the filter:
+a smaller number keeps fewer ties.
+Only the layouts that read tie lengths – "stress" (the default), "fr",
+"drl" and "kk" – are laid out this way. Every other layout, including
+those that already carry meaning in their coordinates such as "layered"
+or "scaling", keeps its coordinates and only fades its ties.
+Requires <code>manynet</code> 2.3.0 or later, and does not apply to signed networks.</p></dd>
+
+
+<dt id="arg--shared">.shared<a class="anchor" aria-label="anchor" href="#arg--shared"></a></dt>
+<dd><p>Internal. A list of the aesthetic ranges and categories found
+across a list of networks, which <code><a href="plot_graphs.html">graphs()</a></code> uses to draw and label each of
+its panels against the same scales. Not intended to be set by hand.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Extra arguments to pass on to the layout algorithm, if necessary.</p></dd>
 
@@ -272,8 +367,16 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other mapping:
+<code><a href="check_layout.html">check_layout</a></code>,
+<code><a href="completion.html">completion</a></code>,
+<code><a href="layout_concentric.html">layout_concentric()</a></code>,
 <code><a href="layout_configuration.html">layout_configuration()</a></code>,
-<code><a href="layout_partition.html">layout_partition</a></code>,
+<code><a href="layout_correspondence.html">layout_correspondence()</a></code>,
+<code><a href="layout_layered.html">layout_layered()</a></code>,
+<code><a href="layout_levels.html">layout_levels()</a></code>,
+<code><a href="layout_matching.html">layout_matching()</a></code>,
+<code><a href="layout_scaling.html">layout_scaling()</a></code>,
+<code><a href="layout_valence.html">layout_valence()</a></code>,
 <code><a href="plot_graphs.html">plot_graphs</a></code>,
 <code><a href="plot_grapht.html">plot_grapht</a></code></p></div>
     </div>
@@ -282,10 +385,10 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_adolescents</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="va">ison_adolescents</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span><span class="va">ison_adolescents</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">mutate</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"introvert"</span>,<span class="st">"extrovert"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>         size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/mark_nodes.html" class="external-link">node_is_cutpoint</a></span><span class="op">(</span><span class="va">ison_adolescents</span><span class="op">)</span>, <span class="fl">6</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>  <span class="fu">mutate_ties</span><span class="op">(</span>ecolor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"friends"</span>, <span class="st">"acquaintances"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>         size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/mark_nodes.html" class="external-link">node_is_cutpoint</a></span><span class="op">(</span><span class="va">ison_adolescents</span><span class="op">)</span>, <span class="fl">6</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">mutate_ties</span><span class="op">(</span>ecolor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"friends"</span>, <span class="st">"acquaintances"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">graphr</span><span class="op">(</span>node_color <span class="op">=</span> <span class="st">"color"</span>, node_size <span class="op">=</span> <span class="st">"size"</span>,</span></span>
 <span class="r-in"><span>         edge_size <span class="op">=</span> <span class="fl">1.5</span>, edge_color <span class="op">=</span> <span class="st">"ecolor"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-2.png" alt="" width="700" height="433"></span>
@@ -293,8 +396,17 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
 <span class="r-plt img"><img src="plot_graphr-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="cn">TRUE</span>, label_repel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0.1</span><span class="op">)</span>, edge_bundle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Label a selection of the nodes rather than all of them</span></span></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-5.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="st">"betweenness"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-6.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_adolescents</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alice"</span>, <span class="st">"Betty"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-7.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0.1</span><span class="op">)</span>, edge_bundle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-8.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0.2</span><span class="op">)</span>, backbone <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-9.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

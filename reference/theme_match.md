@@ -51,7 +51,7 @@ vector of hexcodes can be passed to the `pal` argument.
 
 ``` r
 match_color("#4575b4")
-#> [1] "#4575B4"
+#> [1] "#4575b4"
 is_dark(c("#000","#FFF"))
 #>  #000  #FFF 
 #>  TRUE FALSE 

@@ -22,7 +22,7 @@ When another layout is requested,
 a single static layout is computed on the aggregate
 (union of waves) network instead, so that positions remain constant.
 Unlike graphr(), grapht() uses this dynamic stress layout by default
-even for two-mode networks (rather than a hierarchy layout, which would
+even for two-mode networks (rather than a layered layout, which would
 collapse many nodes onto a line); the two modes remain distinguishable
 by node shape.
 For networks with more than 30 nodes, node labels are suppressed by
@@ -65,7 +65,7 @@ When another layout is requested,
 a single static layout is computed on the aggregate
 (union of waves) network instead, so that positions remain constant.
 Unlike graphr(), grapht() uses this dynamic stress layout by default
-even for two-mode networks (rather than a hierarchy layout, which would
+even for two-mode networks (rather than a layered layout, which would
 collapse many nodes onto a line); the two modes remain distinguishable
 by node shape.
 For networks with more than 30 nodes, node labels are suppressed by
@@ -93,7 +93,7 @@ A progress bar is shown if it takes some time to encode all the
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -154,7 +154,7 @@ When another <code>layout</code> is requested,
 a single static layout is computed on the aggregate
 (union of waves) network instead, so that positions remain constant.
 Unlike <code><a href="plot_graphr.html">graphr()</a></code>, <code>grapht()</code> uses this dynamic stress layout by default
-even for two-mode networks (rather than a hierarchy layout, which would
+even for two-mode networks (rather than a layered layout, which would
 collapse many nodes onto a line); the two modes remain distinguishable
 by node shape.
 For networks with more than 30 nodes, node labels are suppressed by
@@ -227,33 +227,77 @@ It can also be a diffusion model result from e.g.
 
 <dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
 <dd><p>An igraph, ggraph, or manynet layout algorithm.
-If not declared, defaults to "triad" for networks with 3 nodes,
-"quad" for networks with 4 nodes,
-"stress" for all other one mode networks,
-or "hierarchy" for two mode networks.
-For "hierarchy" layout, one can further split graph by
+If not declared, defaults to "configuration" for networks of up to
+six nodes, "levels" for connected multilevel networks,
+"layered" for other two mode networks,
+and "stress" for all other networks.
+For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
 For "concentric" layout algorithm please declare the "membership" as an
 extra argument.
 The "membership" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to draw concentric circles.
-For "multilevel" layout algorithm please declare the "level"
+For "levels" layout algorithm one may declare the "level"
 as extra argument.
 The "level" argument expects either a quoted node attribute present
 in data or vector with the same length as nodes to hierarchically
 order categories.
-If "level" is missing, function will look for 'lvl' node attribute in data.
-The "lineage" layout ranks nodes in Y axis according to values.
-For "lineage" layout algorithm please declare the "rank"
-as extra argument.
-The "rank" argument expects either a quoted node attribute present
-in data or vector with the same length as nodes.</p></dd>
+If "level" is missing, the levels are taken from a 'lvl' node attribute
+where there is one, or else from the two modes of a two mode network.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+accept a "ranks" argument, which takes either one of the methods named
+at <code><a href="layout_layered.html">?layout_layered</a></code> or a numeric node attribute to lay the layers out by,
+as a quoted attribute name or a vector with one value for each node.
+The "scaling" layout places the nodes by multidimensional scaling,
+so that the distance between two nodes approximates the number of steps
+between them. Since those coordinates can be read, this layout is drawn
+with labelled axes on one scale, and captioned with how well two
+dimensions hold the distances; see <code><a href="layout_scaling.html">?layout_scaling</a></code> and <code><a href="check_layout.html">check_stress()</a></code>.
+Note that those axes carry distances rather than named dimensions:
+the drawing can be turned or mirrored without fitting the network
+any better or any worse.
+The "correspondence" layout places the nodes by correspondence analysis,
+so that two nodes with similar ties are drawn together,
+whether or not they are tied to each other.
+It is the usual way to draw a two mode network, since it places both
+modes against the same pair of axes, and it accepts a "direction"
+argument for a directed network and a "double" argument for a signed
+one; see <code><a href="layout_correspondence.html">?layout_correspondence</a></code>.
+Each axis names the share of the network's inertia that it holds.</p></dd>
 
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
-<dd><p>Logical, whether to print node names
-as labels if present.</p></dd>
+<dd><p>Which nodes to label, if the network is labelled.
+<code>TRUE</code> (the default) labels every node and <code>FALSE</code> none of them,
+but a label for every node of a large network hides the network behind
+them, so a <em>selection</em> of the nodes can be given instead:</p><ul><li><p>a number, e.g. <code>labels = 5</code>, labels the nodes within the top five ranks
+by degree. Note that this is a depth of ranks rather than a count of
+nodes: nodes tied at the cut are labelled together, so more than five
+labels may appear.</p></li>
+<li><p>a measure to rank by, e.g. <code>labels = "betweenness"</code>, labels just the
+node or nodes that measure singles out. <code>"degree"</code>, <code>"betweenness"</code>,
+<code>"cutpoints"</code> (every node the mark flags) and <code>"random"</code>
+(a small random sample) are available.
+The two can be combined by naming the number,
+as in <code>labels = c(betweenness = 5)</code>.</p></li>
+<li><p>the name of a logical node attribute, e.g. <code>labels = "is_broker"</code>,
+labels the nodes it marks.</p></li>
+<li><p>a logical vector, one value per node, e.g.
+<code>labels = netrics::node_is_cutpoint(net)</code>;
+or the names or positions of the nodes to label,
+e.g. <code>labels = c("Alice", "Betty")</code>.</p></li>
+</ul><p>Where a length-one string could mean more than one of these,
+a node attribute is preferred to a measure, and a measure to a node name.
+A single number is always read as a depth of ranks rather than as one
+node's position, so a lone node is best named, as in <code>labels = "Alice"</code>.
+For networks of more than 30 nodes, <code>labels</code> defaults to a selection
+rather than to every node; pass <code>labels = TRUE</code> for all of them.
+Ranking nodes uses the <code>{netrics}</code> package, which is suggested rather than
+required: without it installed, an automatic selection falls back to a
+random sample.
+Two-mode and multilevel networks are ranked within each mode or level,
+so that every level is labelled and not just the densest.</p></dd>
 
 
 <dt id="arg-node-color-node-colour">node_color, node_colour<a class="anchor" aria-label="anchor" href="#arg-node-color-node-colour"></a></dt>
@@ -324,7 +368,7 @@ or to a larger value (e.g. <code>15</code>) for more spacing.
 Only used when <code>labels = TRUE</code> and <code>label_repel = TRUE</code>
 (as the padding passed to the repel algorithm) or <code>label_repel = FALSE</code>
 (as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "bipartite"/"railway", "alluvial").</p></dd>
+sense, e.g. "circle"/"concentric", "railway", "lineage").</p></dd>
 
 
 <dt id="arg-label-repel">label_repel<a class="anchor" aria-label="anchor" href="#arg-label-repel"></a></dt>
@@ -333,7 +377,11 @@ from each other and from nodes using <code>ggrepel</code>
 (via <code>ggraph</code>'s <code>repel</code> argument). Defaults to <code>TRUE</code>.
 Set to <code>FALSE</code> to place labels at a fixed offset (see <code>label_dist</code>)
 without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.</p></dd>
+some layouts) repelling algorithm.
+The layered layouts ("layered", "lineage", "railway" and "ladder")
+place each node in a layer, which is where the reader looks for it,
+so a repelled label there would say less about which node it labels
+than a fixed offset does. They ignore this argument and always offset.</p></dd>
 
 
 <dt id="arg-keep-isolates">keep_isolates<a class="anchor" aria-label="anchor" href="#arg-keep-isolates"></a></dt>
@@ -365,15 +413,32 @@ repelling (there is no straightforward way to repel labels consistently
 across animation frames), so <code>label_repel</code> here instead toggles a fixed
 offset nudging labels away from their nodes, and <code>label_dist</code> scales the
 size of that nudge rather than being used as repel padding.</p>
+<p><code>labels</code> can select which nodes to label here too, and the selection is
+resolved once over all the waves so that the same nodes stay labelled from
+frame to frame. Unlike <code><a href="plot_graphr.html">graphr()</a></code>, though, animations of more than 30 nodes
+default to no labels at all rather than to a selection of them.</p>
 <p>Some further <code><a href="plot_graphr.html">graphr()</a></code> features are not available in animations:
 <code>node_group</code> hulls, edge bundling, curved arcs for reciprocated ties,
-and self-loops (loops are not drawn; a note is printed if present).</p>
+and self-loops (loops are not drawn; a note is printed if present).
+Note too that, where no <code>layout</code> is named, <code>grapht()</code> defaults to
+the "stress" layout for every network rather than choosing one by
+the network's shape as <code><a href="plot_graphr.html">graphr()</a></code> does,
+so that nodes move smoothly from one wave to the next.
+A layout named explicitly is still used, computed on the aggregate network.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other mapping:
+<code><a href="check_layout.html">check_layout</a></code>,
+<code><a href="completion.html">completion</a></code>,
+<code><a href="layout_concentric.html">layout_concentric()</a></code>,
 <code><a href="layout_configuration.html">layout_configuration()</a></code>,
-<code><a href="layout_partition.html">layout_partition</a></code>,
+<code><a href="layout_correspondence.html">layout_correspondence()</a></code>,
+<code><a href="layout_layered.html">layout_layered()</a></code>,
+<code><a href="layout_levels.html">layout_levels()</a></code>,
+<code><a href="layout_matching.html">layout_matching()</a></code>,
+<code><a href="layout_scaling.html">layout_scaling()</a></code>,
+<code><a href="layout_valence.html">layout_valence()</a></code>,
 <code><a href="plot_graphr.html">plot_graphr</a></code>,
 <code><a href="plot_graphs.html">plot_graphs</a></code></p></div>
     </div>

@@ -72,8 +72,16 @@ objects displayed side-by-side.
 ## See also
 
 Other mapping:
+[`check_layout`](https://stocnet.github.io/autograph/reference/check_layout.md),
+[`completion`](https://stocnet.github.io/autograph/reference/completion.md),
+[`layout_concentric()`](https://stocnet.github.io/autograph/reference/layout_concentric.md),
 [`layout_configuration()`](https://stocnet.github.io/autograph/reference/layout_configuration.md),
-[`layout_partition`](https://stocnet.github.io/autograph/reference/layout_partition.md),
+[`layout_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md),
+[`layout_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md),
+[`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
+[`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md),
+[`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 [`plot_grapht`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 

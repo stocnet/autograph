@@ -9,7 +9,7 @@ See manynet::to_matching() for more details on the matching procedure."><meta pr
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,9 @@ See <code><a href="https://stocnet.github.io/manynet/reference/modif_paths.html"
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">layout_tbl_graph_matching</span><span class="op">(</span><span class="va">.data</span>, center <span class="op">=</span> <span class="cn">NULL</span>, circular <span class="op">=</span> <span class="cn">FALSE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">layout_matching</span><span class="op">(</span><span class="va">.data</span>, center <span class="op">=</span> <span class="cn">NULL</span>, circular <span class="op">=</span> <span class="cn">FALSE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">layout_tbl_graph_matching</span><span class="op">(</span><span class="va">.data</span>, center <span class="op">=</span> <span class="cn">NULL</span>, circular <span class="op">=</span> <span class="cn">FALSE</span>, times <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,14 +66,41 @@ See <code><a href="https://stocnet.github.io/manynet/reference/modif_paths.html"
 <dd><p>Some <code>{manynet}</code> compatible network data.</p></dd>
 
 
-<dt id="arg-center-circular-times">center, circular, times<a class="anchor" aria-label="anchor" href="#arg-center-circular-times"></a></dt>
-<dd><p>Extra parameters required for <code>{tidygraph}</code>
-compatibility.</p></dd>
+<dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>
+<dd><p>Required for <code>{ggraph}</code> compatibility, and not used here.</p></dd>
+
+
+<dt id="arg-circular">circular<a class="anchor" aria-label="anchor" href="#arg-circular"></a></dt>
+<dd><p>Should the layout be transformed into a radial
+representation. Only possible for some layouts. Defaults to FALSE.
+Required for <code>{ggraph}</code> compatibility.</p></dd>
+
+
+<dt id="arg-times">times<a class="anchor" aria-label="anchor" href="#arg-times"></a></dt>
+<dd><p>Maximum number of iterations, where appropriate.
+Required for <code>{ggraph}</code> compatibility, and ignored by the layouts that
+do not iterate.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Returns a table of nodes' x and y coordinates.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other mapping:
+<code><a href="check_layout.html">check_layout</a></code>,
+<code><a href="completion.html">completion</a></code>,
+<code><a href="layout_concentric.html">layout_concentric()</a></code>,
+<code><a href="layout_configuration.html">layout_configuration()</a></code>,
+<code><a href="layout_correspondence.html">layout_correspondence()</a></code>,
+<code><a href="layout_layered.html">layout_layered()</a></code>,
+<code><a href="layout_levels.html">layout_levels()</a></code>,
+<code><a href="layout_scaling.html">layout_scaling()</a></code>,
+<code><a href="layout_valence.html">layout_valence()</a></code>,
+<code><a href="plot_graphr.html">plot_graphr</a></code>,
+<code><a href="plot_graphs.html">plot_graphs</a></code>,
+<code><a href="plot_grapht.html">plot_grapht</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

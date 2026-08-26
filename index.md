@@ -65,12 +65,7 @@ Compare the output from
 from [igraph](https://r.igraph.org/):
 
 ![Example illustrating differences in default igraph and autograph
-graphs](https://www.jameshollway.com/post/manynet/README-layout-comparison-1.png)
-
-``` R
-#> quartz_off_screen 
-#>                 2
-```
+graphs](https://www.jameshollway.com/post/autograph/README-layout-comparison-1.png)
 
 [igraph](https://r.igraph.org/) requires the bipartite layout to be
 specified, has cumbersome node size defaults for all but the smallest
@@ -83,6 +78,26 @@ default. It also recognises that the network contains names for the
 nodes and prints them vertically so that they are legible in this
 layout. Other ‘clever’ features include automatic node sizing and more.
 
+This inference matters for more than tidiness. Where a default does not
+recognise a property of the network, that property is usually dropped
+silently. Compare the same signed network drawn by each package:
+
+![Example illustrating that igraph's default draws positive and negative
+ties
+identically](https://www.jameshollway.com/post/autograph/README-signed-comparison-1.png)
+
+`irps_tribes` records both alliance and antagonism between sixteen
+tribes, in equal number. [igraph](https://r.igraph.org/) draws all of
+these ties identically, so the distinction that motivates the data is
+not visible.
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+recognises the network as signed and maps the sign to both colour and
+linetype, with a legend. The same applies to weights, to self-ties, and
+to direction:
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+reads these from the network rather than requiring you to know to ask
+for them.
+
 ### More options
 
 All of
@@ -94,7 +109,7 @@ or indicating from which attribute it should inherit this information,
 e.g. `node_color = "Office"` or `node_size = "Seniority"`.
 
 ![Graph illustrating automatic and manual use of node color and
-size](https://www.jameshollway.com/post/manynet/README-more-options-1.png)
+size](https://www.jameshollway.com/post/autograph/README-more-options-1.png)
 
 Legends are added by default when node or tie aesthetics are mapped to
 attributes, but can be removed with `show_legend = FALSE`. Since the
@@ -111,12 +126,12 @@ can use all the layout algorithms offered by packages such as
 [ggraph](https://ggraph.data-imaginist.com), and
 [graphlayouts](https://github.com/schochastics/graphlayouts).
 [autograph](https://stocnet.github.io/autograph/) also offers some
-additional layout algorithms for visualising partitions horizontally,
+additional layout algorithms for visualising layers horizontally,
 vertically, or concentrically, conforming to configurational
 coordinates, or for snapping these layouts to a grid.
 
 ![Graphs illustrating different
-layouts](https://www.jameshollway.com/post/manynet/README-more-layouts-1.png)
+layouts](https://www.jameshollway.com/post/autograph/README-more-layouts-1.png)
 
 ### More networks
 
@@ -128,8 +143,17 @@ networks or network panels.
 arrange individual plots together, and is used throughout the package to
 help arrange plots together informatively.
 
+[`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+computes one layout and holds it across every panel. Plotting each
+network separately gives each panel its own layout, so a node can appear
+in a different position in each panel even where nothing about that node
+has changed. Holding the layout constant makes the panels comparable, so
+that what moves on the page is what changed in the data.
+[`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+also collects a single legend for the whole set.
+
 ![Example of graphs() used on longitudinal
-data](https://www.jameshollway.com/post/manynet/README-autographs-1.png)
+data](https://www.jameshollway.com/post/autograph/README-autographs-1.png)
 
 ### More time
 
@@ -143,7 +167,7 @@ smoothly between waves and nodes fading in and out as they enter and
 exit the network. It really couldn’t be easier.
 
 ![Example of grapht() on longitudinal
-data](https://www.jameshollway.com/post/manynet/README-autographd-1.gif)
+data](https://www.jameshollway.com/post/autograph/README-autographd-1.gif)
 
 ## Generating plots
 
@@ -154,16 +178,34 @@ networks. To keep things simple, all users need to remember is a single,
 generic function:
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html). Method
 dispatching takes care of the rest, so you can concentrate on exploring
-and interpreting your results. Here are some examples, using
-goodness-of-fit results from fitting a SAOM in
+and interpreting your results.
+
+Dispatching works because the results carry a class.
+[`igraph::degree()`](https://r.igraph.org/reference/degree.html) and
+`sna::degree()` each return a bare numeric vector, so
+[`plot()`](https://rdrr.io/r/graphics/plot.default.html) falls back to a
+scatterplot of the values against their index, and that index is not
+meaningful.
+[`netrics::node_by_degree()`](https://stocnet.github.io/netrics/reference/measure_central_degree.html)
+returns a `node_measure`, which
+[autograph](https://stocnet.github.io/autograph/) plots as a themed
+distribution:
+
+![Example illustrating that plotting a bare vector of degree scores
+gives an index scatterplot, where plotting a node_measure gives a
+distribution](https://www.jameshollway.com/post/autograph/README-result-comparison-1.png)
+
+The same holds for the other result classes. Here are some further
+examples, using goodness-of-fit results from fitting a SAOM in
 [RSiena](https://www.stats.ox.ac.uk/~snijders/siena/) and an ERGM in
 [ergm](https://statnet.org). (Note that neither the data nor the model
 are similar; this is just for illustrative purposes.)
 
 ![Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted
-in ergm](reference/figures/README-siena-ergm-gof-1.png)![Goodness-of-fit
+in
+ergm](https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-1.png)![Goodness-of-fit
 plots for a SAOM fitted in RSiena and an ERGM fitted in
-ergm](reference/figures/README-siena-ergm-gof-2.png)
+ergm](https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-2.png)
 
 ### Setting a theme
 
@@ -186,12 +228,6 @@ plot(netrics::tie_by_betweenness(ison_karateka)))/
 (plot(netrics::node_in_regular(ison_southern_women, "e")) + 
 plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
-```
-
-![Themed figures](reference/figures/README-themeset-1.png)
-
-``` r
-
 stocnet_theme("ethz")
 (plot(netrics::node_by_degree(ison_karateka)) + 
 plot(netrics::tie_by_betweenness(ison_karateka)))/
@@ -200,15 +236,116 @@ plot(as_matrix(ison_southern_women),
      membership = netrics::node_in_regular(ison_southern_women, "e")))
 ```
 
-![Themed figures](reference/figures/README-themeset-2.png)
+![Themed
+figures](https://www.jameshollway.com/post/autograph/README-themeset-1.png)![Themed
+figures](https://www.jameshollway.com/post/autograph/README-themeset-2.png)
 
 There are a range of institutional and topical themes available,
-including default, bw, crisp, neon, iheid, ethz, uzh, rug, unibe, oxf,
-unige, cmu, iast, hwu, rainbow, with more on the way.
+including default, bw, crisp, neon, clay, iheid, ethz, uzh, rug, unibe,
+oxf, unige, cmu, iast, hwu, rainbow, with more on the way.
 
 ![Institutional
-themes](reference/figures/README-theme-opts-1.png)![Institutional
-themes](reference/figures/README-theme-opts-2.png)
+themes](https://www.jameshollway.com/post/autograph/README-theme-opts-1.png)![Institutional
+themes](https://www.jameshollway.com/post/autograph/README-theme-opts-2.png)
+
+### Colours everyone can read
+
+About one man in twelve, and one woman in two hundred, sees colour
+differently. A palette that separates its categories for most readers
+can collapse for them, and the classic offender is the red-green pair
+that so many palettes hold.
+
+[autograph](https://stocnet.github.io/autograph/) does something about
+this without asking you to give up a palette. Every theme’s categorical
+palette is reordered when the theme is set, so that the colours a graph
+reaches for first are those that stay distinct under each type of colour
+blindness, and each divergent palette pairs a warm pole with a cool one.
+
+[`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+shows a set of colours as another viewer sees them, so mapping the
+simulated colours back onto a graph shows you their view of it. Here is
+the same network four times: in
+[autograph](https://stocnet.github.io/autograph/)’s default palette as
+most readers see it, then as a reader with deuteranopia does, then as a
+photocopier renders it, and then in the palette
+[ggraph](https://ggraph.data-imaginist.com) falls back on when
+[autograph](https://stocnet.github.io/autograph/) is not setting the
+colours, as that same reader with deuteranopia sees it.
+
+``` r
+
+set_stocnet_theme("default")
+as_seen <- function(colours, type, title){
+  graphr(fict_lotr, node_colour = "Race", node_size = 3, labels = FALSE) +
+    ggplot2::scale_fill_manual(values = simulate_colorblind(colours, type)) +
+    ggtitle(title)
+}
+as_seen(ag_qualitative(6), "normal", "autograph") |
+  as_seen(ag_qualitative(6), "deutan", "autograph, deuteranopia") |
+  as_seen(ag_qualitative(6), "grey", "autograph, greyscale") |
+  as_seen(scales::hue_pal()(6), "deutan", "ggraph default, deuteranopia")
+```
+
+![The same network seen with normal vision, with deuteranopia, and in
+greyscale, in autograph's palette, and with deuteranopia in
+ggraph's](https://www.jameshollway.com/post/autograph/README-cvd-1.png)
+
+The six races remain tellable apart in the second panel, its closest
+pair being Hobbits and Maiar. In the right-hand one, Elves and Ents have
+become the same olive. The third panel is the harder case, and it is not
+one reordering can fix: a greyscale device keeps only the luminance of a
+colour, so two colours of the same lightness merge however different
+their hues.
+[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+reports that view beside its own score; where a figure has to print in
+black and white, use the `"bw"` theme or add a second channel such as
+`node_shape`.
+[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+puts a number on it, scoring how far apart colours are at their worst
+across normal vision and each type of colour blindness:
+
+``` r
+
+round(min(check_separation(ag_qualitative(6)), na.rm = TRUE), 1)             # autograph
+#> [1] 13.5
+round(min(check_separation(scales::hue_pal()(6)), na.rm = TRUE), 1)          # ggraph
+#> [1] 5.5
+round(min(check_separation(igraph::categorical_pal(6)), na.rm = TRUE), 1)    # igraph
+#> [1] 16.2
+```
+
+Below 10 two colours are easily confused, above 25 they are comfortably
+distinct. [igraph](https://r.igraph.org/)’s categorical palette is the
+Okabe-Ito scheme, which was designed for this and scores accordingly:
+where you are free to choose any colours at all, such a scheme is hard
+to beat, and
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+will happily take it. The harder case is the one
+[autograph](https://stocnet.github.io/autograph/) is built for — colours
+chosen by somebody else, for reasons that were not legibility — and
+there the ordering is what stands between a brand palette and an
+unreadable graph. A palette with more colours to draw on has more room
+to gain: six categories score 29 under the `"hwu"` theme and 26 under
+`"oxf"`.
+
+Marks are only half of it. Text has to be read rather than told apart,
+which is a matter of contrast rather than of hue, and
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+scores it against the thresholds of WCAG 2.1: 4.5 for body text, 3 for
+large text and for graphical objects. Every theme’s ink clears 4.5 on
+that theme’s own ground, and the test suite holds it there.
+
+![Each theme's name written in that theme's ink on that theme's ground,
+annotated with its WCAG contrast
+ratio](https://www.jameshollway.com/post/autograph/README-wcag-1.png)
+
+The medium is a separate question again.
+[`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
+sizes the text for where the figure will be seen — `"screen"`,
+`"presentation"`, `"mobile"` — and `"print"` draws on white whatever
+ground the theme prefers, since a tinted ground costs ink and is often
+not reproduced. The theme is untouched by it, so one institutional
+palette carries from the desk to the slide to the page.
 
 If your institution or organisation is not included and you would like
 it to be, please just raise an issue on Github, along with a link to

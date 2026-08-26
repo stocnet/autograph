@@ -3,11 +3,35 @@
 For example, ag_base() will return the current theme's base or background
 color, and ag_highlight() will return the color used in that theme to
 highlight one or more nodes, lines, or such.
+ag_ink() returns the darker colour that theme writes with:
+axis text, reference lines, and other chrome.
+ag_missing() returns the neutral that theme sets aside for data that
+should recede: missing values, isolates counted out of a drawing,
+and any &quot;other&quot; remainder left when small categories are grouped down.
+Keeping one colour for all three means a reader learns it once.
+Keeping the two apart lets the base be light enough to stand away from
+the highlight while the ink stays dark enough to read.
+Where the ground changes under a theme – the &quot;print&quot; medium forces
+white, whatever the theme prefers – ag_ink() falls back to black or
+white rather than return an ink that cannot be read on it.
+See check_contrast() and stocnet_medium().
 Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges."><meta property="og:description" content="These functions assist in calling particular parts of a theme's palette.
 For example, ag_base() will return the current theme's base or background
 color, and ag_highlight() will return the color used in that theme to
 highlight one or more nodes, lines, or such.
+ag_ink() returns the darker colour that theme writes with:
+axis text, reference lines, and other chrome.
+ag_missing() returns the neutral that theme sets aside for data that
+should recede: missing values, isolates counted out of a drawing,
+and any &quot;other&quot; remainder left when small categories are grouped down.
+Keeping one colour for all three means a reader learns it once.
+Keeping the two apart lets the base be light enough to stand away from
+the highlight while the ink stays dark enough to read.
+Where the ground changes under a theme – the &quot;print&quot; medium forces
+white, whatever the theme prefers – ag_ink() falls back to black or
+white rather than return an ink that cannot be read on it.
+See check_contrast() and stocnet_medium().
 Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges."><meta property="og:image" content="https://stocnet.github.io/autograph/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -17,7 +41,7 @@ institutionally or thematically consistent is not without its challenges."><meta
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +74,7 @@ institutionally or thematically consistent is not without its challenges."><meta
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Consistent palette calls</h1>
-      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/theme_palettes.R" class="external-link"><code>R/theme_palettes.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stocnet/autograph/blob/main/R/theme_palette_get.R" class="external-link"><code>R/theme_palette_get.R</code></a></small>
       <div class="d-none name"><code>ag_call.Rd</code></div>
     </div>
 
@@ -58,7 +82,19 @@ institutionally or thematically consistent is not without its challenges."><meta
     <p>These functions assist in calling particular parts of a theme's palette.
 For example, <code>ag_base()</code> will return the current theme's base or background
 color, and <code>ag_highlight()</code> will return the color used in that theme to
-highlight one or more nodes, lines, or such.</p>
+highlight one or more nodes, lines, or such.
+<code>ag_ink()</code> returns the darker colour that theme writes with:
+axis text, reference lines, and other chrome.
+<code>ag_missing()</code> returns the neutral that theme sets aside for data that
+should recede: missing values, isolates counted out of a drawing,
+and any "other" remainder left when small categories are grouped down.
+Keeping one colour for all three means a reader learns it once.
+Keeping the two apart lets the base be light enough to stand away from
+the highlight while the ink stays dark enough to read.
+Where the ground changes under a theme – the "print" medium forces
+white, whatever the theme prefers – <code>ag_ink()</code> falls back to black or
+white rather than return an ink that cannot be read on it.
+See <code><a href="theme_colorblind.html">check_contrast()</a></code> and <code><a href="theme_medium.html">stocnet_medium()</a></code>.</p>
 <p>Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges.</p>
     </div>
@@ -66,6 +102,10 @@ institutionally or thematically consistent is not without its challenges.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">ag_base</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ag_ink</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ag_missing</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">ag_highlight</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -108,10 +148,36 @@ Fortunately there are a range of palettes that function fairly well for
 those who are color-blind.
 These include the <a href="https://CRAN.R-project.org/package=viridis" class="external-link">viridis</a>
 palette,
-and the ColorBrewer palettes (included in the RColorBrewer package).
-The default palettes in <code>{autograph}</code> are designed to be colour-blind
-friendly, but users should always check that their visualisations serve
-their intended audience.</p>
+and the ColorBrewer palettes (included in the RColorBrewer package).</p>
+<p>An institutional palette is not ours to change, but its order is.
+Each theme's categorical palette is therefore reordered when the theme is
+set, so that the first colours a plot draws on are those that stay
+distinct under each type of colour blindness, and <code>ag_qualitative()</code>
+takes those colours in order rather than interpolating between them.
+Divergent palettes pair a warm pole with a cool one for the same reason.
+Use <code><a href="theme_colorblind.html">check_separation()</a></code> to check how your own colours fare,
+and <code><a href="theme_colorblind.html">simulate_colorblind()</a></code> to see them as a colour-blind viewer would.</p>
+<p>Two further questions are worth asking of a palette.
+Whether its text can be read on what it sits on is a matter of contrast
+rather than of hue, and <code><a href="theme_colorblind.html">check_contrast()</a></code> scores it against the
+thresholds of WCAG 2.1.
+Whether it survives print is a matter of lightness alone, since a
+greyscale device keeps the luminance of a colour and discards the rest;
+<code>simulate_colorblind(type = "grey")</code> shows that view, and
+<code><a href="theme_colorblind.html">check_separation()</a></code> reports the greyscale distances beside its own score.
+Most institutional palettes separate by hue and so collapse in greyscale.
+Where a figure has to print in black and white, use the "bw" theme, or
+add a second channel such as <code>node_shape</code>.</p>
+<p>The "rainbow" theme is the exception, and is left in its own order.
+Its point is fidelity to the spectrum of an observed rainbow,
+which reordering would destroy,
+so <code>ag_qualitative()</code> samples across its whole length instead.
+A spectrum is not a colour-blind safe scheme:
+its reds and greens are exactly the pair that red-green colour blindness
+cannot separate.
+Choose it where the order of the categories is itself meaningful,
+and check the result with <code><a href="theme_colorblind.html">check_separation()</a></code>;
+for categories with no order, another theme serves more readers.</p>
     </div>
 
     <div class="section level2">
@@ -119,15 +185,19 @@ their intended audience.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Single colours from the currently active theme</span></span></span>
 <span class="r-in"><span><span class="fu">ag_base</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "black"</span>
+<span class="r-in"><span><span class="fu">ag_ink</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#121212"</span>
 <span class="r-in"><span><span class="fu">ag_highlight</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "red"</span>
+<span class="r-in"><span><span class="fu">ag_missing</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#8C8C8C"</span>
 <span class="r-in"><span><span class="fu">ag_positive</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#4575b4"</span>
 <span class="r-in"><span><span class="fu">ag_negative</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#d73027"</span>
 <span class="r-in"><span><span class="co"># Palettes of a requested length</span></span></span>
 <span class="r-in"><span><span class="fu">ag_qualitative</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#1B9E77" "#DF8402" "#666666"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#1B9E77" "#E6AB02" "#7570B3"</span>
 <span class="r-in"><span><span class="fu">ag_sequential</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "#000000" "#350C09" "#6B1813" "#A1241D" "#D73027"</span>
 <span class="r-in"><span><span class="fu">ag_divergent</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span></span>

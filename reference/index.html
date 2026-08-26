@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,10 +61,31 @@
 
         <dt>
 
-          <code><a href="ag_call.html">ag_base()</a></code> <code><a href="ag_call.html">ag_highlight()</a></code> <code><a href="ag_call.html">ag_positive()</a></code> <code><a href="ag_call.html">ag_negative()</a></code> <code><a href="ag_call.html">ag_qualitative()</a></code> <code><a href="ag_call.html">ag_sequential()</a></code> <code><a href="ag_call.html">ag_divergent()</a></code> <code><a href="ag_call.html">ag_font()</a></code>
+          <code><a href="theme_medium.html">stocnet_medium()</a></code> <code><a href="theme_medium.html">set_stocnet_medium()</a></code> <code><a href="theme_medium.html">ag_size()</a></code>
+
+        </dt>
+        <dd>Setting the medium a plot is made for</dd>
+
+        <dt>
+
+          <code><a href="ag_call.html">ag_base()</a></code> <code><a href="ag_call.html">ag_ink()</a></code> <code><a href="ag_call.html">ag_missing()</a></code> <code><a href="ag_call.html">ag_highlight()</a></code> <code><a href="ag_call.html">ag_positive()</a></code> <code><a href="ag_call.html">ag_negative()</a></code> <code><a href="ag_call.html">ag_qualitative()</a></code> <code><a href="ag_call.html">ag_sequential()</a></code> <code><a href="ag_call.html">ag_divergent()</a></code> <code><a href="ag_call.html">ag_font()</a></code>
 
         </dt>
         <dd>Consistent palette calls</dd>
+
+        <dt>
+
+          <code><a href="list_fonts.html">list_fonts()</a></code>
+
+        </dt>
+        <dd>Listing the fonts available to R</dd>
+
+        <dt>
+
+          <code><a href="theme_colorblind.html">simulate_colorblind()</a></code> <code><a href="theme_colorblind.html">check_separation()</a></code> <code><a href="theme_colorblind.html">check_contrast()</a></code>
+
+        </dt>
+        <dd>Checking colours for colour blindness, print, and legibility</dd>
 
         <dt>
 
@@ -102,6 +123,13 @@
 
         </dt>
         <dd>Easily animate dynamic networks with sensible defaults</dd>
+
+        <dt>
+
+          <code><a href="completion.html">stocnet_completion()</a></code> <code><a href="completion.html">set_completion()</a></code>
+
+        </dt>
+        <dd>Completing argument values as you type</dd>
       </dl></div><div class="section level2">
       <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h2>
 
@@ -156,7 +184,7 @@
 
         <dt>
 
-          <code><a href="plot_adequacy.html">plot(<i>&lt;outliers.goldfish&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;changepoints.goldfish&gt;</i>)</a></code>
+          <code><a href="plot_adequacy.html">plot(<i>&lt;diagnose_outliers&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;outliers.goldfish&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;diagnose_changepoints&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;changepoints.goldfish&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishOutliers&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishChangepoints&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishMargins&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishGOF&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishTimeTest&gt;</i>)</a></code> <code><a href="plot_adequacy.html">plot(<i>&lt;goldfishOnset&gt;</i>)</a></code>
 
         </dt>
         <dd>Plotting adequacy diagnostics</dd>
@@ -174,6 +202,13 @@
 
         </dt>
         <dd>Plotting goodness-of-fit results</dd>
+
+        <dt>
+
+          <code><a href="plot_goldfish_fit.html">plot(<i>&lt;result.goldfish&gt;</i>)</a></code> <code><a href="plot_goldfish_fit.html">plot(<i>&lt;goldfishFit&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plotting a goldfish model fit at a glance</dd>
 
         <dt>
 
@@ -202,6 +237,13 @@
 
         </dt>
         <dd>Plotting effects interpretation</dd>
+
+        <dt>
+
+          <code><a href="count_pages.html">count_pages()</a></code>
+
+        </dt>
+        <dd>How many pages a paged diagnostic figure has</dd>
       </dl></div><div class="section level2">
       <h2 id="layouts">Layouts<a class="anchor" aria-label="anchor" href="#layouts"></a></h2>
 
@@ -214,38 +256,66 @@
 
       <dl><dt>
 
-          <code><a href="layout_configuration.html">layout_configuration()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_configuration()</a></code> <code><a href="layout_configuration.html">layout_dyad()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_dyad()</a></code> <code><a href="layout_configuration.html">layout_triad()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_triad()</a></code> <code><a href="layout_configuration.html">layout_tetrad()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_tetrad()</a></code> <code><a href="layout_configuration.html">layout_pentad()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_pentad()</a></code> <code><a href="layout_configuration.html">layout_hexad()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_hexad()</a></code>
+          <code><a href="layout_concentric.html">layout_concentric()</a></code> <code><a href="layout_concentric.html">layout_tbl_graph_concentric()</a></code>
+
+        </dt>
+        <dd>Concentric layout</dd>
+
+        <dt>
+
+          <code><a href="layout_configuration.html">layout_configuration()</a></code> <code><a href="layout_configuration.html">layout_tbl_graph_configuration()</a></code> <code><a href="layout_configuration.html">layout_dyad()</a></code> <code><a href="layout_configuration.html">layout_triad()</a></code> <code><a href="layout_configuration.html">layout_tetrad()</a></code> <code><a href="layout_configuration.html">layout_pentad()</a></code> <code><a href="layout_configuration.html">layout_hexad()</a></code>
 
         </dt>
         <dd>Layout algorithms based on configurational positions</dd>
 
         <dt>
 
-          <code><a href="layout_layered.html">layout_tbl_graph_layered()</a></code>
+          <code><a href="layout_correspondence.html">layout_correspondence()</a></code> <code><a href="layout_correspondence.html">layout_tbl_graph_correspondence()</a></code>
 
         </dt>
-        <dd>Layered layout</dd>
+        <dd>Correspondence layout</dd>
 
         <dt>
 
-          <code><a href="layout_matching.html">layout_tbl_graph_matching()</a></code>
+          <code><a href="layout_layered.html">layout_layered()</a></code> <code><a href="layout_layered.html">layout_tbl_graph_layered()</a></code> <code><a href="layout_layered.html">layout_lineage()</a></code> <code><a href="layout_layered.html">layout_tbl_graph_lineage()</a></code> <code><a href="layout_layered.html">layout_railway()</a></code> <code><a href="layout_layered.html">layout_tbl_graph_railway()</a></code> <code><a href="layout_layered.html">layout_ladder()</a></code> <code><a href="layout_layered.html">layout_tbl_graph_ladder()</a></code>
+
+        </dt>
+        <dd>Layered layouts</dd>
+
+        <dt>
+
+          <code><a href="layout_levels.html">layout_levels()</a></code> <code><a href="layout_levels.html">layout_tbl_graph_levels()</a></code>
+
+        </dt>
+        <dd>Levels layout</dd>
+
+        <dt>
+
+          <code><a href="layout_matching.html">layout_matching()</a></code> <code><a href="layout_matching.html">layout_tbl_graph_matching()</a></code>
 
         </dt>
         <dd>Matching layout</dd>
 
         <dt>
 
-          <code><a href="layout_partition.html">layout_concentric()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_concentric()</a></code> <code><a href="layout_partition.html">layout_multilevel()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_multilevel()</a></code> <code><a href="layout_partition.html">layout_lineage()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_lineage()</a></code> <code><a href="layout_partition.html">layout_hierarchy()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_hierarchy()</a></code> <code><a href="layout_partition.html">layout_alluvial()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_alluvial()</a></code> <code><a href="layout_partition.html">layout_railway()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_railway()</a></code> <code><a href="layout_partition.html">layout_ladder()</a></code> <code><a href="layout_partition.html">layout_tbl_graph_ladder()</a></code>
+          <code><a href="layout_scaling.html">layout_scaling()</a></code> <code><a href="layout_scaling.html">layout_tbl_graph_scaling()</a></code>
 
         </dt>
-        <dd>Layout algorithms based on bi- or other partitions</dd>
+        <dd>Scaling layout</dd>
 
         <dt>
 
           <code><a href="layout_valence.html">layout_valence()</a></code> <code><a href="layout_valence.html">layout_tbl_graph_valence()</a></code>
 
         </dt>
-        <dd>Valence-based layout</dd>
+        <dd>Valence layout</dd>
+
+        <dt>
+
+          <code><a href="check_layout.html">check_span()</a></code> <code><a href="check_layout.html">check_offset()</a></code> <code><a href="check_layout.html">check_stress()</a></code>
+
+        </dt>
+        <dd>Checking how well a layout draws its ties</dd>
       </dl></div><div class="section level2">
       <h2 id="results-objects-from-other-packages">Results objects from other packages<a class="anchor" aria-label="anchor" href="#results-objects-from-other-packages"></a></h2>
 
@@ -258,7 +328,7 @@
 
       <dl><dt>
 
-          <code><a href="made_earlier.html">res_migraph_reg</a></code> <code><a href="made_earlier.html">res_migraph_test</a></code> <code><a href="made_earlier.html">res_migraph_diff</a></code> <code><a href="made_earlier.html">res_manynet_diff</a></code> <code><a href="made_earlier.html">siena_gof</a></code> <code><a href="made_earlier.html">siena_influence</a></code> <code><a href="made_earlier.html">siena_selection</a></code> <code><a href="made_earlier.html">monan_conv</a></code> <code><a href="made_earlier.html">monan_gof</a></code> <code><a href="made_earlier.html">ergm_gof</a></code> <code><a href="made_earlier.html">goldfish_outliers</a></code> <code><a href="made_earlier.html">goldfish_changepoints</a></code>
+          <code><a href="made_earlier.html">res_migraph_reg</a></code> <code><a href="made_earlier.html">res_migraph_test</a></code> <code><a href="made_earlier.html">res_migraph_diff</a></code> <code><a href="made_earlier.html">res_manynet_diff</a></code> <code><a href="made_earlier.html">siena_gof</a></code> <code><a href="made_earlier.html">siena_influence</a></code> <code><a href="made_earlier.html">siena_selection</a></code> <code><a href="made_earlier.html">monan_conv</a></code> <code><a href="made_earlier.html">monan_gof</a></code> <code><a href="made_earlier.html">ergm_gof</a></code> <code><a href="made_earlier.html">goldfish_outliers</a></code> <code><a href="made_earlier.html">goldfish_changepoints</a></code> <code><a href="made_earlier.html">goldfish_margins</a></code> <code><a href="made_earlier.html">goldfish_gof</a></code> <code><a href="made_earlier.html">goldfish_time</a></code> <code><a href="made_earlier.html">goldfish_onset</a></code> <code><a href="made_earlier.html">goldfish_fit</a></code>
 
         </dt>
         <dd>Precooked results for demonstrating plotting</dd>
