@@ -604,3 +604,28 @@ test_that("padding widens the room a layout asked for without replacing it", {
   expect_equal(sc$expand[[4]], 0)
   expect_equal(sc$expand[[3]], 0.25)
 })
+
+test_that("an arc is drawn for every tie the arc stat keeps", {
+  # `geom_edge_arc()` drops every tie whose two ends sit at one point, and its
+  # `strength` is a parameter rather than an aesthetic, so it has to leave the
+  # same ties out. The "scaling" layout draws two nodes that hold the same
+  # distances to every other node at one point, which used to leave `strength`
+  # two ties longer than the ties it was measured against.
+  net <- manynet::ison_networkers
+  p <- suppressMessages(graphr(net, layout = "scaling", labels = FALSE))
+  drawn <- sum(!autograph:::.tie_is_coincident(net, p))
+  expect_lt(drawn, manynet::net_ties(net))
+  expect_length(autograph:::.infer_arc_strength(net, p), drawn)
+  expect_no_warning(ggplot2::ggplot_build(p))
+  # A network drawn with every node in its own place keeps every tie.
+  q <- suppressMessages(graphr(net, layout = "stress", labels = FALSE))
+  expect_length(autograph:::.infer_arc_strength(net, q), manynet::net_ties(net))
+  expect_no_warning(ggplot2::ggplot_build(q))
+  # A self-loop sits at one point by definition, and is drawn by
+  # `geom_edge_loop0()` instead.
+  loops <- manynet::as_igraph(manynet::ison_adolescents)
+  loops <- igraph::add_edges(loops, c(1, 1))
+  lp <- suppressMessages(graphr(loops))
+  expect_true(utils::tail(autograph:::.tie_is_coincident(loops, lp), 1))
+  expect_no_warning(ggplot2::ggplot_build(lp))
+})

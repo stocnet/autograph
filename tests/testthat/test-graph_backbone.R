@@ -70,9 +70,7 @@ test_that("a backbone moves the layouts that read tie lengths", {
                                      layout = "scaling", backbone = FALSE,
                                      labels = FALSE))
   expect_equal(fixed$data[, c("x", "y")], unfixed$data[, c("x", "y")])
-  # Building this network on this layout warns whether or not a backbone is
-  # drawn, which is not this test's business.
-  expect_equal(suppressWarnings(bb_alphas(fixed)), c(0.08, 0.4))
+  expect_equal(bb_alphas(fixed), c(0.08, 0.4))
 })
 
 test_that("a tie length points the way each layout reads it", {

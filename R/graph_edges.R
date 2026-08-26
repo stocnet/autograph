@@ -191,21 +191,37 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   parts <- .split_edge_aes(out)
   parts$mapping$end_cap <- quote(ggraph::circle(c(out[["end_cap"]]), 'mm'))
   args <- c(list(mapping = do.call(ggplot2::aes, parts$mapping),
-                 strength = .infer_arc_strength(g),
+                 strength = .infer_arc_strength(g, p),
                  arrow = .infer_arrow(out[["esize"]])),
             parts$params)
   .scale_edge_aes(p + do.call(ggraph::geom_edge_arc, args), parts)
 }
 
-.infer_arc_strength <- function(g) {
+.infer_arc_strength <- function(g, p) {
   # `geom_edge_arc()` reciprocated dyads apart (0.2) and draws single ties
-  # straight (0). Its stat removes self-loops before drawing (loops are drawn
-  # separately by `geom_edge_loop0()`), but `strength` is a length-preserving
-  # parameter rather than an aesthetic, so it must exclude loop edges. Otherwise
-  # a full-length (net_ties) vector recycles against the loop-free edge set and
-  # emits "longer object length is not a multiple" warnings on complex networks.
+  # straight (0). Its stat removes every tie whose two ends sit at the same
+  # point before drawing, but `strength` is a length-preserving parameter
+  # rather than an aesthetic, so it must leave the same ties out. Otherwise a
+  # full-length (net_ties) vector recycles against the shorter edge set and
+  # emits "longer object length is not a multiple" warnings.
   strength <- ifelse(igraph::which_mutual(g), 0.2, 0)
-  strength[!igraph::which_loop(g)]
+  strength[!.tie_is_coincident(g, p)]
+}
+
+# Which ties `ggraph:::remove_loop()` drops, tested the way it tests them:
+# on the coordinates rather than on the network. That is every self-loop, which
+# `geom_edge_loop0()` draws instead, and also every tie between two nodes that
+# the layout placed at one point, as the "scaling" layout does where two nodes
+# hold the same distances to every other node.
+.tie_is_coincident <- function(g, p) {
+  el <- igraph::as_edgelist(manynet::as_igraph(g), names = FALSE)
+  xy <- p[["data"]]
+  out <- xy[["x"]][el[, 1]] == xy[["x"]][el[, 2]] &
+    xy[["y"]][el[, 1]] == xy[["y"]][el[, 2]]
+  # A node without coordinates is not a node drawn on top of another one, and
+  # `remove_loop()` keeps its ties too.
+  out[is.na(out)] <- FALSE
+  out
 }
 
 .infer_bundle_geom <- function(edge_bundle) {

@@ -80,6 +80,8 @@
   - Fixed tie opacity so that those between levels fade behind those within them
   - Fixed default node size in multilevel layout, which is now taken from how many nodes there are at each level rather than in the whole network
   - Fixed labelling to be plain text nudged away instead of white-boxed labels
+- Fixed arcs drawn on layout that places two nodes at one point, 
+  e.g. `graphr(ison_networkers, layout = "scaling")`
 - Fixed tie colouring in multiplex networks to color layers not signs by default
   - Signs are still drawn as linetypes
   - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing

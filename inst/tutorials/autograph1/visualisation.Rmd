@@ -581,22 +581,69 @@ setting `edge_size` yourself resizes both together.
 
 ### Taming dense or disconnected networks {#taming-networks}
 
-Two arguments help when a network is too dense, or too sparse, to read at a
-glance.
+Sometimes networks are just a dense hairball.
+This is a technical term to describe networks with many high-degree nodes and many ties, 
+where the sheer number of ties obscures the structure of the network.
+Autograph includes three arguments that can help with this.
 
-Larger, denser networks can turn into a 'hairball', where the sheer number of
-ties obscures everything. `edge_bundle` pulls ties that travel in similar
-directions into shared paths — like cabling them together — so that the main
-'highways' of the network stand out. It is off by default; set
-`edge_bundle = TRUE` (or name a specific algorithm: `"force"`, `"path"`, or
-`"minimal"`) to switch it on. **Compare a dense random network with and
-without bundling.**
+#### Bundling ties {#bundling}
+
+The first option is to draw all of the ties 'bundled' together,
+which can reveal where the most common paths through the network are.
+`edge_bundle` pulls ties that travel in similar
+directions into shared paths — like cabling them together — 
+so that the main 'highways' of the network stand out. 
+It is off by default; set `edge_bundle = TRUE` 
+(or name a specific algorithm: `"force"`, `"path"`, or `"minimal"`) to switch it on. 
+**`ison_lawfirm` records 71 lawyers and 2571
+ties between them, which is about as thick a hairball as a network this small
+can be. Compare it drawn with and without bundling (turn backbone off too for clearest comparison results).**
 
 ```{r bundle, exercise=TRUE, fig.width=9}
-rand <- manynet::generate_random(40, 0.1)
-(graphr(rand) + ggtitle("Unbundled") |
-   graphr(rand, edge_bundle = TRUE) + ggtitle("Bundled"))
+graphr(ison_lawfirm, backbone = FALSE) + ggtitle("Unbundled") | 
+  graphr(ison_lawfirm, backbone = FALSE, edge_bundle = "path") + ggtitle("Bundled")
 ```
+
+I find this works best with networks that are at least moderately dense,
+and sometimes requires a little bit of playing around to get a good result.
+
+#### Backbones {#backbone}
+
+By contrast, `r gloss("backbone")` changes which ties the picture is built around. 
+Ties that carry more weight/structure than expected by a null model local to their endpoints
+are in essence what the network would be if it were stripped back to its skeleton.
+`graphr()` then draws the layout according to this skeleton and 
+fades other ties into the background to further emphasise the main structure. 
+
+Most of the time you will not have to ask for this. 
+Networks of 50+ nodes with 8 ties each on average is drawn this way by default.
+But you can specify `backbone = FALSE` to turns it off, `backbone = TRUE` to force it on, 
+or you can name a filter — `"disparity"`, `"lans"`, `"noise"`, `"mlf"`, or `"simmelian"` — or threshold. 
+**Compare `ison_lawfirm` drawn with and without its backbone.**
+
+```{r backbone, exercise=TRUE, fig.width=9}
+(graphr(ison_lawfirm, node_colour = "office", backbone = FALSE) +
+   ggtitle("Every tie alike") |
+   graphr(ison_lawfirm, node_colour = "office", backbone = TRUE) +
+   ggtitle("Backbone"))
+```
+
+The offices are hardly visible on the left. On the right they separate, because
+the ties that hold each office together are the ties the filter keeps.
+
+Only the layouts that read tie lengths are laid out this way: `"stress"` (the
+default), `"fr"`, `"drl"` and `"kk"`. Every other layout, including those whose
+coordinates already mean something such as `"layered"` or `"scaling"`, keeps
+its coordinates and only fades its ties. Signed networks have no backbone,
+since these null models have no place for a negative weight, and are drawn as
+they were.
+
+Bundling and backbones answer the same problem from different ends, so try one
+before reaching for both. A bundled tie cannot carry a fading of its own —
+bundling merges ties into shared paths — so where both are asked for, the
+backbone still shapes the layout but every tie is drawn alike.
+
+#### Isolates {#isolates}
 
 At the other extreme, many networks contain `r gloss("isolates","isolate")` —
 unconnected nodes — which, under a force-directed layout, drift to the margins
@@ -613,10 +660,11 @@ lotr_iso <- fict_lotr |>
    graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
 ```
 
-For very large real-world networks such as `irps_blogs`, the two work well
-together: `edge_bundle = TRUE` untangles the connected core while
-`isolates = "legend"` keeps its several hundred unconnected blogs from
-crowding that core out.
+For very large real-world networks such as `irps_blogs`, these work well
+together: a backbone picks out the ties that hold the connected core together
+(or `edge_bundle = TRUE`, if you would rather see the paths the ties take than
+which of them matter most), while `isolates = "legend"` keeps its several
+hundred unconnected blogs from crowding that core out.
 
 ### Free play {#illustrating-free-play}
 
@@ -642,7 +690,7 @@ for nodes, `edge_colour` and `edge_size` for ties.
 Use colour or shape for categorical attributes (colour scales better),
 size for continuous ones,
 and `node_group` to shade spatially clustered memberships.
-For dense or disconnected networks, `edge_bundle` and `isolates`
+For dense or disconnected networks, `edge_bundle`, `backbone` and `isolates`
 (see _Taming dense or disconnected networks_ above) keep the picture legible.
 :::
 
@@ -2069,7 +2117,7 @@ Along the way, you have learned to use these functions:
 | `graphr(..., layout, snap)` | chooses and adjusts the layout algorithm |
 | `graphr(..., x, y)` | places nodes at manually supplied coordinates |
 | `ggraph::create_layout()` | returns a layout's table of node coordinates for tweaking |
-| `graphr(..., edge_bundle, isolates)` | tames large, dense, or disconnected networks |
+| `graphr(..., edge_bundle, backbone, isolates)` | tames large, dense, or disconnected networks |
 | `stocnet_theme()` | sets a consistent theme for all graphs and plots |
 | `ggplot2::scale_fill_hue()`, `_grey()`, `_manual()` | overrides node colour palettes |
 | `labs()`, `ggtitle()`, `guides()` | adds titles, axis and legend labels |
