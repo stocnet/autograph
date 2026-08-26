@@ -41,7 +41,13 @@ layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE,
       rep(1, manynet::net_ties(graph))
   weights[is.na(weights)] <- 1
   
-  coords <- matrix(stats::runif(n * 2, min = -1, max = 1), ncol = 2)
+  # The nodes start on a circle rather than at random points, so that the
+  # layout is stable from one run to the next. A random start can place two
+  # nodes on top of each other, which the repulsion force then throws apart.
+  # A small jitter breaks the symmetry of the circle.
+  angle <- 2 * pi * seq_len(n) / n
+  coords <- cbind(cos(angle), sin(angle)) +
+    matrix(stats::runif(n * 2, min = -0.01, max = 0.01), ncol = 2)
   
   for (i in 1:times) {
     delta <- matrix(0, nrow = n, ncol = 2)
@@ -52,7 +58,10 @@ layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE,
         vec <- coords[k, ] - coords[j, ]
         dist <- sqrt(sum(vec^2)) + 1e-4
         dir <- vec / dist
-        force <- repulsion_coef / dist^2
+        # The distance is floored, since two nodes that start close together
+        # would otherwise repel each other with a force large enough to throw
+        # the whole layout apart, which it never recovers from.
+        force <- repulsion_coef / max(dist, 0.1)^2
         
         delta[j, ] <- delta[j, ] - force * dir
         delta[k, ] <- delta[k, ] + force * dir
@@ -75,8 +84,13 @@ layout_valence <- function(.data, times = 500, center = NULL, circular = FALSE,
       delta[t_id, ] <- delta[t_id, ] - force * dir
     }
     
-    # Position update with damping
-    coords <- coords + 0.1 * delta
+    # Position update with damping, a capped step, and cooling.
+    # The cap keeps one large force from moving a node further than the layout
+    # is wide, and the cooling lets the layout settle over the iterations.
+    step <- sqrt(rowSums(delta^2))
+    limit <- ifelse(step > 1, 1 / step, 1)
+    temp <- 1 - (i - 1) / times
+    coords <- coords + 0.1 * temp * delta * limit
   }
   coords <- as.data.frame(coords)
   names(coords) <- c("x", "y")

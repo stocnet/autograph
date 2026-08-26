@@ -89,6 +89,25 @@ check_tute_functions <- function(path, skip = "ergm\\(|grapht\\("){
       if (!grepl("deprecate|defunct|moved", msg, ignore.case = TRUE)) {
         w <- NULL
       }
+
+      # Only fail if the tutorial calls the deprecated function itself. A
+      # dependency that calls a deprecated function of its own dependency
+      # raises the same warning, and no edit to this tutorial can silence it.
+      if (!is.null(w)) {
+        code <- paste(deparse(exprs[[i]]), collapse = " ")
+        # The name a deprecation warning reports, in either the base R form
+        # ("'to_ties' is deprecated") or the {lifecycle} form
+        # ("`to_ties()` was deprecated in manynet 2.3.0").
+        hits <- regmatches(msg, gregexpr(
+          "[`'\"][^`'\"]+[`'\"][^[:alpha:]]*(is|was|has been)[[:space:]]+(deprecated|defunct|moved)",
+          msg))[[1]]
+        named <- gsub("^[`'\"]([^`'\"]+)[`'\"].*$", "\\1", hits)
+        named <- gsub("\\(\\)$", "", named)
+        if (length(named) > 0 &&
+            !any(vapply(named, grepl, logical(1), x = code, fixed = TRUE))) {
+          w <- NULL
+        }
+      }
     }
 
     # Now test what happened
