@@ -84,10 +84,10 @@
 #' drawn <- graphr(thrones)
 #' # How long are the ties of the default layout?
 #' attr(check_span(drawn), "total")
-#' # And of the layers igraph would have chosen?
-#' attr(check_span(graphr(thrones, ranks = "compact")), "total")
 #' # How straight are they?
 #' attr(check_offset(drawn), "mean")
+#' # Compare with the layers igraph would have chosen:
+#' # attr(check_span(graphr(thrones, ranks = "compact")), "total")
 #' # Which layout draws the path distances best?
 #' check_stress(graphr(manynet::ison_southern_women, layout = "scaling"))
 #' check_stress(graphr(manynet::ison_southern_women, layout = "circle"))

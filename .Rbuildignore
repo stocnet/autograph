@@ -24,3 +24,4 @@ vignettes/precompile\.R
 ^CLAUDE\.md$
 ^man-roxygen$
 ^inst/autograph_old\.png$
+^Rplots\.pdf$
