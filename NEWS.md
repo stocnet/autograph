@@ -82,6 +82,7 @@
   - Fixed labelling to be plain text nudged away instead of white-boxed labels
 - Fixed arcs drawn on layout that places two nodes at one point, 
   e.g. `graphr(ison_networkers, layout = "scaling")`
+- Fixed `graphr()` to draw parallel ties as a fan instead of one on top of another
 - Fixed tie colouring in multiplex networks to color layers not signs by default
   - Signs are still drawn as linetypes
   - Added a legend for the tie linetype wherever it is the only thing showing the signs, and is titled by whatever color is showing

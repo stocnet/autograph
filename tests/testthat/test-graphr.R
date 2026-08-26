@@ -605,6 +605,50 @@ test_that("padding widens the room a layout asked for without replacing it", {
   expect_equal(sc$expand[[3]], 0.25)
 })
 
+test_that("parallel ties are fanned apart", {
+  # Two ties between the same two nodes are drawn along the same line by
+  # `geom_edge_link0()`, and by a single arc, so one hides the other. Where the
+  # network holds such ties, they are drawn by `geom_edge_fan()` instead, which
+  # gives each tie in a group its own side of the pair.
+  #
+  # `irps_corruption`, which reported this, belongs to manynet 2.3.0, so the
+  # networks here are built from a dataset both versions carry.
+  .deviation <- function(p) {
+    d <- ggplot2::ggplot_build(p)$data[[1]]
+    vapply(split(d[, c("x", "y")], d$group), function(s) {
+      from <- as.numeric(s[1, ]); to <- as.numeric(s[nrow(s), ])
+      v <- to - from
+      len <- sqrt(sum(v^2))
+      if (len == 0) return(0)
+      max(abs(as.matrix(sweep(as.matrix(s), 2, from)) %*% (c(-v[2], v[1])/len)))
+    }, numeric(1))
+  }
+  # An undirected network without parallel ties is drawn as it was before.
+  expect_false(autograph:::.has_parallel_ties(manynet::ison_adolescents))
+  plain <- suppressMessages(graphr(manynet::ison_adolescents))
+  expect_s3_class(plain$layers[[1]]$geom, "GeomEdgeSegment")
+  # Repeating one tie fans that pair apart and leaves every other tie straight.
+  par <- manynet::as_igraph(manynet::ison_adolescents)
+  par <- igraph::add_edges(par, igraph::as_edgelist(par, names = FALSE)[1, ])
+  expect_true(autograph:::.has_parallel_ties(par))
+  p <- suppressMessages(graphr(par, labels = FALSE))
+  expect_s3_class(p$layers[[1]]$geom, "GeomEdgePath")
+  expect_no_warning(ggplot2::ggplot_build(p))
+  # A straight path deviates by rounding noise rather than by exactly zero.
+  dev <- .deviation(p)
+  expect_equal(sum(dev > 1e-6), 2)
+  # A directed network keeps its arcs until two ties run the same way, which
+  # `which_mutual()` does not tell apart but `which_multiple()` does.
+  dir <- manynet::as_igraph(manynet::ison_networkers)
+  expect_false(autograph:::.has_parallel_ties(dir))
+  dpar <- igraph::add_edges(dir, igraph::as_edgelist(dir, names = FALSE)[1, ])
+  expect_true(autograph:::.has_parallel_ties(dpar))
+  q <- suppressMessages(graphr(dpar, labels = FALSE))
+  expect_no_warning(ggplot2::ggplot_build(q))
+  # The arrowheads are still stopped short of the node they point to.
+  expect_true("end_cap" %in% names(q$layers[[1]]$mapping))
+})
+
 test_that("an arc is drawn for every tie the arc stat keeps", {
   # `geom_edge_arc()` drops every tie whose two ends sit at one point, and its
   # `strength` is a parameter rather than an aesthetic, so it has to leave the

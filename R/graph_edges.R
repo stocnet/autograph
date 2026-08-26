@@ -2,21 +2,26 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
                         edge_bundle = FALSE, layout = NULL, shared = NULL,
                         backbone = NULL) {
   bundle_geom <- .infer_bundle_geom(edge_bundle)
+  fan <- .has_parallel_ties(g)
   if (manynet::is_directed(g)) {
     out <- .infer_directed_edge_mapping(g, edge_color, edge_size, node_size,
                                         layout, shared, backbone)
-    if (is.null(bundle_geom)) {
-      p <- .map_directed_edges(p, g, out)
-    } else {
+    if (!is.null(bundle_geom)) {
       p <- .map_bundled_edges(p, g, out, bundle_geom, directed = TRUE)
+    } else if (fan) {
+      p <- .map_fanned_edges(p, g, out, directed = TRUE)
+    } else {
+      p <- .map_directed_edges(p, g, out)
     }
   } else {
     out <- .infer_edge_mapping(g, edge_color, edge_size, layout, shared,
                                backbone)
-    if (is.null(bundle_geom)) {
-      p <- .map_edges(p, g, out)
-    } else {
+    if (!is.null(bundle_geom)) {
       p <- .map_bundled_edges(p, g, out, bundle_geom, directed = FALSE)
+    } else if (fan) {
+      p <- .map_fanned_edges(p, g, out, directed = FALSE)
+    } else {
+      p <- .map_edges(p, g, out)
     }
   }
   if (manynet::is_complex(g)) {
@@ -222,6 +227,43 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   # `remove_loop()` keeps its ties too.
   out[is.na(out)] <- FALSE
   out
+}
+
+# Whether any two ties join the same pair of nodes in the same way, so that a
+# straight line or a single arc would draw one on top of the other. This is not
+# `is_multiplex()`, which is TRUE for a network that only carries a non-reserved
+# tie attribute (see `.has_layers()` in R/graph_aes.R), and it is not
+# `which_mutual()`, which flags the two ties of a reciprocated dyad that
+# `geom_edge_arc()` already draws apart. `which_multiple()` respects direction:
+# it flags a repeated undirected pair, and a repeated directed pair, but not a
+# reciprocated dyad.
+.has_parallel_ties <- function(g) {
+  any(igraph::which_multiple(manynet::as_igraph(g)))
+}
+
+# `geom_edge_fan()` groups the ties by the unordered node pair, gives each tie in
+# a group its own side of the pair, and draws a group of one straight. Its
+# `strength` is a scalar layer parameter, so the length-preserving problem that
+# `.infer_arc_strength()` solves does not arise here: the fan stat drops the same
+# ties (self-loops, and a tie whose two ends sit at one point) without a vector
+# to keep in step with.
+#
+# The constant is calibrated against the arcs drawn for a reciprocated dyad. For
+# a chord of length one, `geom_edge_arc(strength = 0.2)` bends 0.1159 away from
+# the chord, and a two-tie fan at `strength = 1` bends 0.0625, so 1.85 draws two
+# parallel ties about as far apart as two reciprocated ties.
+.fan_strength <- function() 1.85
+
+.map_fanned_edges <- function(p, g, out, directed = FALSE) {
+  parts <- .split_edge_aes(out)
+  args <- c(list(strength = .fan_strength()), parts$params)
+  if (directed) {
+    parts$mapping$end_cap <- quote(ggraph::circle(c(out[["end_cap"]]), 'mm'))
+    args$arrow <- .infer_arrow(out[["esize"]])
+  }
+  if (length(parts$mapping))
+    args$mapping <- do.call(ggplot2::aes, parts$mapping)
+  .scale_edge_aes(p + do.call(ggraph::geom_edge_fan, args), parts)
 }
 
 .infer_bundle_geom <- function(edge_bundle) {
