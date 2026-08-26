@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,6 +43,22 @@
       <small>Source: <a href="https://github.com/stocnet/autograph/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.1" id="autograph-121">autograph 1.2.1<a class="anchor" aria-label="anchor" href="#autograph-121"></a></h2>
+<div class="section level3">
+<h3 id="layouts-1-2-1">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-2-1"></a></h3>
+<ul><li>Fixed “valence” layout returning a poor layout for some random starts
+<ul><li>The nodes now start on a circle, so one run resembles the next</li>
+<li>The repulsion force between two close nodes is now bounded</li>
+<li>Each step is now capped and cools over the iterations</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="tests-1-2-1">Tests<a class="anchor" aria-label="anchor" href="#tests-1-2-1"></a></h3>
+<ul><li>Fixed the tutorial test failing on a deprecation warning that the tutorial code does not raise itself</li>
+<li>Fixed the “valence” layout test depending on the random seed</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.0" id="autograph-120">autograph 1.2.0<a class="anchor" aria-label="anchor" href="#autograph-120"></a></h2>
 <div class="section level3">
