@@ -1,3 +1,9 @@
+# autograph 1.2.2
+
+## Graphing
+
+- Improved how `node_color=` colours numeric node variables
+
 # autograph 1.2.1
 
 ## Layouts

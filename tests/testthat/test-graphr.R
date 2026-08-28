@@ -200,6 +200,55 @@ test_that("node_color with multiple values uses fill scale", {
   expect_true(any(grepl("fill", scale_names)))
 })
 
+# A measure has an order that categories do not ----
+
+.fill_scale <- function(p) {
+  scales <- Filter(function(s) "fill" %in% s[["aesthetics"]],
+                   p[["scales"]][["scales"]])
+  if (length(scales)) scales[[1]] else NULL
+}
+
+test_that("a numeric node_color is drawn as a gradient, not as categories", {
+  skip_on_cran()
+  net <- manynet::mutate_nodes(ison_adolescents,
+                               core = c(0, 0.1, 0.4, 0.6, 0.7, 1, 0.3, 0.2))
+  p <- graphr(net, node_color = "core")
+  expect_s3_class(.fill_scale(p), "ScaleContinuous")
+  expect_buildable(p)
+  # The gradient runs from the theme's base colour to its highlight
+  expect_equal(.fill_scale(p)[["palette"]](c(0, 1)),
+               c(ag_sequential(9)[1], ag_sequential(9)[9]))
+})
+
+test_that("a gradient node_color is given a colourbar titled by the attribute", {
+  skip_on_cran()
+  net <- manynet::mutate_nodes(ison_adolescents,
+                               core = c(0, 0.1, 0.4, 0.6, 0.7, 1, 0.3, 0.2))
+  guides <- ggplot2::ggplot_build(graphr(net, node_color = "core"))[["plot"]][["guides"]][["guides"]]
+  bars <- Filter(function(gd) inherits(gd, "GuideColourbar"), guides)
+  expect_length(bars, 1)
+  expect_equal(bars[[1]][["params"]][["title"]], "core")
+})
+
+test_that("a numeric node_color of two values stays categorical", {
+  skip_on_cran()
+  net <- manynet::mutate_nodes(ison_adolescents,
+                               grp = c(1, 2, 1, 2, 1, 2, 1, 2))
+  expect_s3_class(.fill_scale(graphr(net, node_color = "grp")), "ScaleDiscrete")
+})
+
+test_that("graphs() shares one gradient range across its panels", {
+  skip_on_cran()
+  nets <- list(a = manynet::mutate_nodes(ison_adolescents,
+                                         core = seq(0, 0.7, length.out = 8)),
+               b = manynet::mutate_nodes(ison_adolescents,
+                                         core = seq(0.3, 1, length.out = 8)))
+  shared <- autograph:::.shared_aes(nets, node_color = "core")
+  expect_equal(shared[["ncolor_range"]], c(0, 1))
+  expect_null(shared[["ncolor"]])
+  expect_buildable(graphs(nets, node_color = "core"))
+})
+
 test_that("two-mode networks get correct node shapes", {
   skip_on_cran()
   p <- graphr(ison_southern_women)

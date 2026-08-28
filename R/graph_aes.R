@@ -168,8 +168,21 @@
   if (!node_color %in% manynet::net_node_attributes(g)) return(NULL)
   vals <- manynet::node_attribute(g, node_color)
   if ("node_mark" %in% class(vals))
-    factor(as.character(vals), levels = c("FALSE", "TRUE")) else
-      as.factor(as.character(vals))
+    return(factor(as.character(vals), levels = c("FALSE", "TRUE")))
+  if (.is_continuous(vals)) return(as.numeric(vals))
+  as.factor(as.character(vals))
+}
+
+# A measure such as coreness or centrality has an order and a distance between
+# its values that a set of categories does not, so it is drawn as a gradient
+# rather than given one colour for each value it takes. Marks are logical and
+# memberships are characters, so neither of them reaches this.
+# Two values are a contrast rather than a gradient, and are left to the
+# categorical palette, which draws such a pair in the theme's base and
+# highlight colours anyway.
+.is_continuous <- function(vals) {
+  if (!is.numeric(vals) || is.factor(vals)) return(FALSE)
+  length(unique(stats::na.omit(as.numeric(vals)))) > 2
 }
 
 # `levels` holds the categories that `graphs()` found across all of its panels.
@@ -179,6 +192,9 @@
 .infer_ncolor <- function(g, node_color, levels = NULL) {
   vals <- .ncolor_values(g, node_color)
   if (is.null(vals)) return(if (!is.null(node_color)) node_color else ag_ink())
+  # A gradient has no categories to hold level for level across the panels of a
+  # `graphs()` plot; its panels are held together by a shared range instead.
+  if (is.numeric(vals)) return(vals)
   if (!is.null(levels)) return(factor(as.character(vals), levels = levels))
   if (length(unique(vals)) == 1) {
     .inform_constant_color("node_color", node_color, "node")
@@ -352,6 +368,7 @@
       .shared_range(gather(function(g) .infer_nsize(g, node_size, layout))),
     ecolor = .shared_levels(gather(function(g) .ecolor_values(g, edge_color))),
     ncolor = .shared_levels(gather(function(g) .ncolor_values(g, node_color))),
+    ncolor_range = .shared_range(gather(function(g) .ncolor_values(g, node_color))),
     nshape = .shared_levels(gather(function(g) .nshape_values(g, node_shape))),
     diffusion = .shared_levels(gather(.diffusion_states)),
     nadopt = .shared_range(gather(.finite_adoption_time)))

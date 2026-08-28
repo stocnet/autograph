@@ -535,6 +535,17 @@ print.grapht <- function(x, ...) {
   }
   if (!is.null(node_color) &&
       node_color %in% manynet::net_node_attributes(waves[[1]])) {
+    # A measure is drawn as a gradient, as it is in `graphr()`; see
+    # `.is_continuous()` in R/graph_aes.R. Read over all of the waves at once,
+    # so that one value keeps one colour from frame to frame.
+    if (.is_continuous(unlist(lapply(waves, function(w)
+      manynet::node_attribute(w, node_color))))) {
+      vals <- vapply(waves, function(w)
+        as.numeric(manynet::node_attribute(w, node_color)),
+        numeric(igraph::vcount(waves[[1]])))
+      return(list(mapped = TRUE, diffusion = FALSE, continuous = TRUE,
+                  values = vals))
+    }
     vals <- vapply(waves, function(w)
       as.character(manynet::node_attribute(w, node_color)),
       character(igraph::vcount(waves[[1]])))
@@ -784,6 +795,10 @@ print.grapht <- function(x, ...) {
       name = NULL,
       values = c("Infected" = cols[1], "Susceptible" = cols[2],
                  "Exposed" = cols[3], "Recovered" = cols[4]))
+  } else if (ncolor_mapped && is.numeric(nodes_out$ncolor)) {
+    p <- p + ggplot2::scale_fill_gradientn(colours = ag_sequential(9),
+                                           guide = ggplot2::guide_colourbar(
+                                             title = node_color))
   } else if (ncolor_mapped) {
     nlevels <- length(unique(nodes_out$ncolor))
     if (nlevels == 2) {
