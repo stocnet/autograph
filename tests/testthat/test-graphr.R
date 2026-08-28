@@ -701,13 +701,18 @@ test_that("parallel ties are fanned apart", {
 test_that("an arc is drawn for every tie the arc stat keeps", {
   # `geom_edge_arc()` drops every tie whose two ends sit at one point, and its
   # `strength` is a parameter rather than an aesthetic, so it has to leave the
-  # same ties out. The "scaling" layout draws two nodes that hold the same
-  # distances to every other node at one point, which used to leave `strength`
-  # two ties longer than the ties it was measured against.
+  # same ties out. Otherwise a full-length vector recycles against the shorter
+  # edge set and warns.
+  #
+  # The "scaling" layout draws two nodes that hold the same distances to every
+  # other node at one point, which used to leave `strength` two ties longer
+  # than the ties it was measured against. How many nodes that layout places at
+  # exactly one point depends on the BLAS `cmdscale()` decomposes the distances
+  # with, so it is not counted here. See the test below, which builds the
+  # coincidence rather than laying it out.
   net <- manynet::ison_networkers
   p <- suppressMessages(graphr(net, layout = "scaling", labels = FALSE))
   drawn <- sum(!autograph:::.tie_is_coincident(net, p))
-  expect_lt(drawn, manynet::net_ties(net))
   expect_length(autograph:::.infer_arc_strength(net, p), drawn)
   expect_no_warning(ggplot2::ggplot_build(p))
   # A network drawn with every node in its own place keeps every tie.
@@ -721,4 +726,28 @@ test_that("an arc is drawn for every tie the arc stat keeps", {
   lp <- suppressMessages(graphr(loops))
   expect_true(utils::tail(autograph:::.tie_is_coincident(loops, lp), 1))
   expect_no_warning(ggplot2::ggplot_build(lp))
+})
+
+test_that("a tie between two nodes at one point is left out of the arc strength", {
+  # The self-loop above is the one coincidence a layout cannot avoid. This
+  # covers the other one, two separate nodes drawn at one point, without
+  # relying on a layout to place them there: `graphr()` takes the name of a
+  # layout rather than a set of coordinates, and which nodes a scaled layout
+  # collapses depends on the BLAS. The coordinates are moved after the plot is
+  # drawn, and the two functions that read them are called on that plot.
+  net <- manynet::as_igraph(manynet::ison_networkers)
+  p <- suppressMessages(graphr(net, layout = "stress", labels = FALSE))
+  expect_equal(sum(autograph:::.tie_is_coincident(net, p)), 0)
+  # The two ends of the first tie are put at one point.
+  pair <- igraph::as_edgelist(net, names = FALSE)[1, ]
+  p[["data"]][pair[2], c("x", "y")] <- p[["data"]][pair[1], c("x", "y")]
+  # Every tie that joins the pair, in either direction, is now coincident.
+  el <- igraph::as_edgelist(net, names = FALSE)
+  expected <- sum(el[, 1] %in% pair & el[, 2] %in% pair)
+  expect_gt(expected, 0)
+  coincident <- autograph:::.tie_is_coincident(net, p)
+  expect_equal(sum(coincident), expected)
+  # `strength` is as long as the ties the arc stat keeps, and no longer.
+  expect_length(autograph:::.infer_arc_strength(net, p),
+                manynet::net_ties(net) - expected)
 })
