@@ -185,8 +185,12 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 - node_color, node_colour:
 
   Node variable to be used for coloring the nodes. It is easiest if this
-  is added as a node attribute to the graph before plotting. Nodes can
-  also be colored by declaring a color instead.
+  is added as a node attribute to the graph before plotting. A
+  categorical variable gives one colour to each category. A measure,
+  such as a centrality or coreness score, is drawn instead as a gradient
+  from the theme's base colour to its highlight colour, with a colourbar
+  in place of the legend. Nodes can also be colored by declaring a color
+  instead.
 
 - node_shape:
 
