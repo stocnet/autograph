@@ -1,5 +1,9 @@
 # autograph 1.2.2
 
+## Package
+
+- Shortened the startup message of `.onAttach()`
+
 ## Graphing
 
 - Improved how `node_color=` colours numeric node variables
