@@ -339,6 +339,15 @@ test_that(".shorten_segments never produces negative-length segments", {
   expect_true(all(newlen <= oldlen))
 })
 
+test_that("grapht() draws a numeric node_color as a gradient", {
+  net <- manynet::mutate_nodes(.wave_fixture()[[1]],
+                               core = c(0, 0.1, 0.4, 0.6, 0.7, 1, 0.3, 0.2))
+  p <- grapht(list(t1 = net, t2 = net), node_color = "core")
+  scales <- Filter(function(s) "fill" %in% s[["aesthetics"]],
+                   p[["scales"]][["scales"]])
+  expect_s3_class(scales[[1]], "ScaleContinuous")
+})
+
 # Issue #40: the tutorial pipeline with a custom time attribute ----
 
 test_that("grapht() works on to_waves() output split by a custom attribute (#40)", {

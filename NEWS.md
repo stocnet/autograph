@@ -1,3 +1,17 @@
+# autograph 1.2.2
+
+## Package
+
+- Shortened the startup message of `.onAttach()`
+
+## Graphing
+
+- Improved how `node_color=` colours numeric node variables
+
+## Tests
+
+- Fixed the arc strength test depending on the BLAS
+
 # autograph 1.2.1
 
 ## Layouts

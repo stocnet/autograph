@@ -23,15 +23,25 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
     # Named values, shared limits and `drop = FALSE` for the same reason as the
     # edge colours in R/graph_edges.R: a category keeps its colour and its key
     # in every panel of a `graphs()` plot.
-    nlevels <- shared[["ncolor"]]
-    if (is.null(nlevels)) nlevels <- unique(as.character(out[["ncolor"]]))
-    if (length(nlevels) > 1){
-      nvalues <- if (length(nlevels) == 2)
-        getOption("snet_highlight", default = c("grey","black")) else
-          ag_qualitative(length(nlevels))
-      p <- p + ggplot2::scale_fill_manual(
-        values = stats::setNames(nvalues, nlevels), limits = nlevels,
-        drop = FALSE, guide = ggplot2::guide_legend(node_color))
+    if (is.numeric(out[["ncolor"]])) {
+      # A measure is drawn as a gradient from the theme's base colour to its
+      # highlight, so that the order of its values can be read off the plot.
+      # The limits are shared across the panels of a `graphs()` plot, so that
+      # one value keeps one colour throughout.
+      p <- p + ggplot2::scale_fill_gradientn(
+        colours = ag_sequential(9), limits = shared[["ncolor_range"]],
+        guide = ggplot2::guide_colourbar(title = node_color))
+    } else {
+      nlevels <- shared[["ncolor"]]
+      if (is.null(nlevels)) nlevels <- unique(as.character(out[["ncolor"]]))
+      if (length(nlevels) > 1){
+        nvalues <- if (length(nlevels) == 2)
+          getOption("snet_highlight", default = c("grey","black")) else
+            ag_qualitative(length(nlevels))
+        p <- p + ggplot2::scale_fill_manual(
+          values = stats::setNames(nvalues, nlevels), limits = nlevels,
+          drop = FALSE, guide = ggplot2::guide_legend(node_color))
+      }
     }
   }
   # Consider rescaling nodes
