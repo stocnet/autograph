@@ -137,7 +137,12 @@ test_that("every layout substitutes and says so where it does not apply", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
   reqs <- autograph:::.layout_requirements()
-  for (lay in names(reqs)) {
+  # A retired name is renamed by .check_layout() (R/graph_checks.R) before the
+  # requirement is judged, so the message names the layout that was attempted
+  # rather than the name that was typed. That renaming is tested below, in "a
+  # deprecated layout name is renamed once", and the retired names are left out
+  # here rather than asking this audit to know both spellings.
+  for (lay in setdiff(names(reqs), autograph:::.deprecated_layouts())) {
     cand <- layout_candidates(lay)
     for (fix in cand$no) {
       net <- ag_layout_pool[[fix]]
