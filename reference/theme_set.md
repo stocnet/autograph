@@ -109,6 +109,7 @@ palettes.
 ## See also
 
 Other themes:
+[`check_colors`](https://stocnet.github.io/autograph/reference/check_colors.md),
 [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md),
 [`theme_colorblind`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
 [`theme_medium`](https://stocnet.github.io/autograph/reference/theme_medium.md)

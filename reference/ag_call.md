@@ -14,7 +14,7 @@ away from the highlight while the ink stays dark enough to read. Where
 the ground changes under a theme – the "print" medium forces white,
 whatever the theme prefers – `ag_ink()` falls back to black or white
 rather than return an ink that cannot be read on it. See
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 and
 [`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md).
 
@@ -75,7 +75,7 @@ distinct under each type of colour blindness, and `ag_qualitative()`
 takes those colours in order rather than interpolating between them.
 Divergent palettes pair a warm pole with a cool one for the same reason.
 Use
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 to check how your own colours fare, and
 [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
 to see them as a colour-blind viewer would.
@@ -83,12 +83,12 @@ to see them as a colour-blind viewer would.
 Two further questions are worth asking of a palette. Whether its text
 can be read on what it sits on is a matter of contrast rather than of
 hue, and
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 scores it against the thresholds of WCAG 2.1. Whether it survives print
 is a matter of lightness alone, since a greyscale device keeps the
 luminance of a colour and discards the rest;
 `simulate_colorblind(type = "grey")` shows that view, and
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 reports the greyscale distances beside its own score. Most institutional
 palettes separate by hue and so collapse in greyscale. Where a figure
 has to print in black and white, use the "bw" theme, or add a second
@@ -101,7 +101,7 @@ length instead. A spectrum is not a colour-blind safe scheme: its reds
 and greens are exactly the pair that red-green colour blindness cannot
 separate. Choose it where the order of the categories is itself
 meaningful, and check the result with
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md);
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md);
 for categories with no order, another theme serves more readers.
 
 ## Examples

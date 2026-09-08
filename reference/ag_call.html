@@ -41,7 +41,7 @@ institutionally or thematically consistent is not without its challenges."><meta
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,7 @@ the highlight while the ink stays dark enough to read.
 Where the ground changes under a theme – the "print" medium forces
 white, whatever the theme prefers – <code>ag_ink()</code> falls back to black or
 white rather than return an ink that cannot be read on it.
-See <code><a href="theme_colorblind.html">check_contrast()</a></code> and <code><a href="theme_medium.html">stocnet_medium()</a></code>.</p>
+See <code><a href="check_colors.html">check_contrast()</a></code> and <code><a href="theme_medium.html">stocnet_medium()</a></code>.</p>
 <p>Using palettes that are high contrast, aesthetically pleasing, and
 institutionally or thematically consistent is not without its challenges.</p>
     </div>
@@ -155,16 +155,16 @@ set, so that the first colours a plot draws on are those that stay
 distinct under each type of colour blindness, and <code>ag_qualitative()</code>
 takes those colours in order rather than interpolating between them.
 Divergent palettes pair a warm pole with a cool one for the same reason.
-Use <code><a href="theme_colorblind.html">check_separation()</a></code> to check how your own colours fare,
+Use <code><a href="check_colors.html">check_separation()</a></code> to check how your own colours fare,
 and <code><a href="theme_colorblind.html">simulate_colorblind()</a></code> to see them as a colour-blind viewer would.</p>
 <p>Two further questions are worth asking of a palette.
 Whether its text can be read on what it sits on is a matter of contrast
-rather than of hue, and <code><a href="theme_colorblind.html">check_contrast()</a></code> scores it against the
+rather than of hue, and <code><a href="check_colors.html">check_contrast()</a></code> scores it against the
 thresholds of WCAG 2.1.
 Whether it survives print is a matter of lightness alone, since a
 greyscale device keeps the luminance of a colour and discards the rest;
 <code>simulate_colorblind(type = "grey")</code> shows that view, and
-<code><a href="theme_colorblind.html">check_separation()</a></code> reports the greyscale distances beside its own score.
+<code><a href="check_colors.html">check_separation()</a></code> reports the greyscale distances beside its own score.
 Most institutional palettes separate by hue and so collapse in greyscale.
 Where a figure has to print in black and white, use the "bw" theme, or
 add a second channel such as <code>node_shape</code>.</p>
@@ -176,7 +176,7 @@ A spectrum is not a colour-blind safe scheme:
 its reds and greens are exactly the pair that red-green colour blindness
 cannot separate.
 Choose it where the order of the categories is itself meaningful,
-and check the result with <code><a href="theme_colorblind.html">check_separation()</a></code>;
+and check the result with <code><a href="check_colors.html">check_separation()</a></code>;
 for categories with no order, another theme serves more readers.</p>
     </div>
 

@@ -499,14 +499,40 @@ sizing with a manually thickened version.**
 
 ### Taming dense or disconnected networks
 
-Sometimes networks are just a dense hairball. This is a technical term
+Sometimes networks look like a dense hairball. This is a technical term
 to describe networks with many high-degree nodes and many ties, where
-the sheer number of ties obscures the structure of the network.
-Autograph includes three arguments that can help with this.
+the sheer number of ties obscures any structure that might be in the
+network. Autograph includes three arguments that can help with this,
+some of which are turned on by default, so we will need to turn them off
+to see the effect of each in isolation.
+
+#### Isolates
+
+First, it is possible that the hairball is not a hairball at all, but a
+network with many disconnected components or, especially, isolates ,
+that each need to be drawn. As each component is drawn under a
+force-directed layout, the components will repel each other and the
+giant component will be squeezed into a clump.
+
+The `isolates` argument in
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+provides some options for what to do with them instead: `"legend"` (the
+default) drops them from the drawing but records how many there were in
+the legend, `"caption"` notes them in a caption instead, and `"keep"`
+leaves them in place. **Add ten unconnected characters to `fict_lotr`
+and compare keeping them with noting them in the legend.**
+
+``` r
+
+lotr_iso <- to_unlabelled(fict_lotr) |>
+  add_nodes(10)
+(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
+   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
+```
 
 #### Bundling ties
 
-The first option is to draw all of the ties ‘bundled’ together, which
+The second option is to draw all of the ties ‘bundled’ together, which
 can reveal where the most common paths through the network are.
 `edge_bundle` pulls ties that travel in similar directions into shared
 paths — like cabling them together — so that the main ‘highways’ of the
@@ -529,7 +555,7 @@ result.
 
 #### Backbones
 
-By contrast, *backbone* changes which ties the picture is built around.
+By contrast, backbone changes which ties the picture is built around.
 Ties that carry more weight/structure than expected by a null model
 local to their endpoints are in essence what the network would be if it
 were stripped back to its skeleton.
@@ -568,25 +594,6 @@ try one before reaching for both. A bundled tie cannot carry a fading of
 its own — bundling merges ties into shared paths — so where both are
 asked for, the backbone still shapes the layout but every tie is drawn
 alike.
-
-#### Isolates
-
-At the other extreme, many networks contain isolates — unconnected nodes
-— which, under a force-directed layout, drift to the margins and squeeze
-the connected core into a clump. The `isolates` argument decides what
-happens to them: `"legend"` (the default) drops them from the drawing
-but records how many there were in the legend, `"caption"` notes them in
-a caption instead, and `"keep"` leaves them in place. **Add two
-unconnected characters to `fict_lotr` and compare keeping them with
-noting them in the legend.**
-
-``` r
-
-lotr_iso <- fict_lotr |>
-  add_nodes(2, list(name = c("Tom Bombadil", "Goldberry")))
-(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
-   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
-```
 
 For very large real-world networks such as `irps_blogs`, these work well
 together: a backbone picks out the ties that hold the connected core
@@ -740,7 +747,7 @@ a “stop/go” palette relies on.
 functions for checking this.
 [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
 shows you a set of colours as such a viewer sees them, and
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 scores how far apart colours are, taking the worst case across normal
 vision and each type of colour blindness. A score below 10 means two
 colours are easily confused, 10 to 25 that they are separable but close,
@@ -800,7 +807,7 @@ spectrum is not a colour-blind safe scheme: its reds and greens are the
 pair that red-green colour blindness cannot separate. Choose it where
 the order of your categories is itself meaningful, and check the result
 with
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md).
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md).
 Where you need particular colours in an institutional palette,
 [`match_color()`](https://stocnet.github.io/autograph/reference/theme_match.md)
 finds the closest the palette has to those you ask for.
@@ -818,7 +825,7 @@ the other.
 
 [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
 answers the second with `type = "grey"`, and
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 reports the greyscale distances beside its own score.
 
 ``` r
@@ -927,9 +934,9 @@ keeps it for future sessions. Individual graphs can still be adjusted by
 appending `ggplot2::scale_fill_*()` functions — `_hue()` for a different
 palette, `_grey()` for print, `_manual()` for hand-picked colours — and
 [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 and
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 check that your palette works for colour-blind viewers, in greyscale,
 and as text.
 [`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
@@ -1107,19 +1114,58 @@ point of this section. Quality measures a layout algorithm might attend
 to include:
 
 - minimising the *crossing number* of edges/ties in the graph ([planar
-  graphs](https://www.jasondavies.com/planarity/) require no crossings)
+  graphs](https://www.jasondavies.com/planarity/) require no crossings):
+  [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
 - minimising the *slope number* of distinct edge slopes in the graph
-  (where vertices are represented as points on a Euclidean plane)
+  (where vertices are represented as points on a Euclidean plane):
+  [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md)
 - minimising the *bend number* in all edges in the graph (every graph
-  has a right angle crossing (RAC) drawing with three bends per edge)
-- minimising the *total edge length*
-- minimising the *maximum edge length*
-- minimising the *edge length variance*
+  has a right angle crossing (RAC) drawing with three bends per edge):
+  not measured, since the bends are set by
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
+  `edge_curved` and `edge_bundle` arguments rather than by the layout
+- minimising the *total edge length*: `attr(check_lengths(p), "total")`
+- minimising the *maximum edge length*: `attr(check_lengths(p), "max")`
+- minimising the *edge length variance*:
+  `attr(check_lengths(p), "variance")`
 - maximising the *angular resolution* or sharpest angle of edges meeting
-  at a common vertex
-- minimising the *bounding box* of the plot
-- evening the *aspect ratio* of the plot
-- displaying *symmetry groups* (subgraph automorphisms)
+  at a common vertex: `attr(check_angles(p), "min")`
+- minimising the *bounding box* of the plot: not measured
+- evening the *aspect ratio* of the plot: not measured
+- displaying *symmetry groups* (subgraph automorphisms): not measured
+
+Each of these functions scores a drawing rather than the network it
+draws, so two layouts of the same network can be compared.
+[`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+runs them all at once, beside
+[`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md),
+which reports how far the distances drawn depart from the distances
+through the network. **Compare a stress layout with a circle.**
+
+``` r
+
+sw_stress <- graphr(ison_southern_women, layout = "stress")
+sw_circle <- graphr(ison_southern_women, layout = "circle")
+rbind(stress = check_drawing(sw_stress), circle = check_drawing(sw_circle))
+```
+
+Every column is read downwards except `angle_min`, which is read
+upwards. Fewer crossings, fewer slopes, shorter ties, more even ties,
+and a wider smallest angle all make a drawing easier to read. `nodes`,
+`ties` and `angle_ideal` are context rather than scores. `angle_ideal`
+is the widest smallest angle the degrees of this network allow, so
+`angle_min` is read as a share of it. The floors are worth knowing as
+well: a network of this many ties cannot be drawn without crossings at
+all, and no drawing of it can use fewer slopes than half its largest
+degree.
+
+No layout wins on every measure. The circle draws every node on one
+ring, which costs it crossings and length: it draws many times the
+crossings of the stress layout, and three times the total tie length. It
+buys the other measures with the same ring: fewer slopes, ties of a more
+even length, and more room between the ties that meet at a node. Its
+stress is the worse of the two, because a layout that never set out to
+draw the path distances scores poorly on them by design.
 
 Graph layouts available in the [igraph](https://r.igraph.org/),
 [ggraph](https://ggraph.data-imaginist.com),
@@ -1965,6 +2011,9 @@ at the console to see all available tutorials.
 
 Here are some of the terms that we have covered in this tutorial:
 
+- Backbone : The backbone of a network comprises the ties that carry
+  more weight, or hold more structure, than a null model local to their
+  endpoints expects.
 - Betweenness : The betweenness centrality of a node is the proportion
   of shortest paths between all pairs of nodes that pass through that
   node.
@@ -1974,11 +2023,15 @@ Here are some of the terms that we have covered in this tutorial:
   one another than to other nodes in the network.
 - Complex : A complex network is one that includes or can include loops
   or self-ties.
+- Component : A component is a connected subgraph not part of a larger
+  connected subgraph.
 - Degree : The degree of a node is the number of connections it has.
 - Directed : A directed network is a network where the ties have a
   direction, from a sender to a receiver.
 - Distribution : A degree distribution is the frequency distribution of
   the degrees of the nodes in a network.
+- Giant : The giant component is the component that includes the most
+  nodes in the network.
 - Homophily : A tendency for nodes to connect to similar nodes.
 - Isolate : An isolate is a node with degree equal to zero.
 - Label : A labelled network includes unique labels for each node (or

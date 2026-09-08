@@ -1,6 +1,52 @@
 # Changelog
 
+## autograph 1.2.3
+
+### Package
+
+- Added [messydates](https://globalgov.github.io/messydates/) to
+  `Suggests`
+- Raised [manynet](https://stocnet.github.io/manynet/) floor to 2.3.1
+
+### Theming
+
+- Added
+  [`scale_x_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+  and
+  [`scale_y_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+  (closes globalgov/messydates#104)
+  - `FUN` resolves each messy date to one date;
+    [`messydates::vmin`](https://globalgov.github.io/messydates/reference/resolve_extrema.html)
+    by default
+- Moved the colour checks into `R/theme_aesthetics.R`
+
+### Layouts
+
+- Added
+  [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  for how many other ties each tie crosses
+- Added
+  [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  for the slope each tie is drawn at
+- Added
+  [`check_lengths()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  for the total, max, and variance of tie lengths
+- Added
+  [`check_angles()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  for the angular resolution at each node
+- Added
+  [`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md),
+  which reports those checks plus
+  [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+
+### Tutorials
+
+- Improved the isolate/bundling/backbone section ordering
+- Each layout quality measure now names the function that measures it
+
 ## autograph 1.2.2
+
+CRAN release: 2026-08-29
 
 ### Package
 
@@ -165,7 +211,7 @@ CRAN release: 2026-08-26
   - By default, networks with 50+ nodes and a mean degree ≥8 use
     backbones
   - `TRUE`/`FALSE` force, or specify filter/threshold (see
-    `manynet::tie_is_backbone()`)
+    [`manynet::tie_is_backbone()`](https://stocnet.github.io/manynet/reference/measure_attributes_ties.html))
 - Improved
   [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
   to draw multilevel networks of interlocking one-mode and two-mode
@@ -233,9 +279,9 @@ CRAN release: 2026-08-26
     and the ground
 - Added
   [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
   and
-  [`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
   for checking palettes
   - Simulates deuteranopia, protanopia, and tritanopia (Machado et
     al. 2009)
@@ -645,7 +691,7 @@ CRAN release: 2026-07-31
 - Added a colour blindness section to the visualisation tutorial
   - Covers
     [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-    [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+    [`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md),
     and how palettes are ordered
   - Notes that the “rainbow” theme is not a colour-blind safe scheme
 - Added a note on installing a theme’s fonts to the visualisation
@@ -866,7 +912,7 @@ CRAN release: 2026-07-21
   (closes [\#39](https://github.com/stocnet/autograph/issues/39)): the
   tutorial now loads [netrics](https://stocnet.github.io/netrics/) and
   uses its measure functions
-  ([`tie_by_closeness()`](https://stocnet.github.io/netrics/reference/measure_centralities_close.html),
+  ([`tie_by_closeness()`](https://stocnet.github.io/netrics/reference/measure_central_tie_close.html),
   [`tie_is_triangular()`](https://stocnet.github.io/netrics/reference/mark_triangles.html)),
   and every tutorial code chunk is now exercised by the functional tests
   below

@@ -296,11 +296,11 @@ become the same olive. The third panel is the harder case, and it is not
 one reordering can fix: a greyscale device keeps only the luminance of a
 colour, so two colours of the same lightness merge however different
 their hues.
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 reports that view beside its own score; where a figure has to print in
 black and white, use the `"bw"` theme or add a second channel such as
 `node_shape`.
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 puts a number on it, scoring how far apart colours are at their worst
 across normal vision and each type of colour blindness:
 
@@ -330,7 +330,7 @@ to gain: six categories score 29 under the `"hwu"` theme and 26 under
 
 Marks are only half of it. Text has to be read rather than told apart,
 which is a matter of contrast rather than of hue, and
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 scores it against the thresholds of WCAG 2.1: 4.5 for body text, 3 for
 large text and for graphical objects. Every theme’s ink clears 4.5 on
 that theme’s own ground, and the test suite holds it there.

@@ -79,6 +79,7 @@ the width, height and resolution the medium calls for as well.
 ## See also
 
 Other themes:
+[`check_colors`](https://stocnet.github.io/autograph/reference/check_colors.md),
 [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md),
 [`theme_colorblind`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
 [`theme_set`](https://stocnet.github.io/autograph/reference/theme_set.md)

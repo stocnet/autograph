@@ -167,8 +167,9 @@ graphr(
   group, and a one wherever the node belongs to the group. One hull is
   then drawn for each column, and the hulls overlap where the groups do.
   A measure that returns such a matrix, such as
-  `netrics::node_x_clique()`, can be named without its network, which is
-  taken to be the network being drawn.
+  [`netrics::node_x_clique()`](https://stocnet.github.io/netrics/reference/motif_clique.html),
+  can be named without its network, which is taken to be the network
+  being drawn.
 
 - edge_color, edge_colour:
 

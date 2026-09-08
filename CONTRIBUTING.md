@@ -379,7 +379,7 @@ Two naming families, and they do not mix:
   [`match_color()`](https://stocnet.github.io/autograph/reference/theme_match.md),
   [`is_dark()`](https://stocnet.github.io/autograph/reference/theme_match.md),
   [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md),
   [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md),
   [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md).
   This is the convention across the stocnet suite, so a user meets one
@@ -400,9 +400,9 @@ Two naming families, and they do not mix:
 - **`check_*` scores, `.check_*` guards**: the exported
   [`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md),
   [`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md),
-  [`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
   and
-  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  [`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
   each measure a drawing and return the score, so that a user can
   compare one layout or palette with another. The private
   `.check_layout()`, `.check_layout_applies()`, `.layout_applies()` and
@@ -451,19 +451,19 @@ every plot and not only the graphs.
 [R/theme_colorblind.R](https://stocnet.github.io/R/theme_colorblind.R)
 holds the colour-checking tools:
 [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md),
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md),
 and the internal `colorblind_sort()` that each theme’s categorical
 palette passes through when the theme is set. The three answer three
 different questions and none substitutes for another:
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 asks whether two marks can be told apart (CIELAB distance, worst case
 across normal and colour-blind vision),
-[`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+[`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
 asks whether text can be read on what it sits on (WCAG 2.1 relative
 luminance), and `simulate_colorblind(type = "grey")` asks whether either
 survives a photocopier. Greyscale is reported beside
-[`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)’s
+[`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)’s
 score rather than folded into it: two colours that differ only in hue
 collapse in greyscale however well they serve a colour-blind reader, so
 a worst case that included it would condemn nearly every institutional
@@ -559,8 +559,8 @@ coercion) and `Imports` `ggplot2` (\>= 4.0.0), `ggraph`, `graphlayouts`,
 `igraph`, `dplyr`, and `patchwork`. `ergm` and `RSiena` are listed under
 `Enhances` (their `plot.*` methods are only invoked if those packages
 are installed and such results are passed in), and `gganimate`,
-`gifski`, `ggforce`, `migraph`, and `netrics` are `Suggests`-only, so
-code paths depending on them should guard with
+`gifski`, `ggforce`, `messydates`, `migraph`, and `netrics` are
+`Suggests`-only, so code paths depending on them should guard with
 [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) (see the
 `thisRequires()` helper in
 [R/autograph_utilities.R](https://stocnet.github.io/R/autograph_utilities.R))
@@ -579,6 +579,19 @@ exporting the function. Call the function with
 package and reports the newer name as missing even where the call is
 never reached. Delete each shim once the minimum is raised past the
 version that added the function.
+
+`messydates` is suggested rather than imported because the dependency
+runs the other way: `messydates` holds no `ggplot2` code of its own, so
+the `mdate` scales in
+[R/scale_mdate.R](https://stocnet.github.io/R/scale_mdate.R) live here,
+where `ggplot2` is already imported. `.onLoad()` registers
+`scale_type.mdate()` with `ggplot2`, which names a scale and so needs no
+`messydates`;
+[`scale_x_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+and
+[`scale_y_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+reach `messydates` only once a plot draws a date, and guard with
+`thisRequires()`.
 
 ### Tests
 

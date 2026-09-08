@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,39 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.2" id="autograph-122">autograph 1.2.2<a class="anchor" aria-label="anchor" href="#autograph-122"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.3" id="autograph-123">autograph 1.2.3<a class="anchor" aria-label="anchor" href="#autograph-123"></a></h2>
+<div class="section level3">
+<h3 id="package-1-2-3">Package<a class="anchor" aria-label="anchor" href="#package-1-2-3"></a></h3>
+<ul><li>Added <a href="https://globalgov.github.io/messydates/" class="external-link">messydates</a> to <code>Suggests</code>
+</li>
+<li>Raised <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> floor to 2.3.1</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-1-2-3">Theming<a class="anchor" aria-label="anchor" href="#theming-1-2-3"></a></h3>
+<ul><li>Added <code><a href="../reference/mdate_scales.html">scale_x_mdate()</a></code> and <code><a href="../reference/mdate_scales.html">scale_y_mdate()</a></code> (closes globalgov/messydates#104)
+<ul><li>
+<code>FUN</code> resolves each messy date to one date; <code><a href="https://globalgov.github.io/messydates/reference/resolve_extrema.html" class="external-link">messydates::vmin</a></code> by default</li>
+</ul></li>
+<li>Moved the colour checks into <code>R/theme_aesthetics.R</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-1-2-3">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-2-3"></a></h3>
+<ul><li>Added <code><a href="../reference/check_layout.html">check_crossings()</a></code> for how many other ties each tie crosses</li>
+<li>Added <code><a href="../reference/check_layout.html">check_slopes()</a></code> for the slope each tie is drawn at</li>
+<li>Added <code><a href="../reference/check_layout.html">check_lengths()</a></code> for the total, max, and variance of tie lengths</li>
+<li>Added <code><a href="../reference/check_layout.html">check_angles()</a></code> for the angular resolution at each node</li>
+<li>Added <code><a href="../reference/check_layout.html">check_drawing()</a></code>, which reports those checks plus <code><a href="../reference/check_layout.html">check_stress()</a></code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorials-1-2-3">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-2-3"></a></h3>
+<ul><li>Improved the isolate/bundling/backbone section ordering</li>
+<li>Each layout quality measure now names the function that measures it</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.2" id="autograph-122">autograph 1.2.2<a class="anchor" aria-label="anchor" href="#autograph-122"></a></h2><p class="text-muted">CRAN release: 2026-08-29</p>
 <div class="section level3">
 <h3 id="package-1-2-2">Package<a class="anchor" aria-label="anchor" href="#package-1-2-2"></a></h3>
 <ul><li>Shortened the startup message of <code>.onAttach()</code>
@@ -174,7 +206,7 @@
 <li>Added <code>backbone=</code> to <code><a href="../reference/plot_graphr.html">graphr()</a></code> for drawing dense, hairball “stress”, “fr”, “drl”, “kk” networks
 <ul><li>By default, networks with 50+ nodes and a mean degree ≥8 use backbones</li>
 <li>
-<code>TRUE</code>/<code>FALSE</code> force, or specify filter/threshold (see <code>manynet::tie_is_backbone()</code>)</li>
+<code>TRUE</code>/<code>FALSE</code> force, or specify filter/threshold (see <code><a href="https://stocnet.github.io/manynet/reference/measure_attributes_ties.html" class="external-link">manynet::tie_is_backbone()</a></code>)</li>
 </ul></li>
 <li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> to draw multilevel networks of interlocking one-mode and two-mode layers by default
 <ul><li>Fixed tie opacity so that those between levels fade behind those within them</li>
@@ -220,7 +252,7 @@
 <li>Blanked elements stay blank, so a graph keeps no axis text or coordinates</li>
 <li>Ties, nodes, and labels with no colour take <code><a href="../reference/ag_call.html">ag_ink()</a></code> and the ground</li>
 </ul></li>
-<li>Added <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/theme_colorblind.html">check_separation()</a></code> and <code><a href="../reference/theme_colorblind.html">check_contrast()</a></code> for checking palettes
+<li>Added <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/check_colors.html">check_separation()</a></code> and <code><a href="../reference/check_colors.html">check_contrast()</a></code> for checking palettes
 <ul><li>Simulates deuteranopia, protanopia, and tritanopia (Machado et al. 2009)</li>
 <li>Scores a pair by its worst case across those and normal vision</li>
 <li>Added <code>severity=</code> to view anomalous trichromacy (deuteranomaly, protanomaly)</li>
@@ -432,7 +464,7 @@
 <div class="section level3">
 <h3 id="tutorials-1-1-2">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-2"></a></h3>
 <ul><li>Added a colour blindness section to the visualisation tutorial
-<ul><li>Covers <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/theme_colorblind.html">check_separation()</a></code>, and how palettes are ordered</li>
+<ul><li>Covers <code><a href="../reference/theme_colorblind.html">simulate_colorblind()</a></code>, <code><a href="../reference/check_colors.html">check_separation()</a></code>, and how palettes are ordered</li>
 <li>Notes that the “rainbow” theme is not a colour-blind safe scheme</li>
 </ul></li>
 <li>Added a note on installing a theme’s fonts to the visualisation tutorial</li>
@@ -529,7 +561,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="tutorials-1-1-0">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-1-0"></a></h3>
-<ul><li>Fixed the “Tying up loose ends” exercise in the visualisation tutorial erroring on <code><a href="https://stocnet.github.io/manynet/reference/defunct.html" class="external-link">tie_closeness()</a></code> (closes <a href="https://github.com/stocnet/autograph/issues/39" class="external-link">#39</a>): the tutorial now loads <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> and uses its measure functions (<code><a href="https://stocnet.github.io/netrics/reference/measure_centralities_close.html" class="external-link">tie_by_closeness()</a></code>, <code><a href="https://stocnet.github.io/netrics/reference/mark_triangles.html" class="external-link">tie_is_triangular()</a></code>), and every tutorial code chunk is now exercised by the functional tests below</li>
+<ul><li>Fixed the “Tying up loose ends” exercise in the visualisation tutorial erroring on <code><a href="https://stocnet.github.io/manynet/reference/defunct.html" class="external-link">tie_closeness()</a></code> (closes <a href="https://github.com/stocnet/autograph/issues/39" class="external-link">#39</a>): the tutorial now loads <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> and uses its measure functions (<code><a href="https://stocnet.github.io/netrics/reference/measure_central_tie_close.html" class="external-link">tie_by_closeness()</a></code>, <code><a href="https://stocnet.github.io/netrics/reference/mark_triangles.html" class="external-link">tie_is_triangular()</a></code>), and every tutorial code chunk is now exercised by the functional tests below</li>
 <li>Reworked the “Visualising Networks” tutorial to match the structure and features of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> v2.2 tutorials
 <ul><li>Rebranded the tutorial in autograph red, with larger, more readable text and matching ‘Run code’ buttons</li>
 <li>Added a checkbox Aims section, “Catching up”, “Going further”, “Beginner note”, and “In brief” callout boxes, per-page mini-tables of contents, and free play sections with a choose-your-own-data difficulty ladder</li>

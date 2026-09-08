@@ -25,12 +25,16 @@ Functions for tailoring graphs with themes, scales, and palettes.
 - [`list_fonts()`](https://stocnet.github.io/autograph/reference/list_fonts.md)
   : Listing the fonts available to R
 - [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
-  [`check_separation()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
-  [`check_contrast()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
-  : Checking colours for colour blindness, print, and legibility
+  : Simulating how colours look to a colour-blind viewer
 - [`match_color()`](https://stocnet.github.io/autograph/reference/theme_match.md)
   [`is_dark()`](https://stocnet.github.io/autograph/reference/theme_match.md)
   : Matching colors across palettes
+- [`check_separation()`](https://stocnet.github.io/autograph/reference/check_colors.md)
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
+  : Checking colours for colour blindness and legibility
+- [`scale_x_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+  [`scale_y_mdate()`](https://stocnet.github.io/autograph/reference/mdate_scales.md)
+  : Scales for messy dates
 
 ## Graphing
 
@@ -159,7 +163,12 @@ improved or additional layouts to those offered in
 - [`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md)
   [`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md)
   [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md)
-  : Checking how well a layout draws its ties
+  [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_lengths()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_angles()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  [`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+  : Checking how well a layout draws a network
 
 ## Results objects from other packages
 

@@ -28,6 +28,7 @@ A vector of font family names.
 ## See also
 
 Other themes:
+[`check_colors`](https://stocnet.github.io/autograph/reference/check_colors.md),
 [`theme_colorblind`](https://stocnet.github.io/autograph/reference/theme_colorblind.md),
 [`theme_medium`](https://stocnet.github.io/autograph/reference/theme_medium.md),
 [`theme_set`](https://stocnet.github.io/autograph/reference/theme_set.md)
