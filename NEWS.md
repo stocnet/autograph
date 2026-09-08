@@ -9,6 +9,10 @@
 
 - Added `scale_x_mdate()` and `scale_y_mdate()` (closes globalgov/messydates#104)
   - `FUN` resolves each messy date to one date; `messydates::vmin` by default
+  
+## Tutorials
+
+- Improved the isolate/bundling/backbone section ordering
 
 # autograph 1.2.2
 

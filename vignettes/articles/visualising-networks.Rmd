@@ -534,23 +534,46 @@ setting `edge_size` yourself resizes both together.
 
 ### Taming dense or disconnected networks {#taming-networks}
 
-Sometimes networks are just a dense hairball.
+Sometimes networks look like a dense hairball.
 This is a technical term to describe networks with many high-degree nodes and many ties, 
-where the sheer number of ties obscures the structure of the network.
-Autograph includes three arguments that can help with this.
+where the sheer number of ties obscures any structure that might be in the network.
+Autograph includes three arguments that can help with this,
+some of which are turned on by default, 
+so we will need to turn them off to see the effect of each in isolation.
+
+#### Isolates {#isolates}
+
+First, it is possible that the hairball is not a hairball at all, 
+but a network with many disconnected components or, especially, `r gloss("isolates","isolate")`, 
+that each need to be drawn.
+As each `r gloss("component")` is drawn under a force-directed layout, 
+the components will repel each other and the `r gloss("giant")` component will be squeezed into a clump.
+
+The `isolates` argument in `graphr()` provides some options for what to do with them instead: 
+`"legend"` (the default) drops them from the drawing but records how many there were in the legend, 
+`"caption"` notes them in a caption instead, 
+and `"keep"` leaves them in place. 
+**Add two unconnected characters to `fict_lotr` and compare keeping them with noting them in the legend.**
+
+```{r isolates, fig.width=9}
+lotr_iso <- to_unlabelled(fict_lotr) |>
+  add_nodes(10)
+(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
+   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
+```
 
 #### Bundling ties {#bundling}
 
-The first option is to draw all of the ties 'bundled' together,
+The second option is to draw all of the ties 'bundled' together,
 which can reveal where the most common paths through the network are.
 `edge_bundle` pulls ties that travel in similar
 directions into shared paths — like cabling them together — 
 so that the main 'highways' of the network stand out. 
 It is off by default; set `edge_bundle = TRUE` 
 (or name a specific algorithm: `"force"`, `"path"`, or `"minimal"`) to switch it on. 
-**`ison_lawfirm` records 71 lawyers and 2571
-ties between them, which is about as thick a hairball as a network this small
-can be. Compare it drawn with and without bundling (turn backbone off too for clearest comparison results).**
+**`ison_lawfirm` records 71 lawyers and 2571 ties between them, 
+which is about as thick a hairball as a network this small can be. 
+Compare it drawn with and without bundling (turn backbone off too for clearest comparison results).**
 
 ```{r bundle, fig.width=9}
 graphr(ison_lawfirm, backbone = FALSE) + ggtitle("Unbundled") | 
@@ -595,23 +618,6 @@ Bundling and backbones answer the same problem from different ends, so try one
 before reaching for both. A bundled tie cannot carry a fading of its own —
 bundling merges ties into shared paths — so where both are asked for, the
 backbone still shapes the layout but every tie is drawn alike.
-
-#### Isolates {#isolates}
-
-At the other extreme, many networks contain `r gloss("isolates","isolate")` —
-unconnected nodes — which, under a force-directed layout, drift to the margins
-and squeeze the connected core into a clump. The `isolates` argument decides
-what happens to them: `"legend"` (the default) drops them from the drawing but
-records how many there were in the legend, `"caption"` notes them in a caption
-instead, and `"keep"` leaves them in place. **Add two unconnected characters
-to `fict_lotr` and compare keeping them with noting them in the legend.**
-
-```{r isolates, fig.width=9}
-lotr_iso <- fict_lotr |>
-  add_nodes(2, list(name = c("Tom Bombadil", "Goldberry")))
-(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
-   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
-```
 
 For very large real-world networks such as `irps_blogs`, these work well
 together: a backbone picks out the ties that hold the connected core together
