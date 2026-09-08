@@ -792,7 +792,7 @@ giant </dfn></abbr> component will be squeezed into a clump.</p>
 some options for what to do with them instead: <code>"legend"</code>
 (the default) drops them from the drawing but records how many there
 were in the legend, <code>"caption"</code> notes them in a caption
-instead, and <code>"keep"</code> leaves them in place. <strong>Add two
+instead, and <code>"keep"</code> leaves them in place. <strong>Add ten
 unconnected characters to <code>fict_lotr</code> and compare keeping
 them with noting them in the legend.</strong></p>
 <div class="tutorial-exercise" data-label="isolates" data-completion="1"
@@ -2676,19 +2676,19 @@ session$onSessionEnded(function() {
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "data-flavours-Q", 
     question = structure("Which prefix marks the larger, more realistic networks bundled with the stocnet packages?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_43e46b0", 
+    "character")), answers = list(structure(list(id = "lnr_ans_346e526", 
         option = "irps_", value = "irps_", label = structure("irps_", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("Right — the irps_ datasets are the real-world ones, so they are the most demanding to graph. No mistakes here, just happy little accidents. <img src='https://media1.tenor.com/m/gHo3jnYbDYwAAAAC/bob-ross-painting.gif' alt='gif of Bob Ross painting a happy little landscape'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_f523617", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_e0671b4", 
         option = "ison_", value = "ison_", label = structure("ison_", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("The ison_ datasets are the classics: small, tidy, and a good place to start.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_34f1a36", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_b369ce4", 
         option = "fict_", value = "fict_", label = structure("fict_", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("The fict_ datasets are fictional networks, mid-sized and fun, but not the largest.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_dbfbaa5", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_57024d9", 
         option = "net_", value = "net_", label = structure("net_", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("There is no net_ prefix for data — net_* are measures of whole networks.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -2700,7 +2700,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "data-flavours-Q-answer", question = "data-flavours-Q"), 
     loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
-    seed = 388119014.819268, options = list()), class = c("learnr_radio", 
+    seed = 1655969393.22888, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
@@ -2839,23 +2839,23 @@ learnr:::store_exercise_cache(structure(list(label = "agsimple", global_setup = 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "graphr-classes-Q", 
     question = structure("Which network objects can graphr() draw?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_dd0c7c3", 
+    "character")), answers = list(structure(list(id = "lnr_ans_daab20d", 
         option = "Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", 
         value = "Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", 
         label = structure("Any manynet-compatible class, including igraph, network, tidygraph, matrices, and edgelists", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("Right — graphr() coerces compatible objects internally, so you rarely need to convert anything first. <img src='https://media1.tenor.com/m/LLLJYVQJNVAAAAAC/chefs-kiss-french-chef.gif' alt='gif of a chef giving a chefs kiss'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_5c9c72a", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_9983650", 
         option = "Only igraph objects", value = "Only igraph objects", 
         label = structure("Only igraph objects", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("That is plot.igraph(). graphr() handles igraph objects too, but not only those.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_52e20d3", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_8fdf14c", 
         option = "Only tidygraph (tbl_graph) objects", value = "Only tidygraph (tbl_graph) objects", 
         label = structure("Only tidygraph (tbl_graph) objects", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("That is what ggraph::ggraph() expects. graphr() is more catholic.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_bf76e9e", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_8d072ad", 
         option = "Only networks bundled in manynet", value = "Only networks bundled in manynet", 
         label = structure("Only networks bundled in manynet", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("The bundled data are just convenient examples — any compatible network object works.", html = TRUE, class = c("html", 
@@ -2868,7 +2868,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "graphr-classes-Q-answer", question = "graphr-classes-Q"), 
     loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
-    seed = 539023595.748998, options = list()), class = c("learnr_radio", 
+    seed = 1322280460.88427, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
  
@@ -3078,20 +3078,20 @@ learnr:::store_exercise_cache(structure(list(label = "degsize", global_setup = s
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "aes-choice-Q", 
     question = structure("Which aesthetic is generally most appropriate for a <em>continuous<\u002fem> node attribute, such as degree or age?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_d87de3b", 
+    "character")), answers = list(structure(list(id = "lnr_ans_5c904cd", 
         option = "Size", value = "Size", label = structure("Size", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("Yes — our eyes read graded sizes as graded quantities. Colour gradients can also work, but are harder to compare precisely. <img src='https://media1.tenor.com/m/AYxBhVmi0p4AAAAC/mixing-paint-peter-draws.gif' alt='gif of an artist swirling paint colours together on a palette'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_889122e", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_aa4613f", 
         option = "Shape", value = "Shape", label = structure("Shape", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Shapes are categorical: there is no natural ordering from circle to triangle to square.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_330ac48", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_c35822e", 
         option = "Group shading (node_group)", value = "Group shading (node_group)", 
         label = structure("Group shading (node_group)", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Group shading highlights membership in discrete groups, not amounts.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_a62cb18", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_5fb2c4f", 
         option = "Labels", value = "Labels", label = structure("Labels", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("You could print the values as labels, but the point of graphing is to see patterns at a glance.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -3103,7 +3103,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "aes-choice-Q-answer", question = "aes-choice-Q"), 
     loading = NULL, random_answer_order = TRUE, allow_retry = TRUE, 
-    seed = 323298659.849452, options = list()), class = c("learnr_radio", 
+    seed = 807028175.124198, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
@@ -3528,19 +3528,19 @@ learnr:::store_exercise_cache(structure(list(label = "colourch", global_setup = 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "fill-Q", question = structure("Why does changing node colours use scale_fill_<em>() functions rather than scale_color_<\u002fem>()?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_96f9bb", 
+"character")), answers = list(structure(list(id = "lnr_ans_41f86cb", 
     option = "Because nodes are drawn as filled shapes, so their interior colour is the 'fill' aesthetic", 
     value = "Because nodes are drawn as filled shapes, so their interior colour is the 'fill' aesthetic", 
     label = structure("Because nodes are drawn as filled shapes, so their interior colour is the ‘fill’ aesthetic", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Correct, ‘color’ in ggplot2 refers to outlines and lines, while the interior of a filled shape is its ‘fill’. That is not just blue, it is cerulean. <img src='https://media1.tenor.com/m/wI7dn3jz6p8AAAAC/prada-cerulean.gif' alt='gif from The Devil Wears Prada: that is not just blue, that is cerulean'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_7cba619", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f53ca30", 
     option = "Because scale_color_*() functions do not exist in ggplot2", 
     value = "Because scale_color_*() functions do not exist in ggplot2", 
     label = structure("Because scale_color_*() functions do not exist in ggplot2", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("They do exist — they control the colour aesthetic, used e.g. for lines and outlines.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6289507", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_552a060", 
     option = "It is an arbitrary choice and either would work", 
     value = "It is an arbitrary choice and either would work", 
     label = structure("It is an arbitrary choice and either would work", html = TRUE, class = c("html", 
@@ -3553,7 +3553,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "fill-Q-answer", question = "fill-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1599317376.75526, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 789788767.632226, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -4319,11 +4319,11 @@ learnr:::store_exercise_cache(structure(list(label = "forcedir", global_setup = 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "layoutinterp-Q", 
     question = structure("Can we interpret the distance between two nodes in a force-directed layout as a precise measure of how closely they are related?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_55dc6a5", 
+    "character")), answers = list(structure(list(id = "lnr_ans_28dd6f8", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right — force-directed layouts are illustrative. Nearby nodes are often closely connected, but distances are a by-product of the algorithm, not a measurement to cite. The force moves the nodes, but it does not measure them. <img src='https://giffiles.alphacoders.com/131/13131.gif' alt='gif of yoda moving things with the force'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_bafd222", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_4eca702", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Careful — two nodes can end up near each other simply because the algorithm ran out of better places to put them. Use spectral or MDS layouts if you need interpretable distances. No mistakes here though, just a happy little accident. <img src='https://media1.tenor.com/m/XP2eqZczZ2MAAAAC/bob-ross-happy.gif' alt='gif of Bob Ross smiling in front of a painting'/>", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -4335,7 +4335,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "layoutinterp-Q-answer", question = "layoutinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 1246518501.91954, options = list()), class = c("learnr_radio", 
+    seed = 258607189.379577, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
@@ -4848,11 +4848,11 @@ learnr:::store_exercise_cache(structure(list(label = "checkstress", global_setup
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "spectralinterp-Q", 
     question = structure("Can we interpret the distance between nodes in spectral and MDS layouts?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_8311383", 
+    "character")), answers = list(structure(list(id = "lnr_ans_d6aeaae", 
         option = "Yes", value = "Yes", label = structure("Yes", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right — in these layouts proximity reflects measured (dis)similarity, though how far to trust it is another question. The stress score reported under a “scaling” layout is what answers that one.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_7f72a29", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_99ad896", 
         option = "No", value = "No", label = structure("No", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Unlike force-directed layouts, spectral and MDS layouts place nodes according to calculated similarities, so distances do carry meaning here.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -4864,29 +4864,29 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "spectralinterp-Q-answer", question = "spectralinterp-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 675450318.685469, options = list()), class = c("learnr_radio", 
+    seed = 985126094.541265, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "stressvariance-Q", 
     question = structure("A <code>&quot;scaling&quot;<\u002fcode> layout reports two numbers: a stress score and a share of the distance variance. One of them would be the same for any other layout of the same network. Which one?", html = TRUE, class = c("html", 
-    "character")), answers = list(structure(list(id = "lnr_ans_d78921f", 
+    "character")), answers = list(structure(list(id = "lnr_ans_c4e34e7", 
         option = "The variance explained", value = "The variance explained", 
         label = structure("The variance explained", html = TRUE, class = c("html", 
         "character")), correct = TRUE, message = structure("That’s right — it asks how much of this network’s structure two dimensions could hold at all, which no choice of layout changes.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_ee0dacb", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_4b4f631", 
         option = "The stress", value = "The stress", label = structure("The stress", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Stress scores the drawing rather than the network, so it does change: <code>check_stress()<\u002fcode> reports 31% for <code>&quot;scaling&quot;<\u002fcode> and 52% for <code>&quot;circle&quot;<\u002fcode> on <code>ison_southern_women<\u002fcode>.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_f0d1eea", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_a29b555", 
         option = "Both of them, since both describe the network", 
         value = "Both of them, since both describe the network", 
         label = structure("Both of them, since both describe the network", html = TRUE, class = c("html", 
         "character")), correct = FALSE, message = structure("Only the variance explained describes the network. Stress measures how far one particular drawing gets the distances wrong, so redrawing the network changes it.", html = TRUE, class = c("html", 
         "character")), type = "literal"), class = c("tutorial_question_answer", 
-    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_bcec8", 
+    "tutorial_quiz_answer")), structure(list(id = "lnr_ans_38aedc3", 
         option = "Neither of them, since both describe the drawing", 
         value = "Neither of them, since both describe the drawing", 
         label = structure("Neither of them, since both describe the drawing", html = TRUE, class = c("html", 
@@ -4900,7 +4900,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
     "character")), message = NULL, post_message = NULL), ids = list(
         answer = "stressvariance-Q-answer", question = "stressvariance-Q"), 
     loading = NULL, random_answer_order = FALSE, allow_retry = TRUE, 
-    seed = 209280652.902546, options = list()), class = c("learnr_radio", 
+    seed = 365350909.82987, options = list()), class = c("learnr_radio", 
 "tutorial_question")), session = session)
 </script>
 
@@ -4989,18 +4989,18 @@ learnr:::store_exercise_cache(structure(list(label = "cos2", global_setup = stru
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "corresp-Q", question = structure("In a <code>&quot;correspondence&quot;<\u002fcode> layout of <code>ison_southern_women<\u002fcode>, Helen is drawn closer to event E9 than to any other event. What does that tell us?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_bf3d95c", 
+"character")), answers = list(structure(list(id = "lnr_ans_af6fda5", 
     option = "Less than it appears: only distances within a mode can be read", 
     value = "Less than it appears: only distances within a mode can be read", 
     label = structure("Less than it appears: only distances within a mode can be read", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("That’s right — a row point near a column point is not a claim about the two of them. Helen did not attend E9 at all. Compare women with women, and events with events.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_bdccbcb", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d1769ee", 
     option = "That Helen attended E9", value = "That Helen attended E9", 
     label = structure("That Helen attended E9", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not necessarily. The two modes share a pair of axes, but the distance between a woman and an event is not a distance you can read. Compare women with women instead.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e9d4fa3", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d8b1193", 
     option = "That Helen was the only woman not to attend E9", 
     value = "That Helen was the only woman not to attend E9", 
     label = structure("That Helen was the only woman not to attend E9", html = TRUE, class = c("html", 
@@ -5013,31 +5013,31 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "corresp-Q-answer", question = "corresp-Q"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 421254314.303838, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 246927758.885015, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "inertia-Q", question = structure("Two <code>&quot;correspondence&quot;<\u002fcode> plots: one holds 60% of its network’s inertia in the two dimensions drawn, the other 36%. Which is the better two-dimensional summary?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_11d55af", 
+"character")), answers = list(structure(list(id = "lnr_ans_1d64b54", 
     option = "It depends how many dimensions each network had to begin with", 
     value = "It depends how many dimensions each network had to begin with", 
     label = structure("It depends how many dimensions each network had to begin with", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("That’s right — 60% of seven dimensions is less than dividing the inertia at random would have given, while 36% of thirty-one beats every baseline. Compare each share against its own, not against 100%.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_2806e6f", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_444ce9", 
     option = "The one holding 60%", value = "The one holding 60%", 
     label = structure("The one holding 60%", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Not necessarily. A share of inertia is measured against however many dimensions the table has. A small network has few, so two of them will hold a good deal whatever its structure.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_9d36409", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c4658d9", 
     option = "The one holding 36%, since a lower share is harder to achieve", 
     value = "The one holding 36%, since a lower share is harder to achieve", 
     label = structure("The one holding 36%, since a lower share is harder to achieve", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Closer, but for the wrong reason — a lower share is not a virtue in itself. What matters is the share compared against what an even spread across the available dimensions would give.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f807401", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_9e54748", 
     option = "Neither, since inertia cannot be compared across networks", 
     value = "Neither, since inertia cannot be compared across networks", 
     label = structure("Neither, since inertia cannot be compared across networks", html = TRUE, class = c("html", 
@@ -5050,7 +5050,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "inertia-Q-answer", question = "inertia-Q"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 1613319470.74874, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 171791405.920003, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5058,19 +5058,19 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "benzecri-Q", question = structure("Should the inertia percentages a <code>&quot;correspondence&quot;<\u002fcode> layout reports be adjusted by the Benzécri correction?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_d01e90b", 
+"character")), answers = list(structure(list(id = "lnr_ans_f8ab553", 
     option = "No — that correction is for multiple correspondence analysis", 
     value = "No — that correction is for multiple correspondence analysis", 
     label = structure("No — that correction is for multiple correspondence analysis", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("That’s right. An indicator matrix invents dimensions that deflate every percentage, which is what Benzécri (and Greenacre’s adjusted version) put back. A single two-way table invents nothing, so these percentages are already exact.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_b09a80f", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c7393f8", 
     option = "Yes, correspondence analysis always understates its percentages", 
     value = "Yes, correspondence analysis always understates its percentages", 
     label = structure("Yes, correspondence analysis always understates its percentages", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Only multiple correspondence analysis does, and only because of the indicator matrix it is run on. This layout analyses a single two-way table, where the percentages are exact.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_835475c", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c97f19a", 
     option = "Yes, but only for two-mode networks", value = "Yes, but only for two-mode networks", 
     label = structure("Yes, but only for two-mode networks", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("The number of modes has nothing to do with it. What would call for a correction is an indicator or Burt matrix, which this layout never builds.", html = TRUE, class = c("html", 
@@ -5082,25 +5082,25 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "benzecri-Q-answer", question = "benzecri-Q"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 1044684089.01353, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 35708689.4833718, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "cos2-Q", question = structure("A node in a <code>&quot;correspondence&quot;<\u002fcode> layout is drawn near the origin. What are the two things that could mean?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_ddad582", 
+"character")), answers = list(structure(list(id = "lnr_ans_f99b3f", 
     option = "Its ties are close to average, or the two dimensions hold it badly", 
     value = "Its ties are close to average, or the two dimensions hold it badly", 
     label = structure("Its ties are close to average, or the two dimensions hold it badly", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("That’s right — and the cos2 is what tells the two apart. A low cos2 means the node sits somewhere this plane cannot show.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_18c690", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_bc72c13", 
     option = "It has few ties, or it has many", value = "It has few ties, or it has many", 
     label = structure("It has few ties, or it has many", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Correspondence analysis divides each node’s ties by how many it has, so how many a node has is not what places it. Look at the cos2 instead.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_9ad051", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_ffb5f94", 
     option = "Only that its ties are close to average", value = "Only that its ties are close to average", 
     label = structure("Only that its ties are close to average", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("That is one of the two. The other is that the two dimensions drawn hold the node badly, so the origin is simply where it lands. The cos2 separates the cases.", html = TRUE, class = c("html", 
@@ -5112,7 +5112,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "cos2-Q-answer", question = "cos2-Q"), loading = NULL, 
-    random_answer_order = FALSE, allow_retry = TRUE, seed = 1566538778.77052, 
+    random_answer_order = FALSE, allow_retry = TRUE, seed = 833215243.612004, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5199,24 +5199,24 @@ learnr:::store_exercise_cache(structure(list(label = "snap", global_setup = stru
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "snap-Q", question = structure("What does snap = TRUE do to the layout you asked for?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_21c42d8", 
+"character")), answers = list(structure(list(id = "lnr_ans_18d1474", 
     option = "It keeps that layout, but moves each node onto the nearest grid coordinate", 
     value = "It keeps that layout, but moves each node onto the nearest grid coordinate", 
     label = structure("It keeps that layout, but moves each node onto the nearest grid coordinate", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Exactly — the arrangement stays recognisable, and the nodes just shuffle onto tidier positions. <img src='https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif' alt='gif of a cartoon character energetically rearranging the living room furniture'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_76c97ee", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_fb46c1f", 
     option = "It replaces that layout with the grid layout", 
     value = "It replaces that layout with the grid layout", label = structure("It replaces that layout with the grid layout", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("That is layout = ‘grid’. With snap = TRUE the chosen layout is computed first, and only then rounded onto a grid.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c0411f5", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_70bbf74", 
     option = "It fixes the layout so that it is the same each time it is run", 
     value = "It fixes the layout so that it is the same each time it is run", 
     label = structure("It fixes the layout so that it is the same each time it is run", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Some layouts, such as ‘stress’, are already deterministic. Snapping is about grid coordinates, not repeatability.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_861d751", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_9b38e14", 
     option = "It removes overlapping labels", value = "It removes overlapping labels", 
     label = structure("It removes overlapping labels", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Snapping often helps label legibility, but it moves nodes rather than labels. Use label_repel and label_dist for labels.", html = TRUE, class = c("html", 
@@ -5228,7 +5228,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "snap-Q-answer", question = "snap-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 2132749769.00686, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 853675483.602476, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5402,19 +5402,19 @@ learnr:::store_exercise_cache(structure(list(label = "grapht", global_setup = st
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "grapht-Q", question = structure("A tie attribute named what marks a network as longitudinal for {manynet}, so that to_waves() and grapht() split it without being told?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_d8ce46e", 
+"character")), answers = list(structure(list(id = "lnr_ans_c7b7663", 
     option = "wave", value = "wave", label = structure("wave", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Yes — name it wave and the waves are found for you, like the pages of a flipbook. Any other name works too, but must be declared via to_waves()’s attribute argument. <img src='https://media1.tenor.com/m/eJEUysVdTxkAAAAd/calvin-and-hobbes-stick-figures-tiger-eating-man-this-was-my-book-stick-figures.gif' alt='gif of a hand flipping through a flipbook of animated stick figures'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e76f3de", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6962bd8", 
     option = "time", value = "time", label = structure("time", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Close in spirit, but it is wave that is recognised automatically.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_e09b4e4", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_fcf7de9", 
     option = "year", value = "year", label = structure("year", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("year is a perfectly good name, but you have to declare it via to_waves()’s attribute argument.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_42a8048", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_a2a60d4", 
     option = "frame", value = "frame", label = structure("frame", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Frames are what the animation renders, not what the network attribute is called.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -5425,7 +5425,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "grapht-Q-answer", question = "grapht-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1410563800.84316, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 2014985585.0617, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5481,25 +5481,25 @@ learnr:::store_exercise_cache(structure(list(label = "ggrapheg", global_setup = 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "ggraph-Q", question = structure("What is the main trade-off in building a graph directly in {ggraph} rather than with graphr()?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_49f60b6", 
+"character")), answers = list(structure(list(id = "lnr_ans_d9b832d", 
     option = "You control every layer yourself, but you have to specify each one", 
     value = "You control every layer yourself, but you have to specify each one", 
     label = structure("You control every layer yourself, but you have to specify each one", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Just so — nothing is drawn until you ask for it, so a plain graph takes more typing. Take the restoration into your own hands only when you need that control. <img src='https://media1.tenor.com/m/MFmfCpzr4L0AAAAd/mr-bean-whistlers-mother.gif' alt='gif of Mr Bean taking the restoration of a painting into his own hands'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d3face8", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_db44d09", 
     option = "You cannot use {ggplot2} layers with {ggraph}", 
     value = "You cannot use {ggplot2} layers with {ggraph}", 
     label = structure("You cannot use {ggplot2} layers with {ggraph}", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("{ggraph} is built on {ggplot2}, so the usual layers, scales, and themes all apply.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_4ffc24a", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_214b61e", 
     option = "{ggraph} accepts fewer network classes, so graphr() is always faster to run", 
     value = "{ggraph} accepts fewer network classes, so graphr() is always faster to run", 
     label = structure("{ggraph} accepts fewer network classes, so graphr() is always faster to run", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("{ggraph} does expect tbl_graph or igraph objects, but the trade-off here is about control, not speed.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_b45f46f", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_de2551d", 
     option = "Graphs built in {ggraph} cannot be saved with ggsave()", 
     value = "Graphs built in {ggraph} cannot be saved with ggsave()", 
     label = structure("Graphs built in {ggraph} cannot be saved with ggsave()", html = TRUE, class = c("html", 
@@ -5512,7 +5512,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "ggraph-Q-answer", question = "ggraph-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1642678446.73507, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 605527415.718029, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5564,19 +5564,19 @@ learnr:::store_exercise_cache(structure(list(label = "plotexamples", global_setu
  
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "export-Q", question = structure("Which file format should you prefer when a publisher asks for a figure that stays sharp at any size?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_fc3d049", 
+"character")), answers = list(structure(list(id = "lnr_ans_4a2b91e", 
     option = ".pdf", value = ".pdf", label = structure(".pdf", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Yes — .pdf and .svg are vector formats, so they scale without going blurry. The masterpiece is done: show the world. <img src='https://media1.tenor.com/m/NitBp-Ag5dAAAAAd/alright-the-masterpiece-is-done-show-the-world.gif' alt='gif of a maker declaring that the masterpiece is done and it is time to show the world'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_f9aa5d3", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_6e54899", 
     option = ".png", value = ".png", label = structure(".png", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("A .png is a raster format. It is fine for the web, and for print at a high dpi, but it does not scale freely.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_510105b", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_fa281d", 
     option = ".jpeg", value = ".jpeg", label = structure(".jpeg", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("A .jpeg is raster too, and its compression blurs lines and text. Avoid it for graphs.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_93e6e7e", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_dc7d50e", 
     option = ".gif", value = ".gif", label = structure(".gif", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("Save a .gif for animations from grapht(), via gganimate::anim_save().", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -5587,7 +5587,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "export-Q-answer", question = "export-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1467455179.31666, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 1106799239.98461, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>
@@ -5595,19 +5595,19 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 
 <script type="application/shiny-prerendered" data-context="server">
 learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label = "summary-Q", question = structure("One last one: which function graphs a list of related networks as comparable panels?", html = TRUE, class = c("html", 
-"character")), answers = list(structure(list(id = "lnr_ans_f6ce214", 
+"character")), answers = list(structure(list(id = "lnr_ans_e26708f", 
     option = "graphs()", value = "graphs()", label = structure("graphs()", html = TRUE, class = c("html", 
     "character")), correct = TRUE, message = structure("Correct — graphs() for panels, grapht() for animations, graphr() for a single graph. Take a bow. <img src='https://media1.tenor.com/m/gSsbNTouixUAAAAC/bravo-applause.gif' alt='gif of an enthusiastic standing ovation and cries of bravo'/>", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_7c5d0fc", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_79c2de5", 
     option = "grapht()", value = "grapht()", label = structure("grapht()", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("grapht() animates change over time instead, rendering the waves as frames.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_80087d5", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_5752064", 
     option = "graphr()", value = "graphr()", label = structure("graphr()", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("graphr() draws one network. You can combine several graphr() calls with {patchwork} operators, though.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
-"tutorial_quiz_answer")), structure(list(id = "lnr_ans_c94f6b4", 
+"tutorial_quiz_answer")), structure(list(id = "lnr_ans_d67baf5", 
     option = "plot()", value = "plot()", label = structure("plot()", html = TRUE, class = c("html", 
     "character")), correct = FALSE, message = structure("The plot() methods are for measures, motifs, and model results, not for lists of networks.", html = TRUE, class = c("html", 
     "character")), type = "literal"), class = c("tutorial_question_answer", 
@@ -5618,7 +5618,7 @@ learnr:::question_prerendered_chunk(structure(list(type = "learnr_radio", label 
 "character")), incorrect = structure("Incorrect", html = TRUE, class = c("html", 
 "character")), message = NULL, post_message = NULL), ids = list(
     answer = "summary-Q-answer", question = "summary-Q"), loading = NULL, 
-    random_answer_order = TRUE, allow_retry = TRUE, seed = 1453375454.82322, 
+    random_answer_order = TRUE, allow_retry = TRUE, seed = 459117549.286207, 
     options = list()), class = c("learnr_radio", "tutorial_question"
 )), session = session)
 </script>

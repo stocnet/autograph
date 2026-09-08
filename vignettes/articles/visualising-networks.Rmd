@@ -553,7 +553,7 @@ The `isolates` argument in `graphr()` provides some options for what to do with 
 `"legend"` (the default) drops them from the drawing but records how many there were in the legend, 
 `"caption"` notes them in a caption instead, 
 and `"keep"` leaves them in place. 
-**Add two unconnected characters to `fict_lotr` and compare keeping them with noting them in the legend.**
+**Add ten unconnected characters to `fict_lotr` and compare keeping them with noting them in the legend.**
 
 ```{r isolates, fig.width=9}
 lotr_iso <- to_unlabelled(fict_lotr) |>
