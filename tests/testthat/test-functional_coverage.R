@@ -257,7 +257,7 @@ test_that("a diffusion that never spread says so rather than plotting", {
     manynet::play_diffusion(manynet::create_empty(5), seeds = 1))
   expect_equal(nrow(flat), 1L)
   # The method warns and returns the warning's own value, not a plot.
-  expect_warning(out <- plot(flat), "No diffusion was observed")
+  expect_snet_warning(out <- plot(flat), "No diffusion was observed")
   out <- suppressWarnings(plot(flat))
   expect_false(inherits(out, "ggplot"))
 })
