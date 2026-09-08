@@ -73,6 +73,7 @@ reference:
       - list_fonts
       - theme_colorblind
       - match_color
+      - check_colors
       - ends_with("themes")
       - ends_with("scales")
       - ends_with("palettes")

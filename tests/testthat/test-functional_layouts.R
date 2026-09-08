@@ -137,7 +137,12 @@ test_that("every layout substitutes and says so where it does not apply", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
   reqs <- autograph:::.layout_requirements()
-  for (lay in names(reqs)) {
+  # A retired name is renamed by .check_layout() (R/graph_checks.R) before the
+  # requirement is judged, so the message names the layout that was attempted
+  # rather than the name that was typed. That renaming is tested below, in "a
+  # deprecated layout name is renamed once", and the retired names are left out
+  # here rather than asking this audit to know both spellings.
+  for (lay in setdiff(names(reqs), autograph:::.deprecated_layouts())) {
     cand <- layout_candidates(lay)
     for (fix in cand$no) {
       net <- ag_layout_pool[[fix]]
@@ -208,7 +213,7 @@ test_that("every deprecated layout still draws, and is offered nowhere", {
     sizes <- c("dyad", "triad", "tetrad", "pentad", "hexad")
     net <- if (lay %in% sizes) manynet::create_ring(match(lay, sizes) + 1L)
       else if (lay == "multilevel") manynet::ison_southern_women else g
-    expect_message(coords <- fn(net), "deprecated", label = lay)
+    expect_snet_warning(coords <- fn(net), "deprecated", label = lay)
     expect_true(all(c("x", "y") %in% names(coords)), label = lay)
     expect_equal(nrow(coords), as.integer(manynet::net_nodes(net)), label = lay)
   }
@@ -217,13 +222,16 @@ test_that("every deprecated layout still draws, and is offered nowhere", {
 test_that("a deprecated layout name is renamed once, where it is checked", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
-  expect_message(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
+  # a deprecation warns, whatever the verbosity, so that a user who is not
+  # reading the console still learns the name is going away
+  expect_snet_warning(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
   expect_equal(lay, "layered")
-  expect_equal(suppressMessages(autograph:::.check_layout("alluvial")), "lineage")
-  expect_equal(suppressMessages(autograph:::.check_layout("multilevel")), "levels")
-  expect_equal(suppressMessages(autograph:::.check_layout("triad")), "configuration")
+  expect_equal(suppressWarnings(autograph:::.check_layout("alluvial")), "lineage")
+  expect_equal(suppressWarnings(autograph:::.check_layout("multilevel")), "levels")
+  expect_equal(suppressWarnings(autograph:::.check_layout("triad")), "configuration")
   # A live name passes through untouched and says nothing.
-  expect_no_message(expect_equal(autograph:::.check_layout("layered"), "layered"))
+  expect_no_warning(expect_no_message(
+    expect_equal(autograph:::.check_layout("layered"), "layered")))
 })
 
 test_that("matching layout aligns matched partners vertically", {
@@ -234,3 +242,36 @@ test_that("matching layout aligns matched partners vertically", {
                 manynet::net_nodes(manynet::ison_southern_women))
 })
 
+
+test_that("every drawing check scores every layout", {
+  skip_on_cran()
+  # The checks are enumerated from the namespace, as the layouts are, so a new
+  # check_*() that reads a plot is audited without a test being written. The
+  # colour checks read a palette rather than a plot, and are audited in
+  # test-functional_themes.R instead.
+  checks <- setdiff(ag_alive_functions("^check_"),
+                    c("check_separation", "check_contrast"))
+  expect_true(length(checks) > 0)
+  for (lay in autograph:::.autograph_layouts()) {
+    fix <- layout_candidates(lay, n_ok = 1)$ok
+    if (length(fix) == 0) next
+    net <- ag_layout_pool[[fix]]
+    p <- run_or_skip(
+      do.call(graphr, c(list(net, layout = lay), layout_extra_args(lay, net))),
+      paste0("draw ", lay), fix)
+    for (fn in checks) {
+      out <- run_or_skip(get(fn, envir = asNamespace("autograph"))(p),
+                         fn, paste0(lay, " x ", fix))
+      run_or_skip({
+        # A check scores what it is given, so it returns one score for every
+        # tie or node of every layout, rather than only of the ones it was
+        # written against. A score may be missing -- a dyad has no angle
+        # between its ties -- but it may not be infinite or a character.
+        vals <- unlist(out)
+        testthat::expect_true(length(vals) > 0)
+        testthat::expect_true(is.numeric(vals))
+        testthat::expect_true(all(is.finite(vals[!is.na(vals)])))
+      }, paste0("score ", fn), paste0(lay, " x ", fix))
+    }
+  }
+})

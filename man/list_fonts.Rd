@@ -27,6 +27,7 @@ head(list_fonts())
 }
 \seealso{
 Other themes:
+\code{\link{check_colors}},
 \code{\link{theme_colorblind}},
 \code{\link{theme_medium}},
 \code{\link{theme_set}}

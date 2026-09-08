@@ -534,23 +534,46 @@ setting `edge_size` yourself resizes both together.
 
 ### Taming dense or disconnected networks {#taming-networks}
 
-Sometimes networks are just a dense hairball.
+Sometimes networks look like a dense hairball.
 This is a technical term to describe networks with many high-degree nodes and many ties, 
-where the sheer number of ties obscures the structure of the network.
-Autograph includes three arguments that can help with this.
+where the sheer number of ties obscures any structure that might be in the network.
+Autograph includes three arguments that can help with this,
+some of which are turned on by default, 
+so we will need to turn them off to see the effect of each in isolation.
+
+#### Isolates {#isolates}
+
+First, it is possible that the hairball is not a hairball at all, 
+but a network with many disconnected components or, especially, `r gloss("isolates","isolate")`, 
+that each need to be drawn.
+As each `r gloss("component")` is drawn under a force-directed layout, 
+the components will repel each other and the `r gloss("giant")` component will be squeezed into a clump.
+
+The `isolates` argument in `graphr()` provides some options for what to do with them instead: 
+`"legend"` (the default) drops them from the drawing but records how many there were in the legend, 
+`"caption"` notes them in a caption instead, 
+and `"keep"` leaves them in place. 
+**Add ten unconnected characters to `fict_lotr` and compare keeping them with noting them in the legend.**
+
+```{r isolates, fig.width=9}
+lotr_iso <- to_unlabelled(fict_lotr) |>
+  add_nodes(10)
+(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
+   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
+```
 
 #### Bundling ties {#bundling}
 
-The first option is to draw all of the ties 'bundled' together,
+The second option is to draw all of the ties 'bundled' together,
 which can reveal where the most common paths through the network are.
 `edge_bundle` pulls ties that travel in similar
 directions into shared paths — like cabling them together — 
 so that the main 'highways' of the network stand out. 
 It is off by default; set `edge_bundle = TRUE` 
 (or name a specific algorithm: `"force"`, `"path"`, or `"minimal"`) to switch it on. 
-**`ison_lawfirm` records 71 lawyers and 2571
-ties between them, which is about as thick a hairball as a network this small
-can be. Compare it drawn with and without bundling (turn backbone off too for clearest comparison results).**
+**`ison_lawfirm` records 71 lawyers and 2571 ties between them, 
+which is about as thick a hairball as a network this small can be. 
+Compare it drawn with and without bundling (turn backbone off too for clearest comparison results).**
 
 ```{r bundle, fig.width=9}
 graphr(ison_lawfirm, backbone = FALSE) + ggtitle("Unbundled") | 
@@ -595,23 +618,6 @@ Bundling and backbones answer the same problem from different ends, so try one
 before reaching for both. A bundled tie cannot carry a fading of its own —
 bundling merges ties into shared paths — so where both are asked for, the
 backbone still shapes the layout but every tie is drawn alike.
-
-#### Isolates {#isolates}
-
-At the other extreme, many networks contain `r gloss("isolates","isolate")` —
-unconnected nodes — which, under a force-directed layout, drift to the margins
-and squeeze the connected core into a clump. The `isolates` argument decides
-what happens to them: `"legend"` (the default) drops them from the drawing but
-records how many there were in the legend, `"caption"` notes them in a caption
-instead, and `"keep"` leaves them in place. **Add two unconnected characters
-to `fict_lotr` and compare keeping them with noting them in the legend.**
-
-```{r isolates, fig.width=9}
-lotr_iso <- fict_lotr |>
-  add_nodes(2, list(name = c("Tom Bombadil", "Goldberry")))
-(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
-   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
-```
 
 For very large real-world networks such as `irps_blogs`, these work well
 together: a backbone picks out the ties that hold the connected core together
@@ -1121,18 +1127,55 @@ is the point of this section.
 Quality measures a layout algorithm might attend to include:
 
 - minimising the _crossing number_ of edges/ties in the graph
-([planar graphs](https://www.jasondavies.com/planarity/) require no crossings)
+([planar graphs](https://www.jasondavies.com/planarity/) require no crossings):
+`check_crossings()`
 - minimising the _slope number_ of distinct edge slopes in the graph
-(where vertices are represented as points on a Euclidean plane)
+(where vertices are represented as points on a Euclidean plane):
+`check_slopes()`
 - minimising the _bend number_ in all edges in the graph
-(every graph has a right angle crossing (RAC) drawing with three bends per edge)
-- minimising the _total edge length_
-- minimising the _maximum edge length_
-- minimising the _edge length variance_
-- maximising the _angular resolution_ or sharpest angle of edges meeting at a common vertex
-- minimising the _bounding box_ of the plot
-- evening the _aspect ratio_ of the plot
-- displaying _symmetry groups_ (subgraph automorphisms)
+(every graph has a right angle crossing (RAC) drawing with three bends per edge):
+not measured, since the bends are set by `graphr()`'s `edge_curved` and
+`edge_bundle` arguments rather than by the layout
+- minimising the _total edge length_: `attr(check_lengths(p), "total")`
+- minimising the _maximum edge length_: `attr(check_lengths(p), "max")`
+- minimising the _edge length variance_: `attr(check_lengths(p), "variance")`
+- maximising the _angular resolution_ or sharpest angle of edges meeting at a common vertex:
+`attr(check_angles(p), "min")`
+- minimising the _bounding box_ of the plot: not measured
+- evening the _aspect ratio_ of the plot: not measured
+- displaying _symmetry groups_ (subgraph automorphisms): not measured
+
+Each of these functions scores a drawing rather than the network it draws,
+so two layouts of the same network can be compared.
+`check_drawing()` runs them all at once, beside `check_stress()`,
+which reports how far the distances drawn depart from the distances
+through the network.
+**Compare a stress layout with a circle.**
+
+```{r check-drawing}
+sw_stress <- graphr(ison_southern_women, layout = "stress")
+sw_circle <- graphr(ison_southern_women, layout = "circle")
+rbind(stress = check_drawing(sw_stress), circle = check_drawing(sw_circle))
+```
+
+Every column is read downwards except `angle_min`, which is read upwards.
+Fewer crossings, fewer slopes, shorter ties, more even ties, and a wider
+smallest angle all make a drawing easier to read.
+`nodes`, `ties` and `angle_ideal` are context rather than scores.
+`angle_ideal` is the widest smallest angle the degrees of this network allow,
+so `angle_min` is read as a share of it.
+The floors are worth knowing as well:
+a network of this many ties cannot be drawn without crossings at all,
+and no drawing of it can use fewer slopes than half its largest degree.
+
+No layout wins on every measure.
+The circle draws every node on one ring, which costs it crossings and length:
+it draws many times the crossings of the stress layout, and three times the
+total tie length. It buys the other measures with the same ring:
+fewer slopes, ties of a more even length, and more room between the ties that
+meet at a node. Its stress is the worse of the two,
+because a layout that never set out to draw the path distances
+scores poorly on them by design.
 
 Graph layouts available in the `{igraph}`, `{ggraph}`, `{graphlayouts}`,
 and `{autograph}` packages can be used in `graphr()`.

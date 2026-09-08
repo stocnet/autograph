@@ -256,11 +256,9 @@ test_that("a diffusion that never spread says so rather than plotting", {
   flat <- manynet::as_diffusion(
     manynet::play_diffusion(manynet::create_empty(5), seeds = 1))
   expect_equal(nrow(flat), 1L)
-  # snet_warn() speaks through cli, and only when verbosity is turned up.
-  old <- options(snet_verbosity = "verbose")
-  on.exit(options(old), add = TRUE)
-  # The method returns the cli message's own value, not a plot.
-  expect_message(out <- plot(flat), "No diffusion was observed")
+  # The method warns and returns the warning's own value, not a plot.
+  expect_snet_warning(out <- plot(flat), "No diffusion was observed")
+  out <- suppressWarnings(plot(flat))
   expect_false(inherits(out, "ggplot"))
 })
 

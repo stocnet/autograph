@@ -80,6 +80,7 @@ stocnet_medium("screen")
 }
 \seealso{
 Other themes:
+\code{\link{check_colors}},
 \code{\link[=list_fonts]{list_fonts()}},
 \code{\link{theme_colorblind}},
 \code{\link{theme_set}}

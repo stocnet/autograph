@@ -230,12 +230,13 @@ test_that("keep_isolates is deprecated but still honoured", {
   tied <- manynet::as_tidygraph(igraph::graph_from_data_frame(
     data.frame(from = "A", to = "B"),
     directed = FALSE, vertices = data.frame(name = c("A", "B", "C"))))
-  # The deprecation notice comes through the stocnet cli interface (snet_warn),
-  # so it is a message rather than a base R warning.
-  old <- options(snet_verbosity = "verbose")
-  on.exit(options(old), add = TRUE)
-  expect_message(p <- grapht(list(t1 = tied, t2 = tied), keep_isolates = FALSE),
-                 "deprecated")
+  # The deprecation notice comes through the stocnet cli interface, which
+  # raises a warning condition whatever the verbosity from manynet 2.3.2, and
+  # prints without raising one before that (see helper-manynet.R).
+  expect_snet_warning(p <- grapht(list(t1 = tied, t2 = tied),
+                                  keep_isolates = FALSE), "deprecated")
+  p <- suppressWarnings(grapht(list(t1 = tied, t2 = tied),
+                               keep_isolates = FALSE))
   nd <- .node_layer(p)$data
   expect_true(all(nd$nalpha[nd$name == "C"] == 0))
 })

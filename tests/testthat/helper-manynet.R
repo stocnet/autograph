@@ -15,3 +15,35 @@ ag_net <- function(x) manynet::as_tidygraph(x)
 # for the version, as the package itself does, since a development build can
 # carry a version string without the function.
 manynet_has <- function(fn) fn %in% getNamespaceExports("manynet")
+
+# manynet raised snet_warn() from a cli alert to a warning condition in 2.3.2.
+# CRAN still ships 2.3.1, where the same call prints (and only where the
+# verbosity allows it) rather than raising anything a test can catch, so a
+# deprecation that warns here announces nothing there. Probed rather than read
+# off the version, as manynet_has() is, and probed once, since the answer
+# cannot change within a session.
+snet_warns <- local({
+  known <- NULL
+  function() {
+    if (is.null(known)) {
+      known <<- FALSE
+      withCallingHandlers(
+        suppressMessages(manynet::snet_warn("probing snet_warn")),
+        warning = function(w) {
+          known <<- TRUE
+          invokeRestart("muffleWarning")
+        })
+    }
+    known
+  }
+})
+
+# A deprecation, or any other snet_warn(), asserted against either manynet.
+# Where the installed manynet raises a warning, the warning and its wording are
+# asserted. Where it does not, the call is only asked to run, since there is no
+# condition to catch: the test then still covers the code path, and the
+# assertion returns as soon as manynet 2.3.2 reaches CRAN.
+expect_snet_warning <- function(expr, regexp, label = NULL) {
+  if (snet_warns()) testthat::expect_warning(expr, regexp, label = label)
+  else testthat::expect_no_error(expr)
+}
