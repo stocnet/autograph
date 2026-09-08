@@ -1,3 +1,14 @@
+# autograph 1.2.3
+
+## Package
+
+- Added `{messydates}` to `Suggests`
+
+## Theming
+
+- Added `scale_x_mdate()` and `scale_y_mdate()` (closes globalgov/messydates#104)
+  - `FUN` resolves each messy date to one date; `messydates::vmin` by default
+
 # autograph 1.2.2
 
 ## Package

@@ -386,7 +386,7 @@ because namespace references inside `ergm` model objects don't survive a plain `
 `Imports` `ggplot2` (>= 4.0.0), `ggraph`, `graphlayouts`, `igraph`, `dplyr`, and `patchwork`.
 `ergm` and `RSiena` are listed under `Enhances` (their `plot.*` methods are only invoked if those
 packages are installed and such results are passed in), and `gganimate`, `gifski`, `ggforce`,
-`migraph`, and `netrics` are `Suggests`-only,
+`messydates`, `migraph`, and `netrics` are `Suggests`-only,
 so code paths depending on them should guard with `requireNamespace()`
 (see the `thisRequires()` helper in [R/autograph_utilities.R](../R/autograph_utilities.R))
 or be skipped gracefully when unavailable.
@@ -401,6 +401,14 @@ Call the function with `getExportedValue()` and not `::`,
 because `R CMD check` resolves a `::` call against the installed package
 and reports the newer name as missing even where the call is never reached.
 Delete each shim once the minimum is raised past the version that added the function.
+
+`messydates` is suggested rather than imported because the dependency runs the
+other way: `messydates` holds no `ggplot2` code of its own, so the `mdate`
+scales in [R/scale_mdate.R](../R/scale_mdate.R) live here, where `ggplot2` is
+already imported.
+`.onLoad()` registers `scale_type.mdate()` with `ggplot2`, which names a scale
+and so needs no `messydates`; `scale_x_mdate()` and `scale_y_mdate()` reach
+`messydates` only once a plot draws a date, and guard with `thisRequires()`.
 
 ### Tests
 
