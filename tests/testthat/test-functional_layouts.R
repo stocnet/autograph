@@ -208,7 +208,7 @@ test_that("every deprecated layout still draws, and is offered nowhere", {
     sizes <- c("dyad", "triad", "tetrad", "pentad", "hexad")
     net <- if (lay %in% sizes) manynet::create_ring(match(lay, sizes) + 1L)
       else if (lay == "multilevel") manynet::ison_southern_women else g
-    expect_message(coords <- fn(net), "deprecated", label = lay)
+    expect_warning(coords <- fn(net), "deprecated", label = lay)
     expect_true(all(c("x", "y") %in% names(coords)), label = lay)
     expect_equal(nrow(coords), as.integer(manynet::net_nodes(net)), label = lay)
   }
@@ -217,13 +217,16 @@ test_that("every deprecated layout still draws, and is offered nowhere", {
 test_that("a deprecated layout name is renamed once, where it is checked", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
-  expect_message(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
+  # a deprecation warns, whatever the verbosity, so that a user who is not
+  # reading the console still learns the name is going away
+  expect_warning(lay <- autograph:::.check_layout("hierarchy"), "deprecated")
   expect_equal(lay, "layered")
-  expect_equal(suppressMessages(autograph:::.check_layout("alluvial")), "lineage")
-  expect_equal(suppressMessages(autograph:::.check_layout("multilevel")), "levels")
-  expect_equal(suppressMessages(autograph:::.check_layout("triad")), "configuration")
+  expect_equal(suppressWarnings(autograph:::.check_layout("alluvial")), "lineage")
+  expect_equal(suppressWarnings(autograph:::.check_layout("multilevel")), "levels")
+  expect_equal(suppressWarnings(autograph:::.check_layout("triad")), "configuration")
   # A live name passes through untouched and says nothing.
-  expect_no_message(expect_equal(autograph:::.check_layout("layered"), "layered"))
+  expect_no_warning(expect_no_message(
+    expect_equal(autograph:::.check_layout("layered"), "layered")))
 })
 
 test_that("matching layout aligns matched partners vertically", {

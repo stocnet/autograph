@@ -3,6 +3,7 @@
 ## Package
 
 - Added `{messydates}` to `Suggests`
+- Raised `{manynet}` floor to 2.3.1
 
 ## Theming
 

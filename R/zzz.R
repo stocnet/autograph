@@ -71,3 +71,13 @@
   greet_startup_cli()
 }
 # nocov end
+
+# {ggplot2} owns the scale_type() generic, and {messydates} owns the mdate
+# class, so neither can register the method that connects them. autograph
+# imports {ggplot2}, and so registers it here. The method names a scale; it
+# does not need {messydates}, which is only reached once a plot draws a date.
+.onLoad <- function(libname, pkgname) {
+  registerS3method("scale_type", "mdate", scale_type.mdate,
+                   envir = asNamespace("ggplot2"))
+  invisible(NULL)
+}

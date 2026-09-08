@@ -9,4 +9,4 @@
 
 0 errors | 0 warnings | 0 notes
 
-This fixes the 'Additional issues' relating to a test depending on BLAS
+- This fixes some tests that were failing for a manynet reverse dependency because of a change in how messages were being printed and tested here
