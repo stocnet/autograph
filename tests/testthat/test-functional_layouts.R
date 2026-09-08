@@ -237,3 +237,36 @@ test_that("matching layout aligns matched partners vertically", {
                 manynet::net_nodes(manynet::ison_southern_women))
 })
 
+
+test_that("every drawing check scores every layout", {
+  skip_on_cran()
+  # The checks are enumerated from the namespace, as the layouts are, so a new
+  # check_*() that reads a plot is audited without a test being written. The
+  # colour checks read a palette rather than a plot, and are audited in
+  # test-functional_themes.R instead.
+  checks <- setdiff(ag_alive_functions("^check_"),
+                    c("check_separation", "check_contrast"))
+  expect_true(length(checks) > 0)
+  for (lay in autograph:::.autograph_layouts()) {
+    fix <- layout_candidates(lay, n_ok = 1)$ok
+    if (length(fix) == 0) next
+    net <- ag_layout_pool[[fix]]
+    p <- run_or_skip(
+      do.call(graphr, c(list(net, layout = lay), layout_extra_args(lay, net))),
+      paste0("draw ", lay), fix)
+    for (fn in checks) {
+      out <- run_or_skip(get(fn, envir = asNamespace("autograph"))(p),
+                         fn, paste0(lay, " x ", fix))
+      run_or_skip({
+        # A check scores what it is given, so it returns one score for every
+        # tie or node of every layout, rather than only of the ones it was
+        # written against. A score may be missing -- a dyad has no angle
+        # between its ties -- but it may not be infinite or a character.
+        vals <- unlist(out)
+        testthat::expect_true(length(vals) > 0)
+        testthat::expect_true(is.numeric(vals))
+        testthat::expect_true(all(is.finite(vals[!is.na(vals)])))
+      }, paste0("score ", fn), paste0(lay, " x ", fix))
+    }
+  }
+})

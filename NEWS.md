@@ -9,10 +9,20 @@
 
 - Added `scale_x_mdate()` and `scale_y_mdate()` (closes globalgov/messydates#104)
   - `FUN` resolves each messy date to one date; `messydates::vmin` by default
-  
+- Moved the colour checks into `R/theme_aesthetics.R`
+
+## Layouts
+
+- Added `check_crossings()` for how many other ties each tie crosses
+- Added `check_slopes()` for the slope each tie is drawn at
+- Added `check_lengths()` for the total, max, and variance of tie lengths
+- Added `check_angles()` for the angular resolution at each node
+- Added `check_drawing()`, which reports those checks plus `check_stress()`
+
 ## Tutorials
 
 - Improved the isolate/bundling/backbone section ordering
+- Each layout quality measure now names the function that measures it
 
 # autograph 1.2.2
 
