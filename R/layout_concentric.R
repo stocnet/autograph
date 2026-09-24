@@ -92,8 +92,12 @@ layout_concentric <- function(.data, membership, radius = NULL,
                            function(g) g[order(values[g], decreasing = TRUE)])
   } else {
     if (manynet::is_twomode(.data) & length(membership) == 2) {
-      xnet <- manynet::as_matrix(manynet::to_multilevel(.data))[membership[[2-1]], 
-                                              membership[[2]]]
+      # `to_onemode()` squares both modes into one matrix with every 'manynet'
+      # version. `to_multilevel()` no longer does: it leaves a 'stocnet'
+      # two-mode, and since 'manynet' 2.4.0 it keeps 'type' on an igraph, so
+      # that `as_matrix()` returns the incidence matrix instead.
+      xnet <- manynet::as_matrix(manynet::to_onemode(.data))[membership[[2-1]],
+                                                             membership[[2]]]
       lo <- layout_tbl_graph_layered(manynet::as_igraph(xnet, twomode = TRUE))
       lo$names <- manynet::node_names(.data)
       if (ncol(lo) == 2) lo[,1] <- seq_len(dim(lo)[1])

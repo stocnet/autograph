@@ -236,7 +236,8 @@ plot.matrix <- function(x, ..., membership = NULL) {
   } else if (manynet::is_twomode(x) &&
              length(intersect(membership[!manynet::node_is_mode(x)], 
                               membership[!manynet::node_is_mode(x)])) > 0) {
-    blocked_data <- manynet::to_multilevel(x)
+    # Squares the incidence matrix, so that both modes can be ordered together
+    blocked_data <- manynet::to_onemode(x)
     if (!is.null(membership)) blocked_data <- blocked_data[order(membership),
                                                            order(membership)]
   } else {

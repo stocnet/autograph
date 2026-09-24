@@ -1,3 +1,9 @@
+# autograph 1.2.4
+
+## Layouts
+
+- Fixed `layout_concentric()` and `plot.matrix()` to square a two-mode network with `manynet::to_onemode()`
+
 # autograph 1.2.3
 
 ## Package
