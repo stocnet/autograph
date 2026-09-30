@@ -244,9 +244,11 @@ layout_tbl_graph_ladder <- layout_ladder
   y <- if (twomode) lo$rank else -lo$rank
   # `as_igraph()` can reorder the nodes of a two-mode network, so the
   # coordinates are put back into the order the caller's network holds them in.
-  if (twomode && "name" %in% igraph::vertex_attr_names(.data)) {
+  # The names are read through 'manynet', since igraph reads only an igraph,
+  # and a two-mode network can arrive as a 'stocnet'.
+  if (twomode && manynet::is_labelled(.data)) {
     ord <- order(match(igraph::vertex_attr(g, "name"),
-                       igraph::vertex_attr(.data, "name")))
+                       manynet::node_names(.data)))
     x <- x[ord]
     y <- y[ord]
   }

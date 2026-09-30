@@ -13,8 +13,11 @@ test_that("concentric and circular layouts graph correctly", {
 
 test_that("concentric layout works when node names are missing", {
   skip_on_cran()
-  llabel <- ison_southern_women |>
-    mutate(name = ifelse(type == TRUE, "", name)) |>
+  # The names are set on an igraph, since a 'stocnet' cannot hold the same
+  # name, here "", for more than one node.
+  sw <- manynet::as_igraph(ison_southern_women)
+  llabel <- igraph::set_vertex_attr(sw, "name",
+    value = ifelse(manynet::node_is_mode(sw), "", manynet::node_names(sw))) |>
     graphr(layout = "concentric")
   expect_true(any(llabel$data$name == ""))
 })

@@ -3,6 +3,8 @@
 ## Layouts
 
 - Fixed `layout_concentric()` and `plot.matrix()` to square a two-mode network with `manynet::to_onemode()`
+- Fixed `layout_layered()`, `layout_lineage()`, `layout_railway()`, `layout_ladder()`, and `layout_matching()` erroring on a two-mode 'stocnet'
+  - The node names are now read with `manynet::node_names()`, since igraph reads only an igraph
 
 # autograph 1.2.3
 

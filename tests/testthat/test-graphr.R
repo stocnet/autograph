@@ -100,7 +100,7 @@ test_that("fancy node mods graph correctly", {
   # two-mode network
   ison_southern_women <- add_node_attribute(ison_southern_women, "group",
                                             c(sample(c("a", "b"),
-                                                     length(ison_southern_women),
+                                                     net_nodes(ison_southern_women),
                                                      replace = TRUE)))
   test2 <- graphr(ison_southern_women, node_color = "type")
   expect_s3_class(test2, c("ggraph","gg","ggplot"))
