@@ -752,6 +752,97 @@ test_that("a tie between two nodes at one point is left out of the arc strength"
                 manynet::net_ties(net) - expected)
 })
 
+test_that("graphr() draws a network that holds a list node attribute", {
+  # A concept lattice keeps the extent and intent of each concept as a list
+  # node attribute, one set to a node and no two sets need be the same size.
+  # ggraph leaves such a column out of the layout, and putting it back has to
+  # keep the list as one column rather than read it as one column to a set.
+  # A lattice is rarely small, and it is the larger network that failed here.
+  members <- lapply(1:40, function(k) letters[seq_len(k %% 7 + 1)])
+  net <- tidygraph::as_tbl_graph(igraph::make_tree(40)) |>
+    tidygraph::mutate(members = members)
+  p <- suppressMessages(graphr(net, layout = "layered"))
+  expect_s3_class(p, "ggplot")
+  expect_equal(p[["data"]][["members"]], members)
+})
+
+# The arrowhead a plot's tie layer was given, or NULL where it has none.
+tie_arrow <- function(p) p$layers[[1]]$geom_params$arrow
+arrow_mm <- function(p) as.numeric(grid::convertUnit(tie_arrow(p)$length, "mm"))
+
+test_that("edge_arrows switches the arrowheads of a directed network", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  # On by default, and 2mm long at the default width.
+  expect_equal(arrow_mm(graphr(net)), 2)
+  expect_equal(arrow_mm(graphr(net, edge_arrows = TRUE)), 2)
+  p_off <- graphr(net, edge_arrows = FALSE)
+  expect_null(tie_arrow(p_off))
+  expect_buildable(p_off)
+  # No length is no arrowhead.
+  expect_null(tie_arrow(graphr(net, edge_arrows = 0)))
+  # The switch reaches the other two geoms that draw directed ties.
+  expect_null(tie_arrow(graphr(net, edge_arrows = FALSE, edge_bundle = TRUE)))
+  expect_s3_class(tie_arrow(graphr(net, edge_bundle = TRUE)), "arrow")
+  multi <- igraph::make_graph(c(1, 2, 1, 2, 2, 3), directed = TRUE)
+  expect_s3_class(tie_arrow(graphr(multi)), "arrow")
+  expect_null(tie_arrow(graphr(multi, edge_arrows = FALSE)))
+})
+
+test_that("arrowheads follow the width of the ties unless given a size", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  # Wider ties get longer arrowheads, up to a cap.
+  expect_equal(arrow_mm(graphr(net, edge_size = 0.75)), 3)
+  expect_equal(arrow_mm(graphr(net, edge_size = 5)), 4)
+  # A size given outright is used whatever the width, and is not capped.
+  expect_equal(arrow_mm(graphr(net, edge_arrows = 3)), 3)
+  expect_equal(arrow_mm(graphr(net, edge_arrows = 6, edge_size = 0.25)), 6)
+  expect_buildable(graphr(net, edge_arrows = 6))
+  # Ties that are not drawn have no arrowheads, whatever was asked for (#50).
+  expect_null(tie_arrow(graphr(net, edge_size = 0)))
+  expect_null(tie_arrow(graphr(net, edge_size = 0, edge_arrows = 3)))
+})
+
+test_that("arrowheads follow the widths drawn rather than the values mapped", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  n <- as.numeric(manynet::net_ties(net))
+  small <- manynet::add_tie_attribute(net, "weight", seq_len(n))
+  large <- manynet::add_tie_attribute(net, "weight", seq_len(n) * 1000)
+  # The same lines on the page, so the same arrowheads on them, whatever units
+  # the weight is recorded in.
+  expect_equal(arrow_mm(graphr(small)), arrow_mm(graphr(large)))
+  # Evenly spread weights are drawn at a mean width of 1.65, which is past
+  # the cap.
+  expect_equal(autograph:::.drawn_esize(c(1, 2, 3)), c(0.3, 1.65, 3))
+  expect_equal(arrow_mm(graphr(small)), 4)
+  # Mostly thin ties are given the small arrowheads that suit them.
+  skew <- manynet::add_tie_attribute(net, "weight", c(rep(1, n - 1), 100))
+  expect_lt(arrow_mm(graphr(skew)), 4)
+  # A scale shared between panels is read across its limits.
+  expect_equal(autograph:::.drawn_esize(c(1, 2), limits = c(1, 3)),
+               c(0.3, 1.65))
+})
+
+test_that("edge_arrows is set aside for an undirected network", {
+  skip_on_cran()
+  expect_null(tie_arrow(graphr(manynet::ison_adolescents)))
+  # Quietly, since the same value is often given to networks of both kinds.
+  old <- options(snet_verbosity = "normal")
+  on.exit(options(old))
+  expect_no_message(p <- graphr(manynet::ison_adolescents, edge_arrows = TRUE))
+  expect_null(tie_arrow(p))
+  expect_null(tie_arrow(graphr(manynet::ison_adolescents, edge_arrows = 3)))
+  expect_buildable(p)
+})
+
+test_that("edge_arrows rejects what is neither a switch nor a size", {
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  for (bad in list("big", -1, c(1, 2), NA, Inf))
+    expect_error(graphr(net, edge_arrows = bad), "edge_arrows")
+})
+
 test_that("a concept lattice is drawn without arrowheads by default", {
   skip_on_cran()
   skip_if_not(exists("to_concepts", asNamespace("manynet")),

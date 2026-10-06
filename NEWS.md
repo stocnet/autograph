@@ -4,6 +4,13 @@
 
 - Improved concept lattice drawing so that it is drawn as a Hasse diagram
 
+## Aesthetics
+
+- Added `edge_arrows=` for tailoring the size of the arrowheads
+  - `NULL` (default) leaves choice to the network, `TRUE` draws them, `FALSE` not
+  - A directed network will, by default, draw arrowheads following `edge_size`
+  - An undirected network has no arrowheads and ignores the argument
+  - A number gives the length of the arrowheads in ggplot2 units
 
 ## Layouts
 

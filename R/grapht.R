@@ -44,7 +44,7 @@
 #'   The visual appearance is consistent with `graphr()`:
 #'   nodes use fillable shapes with the fill aesthetic,
 #'   the same colour palettes are applied,
-#'   directed networks receive arrowheads,
+#'   directed networks receive arrowheads (see `edge_arrows`),
 #'   signed networks distinguish positive from negative ties by linetype,
 #'   and labels use the current theme font.
 #'   Legends transition along with the mapped aesthetics.
@@ -128,6 +128,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                    isolates = c("keep", "fade"),
                    alpha = 0.5,
                    label_dist = NULL, label_repel = TRUE,
+                   edge_arrows = NULL,
                    keep_isolates = NULL, ...,
                    node_colour, edge_colour) {
   thisRequires("gganimate")
@@ -220,7 +221,9 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   p <- .grapht_build(nodes_out, edges_out, g_ref, labels,
                      node_color, node_shape, node_size,
                      edge_color, edge_size,
-                     label_dist, label_repel) +
+                     label_dist, label_repel,
+                     .infer_edge_arrows(g_ref,
+                                        .check_edge_arrows(edge_arrows))) +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
     gganimate::enter_fade() + gganimate::enter_grow() +
@@ -710,7 +713,7 @@ print.grapht <- function(x, ...) {
 .grapht_build <- function(nodes_out, edges_out, g_ref, labels,
                           node_color, node_shape, node_size,
                           edge_color, edge_size,
-                          label_dist, label_repel) {
+                          label_dist, label_repel, edge_arrows = TRUE) {
   directed <- manynet::is_directed(g_ref)
   n_union <- length(unique(nodes_out$name))
   diffusion <- isTRUE(attr(nodes_out, "diffusion"))
@@ -739,7 +742,11 @@ print.grapht <- function(x, ...) {
     if (ltype_mapped) {
       emap <- utils::modifyList(emap, ggplot2::aes(linetype = .data$linetype))
     } else eparams$linetype <- unique(edges_out$linetype)
-    if (directed) eparams$arrow <- .infer_arrow(edges_out$esize[edges_out$status])
+    # The widths are scaled across every frame, so the arrowheads are sized
+    # against that range, from the ties that are present.
+    if (directed) eparams$arrow <- .infer_arrow(
+      edges_out$esize[edges_out$status], edge_arrows,
+      if (esize_mapped) range(edges_out$esize, na.rm = TRUE))
     p <- p + do.call(ggplot2::geom_segment,
                      c(list(mapping = emap, data = edges_out), eparams))
     if (ecolor_mapped) {
@@ -759,7 +766,7 @@ print.grapht <- function(x, ...) {
       p <- p + ggplot2::scale_linewidth_continuous(
         name = ifelse(is.null(edge_size) & manynet::is_weighted(g_ref),
                       "Weight", "Width"),
-        range = c(0.3, 3))
+        range = .edge_width_range())
     if (ltype_mapped)
       p <- p + ggplot2::scale_linetype_identity(guide = "none")
   }

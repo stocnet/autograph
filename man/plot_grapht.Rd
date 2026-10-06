@@ -22,6 +22,7 @@ grapht(
   alpha = 0.5,
   label_dist = NULL,
   label_repel = TRUE,
+  edge_arrows = NULL,
   keep_isolates = NULL,
   ...,
   node_colour,
@@ -113,6 +114,10 @@ A single number is always read as a depth of ranks rather than as one
 node's position, so a lone node is best named, as in \code{labels = "Alice"}.
 For networks of more than 30 nodes, \code{labels} defaults to a selection
 rather than to every node; pass \code{labels = TRUE} for all of them.
+For a concept lattice from \code{manynet::to_concepts()}, \code{labels} defaults to
+the concepts at which a node of the original network first appears,
+so that each of those nodes is named once, as in a Hasse diagram,
+and the concepts named only by their position are left unlabelled.
 Ranking nodes uses the \code{{netrics}} package, which is suggested rather than
 required: without it installed, an automatic selection falls back to a
 random sample.
@@ -189,6 +194,27 @@ place each node in a layer, which is where the reader looks for it,
 so a repelled label there would say less about which node it labels
 than a fixed offset does. They ignore this argument and always offset.}
 
+\item{edge_arrows}{Whether, and at what size, to draw arrowheads on the ties
+of a directed network.
+By default (\code{NULL}) this is decided by the network:
+a directed network is drawn with arrowheads,
+except for a concept lattice from \code{manynet::to_concepts()},
+which is read as a Hasse diagram, where the direction of each tie is
+already given by which of its ends is drawn higher.
+\code{TRUE} draws arrowheads whatever the network, and \code{FALSE} none.
+Arrowheads follow the width the ties are drawn at:
+2mm long at the default \code{edge_size} of 0.5, and longer on wider ties,
+up to 4mm. Where the widths vary, as when they are mapped from a tie
+attribute, one size is chosen for all of the arrowheads from the mean
+width drawn.
+A number, e.g. \code{edge_arrows = 3}, draws arrowheads of that length in
+millimetres instead, whatever the width of the ties.
+This is the unit that \code{{ggplot2}} sizes are given in, as \code{node_size} is,
+so an arrowhead of 3 is a little longer than a node of 3 is wide.
+Ties that are not drawn, as with \code{edge_size = 0}, have no arrowheads.
+An undirected network has no direction to show,
+so the argument is ignored there.}
+
 \item{keep_isolates}{Deprecated. Use \code{isolates = "keep"} or
 \code{isolates = "fade"} instead.}
 
@@ -247,7 +273,7 @@ Users who want more control over animation parameters can call
 The visual appearance is consistent with \code{graphr()}:
 nodes use fillable shapes with the fill aesthetic,
 the same colour palettes are applied,
-directed networks receive arrowheads,
+directed networks receive arrowheads (see \code{edge_arrows}),
 signed networks distinguish positive from negative ties by linetype,
 and labels use the current theme font.
 Legends transition along with the mapped aesthetics.

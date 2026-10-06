@@ -311,16 +311,72 @@
   out
 }
 
-.infer_arrow <- function(esize) {
-  # `arrow=` is a fixed layer parameter, not a mappable aesthetic, so a
-  # per-edge width vector (`esize` mapped from an attribute) is summarised by
-  # its mean to pick one arrowhead size for the whole layer.
-  repr <- if (length(esize) > 1) mean(esize, na.rm = TRUE) else esize
-  if (length(repr) == 0 || is.na(repr) || repr <= 0) return(NULL)
+# The widths the ties are drawn at, which are not always the values given.
+# A single width is drawn as it is. Widths that vary are mapped through a
+# scale that draws the least of them at 0.3 and the greatest at 3, across
+# `limits` where `graphs()` shares one scale between its panels, and across
+# the values themselves otherwise. An arrowhead sized from the values would
+# follow the units a weight happens to be recorded in; sized from these, it
+# follows the lines on the page.
+.edge_width_range <- function() c(0.3, 3)
+
+.drawn_esize <- function(esize, limits = NULL) {
+  esize <- esize[!is.na(esize)]
+  if (is.null(limits)) {
+    if (length(unique(esize)) < 2) return(esize)
+    limits <- range(esize)
+  }
+  to <- .edge_width_range()
+  # A scale with nothing to spread draws every tie at the middle of its range.
+  if (diff(limits) == 0) return(rep(mean(to), length(esize)))
+  to[1] + (pmin(pmax(esize, limits[1]), limits[2]) - limits[1]) /
+    diff(limits) * diff(to)
+}
+
+# `edge_arrows` arrives resolved by `.infer_edge_arrows()`: FALSE for no
+# arrowheads, TRUE for arrowheads that follow the width of the ties, or a
+# number for arrowheads of that length in millimetres whatever the width.
+.infer_arrow <- function(esize, edge_arrows = TRUE, limits = NULL) {
+  if (isFALSE(edge_arrows)) return(NULL)
+  # `arrow=` is a fixed layer parameter, not a mappable aesthetic, so the
+  # widths of a layer whose ties vary are summarised by their mean to pick one
+  # arrowhead size for the whole layer.
+  repr <- mean(.drawn_esize(esize, limits))
+  # A tie that is not drawn has no arrowhead either, whatever size was asked
+  # for: `edge_size = 0` is how the ties are hidden.
+  if (is.na(repr) || repr <= 0) return(NULL)
   # 2mm at the default edge width (0.5), scaled proportionally and capped so
-  # heavily-weighted edges don't get oversized arrowheads.
-  len_mm <- min(repr / 0.5 * 2, 4)
+  # heavily-weighted edges don't get oversized arrowheads. A length the user
+  # gave is theirs, and is not capped.
+  len_mm <- if (is.numeric(edge_arrows)) edge_arrows else min(repr / 0.5 * 2, 4)
   ggplot2::arrow(angle = 15, type = "closed", length = ggplot2::unit(len_mm, 'mm'))
+}
+
+# Decide what `edge_arrows = NULL` means for this network, and set aside a
+# request that the network cannot meet. An arrowhead says which way a tie
+# points, so an undirected network has none to draw. That is said only to a
+# user who asked to hear everything, since the same `edge_arrows` is often
+# given to directed and undirected networks alike, as by `graphs()`, where it
+# sizes the arrowheads there are. A concept lattice is
+# directed, but is read as a Hasse diagram, in which the direction of every
+# tie is already given by which end is drawn higher.
+.infer_edge_arrows <- function(g, edge_arrows) {
+  if (!manynet::is_directed(g)) {
+    if (!is.null(edge_arrows) && !isFALSE(edge_arrows))
+      manynet::snet_minor_info(
+        "This network is undirected, so {.arg edge_arrows} is ignored",
+        "and no arrowheads are drawn.")
+    return(FALSE)
+  }
+  if (!is.null(edge_arrows)) return(edge_arrows)
+  if (.is_concept_lattice(g)) {
+    manynet::snet_info(
+      "Drawing this concept lattice without arrowheads,",
+      "since each tie points down the page.",
+      "Use {.code edge_arrows = TRUE} to draw them.")
+    return(FALSE)
+  }
+  TRUE
 }
 
 # Which concepts of a lattice carry a "reduced" label, or NULL where the

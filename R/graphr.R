@@ -190,6 +190,26 @@
 #'   when a network has enough edges; for directed networks arrowheads are
 #'   retained, but the slight reciprocal-tie curvature used for unbundled edges
 #'   does not apply.
+#' @param edge_arrows Whether, and at what size, to draw arrowheads on the ties
+#'   of a directed network.
+#'   By default (`NULL`) this is decided by the network:
+#'   a directed network is drawn with arrowheads,
+#'   except for a concept lattice from `manynet::to_concepts()`,
+#'   which is read as a Hasse diagram, where the direction of each tie is
+#'   already given by which of its ends is drawn higher.
+#'   `TRUE` draws arrowheads whatever the network, and `FALSE` none.
+#'   Arrowheads follow the width the ties are drawn at:
+#'   2mm long at the default `edge_size` of 0.5, and longer on wider ties,
+#'   up to 4mm. Where the widths vary, as when they are mapped from a tie
+#'   attribute, one size is chosen for all of the arrowheads from the mean
+#'   width drawn.
+#'   A number, e.g. `edge_arrows = 3`, draws arrowheads of that length in
+#'   millimetres instead, whatever the width of the ties.
+#'   This is the unit that `{ggplot2}` sizes are given in, as `node_size` is,
+#'   so an arrowhead of 3 is a little longer than a node of 3 is wide.
+#'   Ties that are not drawn, as with `edge_size = 0`, have no arrowheads.
+#'   An undirected network has no direction to show,
+#'   so the argument is ignored there.
 #' @param backbone How to treat the network's backbone: the ties that a local
 #'   null model keeps, because they carry more weight, or sit in more
 #'   triangles, than chance alone would put there.
@@ -238,6 +258,9 @@
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+#' # Larger arrowheads than the width of the ties would give, or none at all
+#' graphr(ison_networkers, edge_arrows = 4)
+#' graphr(ison_networkers, edge_arrows = FALSE)
 #' graphr(manynet::generate_random(80, 0.2), backbone = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
@@ -245,7 +268,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                    edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
                    label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
-                   backbone = NULL, .shared = NULL, ...,
+                   edge_arrows = NULL, backbone = NULL, .shared = NULL, ...,
                    node_colour, edge_colour) {
   # A list of networks is handed to graphs(). The call is forwarded as written,
   # rather than argument by argument, because the aesthetic arguments have no
@@ -350,6 +373,8 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (missing(edge_size)) edge_size <- NULL else if (!is.numeric(edge_size)) {
     edge_size <- .check_edge_size(g, as.character(substitute(edge_size)))
   }
+  # After the isolates are dropped, so that the network read is the one drawn.
+  edge_arrows <- .infer_edge_arrows(g, .check_edge_arrows(edge_arrows))
   # Find the backbone ----
   # After the layout is settled, since a layout that carries meaning in its
   # coordinates keeps them and fades its ties only, and after the isolates are
@@ -363,7 +388,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   fit <- attr(p[["data"]], "fit")
   # Add edges ----
   p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout,
-                   .shared, backbone)
+                   .shared, backbone, edge_arrows)
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size, layout, .shared)
   # Add labels ----
