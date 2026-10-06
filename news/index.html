@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,67 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.3" id="autograph-123">autograph 1.2.3<a class="anchor" aria-label="anchor" href="#autograph-123"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.4" id="autograph-124">autograph 1.2.4<a class="anchor" aria-label="anchor" href="#autograph-124"></a></h2>
+<div class="section level3">
+<h3 id="package-1-2-4">Package<a class="anchor" aria-label="anchor" href="#package-1-2-4"></a></h3>
+<ul><li>Raised <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> floor to 2.3.4 and <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> floor to 1.0.3
+<ul><li>Dropped shims for <code><a href="https://stocnet.github.io/manynet/reference/manip_nodes_num.html" class="external-link">manynet::delete_isolates()</a></code>, <code><a href="https://stocnet.github.io/manynet/reference/mark_format_node.html" class="external-link">manynet::is_multilevel()</a></code>, <code><a href="https://stocnet.github.io/manynet/reference/measure_attributes_ties.html" class="external-link">manynet::tie_is_backbone()</a></code>, and <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_times()</a></code>
+</li>
+<li>Dropped workarounds for <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_waves()</a></code> failing on non-character changing attributes, “time” panels, and diffusions</li>
+</ul></li>
+<li>Tests now run serially on CRAN</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-1-2-4">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-2-4"></a></h3>
+<ul><li>Improved concept lattice drawing so that it is drawn as a Hasse diagram
+<ul><li>Arrowheads are left off only in the “layered” and “railway” layouts, where each tie points down the page</li>
+</ul></li>
+<li>Fixed <code><a href="../reference/plot_graphr.html">graphr()</a></code> warning about ties that an automatically chosen backbone was drawn from</li>
+</ul></div>
+<div class="section level3">
+<h3 id="aesthetics-1-2-4">Aesthetics<a class="anchor" aria-label="anchor" href="#aesthetics-1-2-4"></a></h3>
+<ul><li>Added <code>edge_arrows=</code> for tailoring the size of the arrowheads
+<ul><li>
+<code>NULL</code> (default) leaves choice to the network, <code>TRUE</code> draws them, <code>FALSE</code> not</li>
+<li>A directed network will, by default, draw arrowheads following <code>edge_size</code>
+</li>
+<li>An undirected network has no arrowheads and ignores the argument</li>
+<li>A number gives the length of the arrowheads in ggplot2 units</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-1-2-4">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-2-4"></a></h3>
+<ul><li>Fixed <code><a href="../reference/layout_concentric.html">layout_concentric()</a></code> and <code><a href="../reference/map_member.html">plot.matrix()</a></code> to square a two-mode network with <code><a href="https://stocnet.github.io/manynet/reference/modif_levels.html" class="external-link">manynet::to_onemode()</a></code>
+</li>
+<li>Fixed <code><a href="../reference/layout_layered.html">layout_layered()</a></code>, <code><a href="../reference/layout_layered.html">layout_lineage()</a></code>, <code><a href="../reference/layout_layered.html">layout_railway()</a></code>, <code><a href="../reference/layout_layered.html">layout_ladder()</a></code>, and <code><a href="../reference/layout_matching.html">layout_matching()</a></code> erroring on a two-mode ‘stocnet’
+<ul><li>The node names are now read with <code><a href="https://stocnet.github.io/manynet/reference/measure_attributes_nodes.html" class="external-link">manynet::node_names()</a></code>, since igraph reads only an igraph</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="tutorials-1-2-4">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials-1-2-4"></a></h3>
+<ul><li>Restructured the “Visualisation” tutorial so that each topic holds one idea
+<ul><li>Moved “Labels and titles” to directly after “Getting started”, and added a free play exercise to “Getting started”</li>
+<li>Renamed “Illustrating graphs” to “Aesthetics”, which now closes with “Legends”
+<ul><li>Added <code>edge_arrows</code> to the aesthetics table and the “Pointing arrows” section of the “Visualisation” tutorial</li>
+<li>Added an example of <code>node_colour</code> on a continuous attribute, which is drawn as a gradient</li>
+</ul></li>
+<li>Reordered “Layouts” by how much of a node’s position is data: spectral, layered, circular, grid, force-directed, then manual</li>
+<li>Added a “Checking layouts” topic for the <code>check_*()</code> functions, stress, inertia, and cos2</li>
+<li>Moved isolates, bundling, and backbones to an “Ew, hairballs” topic after the layouts</li>
+</ul></li>
+<li>Added explanatory figures to the “Visualisation” tutorial
+<ul><li>A gallery of small graphs shows what each aesthetic argument changes</li>
+<li>A gallery shows one network under one layout from each family</li>
+<li>Pairs of drawings of one small network show what each layout check scores</li>
+</ul></li>
+<li>Improved the introduction of the <code>"eigen"</code> layout, which now says what its axes are and how to read them</li>
+<li>Examples now use only degree and attributes that come with the data, in place of measures that the <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a> tutorials introduce</li>
+<li>Fixed the “Legends” example retitling a legend that <code>labs(colour = )</code> does not reach</li>
+<li>Chunks labelled <code>explain-*</code> are now drawn in the static article</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.3" id="autograph-123">autograph 1.2.3<a class="anchor" aria-label="anchor" href="#autograph-123"></a></h2><p class="text-muted">CRAN release: 2026-09-09</p>
 <div class="section level3">
 <h3 id="package-1-2-3">Package<a class="anchor" aria-label="anchor" href="#package-1-2-3"></a></h3>
 <ul><li>Added <a href="https://globalgov.github.io/messydates/" class="external-link">messydates</a> to <code>Suggests</code>

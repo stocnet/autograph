@@ -71,22 +71,30 @@ By the end of this tutorial, you should be able to:
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 and read what the defaults show you
 
-  Map node and tie attributes to colour, shape, size, and groups
+  Choose which nodes to label, and add titles that help others read your
+graph
+
+  Map node and tie attributes to colour, shape, size, and groups, and
+title the legends that explain them
 
   Set a consistent theme across all your plots, and tailor palettes for
 accessibility or print
 
-  Add titles, labels, and legends that help others read your graph
+  Choose an appropriate layout, and know when the positions of nodes can
+be interpreted
 
-  Choose an appropriate layout, and know when the distances between
-nodes can be interpreted
+  Check how legible a drawing is, and how faithful it is to the network
+it draws
+
+  Tame dense or disconnected networks with backbones, bundling, and
+isolate handling
 
   Arrange multiple graphs together with
 [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
 and animate change over time with
 [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 
-  Plot centrality measures and other results with consistent
+  Plot degree and other results with consistent
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) methods
 
   Export publication-ready figures with
@@ -109,23 +117,20 @@ live tutorial — run `run_tute()` at the R console to try it.
 ## Getting started
 
 On this page: Plotting approaches · Graphing approaches · Your first
-graph
+graph · Free play
 
 Before we start, let’s load the packages used in this tutorial.
 [autograph](https://stocnet.github.io/autograph/) provides the graphing
 and plotting functions (and loads
 [manynet](https://stocnet.github.io/manynet/), which provides the
-network data and manipulation verbs),
-[netrics](https://stocnet.github.io/netrics/) provides the network
-measures we will occasionally map onto graphs, and
-[patchwork](https://patchwork.data-imaginist.com) lets us arrange
-multiple plots together.
+network data and manipulation verbs), and
+[netrics](https://stocnet.github.io/netrics/) provides the one network
+measure we will map onto graphs: each node’s degree.
 
 ``` r
 
 library(autograph)
 library(netrics)
-library(patchwork)
 ```
 
 ### Plotting approaches
@@ -252,12 +257,11 @@ Note everything that happened without being asked:
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 recognised that the network is labelled and printed node labels — but
 only for the most central characters, since 36 labels at once would hide
-the network behind them (the Labels section below shows how to choose
-differently), chose a deterministic layout (so you get the same picture
-every time), sized and spaced the labels to minimise overlap, and
-dropped the axes and grey background that mean nothing for networks.
-Because the network is undirected , there are no arrowheads; for a
-directed network,
+the network behind them (the next page shows how to choose differently),
+chose a deterministic layout (so you get the same picture every time),
+sized and spaced the labels to minimise overlap, and dropped the axes
+and grey background that mean nothing for networks. Because the network
+is undirected , there are no arrowheads; for a directed network,
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 would draw them automatically.
 
@@ -271,6 +275,24 @@ tutorial, and others are demonstrated in the tutorials of other
 `{stocnet}` packages. [autograph](https://stocnet.github.io/autograph/)
 also offers consistent theming across graphs and plots, so that you do
 not need to keep specifying the same options over and over again.
+
+### Free play
+
+**Your turn**: before going any further, graph a network of your own
+choosing. Any of the networks bundled with
+[manynet](https://stocnet.github.io/manynet/) will do — here is one
+suggestion per flavour:
+
+| Classic (small, easy) | Fiction (moderate) | Real-world (larger) |
+|----|----|----|
+| `ison_adolescents` (friendships among eight teenagers) | `fict_greys` (Grey’s Anatomy hook-ups) | `irps_911` (the 9/11 hijackers and their associates) |
+
+Then note what
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+decided without being asked. Were all the nodes labelled, some of them,
+or none? Are there arrowheads? More than one node shape? A legend? Each
+of those decisions was read off the data, and each is one you will learn
+to take over in the pages that follow.
 
 In the following pages, we’re going to go through a number of different
 ways of taking control of the graphing process. Click ‘Next Topic’ to
@@ -286,9 +308,122 @@ directed, a deterministic layout, and no chart junk. It returns a
 to a ggplot — adding layers, titles, scales with `+` — you can do to a
 graph.
 
-## Illustrating graphs
+## Labels and titles
 
-On this page: Shaping · Colouring · Sizing · Ties · Arrows · Taming ·
+On this page: Labels · Titles
+
+In that first graph,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+made two decisions about text on your behalf: which nodes to name, and
+that the graph needed no title. Names and titles are the first things a
+reader looks for, and so they are the first things we will take control
+of.
+
+### Labels
+
+With our `fict_lotr` example above, because the network is itself
+labelled,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+adds node labels. If you do not want any labels, you can remove the
+names from the network before passing it on to
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+or more simply use the argument `labels = FALSE`.
+
+``` r
+
+graphr(fict_lotr, labels = FALSE)
+```
+
+Without the labels, the structure of the network is clearer and easier
+to interpret, though we lose the information about which node is which
+character. Which you prefer depends on what the graph is *for*:
+exploring who-is-who, or communicating overall structure.
+
+But this is not really a choice between all and nothing. `fict_lotr` has
+36 nodes, and 36 labels would cover the very network they describe, so
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+labelled only the handful of most central characters and told you so.
+**Ask for all of them with `labels = TRUE` and compare.**
+
+``` r
+
+graphr(fict_lotr, labels = TRUE)
+```
+
+You can decide how many to label by passing a number. This is a depth of
+*ranks* rather than a count of nodes, so characters tied at the cut are
+labelled together — ask for the top three and you may get four names.
+
+``` r
+
+graphr(fict_lotr, labels = 3)
+```
+
+By default the nodes are ranked by their degree , the number of ties
+each node has, so the names you see are those of the best-connected
+characters. You can say so explicitly, and combine it with a number, by
+naming the number: `labels = c(degree = 5)`.
+
+``` r
+
+graphr(fict_lotr, labels = c(degree = 5))
+```
+
+And when you know exactly who matters to your argument, you can just say
+so — by name, or with any logical vector of the nodes. Here
+[`node_attribute()`](https://stocnet.github.io/manynet/reference/measure_attributes_nodes.html)
+pulls the `Race` attribute out of the network as a vector, so that we
+can ask which characters are hobbits.
+
+``` r
+
+graphr(fict_lotr, labels = c("Frodo", "Gandalf")) +
+  ggtitle("Named outright") |
+  graphr(fict_lotr, labels = node_attribute(fict_lotr, "Race") == "Hobbit") +
+  ggtitle("Every hobbit")
+```
+
+**Going further**: By default
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+repels labels away from each other and from nodes so that they do not
+overlap. Two further arguments offer finer control:
+`label_repel = FALSE` places labels at a fixed offset instead, and
+`label_dist` controls how far labels sit from their nodes (in points).
+Degree is only one reason a node might be worth naming: `labels` also
+accepts `"betweenness"`, `"cutpoints"`, or `"random"`, which single out
+nodes for reasons that the [netrics](https://stocnet.github.io/netrics/)
+tutorials introduce. On a two-mode or multilevel network, a selection is
+ranked within each mode or level, so that a dense level cannot crowd the
+others out of the labelling.
+
+### Titles
+
+[autograph](https://stocnet.github.io/autograph/) works well with both
+[ggplot2](https://ggplot2.tidyverse.org) and
+[ggraph](https://ggraph.data-imaginist.com) functions that can be
+appended to create more tailored visualisations. Let’s try this by
+adding a title to a plot. **Append (with a `+`) `labs(title = )` to add
+a title to a plot, say “My graph”, and then add also a subtitle (an
+argument to that function), say “I did this”.**
+
+Note that you can also use
+[`ggtitle()`](https://ggplot2.tidyverse.org/reference/labs.html) to do
+the same thing, but if you just remember
+[`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) you can
+also use it to add labels for *x* and *y* axes, and for some legends
+(see *Legends* on the next page).
+
+**In brief**: `labels` chooses which nodes to name — all of them, none,
+the top few by degree, or the ones you name yourself — and
+`label_repel`/`label_dist` fine-tune their placement.
+[`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) (or
+[`ggtitle()`](https://ggplot2.tidyverse.org/reference/labs.html)) adds
+titles and subtitles. A graph that leaves your hands should be readable
+without you standing next to it explaining.
+
+## Aesthetics
+
+On this page: Shaping · Colouring · Sizing · Ties · Arrows · Legends ·
 Free play
 
 Once we have an initial graph of our network, we can start to explore
@@ -296,15 +431,21 @@ features of the network and its structure in more detail. There are a
 number of different dimensions network researchers can play with to
 illustrate different aspects of the network. On [her excellent and
 helpful website](https://kateto.net/network-visualization), Katya
-Ognyanova outlines some of these dimensions:
+Ognyanova outlines some of these dimensions. The table below names the
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+argument for each of them, beside a small graph that shows what it
+changes. Where the table says *automatic*,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+reads the feature off the data itself: the direction, reciprocity, or
+sign of the ties.
 
-| Nodes |  | Ties |  |
-|:---|:---|:---|:---|
-| Position | `layout=`, `isolates=`, `snap=` | Arrows | *automatic* (directed ties) |
-| Labels | `labels=`, `label_repel=`, `label_dist=`, `node_group=` | Type | *automatic* (signed ties) |
-| Shape | `node_shape=` | Shape (curve) | *automatic* (reciprocated ties), `edge_bundle=` |
-| Size | `node_size=` | Size (width) | `edge_size=` |
-| Colour | `node_colour=`/`node_color=` | Colour | `edge_colour=`/`edge_color=` |
+| Nodes |  |  | Ties |  |  |
+|:---|:--:|:---|:---|:--:|:---|
+| Shape | ![a small graph showing node_shape](visualising-networks_files/figure-html/explain-aesthetics-node_shape.png) | `node_shape=` | Shape (curve) | ![a small graph showing edge_curve](visualising-networks_files/figure-html/explain-aesthetics-edge_curve.png) | *automatic* (reciprocated ties), `edge_bundle=` |
+| Size | ![a small graph showing node_size](visualising-networks_files/figure-html/explain-aesthetics-node_size.png) | `node_size=` | Size (width) | ![a small graph showing edge_size](visualising-networks_files/figure-html/explain-aesthetics-edge_size.png) | `edge_size=` |
+| Colour (categories) | ![a small graph showing node_colour](visualising-networks_files/figure-html/explain-aesthetics-node_colour.png) | `node_colour=`/ `node_color=` | Colour | ![a small graph showing edge_colour](visualising-networks_files/figure-html/explain-aesthetics-edge_colour.png) | `edge_colour=`/ `edge_color=` |
+| Colour (numbers) | ![a small graph showing node_gradient](visualising-networks_files/figure-html/explain-aesthetics-node_gradient.png) | `node_colour=`/ `node_color=` | Linetype (dashed) | ![a small graph showing edge_sign](visualising-networks_files/figure-html/explain-aesthetics-edge_sign.png) | *automatic* (signed ties) |
+| Group | ![a small graph showing node_group](visualising-networks_files/figure-html/explain-aesthetics-node_group.png) | `node_group=` | Arrows | ![a small graph showing edge_arrows](visualising-networks_files/figure-html/explain-aesthetics-edge_arrows.png) | *automatic* (directed ties), `edge_arrows=` |
 
 **Beginner note**: As the table shows, both spellings work:
 `node_colour=` and `node_color=` are the same argument, as are
@@ -315,14 +456,15 @@ written in British English and so says ’colour’ throughout, but you
 should use whichever spelling comes naturally to you.
 
 The named arguments in the table above cover the aesthetics you will
-reach for most often. Several other visual features are not arguments at
-all:
+reach for most often. Several other visual features are marked
+*automatic*:
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 reads them off the data and sets them for you, so that a first graph
 already reads correctly without any tweaking. In particular:
 
 - **arrowheads** are drawn (and trimmed back from the node) where the
-  network is directed , and omitted where it is undirected ;
+  network is directed , and omitted where it is undirected , though
+  `edge_arrows=` can resize or remove them;
 - ties **curve** apart slightly where a dyad is reciprocated , and are
   drawn straight otherwise;
 - ties are drawn **dashed** where a signed network marks them negative,
@@ -331,12 +473,15 @@ already reads correctly without any tweaking. In particular:
 - edges are drawn semi-transparent, so that denser bundles of ties read
   as darker.
 
-You do not set these by hand — but because every graph is a
+Most of these you do not set by hand — but because every graph is a
 [ggplot2](https://ggplot2.tidyverse.org) object, you can always override
 them by dropping down to [ggraph](https://ggraph.data-imaginist.com)
 (see the *Going further with ggraph* section near the end of this
-tutorial). Further arguments tune grouping, labelling, and how dense or
-disconnected networks are drawn; we meet each in its own section below.
+tutorial).
+
+The position of the nodes gets a topic of its own (*Layouts*), as do
+`isolates=` and `edge_bundle=` (*Ew, hairballs*), and you met `labels=`
+on the previous page. This page takes the rest in turn.
 
 Each of the mapping arguments can be given either a literal value
 (e.g. `node_size = 6`) or, more interestingly, the name of a node or tie
@@ -418,24 +563,60 @@ Note that `node_colour` and `node_group` can be used together, either to
 highlight different groupings, or to emphasise group assignment where
 the groups interpenetrate, as described above.
 
-### Sizing nodes
+#### A continuous variable
 
-What about if we’re interested in a continuous variable instead of a
-categorical variable? While the `fict_lotr` dataset does not contain any
-continuous nodal variables, we can create one rather easily from the
-network itself. Let’s use each node’s degree , which is the number of
-ties incident/connecting to the node.
+Race is a category. What if the attribute we care about is a number? The
+`fict_lotr` dataset does not contain any numeric node attributes, but we
+can create one rather easily from the network itself. Let’s use each
+node’s degree , which is the number of ties incident/connecting to the
+node.
 
 **Beginner note**: The `|>` symbol below is called a ‘pipe’. It passes
 the result of the expression on its left on to the function on its
 right, so the code below means “take `fict_lotr`, *then* add a Degree
-attribute to its nodes, *then* graph it with node size mapped to that
+attribute to its nodes, *then* graph it with node colour mapped to that
 attribute”. Piping or ‘chaining’ functions like this is very common in
 modern R, and we use it throughout these tutorials.
 [`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) and the
 other [dplyr](https://dplyr.tidyverse.org)-style verbs for networks are
 covered in [manynet](https://stocnet.github.io/manynet/)’s “Manipulating
 Network Data” tutorial.
+
+``` r
+
+fict_lotr |>
+  mutate(Degree = node_by_deg(fict_lotr)) |>
+  graphr(node_colour = "Degree")
+```
+
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+has not given each degree a colour of its own, as it did each race. A
+number has an order, and distances between its values, that categories
+do not, so it is drawn as a *gradient* instead — from the current
+theme’s base colour to its highlight — and the legend becomes a colour
+bar. The rule
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+follows is simple: a numeric attribute that takes more than two
+different values gets a gradient; anything else — text, a logical
+`TRUE`/`FALSE`, or a number that takes only two values — is treated as a
+set of categories.
+
+Numeric attributes that come with the data work in just the same way.
+`ison_lawfirm` records the `age` and `seniority` of each lawyer in a law
+firm. **Colour the lawyers by age, and then by seniority. Do the older
+lawyers sit together?**
+
+``` r
+
+graphr(ison_lawfirm, node_colour = "age")
+```
+
+### Sizing nodes
+
+Colour is not the only way to show a number, and it is rarely the most
+precise. Our eyes compare sizes more readily than they compare shades,
+which makes `node_size` the usual home for a continuous variable. **Size
+the characters by the degree we calculated above.**
 
 ``` r
 
@@ -448,6 +629,21 @@ Larger nodes are now the better-connected characters, and a size legend
 has been added. Who turns out to be the most connected character in the
 fellowship?
 
+Nothing stops you mapping the same attribute to both aesthetics at once.
+This costs nothing, and helps a reader who is looking at a small figure,
+a greyscale printout, or with a colour vision deficiency. **Compare the
+three encodings of the same variable.**
+
+``` r
+
+lotr <- mutate(fict_lotr, Degree = node_by_deg(fict_lotr))
+(graphr(lotr, labels = FALSE, node_size = "Degree") + ggtitle("Size") |
+    graphr(lotr, labels = FALSE, node_colour = "Degree") + ggtitle("Colour") |
+    graphr(lotr, labels = FALSE, node_size = "Degree", node_colour = "Degree") +
+    ggtitle("Both")) &
+  theme(legend.position = "none")
+```
+
 **Try it yourself**: This section includes an interactive quiz in the
 live tutorial — run `run_tute()` at the R console to try it.
 
@@ -455,25 +651,28 @@ live tutorial — run `run_tute()` at the R console to try it.
 
 All this works similarly with ties/edges. Just replace `node_` with
 `edge_` in the arguments above, and you can control edges’ size and
-colour. In the following example, we add two tie attributes: a
-continuous variable measuring how ‘close’ each tie is to others, and a
-binary variable indicating whether the tie is part of a triangle or not,
-and then colour the ties by the latter. **Run the code, then try
-colouring or sizing the ties by `"weight"` instead.**
+colour. The following example uses two classic networks that come with
+tie attributes: `ison_florentine`, where each tie among the families of
+Renaissance Florence belongs to a `layer` (marriage or business), and
+`ison_karateka`, where each tie among the members of a karate club has a
+`weight` (the number of contexts in which the two members met). **Run
+the code, then try colouring the karate club’s ties by `"weight"`
+instead of sizing them.**
 
 ``` r
 
-fict_lotr |>
-  mutate_ties(weight = tie_by_closeness(fict_lotr),
-              is_tri = tie_is_triangular(fict_lotr)) |>
-  graphr(edge_colour = "is_tri")
+(graphr(ison_florentine, edge_colour = "layer") |
+   graphr(ison_karateka, edge_size = "weight"))
 ```
 
-Note also that some tie attributes are recognised automatically: if a
-network contains a tie attribute called `weight`, ties will be sized by
-weight without you asking, and a tie attribute called `type` will be
-used to distinguish tie types. Naming your attributes accordingly can
-save you some typing.
+Now delete the two `edge_` arguments and run the code again: nothing
+changes. That is because some tie attributes are recognised
+automatically: if a network contains a tie attribute called `weight`,
+ties will be sized by weight without you asking, and a tie attribute
+called `layer` (or `type`) will be used to distinguish the ties of a
+multiplex network. Naming your attributes accordingly can save you some
+typing; for an attribute under any other name, the `edge_` arguments are
+how you ask.
 
 ### Pointing arrows
 
@@ -486,10 +685,9 @@ of the ties: thin ties get small arrowheads, thick ties get larger (but
 capped) ones, and ties of width zero lose their arrowheads entirely.
 This means arrowheads stay proportionate even when tie width is mapped
 from a weight attribute, as in the `ison_networkers` network of messages
-exchanged among early network researchers. You can also scale them
-manually: because the arrowheads follow the tie width, setting
-`edge_size` yourself resizes both together. **Compare the automatic
-sizing with a manually thickened version.**
+exchanged among early network researchers. Because the arrowheads follow
+the tie width, setting `edge_size` yourself resizes both together.
+**Compare the automatic sizing with a manually thickened version.**
 
 ``` r
 
@@ -497,109 +695,75 @@ sizing with a manually thickened version.**
    graphr(ison_networkers, edge_size = 1) + ggtitle("Manual (edge_size = 1)"))
 ```
 
-### Taming dense or disconnected networks
-
-Sometimes networks look like a dense hairball. This is a technical term
-to describe networks with many high-degree nodes and many ties, where
-the sheer number of ties obscures any structure that might be in the
-network. Autograph includes three arguments that can help with this,
-some of which are turned on by default, so we will need to turn them off
-to see the effect of each in isolation.
-
-#### Isolates
-
-First, it is possible that the hairball is not a hairball at all, but a
-network with many disconnected components or, especially, isolates ,
-that each need to be drawn. As each component is drawn under a
-force-directed layout, the components will repel each other and the
-giant component will be squeezed into a clump.
-
-The `isolates` argument in
+To change the arrowheads without changing the ties, use `edge_arrows`.
+It is a switch that can also carry a value: left alone,
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-provides some options for what to do with them instead: `"legend"` (the
-default) drops them from the drawing but records how many there were in
-the legend, `"caption"` notes them in a caption instead, and `"keep"`
-leaves them in place. **Add ten unconnected characters to `fict_lotr`
-and compare keeping them with noting them in the legend.**
+decides from the network; `edge_arrows = FALSE` draws none, which suits
+a network where the direction is already plain from the layout;
+`edge_arrows = TRUE` insists on them; and a number gives their length in
+millimetres, whatever the tie width. **Draw the same network with larger
+arrowheads, and with none.**
 
 ``` r
 
-lotr_iso <- to_unlabelled(fict_lotr) |>
-  add_nodes(10)
-(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
-   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
+(graphr(ison_networkers, edge_arrows = 4) + ggtitle("edge_arrows = 4") |
+   graphr(ison_networkers, edge_arrows = FALSE) + ggtitle("edge_arrows = FALSE"))
 ```
 
-#### Bundling ties
+### Legends
 
-The second option is to draw all of the ties ‘bundled’ together, which
-can reveal where the most common paths through the network are.
-`edge_bundle` pulls ties that travel in similar directions into shared
-paths — like cabling them together — so that the main ‘highways’ of the
-network stand out. It is off by default; set `edge_bundle = TRUE` (or
-name a specific algorithm: `"force"`, `"path"`, or `"minimal"`) to
-switch it on. **`ison_lawfirm` records 71 lawyers and 2571 ties between
-them, which is about as thick a hairball as a network this small can be.
-Compare it drawn with and without bundling (turn backbone off too for
-clearest comparison results).**
-
-``` r
-
-graphr(ison_lawfirm, backbone = FALSE) + ggtitle("Unbundled") | 
-  graphr(ison_lawfirm, backbone = FALSE, edge_bundle = "path") + ggtitle("Bundled")
-```
-
-I find this works best with networks that are at least moderately dense,
-and sometimes requires a little bit of playing around to get a good
-result.
-
-#### Backbones
-
-By contrast, backbone changes which ties the picture is built around.
-Ties that carry more weight/structure than expected by a null model
-local to their endpoints are in essence what the network would be if it
-were stripped back to its skeleton.
+Every mapping on this page has come with a legend, because a mapping is
+unreadable without one. But a legend asks a reader to hold a colour in
+mind while they hunt for it in the graph, and people are poor at that:
+colour is not recalled reliably, even over a couple of seconds.
+Labelling nodes directly asks less of them, which is why
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-then draws the layout according to this skeleton and fades other ties
-into the background to further emphasise the main structure.
+labels nodes where it can, and why, above thirty nodes, it labels the
+most central ones rather than none at all (see *Labels* on the previous
+page). Keep a legend for what cannot be written onto the graph itself,
+and keep it short.
 
-Most of the time you will not have to ask for this. Networks of 50+
-nodes with 8 ties each on average is drawn this way by default. But you
-can specify `backbone = FALSE` to turns it off, `backbone = TRUE` to
-force it on, or you can name a filter — `"disparity"`, `"lans"`,
-`"noise"`, `"mlf"`, or `"simmelian"` — or threshold. **Compare
-`ison_lawfirm` drawn with and without its backbone.**
+While [autograph](https://stocnet.github.io/autograph/) adds legends
+where necessary, it can only title them with what it knows: the name of
+the attribute. Take the following figure, where we highlight the
+character with the highest degree . `Top` is a logical attribute, `TRUE`
+for one node and `FALSE` for the rest, so by the rule above it is drawn
+as two categories rather than a gradient.
 
 ``` r
 
-(graphr(ison_lawfirm, node_colour = "office", backbone = FALSE) +
-   ggtitle("Every tie alike") |
-   graphr(ison_lawfirm, node_colour = "office", backbone = TRUE) +
-   ggtitle("Backbone"))
+fict_lotr |>
+  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate(Top = Degree == max(Degree)) |>
+  graphr(node_colour = "Top")
 ```
 
-The offices are hardly visible on the left. On the right they separate,
-because the ties that hold each office together are the ties the filter
-keeps.
+Which node is highlighted here, and why might that be? A legend that
+says only “Top: FALSE, TRUE” does not tell a reader, who cannot see the
+code that made it. Because the graph is a
+[ggplot2](https://ggplot2.tidyverse.org) object, its legends can be
+revised after the graph has been drawn, using
+[`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) and
+naming the aesthetic concerned. Nodes are drawn as filled shapes, so the
+aesthetic to name is `fill`. Note that we can use `"\n"` within the
+legend title to make the title span multiple lines.
 
-Only the layouts that read tie lengths are laid out this way: `"stress"`
-(the default), `"fr"`, `"drl"` and `"kk"`. Every other layout, including
-those whose coordinates already mean something such as `"layered"` or
-`"scaling"`, keeps its coordinates and only fades its ties. Signed
-networks have no backbone, since these null models have no place for a
-negative weight, and are drawn as they were.
+``` r
 
-Bundling and backbones answer the same problem from different ends, so
-try one before reaching for both. A bundled tie cannot carry a fading of
-its own — bundling merges ties into shared paths — so where both are
-asked for, the backbone still shapes the layout but every tie is drawn
-alike.
+fict_lotr |>
+  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate(Top = Degree == max(Degree)) |>
+  graphr(node_colour = "Top") +
+  guides(fill = ggplot2::guide_legend(title = "Most\nconnected"))
+```
 
-For very large real-world networks such as `irps_blogs`, these work well
-together: a backbone picks out the ties that hold the connected core
-together (or `edge_bundle = TRUE`, if you would rather see the paths the
-ties take than which of them matter most), while `isolates = "legend"`
-keeps its several hundred unconnected blogs from crowding that core out.
+`guides(fill = "none")` removes a legend altogether, which is worth
+doing where the title or caption already says what it would. To change
+the position of the legends, add the
+[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) function
+from [ggplot2](https://ggplot2.tidyverse.org),
+e.g. `theme(legend.position = "bottom")`. The legends can be positioned
+at the top, bottom, left, or right, or all removed using “none”.
 
 ### Free play
 
@@ -618,11 +782,14 @@ one or two of them to colour, shape, size, or groups.
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 maps node and tie attributes to visual aesthetics by name:
 `node_colour`, `node_shape`, `node_size`, and `node_group` for nodes,
-`edge_colour` and `edge_size` for ties. Use colour or shape for
-categorical attributes (colour scales better), size for continuous ones,
-and `node_group` to shade spatially clustered memberships. For dense or
-disconnected networks, `edge_bundle`, `backbone` and `isolates` (see
-*Taming dense or disconnected networks* above) keep the picture legible.
+`edge_colour` and `edge_size` for ties. Arrowheads follow the tie width
+on a directed network, unless `edge_arrows` resizes or removes them. Use
+colour or shape for categorical attributes (colour scales better), size
+for continuous ones (or a colour gradient, or both), and `node_group` to
+shade spatially clustered memberships. Every mapping brings its own
+legend, which
+[`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) can
+retitle or remove.
 
 ## Theming
 
@@ -942,230 +1109,37 @@ and as text.
 [`stocnet_medium()`](https://stocnet.github.io/autograph/reference/theme_medium.md)
 then sizes the result for where it will be seen.
 
-## Titles, labels, and legends
-
-On this page: Labels · Titles · Legends
-
-When it comes to communicating insights from network graphs to others,
-it is important to add in the contextual information that will help them
-understand what they are looking at. In this section, we will learn how
-to add titles, labels, and legends to graphs.
-
-### Labels
-
-With our `fict_lotr` example above, because the network is itself
-labelled,
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-adds node labels. If you do not want any labels, you can remove the
-names from the network before passing it on to
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
-or more simply use the argument `labels = FALSE`.
-
-``` r
-
-graphr(fict_lotr, labels = FALSE)
-```
-
-Without the labels, the structure of the network is clearer and easier
-to interpret, though we lose the information about which node is which
-character. Which you prefer depends on what the graph is *for*:
-exploring who-is-who, or communicating overall structure.
-
-But this is not really a choice between all and nothing. `fict_lotr` has
-36 nodes, and 36 labels would cover the very network they describe, so
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-labelled only the handful of most central characters and told you so.
-**Ask for all of them with `labels = TRUE` and compare.**
-
-``` r
-
-graphr(fict_lotr, labels = TRUE)
-```
-
-You can decide how many to label by passing a number. This is a depth of
-*ranks* rather than a count of nodes, so characters tied at the cut are
-labelled together — ask for the top three and you may get four names.
-
-``` r
-
-graphr(fict_lotr, labels = 3)
-```
-
-Degree is only one reason a node might be worth naming. Passing the name
-of a measure labels whichever node or nodes it singles out:
-`"betweenness"` for the characters who sit between others, `"cutpoints"`
-for those holding the network together, or `"random"` for a small
-unbiased sample.
-
-``` r
-
-graphr(fict_lotr, labels = "betweenness")
-```
-
-To combine the two, name the number: `labels = c(betweenness = 5)`. And
-when you know exactly who matters to your argument, you can just say so
-— by name, or with any logical vector of the nodes.
-
-``` r
-
-graphr(fict_lotr, labels = c("Frodo", "Gandalf")) +
-  ggtitle("Named outright") |
-  graphr(fict_lotr, labels = node_is_cutpoint(fict_lotr)) +
-  ggtitle("Every cutpoint")
-```
-
-**Going further**: By default
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-repels labels away from each other and from nodes so that they do not
-overlap. Two further arguments offer finer control:
-`label_repel = FALSE` places labels at a fixed offset instead, and
-`label_dist` controls how far labels sit from their nodes (in points).
-On a two-mode or multilevel network, a selection is ranked within each
-mode or level, so that a dense level cannot crowd the others out of the
-labelling.
-
-### Titles
-
-[autograph](https://stocnet.github.io/autograph/) works well with both
-[ggplot2](https://ggplot2.tidyverse.org) and
-[ggraph](https://ggraph.data-imaginist.com) functions that can be
-appended to create more tailored visualisations. Let’s try this by
-adding a title to a plot. **Append (with a `+`) `labs(title = )` to add
-a title to a plot, say “My graph”, and then add also a subtitle (an
-argument to that function), say “I did this”.**
-
-Note that you can also use
-[`ggtitle()`](https://ggplot2.tidyverse.org/reference/labs.html) to do
-the same thing, but if you just remember
-[`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) you can
-also use it to add labels for *x* and *y* axes, and legends (see below).
-
-### Legends
-
-A legend asks a reader to hold a colour in mind while they hunt for it
-in the graph, and people are poor at that: colour is not recalled
-reliably, even over a couple of seconds. Labelling nodes directly asks
-less of them, which is why
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-labels nodes where it can, and why, above thirty nodes, it labels the
-most central ones rather than none at all (see *Labels* above). Keep a
-legend for what cannot be written onto the graph itself, and keep it
-short.
-
-While [autograph](https://stocnet.github.io/autograph/) attempts to
-provide legends where necessary, in some cases the legends offer
-insufficient detail, or are absent, such as in the following figure,
-where we highlight the node with the highest betweenness centrality.
-
-``` r
-
-fict_lotr |>
-  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>
-  graphr(node_colour = "maxbet")
-```
-
-Which node is highlighted here, and why might that be? Without a legend
-title, a reader cannot know what the colour signifies.
-[autograph](https://stocnet.github.io/autograph/) supports the
-[ggplot2](https://ggplot2.tidyverse.org) way of adding legends after the
-main plot has been constructed, using
-[`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) to add
-in the legends, and
-[`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) for giving
-those legends particular titles. Note that we can use `"\n"` within the
-legend title to make the title span multiple lines.
-
-``` r
-
-fict_lotr |>
-  mutate(maxbet = node_is_max(node_by_betweenness(fict_lotr))) |>
-  graphr(node_colour = "maxbet") +
-  guides(colour = "legend") +
-  labs(colour = "Maximum\nBetweenness")
-```
-
-To change the position of the legend, add the
-[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html) function
-from [ggplot2](https://ggplot2.tidyverse.org). The legend can be
-positioned at the top, bottom, left, or right, or removed using “none”.
-
-**In brief**:
-[`labs()`](https://ggplot2.tidyverse.org/reference/labs.html) adds
-titles, subtitles, and legend titles;
-[`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) forces
-or removes legends; `labels` chooses which nodes to name — all of them,
-none, the top few by a measure, or the ones you name yourself — and
-`label_repel`/`label_dist` fine-tune their placement. A graph that
-leaves your hands should be readable without you standing next to it
-explaining.
-
 ## Layouts
 
-On this page: Force-directed · Layered · Circular · Spectral · Grid ·
+On this page: Spectral · Layered · Circular · Grid · Force-directed ·
 Manual
 
-The aim of graph layouts is to position nodes in a (usually)
-two-dimensional space to maximise some analytic and aesthetically
-pleasing function. Unlike the maps and scatterplots you may be used to,
-*where* a node is drawn on a network graph is usually not data: it is
-chosen by an algorithm to make the structure readable. Knowing which
-algorithm — and what can and cannot be read off the result — is the
-point of this section. Quality measures a layout algorithm might attend
-to include:
+Unlike the maps and scatterplots you may be used to, *where* a node is
+drawn on a network graph is usually not data. Its position is chosen by
+an algorithm to make the structure readable, and a different algorithm
+would have put it somewhere else. Knowing which algorithm drew a graph —
+and so what can and cannot be read off the positions in it — is the
+point of this section.
 
-- minimising the *crossing number* of edges/ties in the graph ([planar
-  graphs](https://www.jasondavies.com/planarity/) require no crossings):
-  [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
-- minimising the *slope number* of distinct edge slopes in the graph
-  (where vertices are represented as points on a Euclidean plane):
-  [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md)
-- minimising the *bend number* in all edges in the graph (every graph
-  has a right angle crossing (RAC) drawing with three bends per edge):
-  not measured, since the bends are set by
-  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
-  `edge_curved` and `edge_bundle` arguments rather than by the layout
-- minimising the *total edge length*: `attr(check_lengths(p), "total")`
-- minimising the *maximum edge length*: `attr(check_lengths(p), "max")`
-- minimising the *edge length variance*:
-  `attr(check_lengths(p), "variance")`
-- maximising the *angular resolution* or sharpest angle of edges meeting
-  at a common vertex: `attr(check_angles(p), "min")`
-- minimising the *bounding box* of the plot: not measured
-- evening the *aspect ratio* of the plot: not measured
-- displaying *symmetry groups* (subgraph automorphisms): not measured
+It helps to sort layouts by *how much of a node’s position is data*. We
+start with layouts where both coordinates mean something, and work our
+way down to those where the position is only there to keep the picture
+legible:
 
-Each of these functions scores a drawing rather than the network it
-draws, so two layouts of the same network can be compared.
-[`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md)
-runs them all at once, beside
-[`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md),
-which reports how far the distances drawn depart from the distances
-through the network. **Compare a stress layout with a circle.**
+| Layouts | What a node’s position means |
+|----|----|
+| Spectral: `"eigen"`, `"scaling"`, `"correspondence"` | Both axes are calculated from the network |
+| Layered: `"layered"`, `"railway"`, `"lineage"`, `"ladder"` | One axis is data: a mode, a rank, a generation, a year |
+| Circular: `"concentric"`, `"circle"` | The ring a node is on, or its place around it, can be data |
+| Grid: `"grid"`, or any layout with `snap = TRUE` | Regular positions, chosen to keep labels apart |
+| Force-directed: `"stress"`, `"fr"`, `"kk"` | A compromise, chosen to keep the whole drawing legible |
+| Manual: `x =` and `y =` | Whatever you decide |
 
-``` r
+Here is one network drawn by one layout from each of the first five
+rows. Nothing about the network changes from panel to panel; only what
+you can read from it does.
 
-sw_stress <- graphr(ison_southern_women, layout = "stress")
-sw_circle <- graphr(ison_southern_women, layout = "circle")
-rbind(stress = check_drawing(sw_stress), circle = check_drawing(sw_circle))
-```
-
-Every column is read downwards except `angle_min`, which is read
-upwards. Fewer crossings, fewer slopes, shorter ties, more even ties,
-and a wider smallest angle all make a drawing easier to read. `nodes`,
-`ties` and `angle_ideal` are context rather than scores. `angle_ideal`
-is the widest smallest angle the degrees of this network allow, so
-`angle_min` is read as a share of it. The floors are worth knowing as
-well: a network of this many ties cannot be drawn without crossings at
-all, and no drawing of it can use fewer slopes than half its largest
-degree.
-
-No layout wins on every measure. The circle draws every node on one
-ring, which costs it crossings and length: it draws many times the
-crossings of the stress layout, and three times the total tie length. It
-buys the other measures with the same ring: fewer slopes, ties of a more
-even length, and more room between the ties that meet at a node. Its
-stress is the worse of the two, because a layout that never set out to
-draw the path distances scores poorly on them by design.
+![](visualising-networks_files/figure-html/explain-layouts-1.png)
 
 Graph layouts available in the [igraph](https://r.igraph.org/),
 [ggraph](https://ggraph.data-imaginist.com),
@@ -1174,58 +1148,181 @@ Graph layouts available in the [igraph](https://r.igraph.org/),
 in
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md).
 These can be specified using the `layout` argument. For these examples
-we will use `ison_southern_women`, a classical two-mode network of women
-attending events, because two-mode networks make the differences between
-layouts especially visible. In the following sections, we review some of
-the most common types of layouts.
+we will mostly use `ison_southern_women`, a classical two-mode network
+of women attending events, because two-mode networks make the
+differences between layouts especially visible.
 
-### Force-directed layouts
+### Spectral layouts
 
-Force-directed layouts update some initial placement of vertices through
-the operation of some system of metaphorically-physical forces. These
-might include attractive and repulsive forces.
+Spectral layouts are the nearest a network graph comes to a scatterplot.
+Both axes are calculated from the network, and a node’s coordinates are
+its scores on them, so that nodes drawn together are similar in some
+measured sense. [autograph](https://stocnet.github.io/autograph/) offers
+three, which differ in what they take ‘similar’ to mean:
+
+- the **eigenvector** layout draws together nodes that are *tied to the
+  same others*;
+- **multidimensional scaling** draws together nodes that are *few steps
+  apart*;
+- **correspondence analysis** draws together nodes whose *rows in a
+  table of ties look alike*.
+
+All three are careful about position and careless about legibility:
+nodes pile up on top of each other, and ties run long and cross often.
+The rest of this page gradually reverses that trade.
+
+#### Eigenvector layout
+
+The eigenvector layout starts from a matrix. The *Laplacian* of a
+network is a table with a row and a column for every node, which records
+each node’s degree on its diagonal and marks each pair of nodes that are
+tied. Like any such table, it can be broken down into *eigenvectors*: a
+series of axes, each of which gives every node a single score. The
+`"eigen"` layout takes two of them, the two along which the scores
+change least from a node to the nodes it is tied to, and draws one as
+*x* and the other as *y*.
+
+Three things follow from choosing axes this way. Tied nodes get similar
+scores, so a tightly knit group is drawn close together. Nodes tied to
+exactly the same others get exactly the same scores, and are drawn on
+top of each other. And the few nodes that connect one group to another
+are pulled out along an axis, somewhere between the two. You can see all
+three in about the simplest network that has groups at all: three groups
+of four, in which everyone is tied to everyone else in their group,
+joined in a chain by two ties.
+
+![](visualising-networks_files/figure-html/explain-eigen-1.png)
+
+Both panels draw the same twelve nodes, but on the left you can count
+only seven. In each of the groups at the ends of the chain, three
+members share all their ties, and so share one position; the member that
+holds the tie to the middle group is drawn a little towards it. The
+middle group, tied to both of the others, is drawn between them. The
+drawing has lost almost everything about the network except the one
+thing it is for: there are three groups here, this is the order they
+come in, and these are the nodes that join them.
+
+So this is how to read an eigenvector layout:
+
+- *do* read which cluster a node falls in, and which side of an axis it
+  is on: the first axis marks the deepest division in the network;
+- *do* read the nodes strung out between clusters as the ones that
+  connect them;
+- *do not* read a distance as a number of steps, or count the nodes in a
+  clump, since several may be hiding behind one.
+
+**Now draw the Southern Women this way. Which women are drawn on the
+same side as which events?**
 
 ``` r
 
-(graphr(ison_southern_women, layout = "kk") + ggtitle("Kamada-Kawai") |
-   graphr(ison_southern_women, layout = "fr") + ggtitle("Fruchterman-Reingold") |
-   graphr(ison_southern_women, layout = "stress") + ggtitle("Stress Minimisation"))
+graphr(ison_southern_women, layout = "eigen") + ggtitle("Eigenvector")
 ```
 
-The *Kamada-Kawai* (KK) method inserts a spring between all pairs of
-vertices that is the length of the graph distance between them. This
-means that edges with a large weight will be longer. KK offers a good
-layout for lattice -like networks, because it will try to space the
-network out evenly.
+Real networks are rarely as tidy as three groups in a chain, but the
+same reading applies: the women and events at either end of the
+horizontal axis are those that had least to do with each other, and
+those drawn between them took part on both sides.
 
-The *Fruchterman-Reingold* (FR) method uses an attractive force between
-directly connected vertices, and a repulsive force between all vertex
-pairs. The attractive force is proportional to the edge’s weight, thus
-edges with a large weight will be shorter. FR offers a good baseline for
-most types of networks.
+#### Multidimensional scaling
 
-The *Stress Minimisation* (stress) method is related to the KK
-algorithm, but offers better runtime, quality, and stability and so is
-generally preferred. Indeed,
-[autograph](https://stocnet.github.io/autograph/) uses it as the default
-for most networks. It has the advantage of returning the same layout
-each time it is run on the same network.
+Of similar purpose are multidimensional scaling (MDS) techniques, which
+visualise the similarity between nodes in terms of their proximity in a
+two-dimensional (or more) space. The `"scaling"` layout places the nodes
+so that the distance drawn between them stands for the number of steps
+between them in the network.
+
+``` r
+
+graphr(ison_southern_women, layout = "scaling") + ggtitle("Multidimensional Scaling")
+```
+
+Note that this layout is drawn with the axes labelled, whereas you may
+have noticed that the other graphs are not. That is because here the
+coordinates can be read: two nodes drawn twice as far apart are, more or
+less, twice as far apart. The axes are drawn on one scale for the same
+reason. The layout scales the whole network where it is small enough for
+that, using `"mds"` from [igraph](https://r.igraph.org/), and otherwise
+approximates the scaling from a sample of the nodes using `"pmds"` (or
+pivot MDS) from
+[graphlayouts](https://github.com/schochastics/graphlayouts). You can
+still call each of these directly, but since they are both used in
+`"scaling"`, dispatch can be automatic, based on the size and structure
+of the network.
+
+“More or less” is doing some work in that sentence. A network usually
+has more structure than two dimensions alone can hold, so some of the
+distances drawn will not match the distances in the network. How far
+they miss is called the *stress* of the drawing, and the caption under
+the plot reports it, as a percentage, where zero would be a perfect
+drawing. The next page, *Checking layouts*, shows how to read that
+number, and how to obtain it for any other layout.
 
 **Try it yourself**: This section includes an interactive quiz in the
 live tutorial — run `run_tute()` at the R console to try it.
 
-Other force-directed layouts available include:
+#### Correspondence analysis
 
-- Simulated annealing (Davidson and Harel 1993): `"dh"`
-- Graph embedder (Frick et al. 1995): `"gem"`
-- Graphopt (Schmuhl): `"graphopt"`
-- Distributed recursive graph layout (Martin et al. 2008): `"drl"`
+Whereas scaling lays out nodes by their distances from each other,
+correspondence analysis (CA) lays them out by the similarity of their
+ties. This is useful where nodes may not be tied to each other at all,
+but can be tied to the same others, such as in a two-mode network.
+Correspondence analysis takes a rectangular table — here the incidence
+matrix of the Southern Women dataset, one row for each woman and one
+column for each event — and places its rows and its columns in one
+space.
+
+``` r
+
+graphr(ison_southern_women, layout = "correspondence") + ggtitle("Correspondence Analysis")
+```
+
+We can see the similarity to the eigenvector layout above, but here the
+axes are labelled with the share of the network’s *inertia* they hold.
+Inertia is the CA analogue of variance in PCA. It measures the total
+dispersion of points (rows and columns) in the cloud around the
+centroid, computed as the chi-square statistic of the table divided by
+the total sample size (N). In other words, inertia tell us how far the
+ties depart from what one would expect if every woman attended events in
+the same proportion as every other. A network whose nodes all had much
+the same ties would have almost none.
+
+Since the two dimensions hold different shares here, we can see where to
+put the emphasis of our interpretation. Because the first dimension
+holds twice as much as the second, what distinguishes nodes most runs
+along the x-axis rather than the y-axis. Whether those shares are large
+enough for the plot to be worth interpreting is a question for the next
+page, *Checking layouts*.
+
+One thing to keep in mind whenever you read a correspondence analysis:
+while the distances among nodes of the same mode are interpretable,
+distances between nodes from different modes are not necessarily
+interpretable. That is, a woman drawn near an event is **not**
+necessarily an attendee of it. Only the distances *within* a mode can be
+read this way: two women drawn together attended similar events, and two
+events drawn together were attended by similar women. These plots are
+often misread this way.
+
+For a directed network, each node has two profiles: who it sends ties
+to, and who it receives them from. By default the layout reads a tie in
+either direction, so that each node has one position;
+`direction = "out"` and `direction = "in"` read one profile or the
+other. For a signed network there is no correspondence analysis at all,
+since the method divides by the mass of each node and a negative tie has
+no such reading. `double = TRUE` splits each tie into a positive and a
+negative part, so that a node is placed by both who it likes and who it
+dislikes.
+
+**Try it yourself**: This section includes an interactive quiz in the
+live tutorial — run `run_tute()` at the R console to try it.
 
 ### Layered layouts
 
-Layered layouts arrange nodes into layers, positioning them so that they
-reduce crossings. These layouts are best suited for directed acyclic
-graphs, two-mode networks, or other data with a natural ordering.
+Layered layouts give up one of the two axes. One axis is still data — it
+says which layer a node belongs to — while the other is used only to
+arrange the nodes within each layer so that their ties cross as little
+as possible. These layouts are best suited for directed acyclic graphs,
+two-mode networks, or other data with a natural ordering.
 
 [autograph](https://stocnet.github.io/autograph/) offers four, and they
 are one layout drawn four ways. Two things vary: which axis the layers
@@ -1347,10 +1444,11 @@ Other layered layouts include:
 
 ### Circular layouts
 
-Circular layouts arrange nodes around (potentially concentric) circles,
-such that crossings are minimised and adjacent nodes are located close
-together. In some cases, location or layer can be specified by attribute
-or mode.
+Circular layouts give up Cartesian axes altogether and arrange nodes
+around (potentially concentric) circles, such that crossings are
+minimised and adjacent nodes are located close together. What is left
+that can be data is the ring a node is on: in some cases, the ring can
+be specified by attribute or mode.
 
 ``` r
 
@@ -1374,52 +1472,288 @@ Other such layouts include:
 - star: `"star"`
 - arc or linear layouts: `"linear"`
 
-### Spectral layouts
+### Grid layouts
 
-Spectral layouts arrange nodes according to the eigenvalues of the
-Laplacian matrix of a graph. These layouts exaggerate the clustering of
-similarly located nodes and separate less similar nodes in
-two-dimensional space.
-
-``` r
-
-graphr(ison_southern_women, layout = "eigen") + ggtitle("Eigenvector")
-```
-
-#### Multidimensional scaling
-
-Of similar purpose are multidimensional scaling (MDS) techniques, which
-visualise the similarity between nodes in terms of their proximity in a
-two-dimensional (or more) space. The `"scaling"` layout places the nodes
-so that the distance drawn between them stands for the number of steps
-between them in the network.
+Grid layouts arrange nodes at regular Cartesian coordinates. Here the
+positions are no longer data at all: they are evenly spaced because even
+spacing is tidy. These can be useful for making sure all nodes’ labels
+are visible, but horizontal and vertical lines can overlap, making it
+difficult to distinguish whether some nodes are tied or not.
 
 ``` r
 
-graphr(ison_southern_women, layout = "scaling") + ggtitle("Multidimensional Scaling")
+graphr(ison_southern_women, layout = "grid") + ggtitle("Grid")
 ```
 
-Note that this layout is drawn with the axes labelled, whereas you may
-have noticed that the other graphs are not. That is because here the
-coordinates can be read: two nodes drawn twice as far apart are, more or
-less, twice as far apart. The axes are drawn on one scale for the same
-reason. The layout scales the whole network where it is small enough for
-that, using `"mds"` from [igraph](https://r.igraph.org/), and otherwise
-approximates the scaling from a sample of the nodes using `"pmds"` (or
-pivot MDS) from
-[graphlayouts](https://github.com/schochastics/graphlayouts). You can
-still call each of these directly, but since they are both used in
-`"scaling"`, dispatch can be automatic, based on the size and structure
-of the network.
+Other grid layouts include:
 
-“More or less” is doing some work in that sentence. A network usually
-has more structure than two dimensions alone can hold, so some of the
-distances drawn won’t capture the real distances in the network. In some
-cases, the dimensionality is so high that the drawing is misleading. We
-can check how much disagreement there is between scaled distances and
-the network distances as a *stress* score. This is printed as a caption
-under the plot as a percentage of the network distances, such that zero
-would represent a perfect drawing.
+- orthogonal layouts for e.g. printed circuit boards
+- grid snapping for other layouts
+
+That last point deserves a demonstration. Rather than committing to a
+full grid,
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
+`snap = TRUE` argument keeps whatever layout you asked for but snaps its
+coordinates onto a grid — trading a little positional accuracy for the
+label legibility of a grid. **Compare the stress layout with its snapped
+version.**
+
+``` r
+
+(graphr(fict_lotr) + ggtitle("stress") |
+   graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+```
+
+**Try it yourself**: This section includes an interactive quiz in the
+live tutorial — run `run_tute()` at the R console to try it.
+
+### Force-directed layouts
+
+Force-directed layouts complete the trade this page has been making.
+They give up position as data entirely, in exchange for a drawing in
+which tied nodes sit near each other, untied nodes keep apart, and the
+ties are of a similar and readable length. This is why one of them is
+the default layout for most networks, and why you have been looking at
+them since your first graph.
+
+Force-directed layouts update some initial placement of vertices through
+the operation of some system of metaphorically-physical forces. These
+might include attractive and repulsive forces.
+
+``` r
+
+(graphr(ison_southern_women, layout = "kk") + ggtitle("Kamada-Kawai") |
+   graphr(ison_southern_women, layout = "fr") + ggtitle("Fruchterman-Reingold") |
+   graphr(ison_southern_women, layout = "stress") + ggtitle("Stress Minimisation"))
+```
+
+The *Kamada-Kawai* (KK) method inserts a spring between all pairs of
+vertices that is the length of the graph distance between them. This
+means that edges with a large weight will be longer. KK offers a good
+layout for lattice -like networks, because it will try to space the
+network out evenly.
+
+The *Fruchterman-Reingold* (FR) method uses an attractive force between
+directly connected vertices, and a repulsive force between all vertex
+pairs. The attractive force is proportional to the edge’s weight, thus
+edges with a large weight will be shorter. FR offers a good baseline for
+most types of networks.
+
+The *Stress Minimisation* (stress) method is related to the KK
+algorithm, but offers better runtime, quality, and stability and so is
+generally preferred. Indeed,
+[autograph](https://stocnet.github.io/autograph/) uses it as the default
+for most networks. It has the advantage of returning the same layout
+each time it is run on the same network.
+
+**Try it yourself**: This section includes an interactive quiz in the
+live tutorial — run `run_tute()` at the R console to try it.
+
+Other force-directed layouts available include:
+
+- Simulated annealing (Davidson and Harel 1993): `"dh"`
+- Graph embedder (Frick et al. 1995): `"gem"`
+- Graphopt (Schmuhl): `"graphopt"`
+- Distributed recursive graph layout (Martin et al. 2008): `"drl"`
+
+### Manual layouts
+
+Whatever their differences, all these layout algorithms do the same job:
+they return a table of node coordinates. Nothing stops you computing
+that table yourself, inspecting it, adjusting a coordinate or two, and
+handing the result back to
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+via its `x` and `y` arguments. This is handy when a layout is *almost*
+right — say one label sits awkwardly, or you want a particular node set
+apart — or when you need the same hand-tuned positions across several
+figures. **Compute a stress layout for `fict_lotr`, inspect the
+coordinate table, banish Gollum to the top-right corner, and re-graph.**
+
+``` r
+
+lo <- ggraph::create_layout(as_tidygraph(fict_lotr), layout = "stress")
+head(lo[, c("name", "x", "y")])
+lo$x[lo$name == "Gollum"] <- max(lo$x) + 1
+lo$y[lo$name == "Gollum"] <- max(lo$y) + 1
+graphr(fict_lotr, x = lo$x, y = lo$y)
+```
+
+The same trick lets you reuse a layout across plots (compute once, pass
+the same `x`/`y` to each call), which keeps node positions identical
+between figures — useful when readers need to compare them.
+
+**Going further**: [autograph](https://stocnet.github.io/autograph/)
+also provides its own special-purpose layouts — `"configuration"`,
+`"correspondence"`, `"levels"`, `"matching"`, `"scaling"`, `"valence"`,
+and the layered family — documented at
+[`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
+and friends. Several layouts take a layout-specific extra argument
+(passed through `...`) to control how nodes are ordered: `"concentric"`
+a `membership`, `"levels"` a `level`, and the layered layouts `ranks` —
+each a node attribute name or a vector. See
+[`?graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+for the full list.
+
+**In brief**: Pass `layout =` to
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+to choose among spectral (`"eigen"`, `"scaling"`, `"correspondence"`),
+layered (`"layered"`, `"railway"`, `"lineage"`), circular
+(`"concentric"`, `"circle"`), grid, and force-directed (`"stress"`,
+`"fr"`, `"kk"`) layouts. The order matters: spectral layouts place nodes
+by measured similarity, so their positions can be read; layered layouts
+make one axis mean something, which suits two-mode or hierarchical data;
+force-directed layouts are illustrative — do not over-interpret
+distances in them. And since every layout is just a table of
+coordinates, you can always compute one with
+[`ggraph::create_layout()`](https://ggraph.data-imaginist.com/reference/ggraph.html),
+adjust it, and pass it back via
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
+`x` and `y` arguments.
+
+## Checking layouts
+
+On this page: Legibility · Layers · Faithfulness · Free play
+
+The last page sorted layouts by what their positions mean. This page
+asks a second question of any one drawing: is it any good? There are two
+quite different ways for a drawing to be good. It can be *legible*: easy
+on the eye, with ties you can follow. And it can be *faithful*: its
+distances can stand for distances in the network. Each `check_*()`
+function below scores one of these qualities, and each scores a
+*drawing* rather than the network it draws, so that two layouts of the
+same network can be compared.
+
+### Legibility
+
+Researchers who study graph drawing have identified a number of features
+that make a drawing easier or harder to read. Each of the following four
+comes with a pair of drawings of one small network: the same nodes and
+the same ties, only placed differently. The score in each title is
+calculated from the drawing beneath it.
+
+#### Crossings
+
+Ties that cross are hard to follow, and a reader can mistake a crossing
+for a node.
+[`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+counts the crossings in a drawing. A ring of eight nodes can be drawn
+with none at all; place the same nodes around the same circle in another
+order, and the same eight ties cross repeatedly. (A graph that *can* be
+drawn with no crossings is called
+[planar](https://www.jasondavies.com/planarity/); many cannot.)
+
+![](visualising-networks_files/figure-html/explain-crossings-1.png)
+
+#### Slopes
+
+A drawing whose ties run in only a few directions looks ordered, and one
+whose ties run in every direction looks busy.
+[`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+counts the different slopes that the ties are drawn at. A lattice drawn
+on a grid needs only three; the same lattice drawn around a circle needs
+many more.
+
+![](visualising-networks_files/figure-html/explain-slopes-1.png)
+
+#### Lengths
+
+Long ties are hard to follow from one end to the other, and ties of very
+different lengths suggest differences that are not in the data: a long
+tie reads as a weak or distant one, whether or not it is.
+[`check_lengths()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+measures each tie as a share of the diagonal of the drawing, and reports
+their total, their maximum, and how much they vary (`"cv"`, the
+coefficient of variation, which is zero where every tie is the same
+length). Pull one node of the ring away from the others, and two ties
+stretch while the rest stay as they were.
+
+![](visualising-networks_files/figure-html/explain-lengths-1.png)
+
+#### Angles
+
+Where several ties meet at a node, they are easiest to tell apart when
+they leave it in well separated directions.
+[`check_angles()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+reports the smallest angle between two ties at each node, and the
+smallest of those is the *angular resolution* of the drawing. A star
+with six leaves can give every tie 60° of room; gather the same leaves
+on one side of the centre, and the ties crowd together.
+
+![](visualising-networks_files/figure-html/explain-angles-1.png)
+
+#### All at once
+
+[`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+runs all four of these checks at once, beside
+[`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md),
+which we will come to under *Faithfulness* below. **Compare a stress
+layout with a circle.**
+
+``` r
+
+sw_stress <- graphr(ison_southern_women, layout = "stress")
+sw_circle <- graphr(ison_southern_women, layout = "circle")
+rbind(stress = check_drawing(sw_stress), circle = check_drawing(sw_circle))
+```
+
+Every column is read downwards except `angle_min`, which is read
+upwards. Fewer crossings, fewer slopes, shorter ties, more even ties,
+and a wider smallest angle all make a drawing easier to read. `nodes`,
+`ties` and `angle_ideal` are context rather than scores. `angle_ideal`
+is the widest smallest angle the degrees of this network allow, so
+`angle_min` is read as a share of it. The floors are worth knowing as
+well: a network of this many ties cannot be drawn without crossings at
+all, and no drawing of it can use fewer slopes than half its largest
+degree.
+
+No layout wins on every measure. The circle draws every node on one
+ring, which costs it crossings and length: it draws many times the
+crossings of the stress layout, and three times the total tie length. It
+buys the other measures with the same ring: fewer slopes, ties of a more
+even length, and more room between the ties that meet at a node. Its
+stress is the worse of the two, because a layout that never set out to
+draw the path distances scores poorly on them by design.
+
+A few other qualities are sometimes asked of a drawing but are not
+measured here: the number of bends in its ties (which
+[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
+`edge_bundle` argument sets, rather than the layout), the size and
+aspect ratio of the box it fits in, and how well it displays the
+symmetries of the network.
+
+### Layers
+
+Layered layouts have two legibility checks of their own, which you met
+with the family tree of Westeros in *Layered layouts*:
+[`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+counts how many rows each tie crosses, and
+[`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+measures how far each tie travels sideways. Both are costs. A tie that
+runs to the next row is easy to follow; one that passes over a row has
+to find its way between the nodes on it. Each of the six ties in a small
+tree runs to the next row. Move one leaf down a row, and its tie crosses
+two rows instead of one, so that the total over all the ties rises from
+six rows to seven.
+
+![](visualising-networks_files/figure-html/explain-span-1.png)
+
+### Faithfulness
+
+A legible drawing is not necessarily a faithful one. Where a layout
+claims that its distances are data, as the spectral layouts on the last
+page did, we should ask how far to believe it.
+
+#### Stress
+
+*Stress* measures the disagreement between the distances drawn and the
+distances in the network, counted as the number of steps from one node
+to another. It is a percentage of the network distances, such that zero
+would represent a perfect drawing. A path of seven nodes drawn as a
+straight line is one: every pair of nodes is drawn exactly as far apart
+as it is steps apart. Bend the same path around a circle, and its two
+ends, six steps apart, are drawn almost as neighbours.
+
+![](visualising-networks_files/figure-html/explain-stress-1.png)
 
 How low is low? Kruskal ([1964](https://doi.org/10.1007/BF02289565)),
 who introduced the score, recommends 20% as poor, 10% as fair, 5% as
@@ -1436,7 +1770,7 @@ interpretable structure;
 will alert you in the console where the score is above 30%. By contrast,
 a stress score near 5% is rare and worth trusting.
 
-Note that this stress score is not only for this layout.
+Note that this stress score is not only for the `"scaling"` layout.
 [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md)
 measures any drawing the same way, so layouts can be compared on the
 same network (Brandes and Pich
@@ -1453,13 +1787,14 @@ accident: it minimises a related criterion directly. What `"scaling"`
 adds is the axes and the score, so that the distances can be read and
 the reading can be checked.
 
-In addition to stress, the scaling layout also reports how much of the
-variance in the network’s distances the two dimensions drawn hold. The
-two numbers answer different questions, and the comparison above shows
-how. Stress belongs to the drawing: draw this one network four ways and
-you get four different scores. The variance explained belongs to the
-network: it is the same 31% whichever of the four you draw, because it
-asks how much of the structure two dimensions could hold at all.
+In addition to stress, the `"scaling"` layout also reports how much of
+the variance in the network’s distances the two dimensions drawn hold.
+The two numbers answer different questions, and the comparison above
+shows how. Stress belongs to the drawing: draw this one network four
+ways and you get four different scores. The variance explained belongs
+to the network: it is the same 31% whichever of the four you draw,
+because it asks how much of the structure two dimensions could hold at
+all.
 
 So read them together. A low variance explained sets a floor that no
 layout gets under. Where two dimensions can hold only a third of the
@@ -1470,31 +1805,11 @@ drawing gets.
 **Try it yourself**: This section includes an interactive quiz in the
 live tutorial — run `run_tute()` at the R console to try it.
 
-#### Correspondence analysis
+#### Inertia
 
-Whereas scaling lays out nodes by their distances from each other,
-correspondence analysis (CA) lays them out by the similarity of their
-ties. This is useful where nodes may not be tied to each other at all,
-but can be tied to the same others, such as in a two-mode network.
-Correspondence analysis takes a rectangular table — here the incidence
-matrix of the Southern Women dataset, one row for each woman and one
-column for each event — and places its rows and its columns in one
-space.
-
-``` r
-
-graphr(ison_southern_women, layout = "correspondence") + ggtitle("Correspondence Analysis")
-```
-
-We can see the similarity to the eigenvector layout above, but the axes
-are labelled with the share of the network’s *inertia* they hold.
-Inertia is the CA analogue of variance in PCA. It measures the total
-dispersion of points (rows and columns) in the cloud around the
-centroid, computed as the chi-square statistic of the table divided by
-the total sample size (N). In other words, inertia tell us how far the
-ties depart from what one would expect if every woman attended events in
-the same proportion as every other. A network whose nodes all had much
-the same ties would have almost none.
+Correspondence analysis has its own measure of how much the two
+dimensions drawn hold, which you saw on its axis labels: each one’s
+share of the network’s *inertia*.
 
 Each dimension extracted captures a share of this total inertia. Because
 it is a share of variance explained, and not a measure of fit like
@@ -1542,28 +1857,16 @@ applies the stricter of the two baselines for you, noting at the console
 where two dimensions hold no more inertia than a random division would
 have given them.
 
-Since the two dimensions have different percentages here, we can see
-where we should put the emphasis of our interpretation. Because the
-first dimension holds twice as much, it suggests that what distinguishes
-nodes most runs along the x-axis rather than the y-axis.
+#### Cos2
 
-Two more things to note about correspondence analysis. First, while the
-distances among nodes of the same mode are interpretable, distances
-between nodes from different modes are not necessarily interpretable.
-That is, a woman drawn near an event is **not** necessarily an attendee
-of it. Only the distances *within* a mode can be read this way: two
-women drawn together attended similar events, and two events drawn
-together were attended by similar women. These plots are often misread
-this way.
-
-Second, some nodes are better represented by the top two dimensions than
-others. A plot can hold most of the network’s inertia and still put one
-particular node nowhere near where it belongs. This representation is
-captured by a measure called *cos2*: how much of its position the two
-dimensions drawn actually hold, from 0 to 1, where lower is worse. A
-node the plane captures badly may be located near the centre of the
-plot, not because it is average, but because there is nowhere else to
-put it.
+A share of inertia describes the plot as a whole. But some nodes are
+better represented by the top two dimensions than others. A plot can
+hold most of the network’s inertia and still put one particular node
+nowhere near where it belongs. This representation is captured by a
+measure called *cos2*: how much of its position the two dimensions drawn
+actually hold, from 0 to 1, where lower is worse. A node the plane
+captures badly may be located near the centre of the plot, not because
+it is average, but because there is nowhere else to put it.
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
 names these nodes in the console when it draws the layout, but you can
 recover the scores like so:
@@ -1574,106 +1877,163 @@ fit <- attr(layout_correspondence(ison_southern_women), "fit")
 round(sort(fit$cos2), 2)
 ```
 
-For a directed network, each node has two profiles: who it sends ties
-to, and who it receives them from. By default the layout reads a tie in
-either direction, so that each node has one position;
-`direction = "out"` and `direction = "in"` read one profile or the
-other. For a signed network there is no correspondence analysis at all,
-since the method divides by the mass of each node and a negative tie has
-no such reading. `double = TRUE` splits each tie into a positive and a
-negative part, so that a node is placed by both who it likes and who it
-dislikes.
-
 **Try it yourself**: This section includes an interactive quiz in the
 live tutorial — run `run_tute()` at the R console to try it.
 
-### Grid layouts
+### Free play
 
-Grid layouts arrange nodes based on some Cartesian coordinates. These
-can be useful for making sure all nodes’ labels are visible, but
-horizontal and vertical lines can overlap, making it difficult to
-distinguish whether some nodes are tied or not.
-
-``` r
-
-graphr(ison_southern_women, layout = "grid") + ggtitle("Grid")
-```
-
-Other grid layouts include:
-
-- orthogonal layouts for e.g. printed circuit boards
-- grid snapping for other layouts
-
-That last point deserves a demonstration. Rather than committing to a
-full grid,
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
-`snap = TRUE` argument keeps whatever layout you asked for but snaps its
-coordinates onto a grid — trading a little positional accuracy for the
-label legibility of a grid. **Compare the stress layout with its snapped
-version.**
+**Your turn**: the `create_*()` functions from
+[manynet](https://stocnet.github.io/manynet/) make networks with one
+very regular structure each, which makes them ideal for finding out what
+each check rewards. The code below draws a ring, a star, a lattice, and
+a tree with one layout, and checks each drawing. **Change the layout to
+`"stress"`, `"grid"`, `"star"`, or `"tree"`. Which network and layout
+together give the fewest slopes? The most even ties? The widest smallest
+angle? And can you find a layout that draws the lattice without any
+crossings?**
 
 ``` r
 
-(graphr(fict_lotr) + ggtitle("stress") |
-   graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+nets <- list(ring = create_ring(12), star = create_star(12),
+             lattice = create_lattice(12), tree = create_tree(12))
+do.call(rbind, lapply(nets, function(net) {
+  check_drawing(graphr(net, layout = "circle"))
+}))
 ```
 
-**Try it yourself**: This section includes an interactive quiz in the
-live tutorial — run `run_tute()` at the R console to try it.
+**In brief**: A drawing can be checked for how legible it is and for how
+faithful it is, and the two often pull apart.
 
-### Manual layouts
+| Check | Function | Better when | A layout that aims for it |
+|----|----|----|----|
+| Crossings | [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md) | lower | `"layered"`, `"stress"` |
+| Slopes | [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md) | lower | `"grid"`, `"circle"` |
+| Tie lengths | [`check_lengths()`](https://stocnet.github.io/autograph/reference/check_layout.md) | shorter and more even | `"stress"`, `"fr"` |
+| Smallest angle | [`check_angles()`](https://stocnet.github.io/autograph/reference/check_layout.md) | higher | `"circle"`, `"star"` |
+| Rows crossed, sideways travel | [`check_span()`](https://stocnet.github.io/autograph/reference/check_layout.md), [`check_offset()`](https://stocnet.github.io/autograph/reference/check_layout.md) | lower | `"layered"` and its family |
+| Stress | [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md) | lower | `"stress"`, `"scaling"` |
+| Inertia and cos2 | [`layout_correspondence()`](https://stocnet.github.io/autograph/reference/layout_correspondence.md) | higher | `"correspondence"` |
 
-Whatever their differences, all these layout algorithms do the same job:
-they return a table of node coordinates. Nothing stops you computing
-that table yourself, inspecting it, adjusting a coordinate or two, and
-handing the result back to
+[`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+reports the first four and stress together. No layout wins on every
+measure, so choose the checks that matter for what you want your reader
+to see.
+
+## Ew, hairballs
+
+On this page: Isolates · Bundling · Backbones
+
+Sometimes no layout helps. Whichever one you choose, the drawing comes
+out as a dense hairball, and
+[`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md)
+only confirms what you can already see. ‘Hairball’ is a technical term
+to describe networks with many high-degree nodes and many ties, where
+the sheer number of ties obscures any structure that might be in the
+network. Autograph includes three arguments that can help with this,
+some of which are turned on by default, so we will need to turn them off
+to see the effect of each in isolation.
+
+### Isolates
+
+First, it is possible that the hairball is not a hairball at all, but a
+network with many disconnected components or, especially, isolates ,
+that each need to be drawn. As each component is drawn under a
+force-directed layout, the components will repel each other and the
+giant component will be squeezed into a clump.
+
+The `isolates` argument in
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-via its `x` and `y` arguments. This is handy when a layout is *almost*
-right — say one label sits awkwardly, or you want a particular node set
-apart — or when you need the same hand-tuned positions across several
-figures. **Compute a stress layout for `fict_lotr`, inspect the
-coordinate table, banish Gollum to the top-right corner, and re-graph.**
+provides some options for what to do with them instead: `"legend"` (the
+default) drops them from the drawing but records how many there were in
+the legend, `"caption"` notes them in a caption instead, and `"keep"`
+leaves them in place. **Add ten unconnected characters to `fict_lotr`
+and compare keeping them with noting them in the legend.**
 
 ``` r
 
-lo <- ggraph::create_layout(as_tidygraph(fict_lotr), layout = "stress")
-head(lo[, c("name", "x", "y")])
-lo$x[lo$name == "Gollum"] <- max(lo$x) + 1
-lo$y[lo$name == "Gollum"] <- max(lo$y) + 1
-graphr(fict_lotr, x = lo$x, y = lo$y)
+lotr_iso <- to_unlabelled(fict_lotr) |>
+  add_nodes(10)
+(graphr(lotr_iso, isolates = "keep") + ggtitle("keep") |
+   graphr(lotr_iso, isolates = "legend") + ggtitle("legend"))
 ```
 
-The same trick lets you reuse a layout across plots (compute once, pass
-the same `x`/`y` to each call), which keeps node positions identical
-between figures — useful when readers need to compare them.
+### Bundling ties
 
-**Going further**: [autograph](https://stocnet.github.io/autograph/)
-also provides its own special-purpose layouts — `"configuration"`,
-`"correspondence"`, `"levels"`, `"matching"`, `"scaling"`, `"valence"`,
-and the layered family — documented at
-[`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
-and friends. Several layouts take a layout-specific extra argument
-(passed through `...`) to control how nodes are ordered: `"concentric"`
-a `membership`, `"levels"` a `level`, and the layered layouts `ranks` —
-each a node attribute name or a vector. See
-[`?graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-for the full list.
+The second option is to draw all of the ties ‘bundled’ together, which
+can reveal where the most common paths through the network are.
+`edge_bundle` pulls ties that travel in similar directions into shared
+paths — like cabling them together — so that the main ‘highways’ of the
+network stand out. It is off by default; set `edge_bundle = TRUE` (or
+name a specific algorithm: `"force"`, `"path"`, or `"minimal"`) to
+switch it on. **`ison_lawfirm` records 71 lawyers and 2571 ties between
+them, which is about as thick a hairball as a network this small can be.
+Compare it drawn with and without bundling (turn backbone off too for
+clearest comparison results).**
 
-**In brief**: Pass `layout =` to
+``` r
+
+graphr(ison_lawfirm, backbone = FALSE) + ggtitle("Unbundled") | 
+  graphr(ison_lawfirm, backbone = FALSE, edge_bundle = "path") + ggtitle("Bundled")
+```
+
+I find this works best with networks that are at least moderately dense,
+and sometimes requires a little bit of playing around to get a good
+result.
+
+### Backbones
+
+By contrast, backbone changes which ties the picture is built around.
+Ties that carry more weight/structure than expected by a null model
+local to their endpoints are in essence what the network would be if it
+were stripped back to its skeleton.
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
-to choose among force-directed (`"stress"`, `"fr"`, `"kk"`), layered
-(`"layered"`, `"railway"`, `"lineage"`), circular (`"concentric"`,
-`"circle"`), spectral (`"eigen"`, `"scaling"`, `"correspondence"`), and
-grid layouts. Force-directed layouts are illustrative — do not
-over-interpret distances; spectral/MDS layouts place nodes by measured
-similarity, and `"scaling"` captions the plot with how far that reading
-can be trusted; layered layouts suit two-mode or hierarchical data. And
-since every layout is just a table of coordinates, you can always
-compute one with
-[`ggraph::create_layout()`](https://ggraph.data-imaginist.com/reference/ggraph.html),
-adjust it, and pass it back via
-[`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
-`x` and `y` arguments.
+then draws the layout according to this skeleton and fades other ties
+into the background to further emphasise the main structure.
+
+Most of the time you will not have to ask for this. Networks of 50+
+nodes with 8 ties each on average is drawn this way by default. But you
+can specify `backbone = FALSE` to turns it off, `backbone = TRUE` to
+force it on, or you can name a filter — `"disparity"`, `"lans"`,
+`"noise"`, `"mlf"`, or `"simmelian"` — or threshold. **Compare
+`ison_lawfirm` drawn with and without its backbone.**
+
+``` r
+
+(graphr(ison_lawfirm, node_colour = "office", backbone = FALSE) +
+   ggtitle("Every tie alike") |
+   graphr(ison_lawfirm, node_colour = "office", backbone = TRUE) +
+   ggtitle("Backbone"))
+```
+
+The offices are hardly visible on the left. On the right they separate,
+because the ties that hold each office together are the ties the filter
+keeps.
+
+Only the layouts that read tie lengths are laid out this way: `"stress"`
+(the default), `"fr"`, `"drl"` and `"kk"`. Every other layout, including
+those whose coordinates already mean something such as `"layered"` or
+`"scaling"`, keeps its coordinates and only fades its ties. Signed
+networks have no backbone, since these null models have no place for a
+negative weight, and are drawn as they were.
+
+Bundling and backbones answer the same problem from different ends, so
+try one before reaching for both. A bundled tie cannot carry a fading of
+its own — bundling merges ties into shared paths — so where both are
+asked for, the backbone still shapes the layout but every tie is drawn
+alike.
+
+For very large real-world networks such as `irps_blogs`, these work well
+together: a backbone picks out the ties that hold the connected core
+together (or `edge_bundle = TRUE`, if you would rather see the paths the
+ties take than which of them matter most), while `isolates = "legend"`
+keeps its several hundred unconnected blogs from crowding that core out.
+
+**In brief**: Where a network is too dense or too scattered for any
+layout to draw legibly, change what is drawn rather than where:
+`isolates` takes unconnected nodes out of the drawing and into the
+legend or caption, `edge_bundle` gathers ties that run the same way into
+shared paths, and `backbone` lays the network out by the ties that
+matter most and fades the rest.
 
 ## Multiple graphs
 
@@ -1762,9 +2122,8 @@ the network as longitudinal for
 (and
 [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
 itself, passed such a network directly) will split it without being told
-which attribute to use. From
-[manynet](https://stocnet.github.io/manynet/) 2.2.2, any other name
-(say, `year`) works just as well — it only needs declaring via
+which attribute to use. Any other name (say, `year`) works just as well
+— it only needs declaring via
 [`to_waves()`](https://stocnet.github.io/manynet/reference/modif_split.html)’s
 `attribute` argument.
 
@@ -1910,28 +2269,28 @@ as [RSiena](https://www.stats.ox.ac.uk/~snijders/siena/),
 use the same theming system as
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 so that you can set a theme once and have it apply to all your graphs
-and plots. **Let’s try this now with a few examples, plotting the
-distributions of two centrality measures under two themes.**
+and plots. **Let’s try this now, plotting the distribution of a
+centrality measure under two themes.**
 
 ``` r
 
 stocnet_theme("default")
-plot(node_by_degree(fict_lotr)) +
-plot(node_by_closeness(fict_lotr))
+plot(node_by_degree(fict_lotr))
 stocnet_theme("oxf")
-plot(node_by_degree(fict_lotr)) +
-plot(node_by_closeness(fict_lotr))
+plot(node_by_degree(fict_lotr))
 stocnet_theme("default")
 ```
 
 Each plot shows the distribution of a node measure across the network —
-here how unequal the characters’ degree and closeness centralities are.
-This is a very simple example, but the same principle applies to all
-plots in [autograph](https://stocnet.github.io/autograph/): one can set
-a theme once and have it apply to all plots, and one can always add
-additional [ggplot2](https://ggplot2.tidyverse.org) layers to any plot
-to further customise it — titles and labels, but also trend lines,
-confidence intervals, and so on. The plot methods for model results are
+here how unequal the characters’ degree centralities are. The other
+measures that can be plotted this way are introduced in the
+[netrics](https://stocnet.github.io/netrics/) tutorials. This is a very
+simple example, but the same principle applies to all plots in
+[autograph](https://stocnet.github.io/autograph/): one can set a theme
+once and have it apply to all plots, and one can always add additional
+[ggplot2](https://ggplot2.tidyverse.org) layers to any plot to further
+customise it — titles and labels, but also trend lines, confidence
+intervals, and so on. The plot methods for model results are
 demonstrated in the tutorials of the packages that produce those
 results.
 
@@ -1984,14 +2343,17 @@ Along the way, you have learned to use these functions:
 | [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md) | graphs any manynet-compatible network with sensible defaults |
 | `graphr(..., node_colour/node_shape/node_size/node_group)` | maps node attributes to aesthetics |
 | `graphr(..., edge_colour/edge_size)` | maps tie attributes to aesthetics |
+| `graphr(..., edge_arrows)` | resizes or removes the arrowheads of directed ties |
 | `graphr(..., labels, label_repel, label_dist)` | chooses which nodes to label, and places the labels |
 | `graphr(..., layout, snap)` | chooses and adjusts the layout algorithm |
 | `graphr(..., x, y)` | places nodes at manually supplied coordinates |
 | [`ggraph::create_layout()`](https://ggraph.data-imaginist.com/reference/ggraph.html) | returns a layout’s table of node coordinates for tweaking |
+| [`check_drawing()`](https://stocnet.github.io/autograph/reference/check_layout.md), [`check_crossings()`](https://stocnet.github.io/autograph/reference/check_layout.md), [`check_slopes()`](https://stocnet.github.io/autograph/reference/check_layout.md), [`check_lengths()`](https://stocnet.github.io/autograph/reference/check_layout.md), [`check_angles()`](https://stocnet.github.io/autograph/reference/check_layout.md) | score how legible a drawing is |
+| [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md) | scores how faithful a drawing’s distances are |
 | `graphr(..., edge_bundle, backbone, isolates)` | tames large, dense, or disconnected networks |
 | [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md) | sets a consistent theme for all graphs and plots |
 | [`ggplot2::scale_fill_hue()`](https://ggplot2.tidyverse.org/reference/scale_hue.html), `_grey()`, `_manual()` | overrides node colour palettes |
-| [`labs()`](https://ggplot2.tidyverse.org/reference/labs.html), [`ggtitle()`](https://ggplot2.tidyverse.org/reference/labs.html), [`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) | adds titles, axis and legend labels |
+| [`labs()`](https://ggplot2.tidyverse.org/reference/labs.html), [`ggtitle()`](https://ggplot2.tidyverse.org/reference/labs.html), [`guides()`](https://ggplot2.tidyverse.org/reference/guides.html) | adds titles, and retitles or removes legends |
 | [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md) | graphs a list of networks as comparable panels |
 | [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md) | animates a longitudinal or dynamic network as a gif |
 | [`plot()`](https://rdrr.io/r/graphics/plot.default.html) | plots measures, motifs, and model results consistently |
@@ -2014,11 +2376,6 @@ Here are some of the terms that we have covered in this tutorial:
 - Backbone : The backbone of a network comprises the ties that carry
   more weight, or hold more structure, than a null model local to their
   endpoints expects.
-- Betweenness : The betweenness centrality of a node is the proportion
-  of shortest paths between all pairs of nodes that pass through that
-  node.
-- Closeness : The closeness centrality of a node is the reciprocal of
-  the sum of its distances to all other nodes.
 - Community : A community is a set of nodes more densely connected to
   one another than to other nodes in the network.
 - Complex : A complex network is one that includes or can include loops
@@ -2039,6 +2396,7 @@ Here are some of the terms that we have covered in this tutorial:
 - Lattice : A network that can be drawn as a regular tiling.
 - Longitudinal : A longitudinal network is one observed in two or more
   discrete waves or panels over time.
+- Multiplex : A network that includes multiple types of tie.
 - Network : A network comprises one or more sets of nodes, one or more
   sets of ties among them, and potentially some node, tie, or
   network-level attributes.
@@ -2051,7 +2409,6 @@ Here are some of the terms that we have covered in this tutorial:
   network.
 - Tie : A tie, edge, or link is a connection or relationship between two
   nodes.
-- Triangle : A cycle of length three in a network.
 - Twomode : A two-mode (or bipartite) network is a network with two
   different sets of nodes, where ties connect only nodes from different
   sets, such as people and the events they attend.

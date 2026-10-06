@@ -41,7 +41,7 @@ try run_tute("Visualisation").'><meta property="og:image" content="https://stocn
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -116,6 +116,7 @@ try <code>run_tute("Visualisation")</code>.</p>
 <span>  label_dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label_repel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  edge_bundle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  edge_arrows <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  backbone <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .shared <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -200,6 +201,10 @@ A single number is always read as a depth of ranks rather than as one
 node's position, so a lone node is best named, as in <code>labels = "Alice"</code>.
 For networks of more than 30 nodes, <code>labels</code> defaults to a selection
 rather than to every node; pass <code>labels = TRUE</code> for all of them.
+For a concept lattice from <code>manynet::to_concepts()</code>, <code>labels</code> defaults to
+the concepts at which a node of the original network first appears,
+so that each of those nodes is named once, as in a Hasse diagram,
+and the concepts named only by their position are left unlabelled.
 Ranking nodes uses the <code>{netrics}</code> package, which is suggested rather than
 required: without it installed, an automatic selection falls back to a
 random sample.
@@ -328,6 +333,31 @@ retained, but the slight reciprocal-tie curvature used for unbundled edges
 does not apply.</p></dd>
 
 
+<dt id="arg-edge-arrows">edge_arrows<a class="anchor" aria-label="anchor" href="#arg-edge-arrows"></a></dt>
+<dd><p>Whether, and at what size, to draw arrowheads on the ties
+of a directed network.
+By default (<code>NULL</code>) this is decided by the network:
+a directed network is drawn with arrowheads,
+except for a concept lattice from <code>manynet::to_concepts()</code> in the
+"layered" (its default) or "railway" layout.
+That is read as a Hasse diagram, where the direction of each tie is
+already given by which of its ends is drawn higher.
+In any other layout a concept lattice keeps its arrowheads.
+<code>TRUE</code> draws arrowheads whatever the network, and <code>FALSE</code> none.
+Arrowheads follow the width the ties are drawn at:
+2mm long at the default <code>edge_size</code> of 0.5, and longer on wider ties,
+up to 4mm. Where the widths vary, as when they are mapped from a tie
+attribute, one size is chosen for all of the arrowheads from the mean
+width drawn.
+A number, e.g. <code>edge_arrows = 3</code>, draws arrowheads of that length in
+millimetres instead, whatever the width of the ties.
+This is the unit that <code>{ggplot2}</code> sizes are given in, as <code>node_size</code> is,
+so an arrowhead of 3 is a little longer than a node of 3 is wide.
+Ties that are not drawn, as with <code>edge_size = 0</code>, have no arrowheads.
+An undirected network has no direction to show,
+so the argument is ignored there.</p></dd>
+
+
 <dt id="arg-backbone">backbone<a class="anchor" aria-label="anchor" href="#arg-backbone"></a></dt>
 <dd><p>How to treat the network's backbone: the ties that a local
 null model keeps, because they carry more weight, or sit in more
@@ -350,7 +380,7 @@ Only the layouts that read tie lengths – "stress" (the default), "fr",
 "drl" and "kk" – are laid out this way. Every other layout, including
 those that already carry meaning in their coordinates such as "layered"
 or "scaling", keeps its coordinates and only fades its ties.
-Requires <code>manynet</code> 2.3.0 or later, and does not apply to signed networks.</p></dd>
+Does not apply to signed networks.</p></dd>
 
 
 <dt id="arg--shared">.shared<a class="anchor" aria-label="anchor" href="#arg--shared"></a></dt>
@@ -409,8 +439,13 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
 <span class="r-plt img"><img src="plot_graphr-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0.1</span><span class="op">)</span>, edge_bundle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-8.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0.2</span><span class="op">)</span>, backbone <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Larger arrowheads than the width of the ties would give, or none at all</span></span></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_networkers</span>, edge_arrows <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-9.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_networkers</span>, edge_arrows <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-10.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0.2</span><span class="op">)</span>, backbone <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-11.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

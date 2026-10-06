@@ -46,10 +46,10 @@ directly on the returned object.
 The visual appearance is consistent with
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md):
 nodes use fillable shapes with the fill aesthetic, the same colour
-palettes are applied, directed networks receive arrowheads, signed
-networks distinguish positive from negative ties by linetype, and labels
-use the current theme font. Legends transition along with the mapped
-aesthetics.
+palettes are applied, directed networks receive arrowheads (see
+`edge_arrows`), signed networks distinguish positive from negative ties
+by linetype, and labels use the current theme font. Legends transition
+along with the mapped aesthetics.
 
 A progress bar is shown if it takes some time to encode all the .png
 files into a .gif.
@@ -70,6 +70,7 @@ grapht(
   alpha = 0.5,
   label_dist = NULL,
   label_repel = TRUE,
+  edge_arrows = NULL,
   keep_isolates = NULL,
   ...,
   node_colour,
@@ -148,39 +149,17 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 - labels:
 
   Which nodes to label, if the network is labelled. `TRUE` (the default)
-  labels every node and `FALSE` none of them, but a label for every node
-  of a large network hides the network behind them, so a *selection* of
-  the nodes can be given instead:
-
-  - a number, e.g. `labels = 5`, labels the nodes within the top five
-    ranks by degree. Note that this is a depth of ranks rather than a
-    count of nodes: nodes tied at the cut are labelled together, so more
-    than five labels may appear.
-
-  - a measure to rank by, e.g. `labels = "betweenness"`, labels just the
-    node or nodes that measure singles out. `"degree"`, `"betweenness"`,
-    `"cutpoints"` (every node the mark flags) and `"random"` (a small
-    random sample) are available. The two can be combined by naming the
-    number, as in `labels = c(betweenness = 5)`.
-
-  - the name of a logical node attribute, e.g. `labels = "is_broker"`,
-    labels the nodes it marks.
-
-  - a logical vector, one value per node, e.g.
-    `labels = netrics::node_is_cutpoint(net)`; or the names or positions
-    of the nodes to label, e.g. `labels = c("Alice", "Betty")`.
-
-  Where a length-one string could mean more than one of these, a node
-  attribute is preferred to a measure, and a measure to a node name. A
-  single number is always read as a depth of ranks rather than as one
-  node's position, so a lone node is best named, as in
-  `labels = "Alice"`. For networks of more than 30 nodes, `labels`
-  defaults to a selection rather than to every node; pass
-  `labels = TRUE` for all of them. Ranking nodes uses the `{netrics}`
-  package, which is suggested rather than required: without it
-  installed, an automatic selection falls back to a random sample.
-  Two-mode and multilevel networks are ranked within each mode or level,
-  so that every level is labelled and not just the densest.
+  labels every node and `FALSE` none. A selection of the nodes can be
+  given as in
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md):
+  a number of ranks, a measure to rank by, the name of a logical node
+  attribute, a logical vector, or the names or positions of the nodes.
+  The selection is made once over all the waves, so that the same nodes
+  stay labelled from frame to frame. For networks of more than 30 nodes,
+  `labels` defaults to no labels at all; pass `labels = TRUE` for all of
+  them. Unlike
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+  no selection is made for a concept lattice.
 
 - node_color, node_colour:
 
@@ -261,6 +240,28 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   in a layer, which is where the reader looks for it, so a repelled
   label there would say less about which node it labels than a fixed
   offset does. They ignore this argument and always offset.
+
+- edge_arrows:
+
+  Whether, and at what size, to draw arrowheads on the ties of a
+  directed network. By default (`NULL`) this is decided by the network:
+  a directed network is drawn with arrowheads, except for a concept
+  lattice from `manynet::to_concepts()` in the "layered" (its default)
+  or "railway" layout. That is read as a Hasse diagram, where the
+  direction of each tie is already given by which of its ends is drawn
+  higher. In any other layout a concept lattice keeps its arrowheads.
+  `TRUE` draws arrowheads whatever the network, and `FALSE` none.
+  Arrowheads follow the width the ties are drawn at: 2mm long at the
+  default `edge_size` of 0.5, and longer on wider ties, up to 4mm. Where
+  the widths vary, as when they are mapped from a tie attribute, one
+  size is chosen for all of the arrowheads from the mean width drawn. A
+  number, e.g. `edge_arrows = 3`, draws arrowheads of that length in
+  millimetres instead, whatever the width of the ties. This is the unit
+  that `{ggplot2}` sizes are given in, as `node_size` is, so an
+  arrowhead of 3 is a little longer than a node of 3 is wide. Ties that
+  are not drawn, as with `edge_size = 0`, have no arrowheads. An
+  undirected network has no direction to show, so the argument is
+  ignored there.
 
 - keep_isolates:
 

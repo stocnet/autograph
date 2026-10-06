@@ -37,7 +37,7 @@ gganimate::animate() directly on the returned object.
 The visual appearance is consistent with graphr():
 nodes use fillable shapes with the fill aesthetic,
 the same colour palettes are applied,
-directed networks receive arrowheads,
+directed networks receive arrowheads (see edge_arrows),
 signed networks distinguish positive from negative ties by linetype,
 and labels use the current theme font.
 Legends transition along with the mapped aesthetics.
@@ -80,7 +80,7 @@ gganimate::animate() directly on the returned object.
 The visual appearance is consistent with graphr():
 nodes use fillable shapes with the fill aesthetic,
 the same colour palettes are applied,
-directed networks receive arrowheads,
+directed networks receive arrowheads (see edge_arrows),
 signed networks distinguish positive from negative ties by linetype,
 and labels use the current theme font.
 Legends transition along with the mapped aesthetics.
@@ -93,7 +93,7 @@ A progress bar is shown if it takes some time to encode all the
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -169,7 +169,7 @@ Users who want more control over animation parameters can call
 <p>The visual appearance is consistent with <code><a href="plot_graphr.html">graphr()</a></code>:
 nodes use fillable shapes with the fill aesthetic,
 the same colour palettes are applied,
-directed networks receive arrowheads,
+directed networks receive arrowheads (see <code>edge_arrows</code>),
 signed networks distinguish positive from negative ties by linetype,
 and labels use the current theme font.
 Legends transition along with the mapped aesthetics.</p>
@@ -192,6 +192,7 @@ Legends transition along with the mapped aesthetics.</p>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  label_dist <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  label_repel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  edge_arrows <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  keep_isolates <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  <span class="va">node_colour</span>,</span>
@@ -269,35 +270,15 @@ Each axis names the share of the network's inertia that it holds.</p></dd>
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
 <dd><p>Which nodes to label, if the network is labelled.
-<code>TRUE</code> (the default) labels every node and <code>FALSE</code> none of them,
-but a label for every node of a large network hides the network behind
-them, so a <em>selection</em> of the nodes can be given instead:</p><ul><li><p>a number, e.g. <code>labels = 5</code>, labels the nodes within the top five ranks
-by degree. Note that this is a depth of ranks rather than a count of
-nodes: nodes tied at the cut are labelled together, so more than five
-labels may appear.</p></li>
-<li><p>a measure to rank by, e.g. <code>labels = "betweenness"</code>, labels just the
-node or nodes that measure singles out. <code>"degree"</code>, <code>"betweenness"</code>,
-<code>"cutpoints"</code> (every node the mark flags) and <code>"random"</code>
-(a small random sample) are available.
-The two can be combined by naming the number,
-as in <code>labels = c(betweenness = 5)</code>.</p></li>
-<li><p>the name of a logical node attribute, e.g. <code>labels = "is_broker"</code>,
-labels the nodes it marks.</p></li>
-<li><p>a logical vector, one value per node, e.g.
-<code>labels = netrics::node_is_cutpoint(net)</code>;
-or the names or positions of the nodes to label,
-e.g. <code>labels = c("Alice", "Betty")</code>.</p></li>
-</ul><p>Where a length-one string could mean more than one of these,
-a node attribute is preferred to a measure, and a measure to a node name.
-A single number is always read as a depth of ranks rather than as one
-node's position, so a lone node is best named, as in <code>labels = "Alice"</code>.
-For networks of more than 30 nodes, <code>labels</code> defaults to a selection
-rather than to every node; pass <code>labels = TRUE</code> for all of them.
-Ranking nodes uses the <code>{netrics}</code> package, which is suggested rather than
-required: without it installed, an automatic selection falls back to a
-random sample.
-Two-mode and multilevel networks are ranked within each mode or level,
-so that every level is labelled and not just the densest.</p></dd>
+<code>TRUE</code> (the default) labels every node and <code>FALSE</code> none.
+A selection of the nodes can be given as in <code><a href="plot_graphr.html">graphr()</a></code>:
+a number of ranks, a measure to rank by, the name of a logical node
+attribute, a logical vector, or the names or positions of the nodes.
+The selection is made once over all the waves, so that the same nodes
+stay labelled from frame to frame.
+For networks of more than 30 nodes, <code>labels</code> defaults to no labels at
+all; pass <code>labels = TRUE</code> for all of them.
+Unlike <code><a href="plot_graphr.html">graphr()</a></code>, no selection is made for a concept lattice.</p></dd>
 
 
 <dt id="arg-node-color-node-colour">node_color, node_colour<a class="anchor" aria-label="anchor" href="#arg-node-color-node-colour"></a></dt>
@@ -386,6 +367,31 @@ The layered layouts ("layered", "lineage", "railway" and "ladder")
 place each node in a layer, which is where the reader looks for it,
 so a repelled label there would say less about which node it labels
 than a fixed offset does. They ignore this argument and always offset.</p></dd>
+
+
+<dt id="arg-edge-arrows">edge_arrows<a class="anchor" aria-label="anchor" href="#arg-edge-arrows"></a></dt>
+<dd><p>Whether, and at what size, to draw arrowheads on the ties
+of a directed network.
+By default (<code>NULL</code>) this is decided by the network:
+a directed network is drawn with arrowheads,
+except for a concept lattice from <code>manynet::to_concepts()</code> in the
+"layered" (its default) or "railway" layout.
+That is read as a Hasse diagram, where the direction of each tie is
+already given by which of its ends is drawn higher.
+In any other layout a concept lattice keeps its arrowheads.
+<code>TRUE</code> draws arrowheads whatever the network, and <code>FALSE</code> none.
+Arrowheads follow the width the ties are drawn at:
+2mm long at the default <code>edge_size</code> of 0.5, and longer on wider ties,
+up to 4mm. Where the widths vary, as when they are mapped from a tie
+attribute, one size is chosen for all of the arrowheads from the mean
+width drawn.
+A number, e.g. <code>edge_arrows = 3</code>, draws arrowheads of that length in
+millimetres instead, whatever the width of the ties.
+This is the unit that <code>{ggplot2}</code> sizes are given in, as <code>node_size</code> is,
+so an arrowhead of 3 is a little longer than a node of 3 is wide.
+Ties that are not drawn, as with <code>edge_size = 0</code>, have no arrowheads.
+An undirected network has no direction to show,
+so the argument is ignored there.</p></dd>
 
 
 <dt id="arg-keep-isolates">keep_isolates<a class="anchor" aria-label="anchor" href="#arg-keep-isolates"></a></dt>

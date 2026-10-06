@@ -569,11 +569,11 @@ or be skipped gracefully when unavailable.
 The declared minimum of each `stocnet` dependency is the version on
 CRAN, so that CI can install it. Where `autograph` needs something that
 only a newer, unreleased version has, reach it through a shim in
-[R/autograph_utilities.R](https://stocnet.github.io/R/autograph_utilities.R)
-rather than by raising the minimum. Test for the function with
-`.ag_has_manynet()` rather than for the version string, because a
-pre-release development build can carry the version without yet
-exporting the function. Call the function with
+[R/autograph-defunct.R](https://stocnet.github.io/R/autograph-defunct.R)
+rather than by raising the minimum. Test for the function
+(`fn %in% getNamespaceExports("manynet")`) rather than for the version
+string, because a pre-release development build can carry the version
+without yet exporting the function. Call the function with
 [`getExportedValue()`](https://rdrr.io/r/base/ns-reflect.html) and not
 `::`, because `R CMD check` resolves a `::` call against the installed
 package and reports the newer name as missing even where the call is
