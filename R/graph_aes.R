@@ -323,6 +323,45 @@
   ggplot2::arrow(angle = 15, type = "closed", length = ggplot2::unit(len_mm, 'mm'))
 }
 
+# Which concepts of a lattice carry a "reduced" label, or NULL where the
+# network is not a lattice that says. Each node of the first set is named at
+# the lowest concept that holds it, which is the one with the smallest extent,
+# and each node of the second set at the highest concept that holds it, which
+# is the one with the smallest intent. This is read from the extents and
+# intents themselves rather than from the names, since a node of the original
+# network may well be called "C1", as the concepts that name nothing are.
+.concept_is_labelled <- function(g) {
+  if (!.is_concept_lattice(g)) return(NULL)
+  ig <- manynet::as_igraph(g)
+  if (!all(c("extent", "intent") %in% igraph::vertex_attr_names(ig)))
+    return(NULL)
+  first_at <- function(sets) {
+    sets <- lapply(sets, as.character)
+    size <- lengths(sets)
+    members <- unique(unlist(sets))
+    vapply(members, function(m) {
+      holds <- which(vapply(sets, function(s) m %in% s, logical(1)))
+      holds[which.min(size[holds])]
+    }, integer(1))
+  }
+  seq_len(igraph::vcount(ig)) %in%
+    c(first_at(igraph::vertex_attr(ig, "extent")),
+      first_at(igraph::vertex_attr(ig, "intent")))
+}
+
+# `manynet::to_concepts()` records the projection it made in the network's
+# information, which is the only thing that tells a concept lattice from any
+# other directed acyclic network. The record outlives a later change to the
+# network, so the ties are checked too: a lattice that has been made
+# undirected, say, is no longer drawn as one.
+.is_concept_lattice <- function(g) {
+  made <- tryCatch(igraph::graph_attr(manynet::as_igraph(g), "transformations"),
+                   error = function(e) NULL)
+  if (!is.list(made)) return(FALSE)
+  "concept lattice" %in% unlist(made[["projection"]]) &&
+    manynet::is_directed(g) && manynet::is_acyclic(g)
+}
+
 .infer_line_type <- function(g) {
   if (manynet::is_signed(g)) {
     signs <- as.numeric(manynet::tie_signs(g))

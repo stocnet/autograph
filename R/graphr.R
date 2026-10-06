@@ -93,6 +93,10 @@
 #'   node's position, so a lone node is best named, as in `labels = "Alice"`.
 #'   For networks of more than 30 nodes, `labels` defaults to a selection
 #'   rather than to every node; pass `labels = TRUE` for all of them.
+#'   For a concept lattice from `manynet::to_concepts()`, `labels` defaults to
+#'   the concepts at which a node of the original network first appears,
+#'   so that each of those nodes is named once, as in a Hasse diagram,
+#'   and the concepts named only by their position are left unlabelled.
 #'   Ranking nodes uses the `{netrics}` package, which is suggested rather than
 #'   required: without it installed, an automatic selection falls back to a
 #'   random sample.
@@ -282,7 +286,18 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # nodes that stand out. Decided here rather than above so that the count
   # reflects the nodes actually drawn, once any isolates have been dropped.
   n <- as.numeric(manynet::net_nodes(g))
-  if (labels_missing && isTRUE(labels) && n > 30) {
+  # A concept lattice says for itself which of its nodes to label, whatever
+  # its size: those at which a node of the original network first appears.
+  # The rest are named only by their position, which is no help to a reader.
+  introduces <- if (labels_missing && isTRUE(labels)) .concept_is_labelled(g)
+  if (!is.null(introduces)) {
+    labels <- manynet::node_names(g)[introduces]
+    manynet::snet_info(
+      "Labelling the {length(labels)} of {n} concepts at which a node of the",
+      "original network first appears.",
+      "Use {.code labels = TRUE} to label all of them.")
+    if (!length(labels)) labels <- FALSE
+  } else if (labels_missing && isTRUE(labels) && n > 30) {
     labels <- structure(5L, criterion = "degree", automatic = TRUE)
     n_lab <- sum(.infer_labels(g, labels))
     manynet::snet_info(

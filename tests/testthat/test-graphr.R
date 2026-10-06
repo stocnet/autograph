@@ -751,3 +751,60 @@ test_that("a tie between two nodes at one point is left out of the arc strength"
   expect_length(autograph:::.infer_arc_strength(net, p),
                 manynet::net_ties(net) - expected)
 })
+
+test_that("a concept lattice is drawn without arrowheads by default", {
+  skip_on_cran()
+  skip_if_not(exists("to_concepts", asNamespace("manynet")),
+              "manynet::to_concepts() is not available")
+  lat <- suppressMessages(
+    getExportedValue("manynet", "to_concepts")(manynet::ison_southern_women))
+  expect_true(autograph:::.is_concept_lattice(manynet::as_tidygraph(lat)))
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old))
+  expect_message(p <- graphr(lat, labels = FALSE), "concept lattice")
+  expect_null(tie_arrow(p))
+  expect_buildable(p)
+  # Asking for them outright brings them back.
+  expect_s3_class(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, edge_arrows = TRUE))), "arrow")
+  # Any other directed acyclic network keeps its arrowheads.
+  tree <- igraph::make_tree(10)
+  expect_false(autograph:::.is_concept_lattice(tree))
+  expect_s3_class(tie_arrow(graphr(tree)), "arrow")
+})
+
+test_that("a concept lattice labels the concepts that introduce a node", {
+  skip_on_cran()
+  skip_if_not(exists("to_concepts", asNamespace("manynet")),
+              "manynet::to_concepts() is not available")
+  to_concepts <- getExportedValue("manynet", "to_concepts")
+  # The labels a plot draws, read from the data of its text layer.
+  drawn <- function(p) {
+    text <- Filter(function(l) inherits(l$geom, "GeomText"), p$layers)
+    if (!length(text)) return(character())
+    text[[1]]$data[["name"]]
+  }
+  women <- manynet::ison_southern_women
+  lat <- suppressMessages(to_concepts(women))
+  nms <- manynet::node_names(lat)
+  sel <- autograph:::.concept_is_labelled(manynet::as_tidygraph(lat))
+  # Every woman and every event is named exactly once among those labels,
+  # and none of the concepts named only by its position is among them.
+  named <- unlist(strsplit(gsub("[{}]", "", nms[sel]), ",? "))
+  expect_setequal(named, manynet::node_names(women))
+  expect_false(anyDuplicated(named) > 0)
+  expect_equal(sel, !grepl("^C[0-9]+$", nms))
+  expect_setequal(drawn(suppressMessages(graphr(lat))), nms[sel])
+  # A choice the user made is theirs.
+  expect_setequal(drawn(suppressMessages(graphr(lat, labels = TRUE))), nms)
+  expect_length(drawn(suppressMessages(graphr(lat, labels = FALSE))), 0)
+  # A small lattice is treated the same way, though it is under the size at
+  # which a selection is otherwise made.
+  small <- suppressMessages(suppressWarnings(
+    to_concepts(manynet::ison_adolescents)))
+  snm <- manynet::node_names(small)
+  expect_setequal(drawn(suppressMessages(graphr(small))),
+                  snm[!grepl("^C[0-9]+$", snm)])
+  # Anything that is not a lattice has nothing to say here.
+  expect_null(autograph:::.concept_is_labelled(igraph::make_tree(10)))
+})

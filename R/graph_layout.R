@@ -31,7 +31,7 @@ graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
   if ("graph" %in% names(attributes(lo))) {
     if (!setequal(names(as.data.frame(attr(lo, "graph"))), names(lo))) {
       for (n in setdiff(names(as.data.frame(attr(lo, "graph"))), names(lo))) {
-        lo[n] <- igraph::vertex_attr(g, n)
+        lo[[n]] <- igraph::vertex_attr(g, n)
       }
     }
   }
