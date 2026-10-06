@@ -1,23 +1,26 @@
 graph_edges <- function(p, g, edge_color, edge_size, node_size,
                         edge_bundle = FALSE, layout = NULL, shared = NULL,
-                        backbone = NULL) {
+                        backbone = NULL, edge_arrows = TRUE) {
   bundle_geom <- .infer_bundle_geom(edge_bundle)
   fan <- .has_parallel_ties(g)
   if (manynet::is_directed(g)) {
     out <- .infer_directed_edge_mapping(g, edge_color, edge_size, node_size,
                                         layout, shared, backbone)
+    # One arrowhead size for the layer, read from the widths the ties are
+    # drawn at, which `graphs()` scales across all of its panels.
+    arrow <- .infer_arrow(out[["esize"]], edge_arrows, shared[["esize"]])
     if (!is.null(bundle_geom)) {
-      p <- .map_bundled_edges(p, g, out, bundle_geom, directed = TRUE)
+      p <- .map_bundled_edges(p, g, out, bundle_geom, arrow = arrow)
     } else if (fan) {
-      p <- .map_fanned_edges(p, g, out, directed = TRUE)
+      p <- .map_fanned_edges(p, g, out, directed = TRUE, arrow = arrow)
     } else {
-      p <- .map_directed_edges(p, g, out)
+      p <- .map_directed_edges(p, g, out, arrow)
     }
   } else {
     out <- .infer_edge_mapping(g, edge_color, edge_size, layout, shared,
                                backbone)
     if (!is.null(bundle_geom)) {
-      p <- .map_bundled_edges(p, g, out, bundle_geom, directed = FALSE)
+      p <- .map_bundled_edges(p, g, out, bundle_geom)
     } else if (fan) {
       p <- .map_fanned_edges(p, g, out, directed = FALSE)
     } else {
@@ -37,7 +40,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   # collected and a weight is drawn at the same width in each panel.
   if (is.null(shared[["esize"]]) && length(unique(out[["esize"]])) == 1) {
     p <- p + ggplot2::guides(edge_width = "none")
-  } else p <- p + ggraph::scale_edge_width_continuous(range = c(0.3, 3),
+  } else p <- p + ggraph::scale_edge_width_continuous(range = .edge_width_range(),
                                                       limits = shared[["esize"]],
                                                       guide = ggplot2::guide_legend(
                                                         ifelse(is.null(edge_size) &
@@ -192,12 +195,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   p
 }
 
-.map_directed_edges <- function(p, g, out) {
+.map_directed_edges <- function(p, g, out, arrow = NULL) {
   parts <- .split_edge_aes(out)
   parts$mapping$end_cap <- quote(ggraph::circle(c(out[["end_cap"]]), 'mm'))
   args <- c(list(mapping = do.call(ggplot2::aes, parts$mapping),
                  strength = .infer_arc_strength(g, p),
-                 arrow = .infer_arrow(out[["esize"]])),
+                 arrow = arrow),
             parts$params)
   .scale_edge_aes(p + do.call(ggraph::geom_edge_arc, args), parts)
 }
@@ -254,12 +257,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 # parallel ties about as far apart as two reciprocated ties.
 .fan_strength <- function() 1.85
 
-.map_fanned_edges <- function(p, g, out, directed = FALSE) {
+.map_fanned_edges <- function(p, g, out, directed = FALSE, arrow = NULL) {
   parts <- .split_edge_aes(out)
   args <- c(list(strength = .fan_strength()), parts$params)
   if (directed) {
     parts$mapping$end_cap <- quote(ggraph::circle(c(out[["end_cap"]]), 'mm'))
-    args$arrow <- .infer_arrow(out[["esize"]])
+    args$arrow <- arrow
   }
   if (length(parts$mapping))
     args$mapping <- do.call(ggplot2::aes, parts$mapping)
@@ -279,13 +282,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
          minimal = ggraph::geom_edge_bundle_minimal)
 }
 
-.map_bundled_edges <- function(p, g, out, bundle_geom, directed = FALSE) {
+.map_bundled_edges <- function(p, g, out, bundle_geom, arrow = NULL) {
   # Edge-bundling geoms draw paths that are pulled together into bundles, so the
   # arc `strength`/`end_cap` treatment used for straight/arced edges does not
-  # apply. Directed networks keep arrowheads (scaled via `.infer_arrow()`);
-  # undirected networks omit them. Colour/width mapping is preserved to the
-  # extent the geom's aesthetics allow.
-  arrow <- if (directed) .infer_arrow(out[["esize"]]) else NULL
+  # apply. Directed networks keep the arrowheads `graph_edges()` chose for
+  # them; undirected networks have none. Colour/width mapping is preserved to
+  # the extent the geom's aesthetics allow.
   parts <- .split_edge_aes(out)
   # Bundling merges edges into shared paths whose stat inserts NA-separated
   # break points, so a per-tie linetype cannot be represented (the NAs reach

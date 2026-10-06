@@ -63,7 +63,10 @@ test_that("scaling coordinates are kept when snapping is asked for", {
   snapped <- suppressMessages(
     graphr(manynet::ison_southern_women, layout = "scaling", snap = TRUE))
   plain <- graphr(manynet::ison_southern_women, layout = "scaling")
-  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")])
+  # Each plot holds its own copy of the graph, which differs in its igraph
+  # pointer alone, so only the coordinates are compared.
+  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")],
+               ignore_attr = "graph")
 })
 
 test_that("the fit is captioned alongside the isolates", {

@@ -110,7 +110,12 @@ graphs <- function(netlist, waves,
       labels_given <- "labels" %in% names(dots)
       lab <- .check_labels(ref, if (labels_given) dots$labels else TRUE)
       n_ref <- as.numeric(manynet::net_nodes(ref))
-      if (isTRUE(lab) && !labels_given && n_ref > 30)
+      # A concept lattice is left to each panel, where `graphr()` labels the
+      # concepts at which a node of the original network first appears. Those
+      # differ from one lattice to the next, as the most central nodes of one
+      # set of nodes do not.
+      if (isTRUE(lab) && !labels_given && n_ref > 30 &&
+          is.null(.concept_is_labelled(ref)))
         lab <- structure(5L, criterion = "degree", automatic = TRUE)
       if (!isTRUE(lab) && !isFALSE(lab)) {
         dots$labels <- manynet::node_names(ref)[.infer_labels(ref, lab)]

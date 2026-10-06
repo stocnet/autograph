@@ -100,7 +100,7 @@ test_that("fancy node mods graph correctly", {
   # two-mode network
   ison_southern_women <- add_node_attribute(ison_southern_women, "group",
                                             c(sample(c("a", "b"),
-                                                     length(ison_southern_women),
+                                                     net_nodes(ison_southern_women),
                                                      replace = TRUE)))
   test2 <- graphr(ison_southern_women, node_color = "type")
   expect_s3_class(test2, c("ggraph","gg","ggplot"))
@@ -139,7 +139,7 @@ test_that("node_group works correctly", {
 
 test_that("node_group draws overlapping hulls from a membership matrix", {
   skip_on_cran()
-  skip_if_not_installed("netrics", "1.0.0")
+  skip_if_not_installed("netrics")
   skip_if_not_installed("ggforce")
   cliques <- netrics::node_x_clique(ison_adolescents)
   p <- graphr(ison_adolescents, node_group = netrics::node_x_clique())
@@ -750,4 +750,172 @@ test_that("a tie between two nodes at one point is left out of the arc strength"
   # `strength` is as long as the ties the arc stat keeps, and no longer.
   expect_length(autograph:::.infer_arc_strength(net, p),
                 manynet::net_ties(net) - expected)
+})
+
+test_that("graphr() draws a network that holds a list node attribute", {
+  # A concept lattice keeps the extent and intent of each concept as a list
+  # node attribute, one set to a node and no two sets need be the same size.
+  # ggraph leaves such a column out of the layout, and putting it back has to
+  # keep the list as one column rather than read it as one column to a set.
+  # A lattice is rarely small, and it is the larger network that failed here.
+  members <- lapply(1:40, function(k) letters[seq_len(k %% 7 + 1)])
+  net <- igraph::make_tree(40)
+  igraph::vertex_attr(net, "members") <- members
+  net <- manynet::as_tidygraph(net)
+  p <- suppressMessages(graphr(net, layout = "layered"))
+  expect_s3_class(p, "ggplot")
+  expect_equal(p[["data"]][["members"]], members)
+})
+
+# The arrowhead a plot's tie layer was given, or NULL where it has none.
+tie_arrow <- function(p) p$layers[[1]]$geom_params$arrow
+arrow_mm <- function(p) as.numeric(grid::convertUnit(tie_arrow(p)$length, "mm"))
+
+test_that("edge_arrows switches the arrowheads of a directed network", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  # On by default, and 2mm long at the default width.
+  expect_equal(arrow_mm(graphr(net)), 2)
+  expect_equal(arrow_mm(graphr(net, edge_arrows = TRUE)), 2)
+  p_off <- graphr(net, edge_arrows = FALSE)
+  expect_null(tie_arrow(p_off))
+  expect_buildable(p_off)
+  # No length is no arrowhead.
+  expect_null(tie_arrow(graphr(net, edge_arrows = 0)))
+  # The switch reaches the other two geoms that draw directed ties.
+  expect_null(tie_arrow(graphr(net, edge_arrows = FALSE, edge_bundle = TRUE)))
+  expect_s3_class(tie_arrow(graphr(net, edge_bundle = TRUE)), "arrow")
+  multi <- igraph::make_graph(c(1, 2, 1, 2, 2, 3), directed = TRUE)
+  expect_s3_class(tie_arrow(graphr(multi)), "arrow")
+  expect_null(tie_arrow(graphr(multi, edge_arrows = FALSE)))
+})
+
+test_that("arrowheads follow the width of the ties unless given a size", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  # Wider ties get longer arrowheads, up to a cap.
+  expect_equal(arrow_mm(graphr(net, edge_size = 0.75)), 3)
+  expect_equal(arrow_mm(graphr(net, edge_size = 5)), 4)
+  # A size given outright is used whatever the width, and is not capped.
+  expect_equal(arrow_mm(graphr(net, edge_arrows = 3)), 3)
+  expect_equal(arrow_mm(graphr(net, edge_arrows = 6, edge_size = 0.25)), 6)
+  expect_buildable(graphr(net, edge_arrows = 6))
+  # Ties that are not drawn have no arrowheads, whatever was asked for (#50).
+  expect_null(tie_arrow(graphr(net, edge_size = 0)))
+  expect_null(tie_arrow(graphr(net, edge_size = 0, edge_arrows = 3)))
+})
+
+test_that("arrowheads follow the widths drawn rather than the values mapped", {
+  skip_on_cran()
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  n <- as.numeric(manynet::net_ties(net))
+  small <- manynet::add_tie_attribute(net, "weight", seq_len(n))
+  large <- manynet::add_tie_attribute(net, "weight", seq_len(n) * 1000)
+  # The same lines on the page, so the same arrowheads on them, whatever units
+  # the weight is recorded in.
+  expect_equal(arrow_mm(graphr(small)), arrow_mm(graphr(large)))
+  # Evenly spread weights are drawn at a mean width of 1.65, which is past
+  # the cap.
+  expect_equal(autograph:::.drawn_esize(c(1, 2, 3)), c(0.3, 1.65, 3))
+  expect_equal(arrow_mm(graphr(small)), 4)
+  # Mostly thin ties are given the small arrowheads that suit them.
+  skew <- manynet::add_tie_attribute(net, "weight", c(rep(1, n - 1), 100))
+  expect_lt(arrow_mm(graphr(skew)), 4)
+  # A scale shared between panels is read across its limits.
+  expect_equal(autograph:::.drawn_esize(c(1, 2), limits = c(1, 3)),
+               c(0.3, 1.65))
+})
+
+test_that("edge_arrows is set aside for an undirected network", {
+  skip_on_cran()
+  expect_null(tie_arrow(graphr(manynet::ison_adolescents)))
+  # Quietly, since the same value is often given to networks of both kinds.
+  old <- options(snet_verbosity = "normal")
+  on.exit(options(old))
+  expect_no_message(p <- graphr(manynet::ison_adolescents, edge_arrows = TRUE))
+  expect_null(tie_arrow(p))
+  expect_null(tie_arrow(graphr(manynet::ison_adolescents, edge_arrows = 3)))
+  expect_buildable(p)
+})
+
+test_that("edge_arrows rejects what is neither a switch nor a size", {
+  net <- manynet::to_directed(manynet::ison_adolescents)
+  for (bad in list("big", -1, c(1, 2), NA, Inf))
+    expect_error(graphr(net, edge_arrows = bad), "edge_arrows")
+})
+
+test_that("a concept lattice is drawn without arrowheads by default", {
+  skip_on_cran()
+  skip_if_not(manynet_has("to_concepts"),
+              "manynet::to_concepts() is not available")
+  lat <- suppressMessages(
+    getExportedValue("manynet", "to_concepts")(manynet::ison_southern_women))
+  expect_true(autograph:::.is_concept_lattice(manynet::as_tidygraph(lat)))
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old))
+  expect_message(p <- graphr(lat, labels = FALSE), "concept lattice")
+  expect_null(tie_arrow(p))
+  expect_buildable(p)
+  # Asking for them outright brings them back.
+  expect_s3_class(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, edge_arrows = TRUE))), "arrow")
+  # They are left off only where the layout draws a Hasse diagram. A layout
+  # that puts no meaning in which end of a tie is higher keeps them, as do
+  # coordinates or ranks the caller gave.
+  expect_null(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, layout = "railway"))))
+  for (lay in c("circle", "stress", "lineage"))
+    expect_s3_class(tie_arrow(suppressMessages(
+      graphr(lat, labels = FALSE, layout = lay))), "arrow")
+  n <- manynet::net_nodes(lat)
+  expect_s3_class(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, x = seq_len(n), y = rev(seq_len(n))))), "arrow")
+  expect_true(autograph:::.is_hasse_layout("layered", ranks = "tight"))
+  expect_false(autograph:::.is_hasse_layout("layered", ranks = "year"))
+  expect_false(autograph:::.is_hasse_layout("layered", manual = TRUE))
+  # Any other directed acyclic network keeps its arrowheads.
+  tree <- igraph::make_tree(10)
+  expect_false(autograph:::.is_concept_lattice(tree))
+  expect_s3_class(tie_arrow(graphr(tree)), "arrow")
+})
+
+test_that("a concept lattice labels the concepts that introduce a node", {
+  skip_on_cran()
+  skip_if_not(manynet_has("to_concepts"),
+              "manynet::to_concepts() is not available")
+  to_concepts <- getExportedValue("manynet", "to_concepts")
+  # The labels a plot draws, read from the data of its text layer.
+  drawn <- function(p) {
+    text <- Filter(function(l) inherits(l$geom, "GeomText"), p$layers)
+    if (!length(text)) return(character())
+    text[[1]]$data[["name"]]
+  }
+  women <- manynet::ison_southern_women
+  lat <- suppressMessages(to_concepts(women))
+  nms <- manynet::node_names(lat)
+  sel <- autograph:::.concept_is_labelled(manynet::as_tidygraph(lat))
+  # Every woman and every event is named exactly once among those labels,
+  # and none of the concepts named only by its position is among them.
+  named <- unlist(strsplit(gsub("[{}]", "", nms[sel]), ",? "))
+  expect_setequal(named, manynet::node_names(women))
+  expect_false(anyDuplicated(named) > 0)
+  expect_equal(sel, !grepl("^C[0-9]+$", nms))
+  expect_setequal(drawn(suppressMessages(graphr(lat))), nms[sel])
+  # A choice the user made is theirs.
+  expect_setequal(drawn(suppressMessages(graphr(lat, labels = TRUE))), nms)
+  expect_length(drawn(suppressMessages(graphr(lat, labels = FALSE))), 0)
+  # A small lattice is treated the same way, though it is under the size at
+  # which a selection is otherwise made.
+  small <- suppressMessages(suppressWarnings(
+    to_concepts(manynet::ison_adolescents)))
+  snm <- manynet::node_names(small)
+  expect_setequal(drawn(suppressMessages(graphr(small))),
+                  snm[!grepl("^C[0-9]+$", snm)])
+  # A list of lattices is drawn by `graphs()`, which leaves the choice to each
+  # panel rather than labelling the most central concepts of the first.
+  expect_gt(manynet::net_nodes(lat), 30)
+  ps <- suppressMessages(graphr(list(lat, lat)))
+  for (i in 1:2) expect_setequal(drawn(ps[[i]]), nms[sel])
+  # Anything that is not a lattice has nothing to say here.
+  expect_null(autograph:::.concept_is_labelled(igraph::make_tree(10)))
 })

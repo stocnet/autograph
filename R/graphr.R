@@ -93,6 +93,10 @@
 #'   node's position, so a lone node is best named, as in `labels = "Alice"`.
 #'   For networks of more than 30 nodes, `labels` defaults to a selection
 #'   rather than to every node; pass `labels = TRUE` for all of them.
+#'   For a concept lattice from `manynet::to_concepts()`, `labels` defaults to
+#'   the concepts at which a node of the original network first appears,
+#'   so that each of those nodes is named once, as in a Hasse diagram,
+#'   and the concepts named only by their position are left unlabelled.
 #'   Ranking nodes uses the `{netrics}` package, which is suggested rather than
 #'   required: without it installed, an automatic selection falls back to a
 #'   random sample.
@@ -186,6 +190,28 @@
 #'   when a network has enough edges; for directed networks arrowheads are
 #'   retained, but the slight reciprocal-tie curvature used for unbundled edges
 #'   does not apply.
+#' @param edge_arrows Whether, and at what size, to draw arrowheads on the ties
+#'   of a directed network.
+#'   By default (`NULL`) this is decided by the network:
+#'   a directed network is drawn with arrowheads,
+#'   except for a concept lattice from `manynet::to_concepts()` in the
+#'   "layered" (its default) or "railway" layout.
+#'   That is read as a Hasse diagram, where the direction of each tie is
+#'   already given by which of its ends is drawn higher.
+#'   In any other layout a concept lattice keeps its arrowheads.
+#'   `TRUE` draws arrowheads whatever the network, and `FALSE` none.
+#'   Arrowheads follow the width the ties are drawn at:
+#'   2mm long at the default `edge_size` of 0.5, and longer on wider ties,
+#'   up to 4mm. Where the widths vary, as when they are mapped from a tie
+#'   attribute, one size is chosen for all of the arrowheads from the mean
+#'   width drawn.
+#'   A number, e.g. `edge_arrows = 3`, draws arrowheads of that length in
+#'   millimetres instead, whatever the width of the ties.
+#'   This is the unit that `{ggplot2}` sizes are given in, as `node_size` is,
+#'   so an arrowhead of 3 is a little longer than a node of 3 is wide.
+#'   Ties that are not drawn, as with `edge_size = 0`, have no arrowheads.
+#'   An undirected network has no direction to show,
+#'   so the argument is ignored there.
 #' @param backbone How to treat the network's backbone: the ties that a local
 #'   null model keeps, because they carry more weight, or sit in more
 #'   triangles, than chance alone would put there.
@@ -207,7 +233,7 @@
 #'   "drl" and "kk" -- are laid out this way. Every other layout, including
 #'   those that already carry meaning in their coordinates such as "layered"
 #'   or "scaling", keeps its coordinates and only fades its ties.
-#'   Requires `manynet` 2.3.0 or later, and does not apply to signed networks.
+#'   Does not apply to signed networks.
 #' @param .shared Internal. A list of the aesthetic ranges and categories found
 #'   across a list of networks, which `graphs()` uses to draw and label each of
 #'   its panels against the same scales. Not intended to be set by hand.
@@ -234,6 +260,9 @@
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
+#' # Larger arrowheads than the width of the ties would give, or none at all
+#' graphr(ison_networkers, edge_arrows = 4)
+#' graphr(ison_networkers, edge_arrows = FALSE)
 #' graphr(manynet::generate_random(80, 0.2), backbone = TRUE)
 #' @export
 graphr <- function(.data, layout = NULL, labels = TRUE,
@@ -241,7 +270,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
                    edge_color, edge_size,
                    isolates = c("legend","caption","keep"), snap = FALSE,
                    label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
-                   backbone = NULL, .shared = NULL, ...,
+                   edge_arrows = NULL, backbone = NULL, .shared = NULL, ...,
                    node_colour, edge_colour) {
   # A list of networks is handed to graphs(). The call is forwarded as written,
   # rather than argument by argument, because the aesthetic arguments have no
@@ -275,14 +304,25 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     } else {
       isos <- which(.node_is_isolate(g))
     }
-    g <- .ag_delete_isolates(g)
+    g <- manynet::delete_isolates(g)
   }
   # A label for every node of a large network hides the network behind them,
   # so unless labelling was asked for outright, fall back to labelling the
   # nodes that stand out. Decided here rather than above so that the count
   # reflects the nodes actually drawn, once any isolates have been dropped.
   n <- as.numeric(manynet::net_nodes(g))
-  if (labels_missing && isTRUE(labels) && n > 30) {
+  # A concept lattice says for itself which of its nodes to label, whatever
+  # its size: those at which a node of the original network first appears.
+  # The rest are named only by their position, which is no help to a reader.
+  introduces <- if (labels_missing && isTRUE(labels)) .concept_is_labelled(g)
+  if (!is.null(introduces)) {
+    labels <- manynet::node_names(g)[introduces]
+    manynet::snet_info(
+      "Labelling the {length(labels)} of {n} concepts at which a node of the",
+      "original network first appears.",
+      "Use {.code labels = TRUE} to label all of them.")
+    if (!length(labels)) labels <- FALSE
+  } else if (labels_missing && isTRUE(labels) && n > 30) {
     labels <- structure(5L, criterion = "degree", automatic = TRUE)
     n_lab <- sum(.infer_labels(g, labels))
     manynet::snet_info(
@@ -335,12 +375,18 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (missing(edge_size)) edge_size <- NULL else if (!is.numeric(edge_size)) {
     edge_size <- .check_edge_size(g, as.character(substitute(edge_size)))
   }
+  # After the isolates are dropped, so that the network read is the one drawn.
+  # After the layout is settled too, since a concept lattice goes without
+  # arrowheads only where the layout draws it as a Hasse diagram.
+  manual <- all(c("x", "y") %in% names(list(...)))
+  edge_arrows <- .infer_edge_arrows(g, .check_edge_arrows(edge_arrows),
+                                    hasse = .is_hasse_layout(layout, manual, ...))
   # Find the backbone ----
   # After the layout is settled, since a layout that carries meaning in its
   # coordinates keeps them and fades its ties only, and after the isolates are
   # dropped, so that the filter reads the network that is drawn.
   backbone <- .infer_backbone(g, .check_backbone(backbone), layout, edge_bundle,
-                              manual = all(c("x", "y") %in% names(list(...))))
+                              manual = manual)
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, backbone, ...)
   # Read where the layout left it, since the later steps have no use for it
@@ -348,7 +394,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   fit <- attr(p[["data"]], "fit")
   # Add edges ----
   p <- graph_edges(p, g, edge_color, edge_size, node_size, edge_bundle, layout,
-                   .shared, backbone)
+                   .shared, backbone, edge_arrows)
   # Add nodes ----
   p <- graph_nodes(p, g, node_color, node_shape, node_size, layout, .shared)
   # Add labels ----
@@ -493,7 +539,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       g <- g[[1]]
     if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
-    } else if (.ag_is_multilevel(g) && manynet::is_connected(g)) {
+    } else if (manynet::is_multilevel(g) && manynet::is_connected(g)) {
       # Checked before `is_twomode()`, which is also TRUE for these networks.
       # A "layered" layout would place each level along a single row, which
       # collapses the within-level ties that make the network multilevel.

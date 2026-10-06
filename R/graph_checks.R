@@ -167,6 +167,21 @@
               extra_desc = "A number, such as {.code edge_size = 2}, can also be given here.")
 }
 
+# `edge_arrows` is a switch that can also carry a size: NULL leaves the choice
+# to the network, TRUE and FALSE make it, and a number makes it and gives the
+# length of the arrowheads too. No length is no arrowhead, so 0 is FALSE.
+.check_edge_arrows <- function(edge_arrows) {
+  if (is.null(edge_arrows)) return(NULL)
+  if (isTRUE(edge_arrows) || isFALSE(edge_arrows)) return(edge_arrows)
+  if (is.numeric(edge_arrows) && length(edge_arrows) == 1L &&
+      is.finite(edge_arrows) && edge_arrows >= 0)
+    return(if (edge_arrows == 0) FALSE else as.numeric(edge_arrows))
+  manynet::snet_abort(
+    "{.arg edge_arrows} should be {.code TRUE} or {.code FALSE},",
+    "or a single positive number giving the length of the arrowheads in",
+    "millimetres, such as {.code edge_arrows = 3}.")
+}
+
 .check_node_group <- function(g, node_group) {
   .match_name(node_group, igraph::vertex_attr_names(g), "node_group",
               what = "node attribute")

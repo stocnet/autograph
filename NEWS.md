@@ -1,3 +1,51 @@
+# autograph 1.2.4
+
+## Package
+
+- Raised `{manynet}` floor to 2.3.4 and `{netrics}` floor to 1.0.3
+  - Dropped shims for `manynet::delete_isolates()`, `manynet::is_multilevel()`, `manynet::tie_is_backbone()`, and `manynet::to_times()`
+  - Dropped workarounds for `manynet::to_waves()` failing on non-character changing attributes, "time" panels, and diffusions
+- Tests now run serially on CRAN
+
+## Graphing
+
+- Improved concept lattice drawing so that it is drawn as a Hasse diagram
+  - Arrowheads are left off only in the "layered" and "railway" layouts, where each tie points down the page
+- Fixed `graphr()` warning about ties that an automatically chosen backbone was drawn from
+
+## Aesthetics
+
+- Added `edge_arrows=` for tailoring the size of the arrowheads
+  - `NULL` (default) leaves choice to the network, `TRUE` draws them, `FALSE` not
+  - A directed network will, by default, draw arrowheads following `edge_size`
+  - An undirected network has no arrowheads and ignores the argument
+  - A number gives the length of the arrowheads in ggplot2 units
+
+## Layouts
+
+- Fixed `layout_concentric()` and `plot.matrix()` to square a two-mode network with `manynet::to_onemode()`
+- Fixed `layout_layered()`, `layout_lineage()`, `layout_railway()`, `layout_ladder()`, and `layout_matching()` erroring on a two-mode 'stocnet'
+  - The node names are now read with `manynet::node_names()`, since igraph reads only an igraph
+
+## Tutorials
+
+- Restructured the "Visualisation" tutorial so that each topic holds one idea
+  - Moved "Labels and titles" to directly after "Getting started", and added a free play exercise to "Getting started"
+  - Renamed "Illustrating graphs" to "Aesthetics", which now closes with "Legends"
+    - Added `edge_arrows` to the aesthetics table and the "Pointing arrows" section of the "Visualisation" tutorial
+    - Added an example of `node_colour` on a continuous attribute, which is drawn as a gradient
+  - Reordered "Layouts" by how much of a node's position is data: spectral, layered, circular, grid, force-directed, then manual
+  - Added a "Checking layouts" topic for the `check_*()` functions, stress, inertia, and cos2
+  - Moved isolates, bundling, and backbones to an "Ew, hairballs" topic after the layouts
+- Added explanatory figures to the "Visualisation" tutorial
+  - A gallery of small graphs shows what each aesthetic argument changes
+  - A gallery shows one network under one layout from each family
+  - Pairs of drawings of one small network show what each layout check scores
+- Improved the introduction of the `"eigen"` layout, which now says what its axes are and how to read them
+- Examples now use only degree and attributes that come with the data, in place of measures that the `{netrics}` tutorials introduce
+- Fixed the "Legends" example retitling a legend that `labs(colour = )` does not reach
+- Chunks labelled `explain-*` are now drawn in the static article
+
 # autograph 1.2.3
 
 ## Package

@@ -29,6 +29,7 @@ graphr_arg_values <- list(
   edge_colour = NULL, # alias of edge_color
   edge_size   = list("weight", 0.5),
   edge_bundle = list("force"),
+  edge_arrows = list(TRUE, FALSE, 3), # also test-graphr.R, on directed data
   isolates    = list("legend", "caption", "keep"),
   snap        = NULL, # exercised in test-functional_layouts.R
   backbone    = list(TRUE, FALSE, "simmelian", 0.1), # also test-graph_backbone.R

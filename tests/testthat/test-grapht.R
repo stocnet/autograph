@@ -58,13 +58,12 @@ test_that("grapht() accepts an unsplit longitudinal network", {
 
 test_that("grapht() splits a longitudinal network with a logical changing attribute", {
   # fict_starwars is a changing+longitudinal network with a logical `active`
-  # node attribute (and numeric height/mass) that change over time. manynet's
-  # to_waves() aborts splitting these ("Can't combine <character> and
-  # <logical>"); .to_waves_safe() coerces the offending attributes and retries.
+  # node attribute (and numeric height/mass) that change over time, which
+  # manynet's to_waves() once aborted on ("Can't combine <character> and
+  # <logical>").
   skip_if_not(manynet::is_changing(manynet::fict_starwars))
   expect_true(is.logical(manynet::node_attribute(manynet::fict_starwars, "active")))
-  # .to_waves_safe() returns the same waves manynet would, without erroring
-  waves <- autograph:::.to_waves_safe(manynet::fict_starwars)
+  waves <- manynet::to_waves(manynet::fict_starwars)
   expect_type(waves, "list")
   expect_gt(length(waves), 1)
   p <- grapht(manynet::fict_starwars)
@@ -231,10 +230,9 @@ test_that("keep_isolates is deprecated but still honoured", {
     data.frame(from = "A", to = "B"),
     directed = FALSE, vertices = data.frame(name = c("A", "B", "C"))))
   # The deprecation notice comes through the stocnet cli interface, which
-  # raises a warning condition whatever the verbosity from manynet 2.3.2, and
-  # prints without raising one before that (see helper-manynet.R).
-  expect_snet_warning(p <- grapht(list(t1 = tied, t2 = tied),
-                                  keep_isolates = FALSE), "deprecated")
+  # raises a warning condition whatever the verbosity.
+  expect_warning(p <- grapht(list(t1 = tied, t2 = tied),
+                             keep_isolates = FALSE), "deprecated")
   p <- suppressWarnings(grapht(list(t1 = tied, t2 = tied),
                                keep_isolates = FALSE))
   nd <- .node_layer(p)$data
@@ -273,6 +271,29 @@ test_that("directed networks get trimmed segments and an arrow", {
   raw_xend <- nd$x[match(paste(el$data$to, el$data$frame),
                          paste(nd$name, nd$frame))]
   expect_true(any(abs(el$data$xend - raw_xend) > 1e-10))
+})
+
+test_that("edge_arrows switches and sizes the arrowheads of an animation", {
+  dl <- list(
+    t1 = manynet::as_tidygraph(igraph::graph_from_data_frame(
+      data.frame(from = c("A", "B", "C"), to = c("B", "C", "A")))),
+    t2 = manynet::as_tidygraph(igraph::graph_from_data_frame(
+      data.frame(from = c("A", "C"), to = c("C", "B")))))
+  arrow_of <- function(p) .edge_layer(p)$geom_params$arrow
+  arrow_mm <- function(p)
+    as.numeric(grid::convertUnit(arrow_of(p)$length, "mm"))
+  # By default, and where asked for, they follow the width of the ties.
+  expect_equal(arrow_mm(grapht(dl)), 2)
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = TRUE)), 2)
+  expect_null(arrow_of(grapht(dl, edge_arrows = FALSE)))
+  expect_null(arrow_of(grapht(dl, edge_arrows = 0)))
+  # A length that is given is used whatever the width of the ties.
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = 3)), 3)
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = 6, edge_size = 0.25)), 6)
+  # An undirected animation has no arrowheads to size.
+  expect_null(arrow_of(grapht(.wave_fixture(), edge_arrows = 3)))
+  for (bad in list("big", -1, c(1, 2), NA, Inf))
+    expect_error(grapht(dl, edge_arrows = bad), "edge_arrows")
 })
 
 test_that("signed networks map sign to colour and linetype", {
@@ -352,7 +373,6 @@ test_that("grapht() draws a numeric node_color as a gradient", {
 # Issue #40: the tutorial pipeline with a custom time attribute ----
 
 test_that("grapht() works on to_waves() output split by a custom attribute (#40)", {
-  skip_if_not_installed("manynet", minimum_version = "2.2.2")
   set.seed(123)
   p <- manynet::fict_lotr |>
     manynet::mutate_ties(year = sample(1:12, manynet::net_ties(manynet::fict_lotr),
@@ -382,7 +402,7 @@ test_that("grapht() splits a begin/end spell network into active-spell slices", 
   slices <- autograph:::.grapht_spell_slices(manynet::irps_wwi)
   expect_type(slices, "list")
   # One slice per change point (each moment a tie begins or ends), named by year
-  # and in order; this mirrors manynet::to_time() on manynet >= 2.2.2.
+  # and in order; this mirrors manynet::to_times().
   changes <- sort(unique(c(manynet::tie_attribute(manynet::irps_wwi, "begin"),
                            manynet::tie_attribute(manynet::irps_wwi, "end"))))
   expect_equal(names(slices), as.character(changes))

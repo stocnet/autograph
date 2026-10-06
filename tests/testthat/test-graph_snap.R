@@ -80,7 +80,10 @@ test_that("snapping a two-mode (layered) layout falls back gracefully", {
   snapped <- suppressMessages(graphr(manynet::ison_southern_women, snap = TRUE))
   plain   <- graphr(manynet::ison_southern_women)
   expect_buildable(snapped)
-  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")])
+  # Each plot holds its own copy of the graph, which differs in its igraph
+  # pointer alone, so only the coordinates are compared.
+  expect_equal(snapped$data[, c("x", "y")], plain$data[, c("x", "y")],
+               ignore_attr = "graph")
 })
 
 test_that("snapping still works on a two-mode network with a force layout", {
