@@ -231,7 +231,7 @@
 #'   "drl" and "kk" -- are laid out this way. Every other layout, including
 #'   those that already carry meaning in their coordinates such as "layered"
 #'   or "scaling", keeps its coordinates and only fades its ties.
-#'   Requires `manynet` 2.3.0 or later, and does not apply to signed networks.
+#'   Does not apply to signed networks.
 #' @param .shared Internal. A list of the aesthetic ranges and categories found
 #'   across a list of networks, which `graphs()` uses to draw and label each of
 #'   its panels against the same scales. Not intended to be set by hand.
@@ -302,7 +302,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     } else {
       isos <- which(.node_is_isolate(g))
     }
-    g <- .ag_delete_isolates(g)
+    g <- manynet::delete_isolates(g)
   }
   # A label for every node of a large network hides the network behind them,
   # so unless labelling was asked for outright, fall back to labelling the
@@ -533,7 +533,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       g <- g[[1]]
     if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
-    } else if (.ag_is_multilevel(g) && manynet::is_connected(g)) {
+    } else if (manynet::is_multilevel(g) && manynet::is_connected(g)) {
       # Checked before `is_twomode()`, which is also TRUE for these networks.
       # A "layered" layout would place each level along a single row, which
       # collapses the within-level ties that make the network multilevel.

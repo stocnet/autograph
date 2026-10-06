@@ -1,8 +1,16 @@
 # autograph 1.2.4
 
+## Package
+
+- Raised `{manynet}` floor to 2.3.4 and `{netrics}` floor to 1.0.3
+  - Dropped shims for `manynet::delete_isolates()`, `manynet::is_multilevel()`, `manynet::tie_is_backbone()`, and `manynet::to_times()`
+  - Dropped workarounds for `manynet::to_waves()` failing on non-character changing attributes, "time" panels, and diffusions
+- Tests now run serially on CRAN
+
 ## Graphing
 
 - Improved concept lattice drawing so that it is drawn as a Hasse diagram
+- Fixed `graphr()` warning about ties that an automatically chosen backbone was drawn from
 
 ## Aesthetics
 

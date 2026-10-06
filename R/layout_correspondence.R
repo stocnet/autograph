@@ -151,7 +151,7 @@ layout_tbl_graph_correspondence <- layout_correspondence
   # matrix that keeps every tie. A multilevel network is two-mode as well, but
   # also has ties within its modes, and manynet::as_matrix() would drop those,
   # so it is read as a square matrix like any one-mode network.
-  bipartite <- manynet::is_twomode(g) && !.ag_is_multilevel(g)
+  bipartite <- manynet::is_twomode(g) && !manynet::is_multilevel(g)
   if (bipartite) {
     # manynet orders the nodes of the first mode before those of the second,
     # which is the order the rows and then the columns of the incidence matrix

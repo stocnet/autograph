@@ -35,7 +35,6 @@ test_that("only a large, dense network counts as a hairball", {
 })
 
 test_that("a backbone fades the ties the filter does not keep", {
-  skip_if_not(manynet_has("tie_is_backbone"))
   p <- suppressMessages(graphr(bb_fixture, backbone = TRUE, labels = FALSE))
   expect_buildable(p)
   expect_equal(bb_alphas(p), c(0.08, 0.4))
@@ -46,16 +45,18 @@ test_that("a backbone fades the ties the filter does not keep", {
 })
 
 test_that("a backbone is drawn without being asked for, and can be refused", {
-  skip_if_not(manynet_has("tie_is_backbone"))
   auto <- suppressMessages(graphr(bb_fixture, labels = FALSE))
   expect_equal(bb_alphas(auto), c(0.08, 0.4))
+  # A backbone nobody asked for does not warn about how it was found, as
+  # manynet does of a network that ties some pairs more than once.
+  expect_no_warning(suppressMessages(graphr(manynet::ison_lawfirm,
+                                            labels = FALSE)))
   # A network the reader can already follow is left alone.
   small <- graphr(manynet::ison_adolescents)
   expect_equal(bb_alphas(small), 0.4)
 })
 
 test_that("a backbone moves the layouts that read tie lengths", {
-  skip_if_not(manynet_has("tie_is_backbone"))
   moved <- suppressMessages(graphr(bb_fixture, layout = "stress",
                                    backbone = TRUE, labels = FALSE))
   plain <- suppressMessages(graphr(bb_fixture, layout = "stress",
@@ -103,7 +104,6 @@ test_that("a tie length points the way each layout reads it", {
 })
 
 test_that("a network without a backbone to draw is drawn as it was", {
-  skip_if_not(manynet_has("tie_is_backbone"))
   # A signed network has no backbone, since these null models have no place
   # for a negative weight.
   signed <- suppressMessages(graphr(manynet::fict_marvel, backbone = TRUE,
@@ -120,7 +120,6 @@ test_that("a network without a backbone to draw is drawn as it was", {
 })
 
 test_that("a bundled network is drawn without a fading", {
-  skip_if_not(manynet_has("tie_is_backbone"))
   p <- suppressMessages(graphr(bb_fixture, backbone = TRUE, labels = FALSE,
                                edge_bundle = TRUE))
   expect_buildable(p)

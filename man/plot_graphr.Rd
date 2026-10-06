@@ -251,7 +251,7 @@ Only the layouts that read tie lengths -- "stress" (the default), "fr",
 "drl" and "kk" -- are laid out this way. Every other layout, including
 those that already carry meaning in their coordinates such as "layered"
 or "scaling", keeps its coordinates and only fades its ties.
-Requires \code{manynet} 2.3.0 or later, and does not apply to signed networks.}
+Does not apply to signed networks.}
 
 \item{.shared}{Internal. A list of the aesthetic ranges and categories found
 across a list of networks, which \code{graphs()} uses to draw and label each of

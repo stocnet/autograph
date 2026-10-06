@@ -139,7 +139,7 @@ test_that("node_group works correctly", {
 
 test_that("node_group draws overlapping hulls from a membership matrix", {
   skip_on_cran()
-  skip_if_not_installed("netrics", "1.0.0")
+  skip_if_not_installed("netrics")
   skip_if_not_installed("ggforce")
   cliques <- netrics::node_x_clique(ison_adolescents)
   p <- graphr(ison_adolescents, node_group = netrics::node_x_clique())
@@ -759,8 +759,9 @@ test_that("graphr() draws a network that holds a list node attribute", {
   # keep the list as one column rather than read it as one column to a set.
   # A lattice is rarely small, and it is the larger network that failed here.
   members <- lapply(1:40, function(k) letters[seq_len(k %% 7 + 1)])
-  net <- tidygraph::as_tbl_graph(igraph::make_tree(40)) |>
-    tidygraph::mutate(members = members)
+  net <- igraph::make_tree(40)
+  igraph::vertex_attr(net, "members") <- members
+  net <- manynet::as_tidygraph(net)
   p <- suppressMessages(graphr(net, layout = "layered"))
   expect_s3_class(p, "ggplot")
   expect_equal(p[["data"]][["members"]], members)
@@ -845,7 +846,7 @@ test_that("edge_arrows rejects what is neither a switch nor a size", {
 
 test_that("a concept lattice is drawn without arrowheads by default", {
   skip_on_cran()
-  skip_if_not(exists("to_concepts", asNamespace("manynet")),
+  skip_if_not(manynet_has("to_concepts"),
               "manynet::to_concepts() is not available")
   lat <- suppressMessages(
     getExportedValue("manynet", "to_concepts")(manynet::ison_southern_women))
@@ -866,7 +867,7 @@ test_that("a concept lattice is drawn without arrowheads by default", {
 
 test_that("a concept lattice labels the concepts that introduce a node", {
   skip_on_cran()
-  skip_if_not(exists("to_concepts", asNamespace("manynet")),
+  skip_if_not(manynet_has("to_concepts"),
               "manynet::to_concepts() is not available")
   to_concepts <- getExportedValue("manynet", "to_concepts")
   # The labels a plot draws, read from the data of its text layer.

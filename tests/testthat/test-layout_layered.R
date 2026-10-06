@@ -77,7 +77,7 @@ test_that("layered places every node, isolates included", {
 
 test_that("layered packs the components apart", {
   skip_on_cran()
-  thrones <- .ag_delete_isolates(to_uniplex(fict_thrones, "parent"))
+  thrones <- delete_isolates(to_uniplex(fict_thrones, "parent"))
   lo <- layout_layered(thrones)
   memb <- igraph::components(as_igraph(thrones), mode = "weak")$membership
   spans <- lapply(sort(unique(memb)), function(cc) range(lo$x[memb == cc]))
@@ -220,7 +220,7 @@ test_that("railway gives every layer the same spacing", {
 
 test_that(".tighten_layers keeps every tie pointing down and shortens them", {
   skip_on_cran()
-  g <- as_igraph(.ag_delete_isolates(to_uniplex(fict_thrones, "parent")))
+  g <- as_igraph(delete_isolates(to_uniplex(fict_thrones, "parent")))
   ties <- igraph::as_edgelist(g, names = FALSE)
   loose <- autograph:::.rank_layers(g)
   tight <- autograph:::.tighten_layers(g)
@@ -250,7 +250,7 @@ test_that("check_span and check_offset read a graphr plot", {
   skip_on_cran()
   thrones <- to_uniplex(fict_thrones, "parent")
   p <- graphr(thrones)
-  ties <- net_ties(.ag_delete_isolates(thrones))
+  ties <- net_ties(delete_isolates(thrones))
   span <- check_span(p)
   offset <- check_offset(p)
   expect_length(span, ties)

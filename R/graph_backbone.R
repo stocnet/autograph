@@ -2,7 +2,7 @@
 # network dense enough that every tie covers another one, and dense enough that
 # a force layout has no room to pull its groups apart.
 #
-# {manynet} 2.3.0 marks the ties a local null model keeps -- the ties that carry
+# {manynet} marks the ties a local null model keeps -- the ties that carry
 # more weight, or sit in more triangles, than chance alone would put there.
 # Those ties are what this uses, in two places at once. The layout is computed
 # from them, so the groups they hold together separate. Every tie is still
@@ -65,9 +65,8 @@
 
 # One logical for each tie of `g`, TRUE where the filter keeps it, or NULL
 # where no filter applies. NULL is the answer wherever the drawing would not
-# change: a network with no ties, a filter that keeps every tie or none, an
-# older manynet, or a signed network, whose negative weights have no place in
-# these null models.
+# change: a network with no ties, a filter that keeps every tie or none, or a
+# signed network, whose negative weights have no place in these null models.
 .infer_backbone <- function(g, spec, layout = NULL, edge_bundle = FALSE,
                             manual = FALSE) {
   if (is.null(spec)) return(NULL)
@@ -75,11 +74,6 @@
   if (auto) {
     if (!.is_hairball(g)) return(NULL)
     spec <- list(filter = NULL, threshold = NULL)
-  }
-  if (!.ag_has_manynet("tie_is_backbone")) {
-    if (!auto) manynet::snet_info(
-      "Drawing every tie alike: {.arg backbone} needs {.pkg manynet} 2.3.0.")
-    return(NULL)
   }
   if (manynet::net_ties(g) == 0) return(NULL)
   if (manynet::is_signed(g)) {
@@ -110,12 +104,14 @@
 # again below alongside what it did to the drawing, so its own note is stilled
 # here. A filter the user named is left to fail in manynet's own words, since
 # that is where the reason is known; one chosen automatically is stepped over
-# instead, so that a filter that cannot run never stops a plot.
+# instead, so that a filter that cannot run never stops a plot. manynet's
+# warnings are conditions rather than notes, and are stilled the same way for
+# a backbone nobody asked for, which should not warn about how it was found.
 .backbone_mark <- function(g, filter, threshold, auto) {
   call_it <- function() suppressMessages(
-    getExportedValue("manynet", "tie_is_backbone")(g, filter = filter,
-                                                   threshold = threshold))
-  mark <- if (auto) tryCatch(call_it(), error = function(e) NULL) else call_it()
+    manynet::tie_is_backbone(g, filter = filter, threshold = threshold))
+  mark <- if (auto) tryCatch(suppressWarnings(call_it()),
+                             error = function(e) NULL) else call_it()
   if (is.null(mark)) return(NULL)
   # `tie_is_backbone()` returns a named 'tie_mark', and a name or a class of
   # its own would travel into the plot's data as one.

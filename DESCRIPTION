@@ -13,7 +13,7 @@ Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 4.1.0),
-    manynet (>= 2.3.1)
+    manynet (>= 2.3.4)
 Imports:
     dplyr (>= 1.1.0),
     ggraph (>= 2.2.0),
@@ -28,7 +28,7 @@ Suggests:
     messydates (>= 1.0.0),
     methods,
     migraph,
-    netrics (>= 0.4.0),
+    netrics (>= 1.0.3),
     systemfonts,
     testthat (>= 3.0.0)
 Enhances:

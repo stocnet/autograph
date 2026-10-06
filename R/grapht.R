@@ -324,78 +324,12 @@ print.grapht <- function(x, ...) {
       manynet::is_changing(x) || manynet::is_longitudinal(x)) {
     if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
       attr(x, "network")
-    else .to_waves_safe(x)
+    else manynet::to_waves(x)
   } else if (.grapht_is_spell(x)) {
     .grapht_spell_slices(x)
   } else if (manynet::is_dynamic(x)) {
     manynet::to_slices(x)
   } else x
-}
-
-# Splits a changing/longitudinal network into waves via `manynet::to_waves()`,
-# guarding against two bugs, each of which loses every wave rather than part of
-# one, and each of which is met by retrying the split another way. autograph
-# has an unversioned dependency on manynet, so `to_waves()` is always tried
-# unchanged first -- behaviour then tracks manynet once each bug is fixed
-# upstream -- and each guard is a response to the error actually raised.
-#
-# The first bug, present through at least manynet 2.2.2, is that a node
-# attribute that *changes* over time but is stored as a non-character vector
-# (e.g. the logical `active` flag, or numeric `height`/`mass`, in
-# `manynet::fict_starwars`) cannot be split. Internally `to_waves()` coalesces
-# each attribute against a character update vector built from the (always
-# character) changelist values; when the stored attribute is logical or numeric
-# this aborts with a vctrs "Can't combine <character> and <...>" error before
-# any wave is produced. Those attributes are coerced to character (the type
-# those columns already take in the split output regardless) and the split
-# retried.
-#
-# The second bug, in manynet 2.3.0, is that `to_waves()` splits neither a panel
-# whose waves are recorded as a "time" tie attribute (as `ison_monks` now
-# records them, aborting with "object 'wave' not found") nor a changing network
-# with no tie attributes at all (as a diffusion result has, aborting with
-# "`name` must be a single string, not a character `NA`"). Both are met by
-# `to_times()`, which 2.3.0 added and which reads whichever way the network
-# records its moments. It is a fallback rather than the first choice because it
-# returns each moment with only the nodes present at it, where `to_waves()`
-# gives every wave the whole node set.
-.to_waves_safe <- function(x) {
-  out <- tryCatch(manynet::to_waves(x), error = function(e) e)
-  if (inherits(out, "error") && manynet::is_changing(x) &&
-      grepl("Can't combine", conditionMessage(out), fixed = TRUE)) {
-    changing <- tryCatch(unique(manynet::as_changelist(x)$var),
-                         error = function(...) character(0))
-    for (a in intersect(changing, manynet::net_node_attributes(x))) {
-      old <- manynet::node_attribute(x, a)
-      if (!is.character(old))
-        x <- manynet::add_node_attribute(x, a, as.character(unclass(old)))
-    }
-    out <- tryCatch(manynet::to_waves(x), error = function(e) e)
-  }
-  if (inherits(out, "error")) {
-    if (.manynet_has("to_times")) {
-      alt <- tryCatch(.manynet_fn("to_times")(x), error = function(e) NULL)
-      if (manynet::is_list(alt) && length(alt) > 1) return(alt)
-    }
-    stop(out)
-  }
-  out
-}
-
-# Whether the installed manynet exports a function, so that a newer manynet is
-# used where it offers something an older one does not, without autograph
-# requiring that version. Tests for the function rather than for the version,
-# since a development build can carry a version string without the function.
-.manynet_has <- function(fn) {
-  isTRUE(fn %in% getNamespaceExports("manynet"))
-}
-
-# The function itself, fetched from the manynet namespace at run time. A
-# `manynet::to_times()` written out in full is a hard reference, which R CMD
-# check reports as a missing object against a manynet that does not export it
-# yet. Always guard a call to this with `.manynet_has()`.
-.manynet_fn <- function(fn) {
-  get(fn, envir = asNamespace("manynet"))
 }
 
 # A spell (interval) network records each tie's lifespan as `begin`/`end` tie
@@ -411,33 +345,11 @@ print.grapht <- function(x, ...) {
 # which some tie begins or ends), keeping the ties active during that spell
 # (begin <= t < end). Unlike the cumulative slices of an event network, these
 # show the network as it stood at each moment, so ties that dissolve disappear
-# again. manynet splits this three ways depending on its version, so each is
-# tested for rather than assumed: `to_times()` from 2.3.0 returns one network
-# per moment (2.3.0 having made `to_time()` require the moment to scope to);
-# `to_time()` without a `time` did the same from 2.2.2; and older manynet is
-# reimplemented equivalently below. The version test is paired with a test of
-# the function itself, because a development build can carry a version string
-# without yet exposing the feature. All three are behaviourally identical.
+# again. `to_times()` returns a single network where there is only one change
+# point, but grapht() always needs a list of snapshots to iterate over.
 .grapht_spell_slices <- function(net) {
-  if (.manynet_has("to_times")) {
-    out <- .manynet_fn("to_times")(net)
-    if (!manynet::is_list(out)) out <- list(out)
-    return(out)
-  }
-  if (utils::packageVersion("manynet") >= "2.2.2" &&
-      !identical(formals(manynet::to_time)[["time"]], quote(expr = ))) {
-    out <- manynet::to_time(net)
-    # to_time() returns a single network when there is only one change point,
-    # but grapht() always needs a list of snapshots to iterate over.
-    if (!manynet::is_list(out)) out <- list(out)
-    return(out)
-  }
-  begin <- end <- NULL # for R CMD check (used inside filter_ties' data mask)
-  moments <- sort(unique(stats::na.omit(c(manynet::tie_attribute(net, "begin"),
-                                          manynet::tie_attribute(net, "end")))))
-  out <- lapply(moments, function(t)
-    manynet::filter_ties(net, begin <= t & (is.na(end) | end > t)))
-  names(out) <- as.character(moments)
+  out <- manynet::to_times(net)
+  if (!manynet::is_list(out)) out <- list(out)
   out
 }
 
