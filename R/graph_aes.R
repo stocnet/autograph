@@ -359,8 +359,9 @@
 # given to directed and undirected networks alike, as by `graphs()`, where it
 # sizes the arrowheads there are. A concept lattice is
 # directed, but is read as a Hasse diagram, in which the direction of every
-# tie is already given by which end is drawn higher.
-.infer_edge_arrows <- function(g, edge_arrows) {
+# tie is already given by which end is drawn higher. That holds only where
+# the layout draws it so, which `hasse` says: see `.is_hasse_layout()`.
+.infer_edge_arrows <- function(g, edge_arrows, hasse = FALSE) {
   if (!manynet::is_directed(g)) {
     if (!is.null(edge_arrows) && !isFALSE(edge_arrows))
       manynet::snet_minor_info(
@@ -369,7 +370,7 @@
     return(FALSE)
   }
   if (!is.null(edge_arrows)) return(edge_arrows)
-  if (.is_concept_lattice(g)) {
+  if (hasse && .is_concept_lattice(g)) {
     manynet::snet_info(
       "Drawing this concept lattice without arrowheads,",
       "since each tie points down the page.",
@@ -377,6 +378,20 @@
     return(FALSE)
   }
   TRUE
+}
+
+# Whether the layout draws every tie of a directed acyclic network pointing
+# down the page, as a Hasse diagram needs. Only "layered" and "railway" do:
+# "lineage" and "ladder" run their layers across the page, and any other
+# layout, or coordinates the caller gave, puts no meaning in which end of a
+# tie is higher. Nor do layers the caller ranked by an attribute, which need
+# not follow the ties.
+.is_hasse_layout <- function(layout, manual = FALSE, ...) {
+  dots <- list(...)
+  ranked <- unlist(dots[intersect(names(dots), c("ranks", "rank"))])
+  !manual && is.character(layout) && length(layout) == 1 &&
+    layout %in% c("layered", "railway") &&
+    all(ranked %in% .rank_methods())
 }
 
 # Which concepts of a lattice carry a "reduced" label, or NULL where the

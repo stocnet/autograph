@@ -10,6 +10,7 @@
 ## Graphing
 
 - Improved concept lattice drawing so that it is drawn as a Hasse diagram
+  - Arrowheads are left off only in the "layered" and "railway" layouts, where each tie points down the page
 - Fixed `graphr()` warning about ties that an automatically chosen backbone was drawn from
 
 ## Aesthetics

@@ -194,9 +194,11 @@
 #'   of a directed network.
 #'   By default (`NULL`) this is decided by the network:
 #'   a directed network is drawn with arrowheads,
-#'   except for a concept lattice from `manynet::to_concepts()`,
-#'   which is read as a Hasse diagram, where the direction of each tie is
+#'   except for a concept lattice from `manynet::to_concepts()` in the
+#'   "layered" (its default) or "railway" layout.
+#'   That is read as a Hasse diagram, where the direction of each tie is
 #'   already given by which of its ends is drawn higher.
+#'   In any other layout a concept lattice keeps its arrowheads.
 #'   `TRUE` draws arrowheads whatever the network, and `FALSE` none.
 #'   Arrowheads follow the width the ties are drawn at:
 #'   2mm long at the default `edge_size` of 0.5, and longer on wider ties,
@@ -374,13 +376,17 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     edge_size <- .check_edge_size(g, as.character(substitute(edge_size)))
   }
   # After the isolates are dropped, so that the network read is the one drawn.
-  edge_arrows <- .infer_edge_arrows(g, .check_edge_arrows(edge_arrows))
+  # After the layout is settled too, since a concept lattice goes without
+  # arrowheads only where the layout draws it as a Hasse diagram.
+  manual <- all(c("x", "y") %in% names(list(...)))
+  edge_arrows <- .infer_edge_arrows(g, .check_edge_arrows(edge_arrows),
+                                    hasse = .is_hasse_layout(layout, manual, ...))
   # Find the backbone ----
   # After the layout is settled, since a layout that carries meaning in its
   # coordinates keeps them and fades its ties only, and after the isolates are
   # dropped, so that the filter reads the network that is drawn.
   backbone <- .infer_backbone(g, .check_backbone(backbone), layout, edge_bundle,
-                              manual = all(c("x", "y") %in% names(list(...))))
+                              manual = manual)
   # Add layout ----
   p <- graph_layout(g, layout, labels, node_group, snap, backbone, ...)
   # Read where the layout left it, since the later steps have no use for it

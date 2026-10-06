@@ -86,43 +86,15 @@ one; see \code{?layout_correspondence}.
 Each axis names the share of the network's inertia that it holds.}
 
 \item{labels}{Which nodes to label, if the network is labelled.
-\code{TRUE} (the default) labels every node and \code{FALSE} none of them,
-but a label for every node of a large network hides the network behind
-them, so a \emph{selection} of the nodes can be given instead:
-\itemize{
-\item a number, e.g. \code{labels = 5}, labels the nodes within the top five ranks
-by degree. Note that this is a depth of ranks rather than a count of
-nodes: nodes tied at the cut are labelled together, so more than five
-labels may appear.
-\item a measure to rank by, e.g. \code{labels = "betweenness"}, labels just the
-node or nodes that measure singles out. \code{"degree"}, \code{"betweenness"},
-\code{"cutpoints"} (every node the mark flags) and \code{"random"}
-(a small random sample) are available.
-The two can be combined by naming the number,
-as in \code{labels = c(betweenness = 5)}.
-\item the name of a logical node attribute, e.g. \code{labels = "is_broker"},
-labels the nodes it marks.
-\item a logical vector, one value per node, e.g.
-\code{labels = netrics::node_is_cutpoint(net)};
-or the names or positions of the nodes to label,
-e.g. \code{labels = c("Alice", "Betty")}.
-}
-
-Where a length-one string could mean more than one of these,
-a node attribute is preferred to a measure, and a measure to a node name.
-A single number is always read as a depth of ranks rather than as one
-node's position, so a lone node is best named, as in \code{labels = "Alice"}.
-For networks of more than 30 nodes, \code{labels} defaults to a selection
-rather than to every node; pass \code{labels = TRUE} for all of them.
-For a concept lattice from \code{manynet::to_concepts()}, \code{labels} defaults to
-the concepts at which a node of the original network first appears,
-so that each of those nodes is named once, as in a Hasse diagram,
-and the concepts named only by their position are left unlabelled.
-Ranking nodes uses the \code{{netrics}} package, which is suggested rather than
-required: without it installed, an automatic selection falls back to a
-random sample.
-Two-mode and multilevel networks are ranked within each mode or level,
-so that every level is labelled and not just the densest.}
+\code{TRUE} (the default) labels every node and \code{FALSE} none.
+A selection of the nodes can be given as in \code{graphr()}:
+a number of ranks, a measure to rank by, the name of a logical node
+attribute, a logical vector, or the names or positions of the nodes.
+The selection is made once over all the waves, so that the same nodes
+stay labelled from frame to frame.
+For networks of more than 30 nodes, \code{labels} defaults to no labels at
+all; pass \code{labels = TRUE} for all of them.
+Unlike \code{graphr()}, no selection is made for a concept lattice.}
 
 \item{node_color, node_colour}{Node variable to be used for coloring the nodes.
 It is easiest if this is added as a node attribute to
@@ -198,9 +170,11 @@ than a fixed offset does. They ignore this argument and always offset.}
 of a directed network.
 By default (\code{NULL}) this is decided by the network:
 a directed network is drawn with arrowheads,
-except for a concept lattice from \code{manynet::to_concepts()},
-which is read as a Hasse diagram, where the direction of each tie is
+except for a concept lattice from \code{manynet::to_concepts()} in the
+"layered" (its default) or "railway" layout.
+That is read as a Hasse diagram, where the direction of each tie is
 already given by which of its ends is drawn higher.
+In any other layout a concept lattice keeps its arrowheads.
 \code{TRUE} draws arrowheads whatever the network, and \code{FALSE} none.
 Arrowheads follow the width the ties are drawn at:
 2mm long at the default \code{edge_size} of 0.5, and longer on wider ties,

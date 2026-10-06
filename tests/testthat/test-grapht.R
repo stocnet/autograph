@@ -273,6 +273,29 @@ test_that("directed networks get trimmed segments and an arrow", {
   expect_true(any(abs(el$data$xend - raw_xend) > 1e-10))
 })
 
+test_that("edge_arrows switches and sizes the arrowheads of an animation", {
+  dl <- list(
+    t1 = manynet::as_tidygraph(igraph::graph_from_data_frame(
+      data.frame(from = c("A", "B", "C"), to = c("B", "C", "A")))),
+    t2 = manynet::as_tidygraph(igraph::graph_from_data_frame(
+      data.frame(from = c("A", "C"), to = c("C", "B")))))
+  arrow_of <- function(p) .edge_layer(p)$geom_params$arrow
+  arrow_mm <- function(p)
+    as.numeric(grid::convertUnit(arrow_of(p)$length, "mm"))
+  # By default, and where asked for, they follow the width of the ties.
+  expect_equal(arrow_mm(grapht(dl)), 2)
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = TRUE)), 2)
+  expect_null(arrow_of(grapht(dl, edge_arrows = FALSE)))
+  expect_null(arrow_of(grapht(dl, edge_arrows = 0)))
+  # A length that is given is used whatever the width of the ties.
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = 3)), 3)
+  expect_equal(arrow_mm(grapht(dl, edge_arrows = 6, edge_size = 0.25)), 6)
+  # An undirected animation has no arrowheads to size.
+  expect_null(arrow_of(grapht(.wave_fixture(), edge_arrows = 3)))
+  for (bad in list("big", -1, c(1, 2), NA, Inf))
+    expect_error(grapht(dl, edge_arrows = bad), "edge_arrows")
+})
+
 test_that("signed networks map sign to colour and linetype", {
   sg <- manynet::as_tidygraph(igraph::graph_from_data_frame(
     data.frame(from = c("A", "B", "C"), to = c("B", "C", "A"),

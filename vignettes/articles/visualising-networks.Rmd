@@ -542,10 +542,13 @@ negative, and solid where positive;
 
 Most of these you do not set by hand — but because every graph is a `{ggplot2}`
 object, you can always override them by dropping down to `{ggraph}`
-(see the _Going further with ggraph_ section near the end of this tutorial).\nThe position of the nodes gets a topic of its own (_Layouts_),
+(see the _Going further with ggraph_ section near the end of this tutorial).
+
+The position of the nodes gets a topic of its own (_Layouts_),
 as do `isolates=` and `edge_bundle=` (_Ew, hairballs_),
 and you met `labels=` on the previous page.
-This page takes the rest in turn.\n
+This page takes the rest in turn.
+
 Each of the mapping arguments can be given either a literal value
 (e.g. `node_size = 6`) or, more interestingly,
 the name of a node or tie attribute in the data

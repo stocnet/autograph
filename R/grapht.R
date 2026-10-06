@@ -65,6 +65,16 @@
 #'   per change point showing the ties active in that spell.
 #'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
+#' @param labels Which nodes to label, if the network is labelled.
+#'   `TRUE` (the default) labels every node and `FALSE` none.
+#'   A selection of the nodes can be given as in `graphr()`:
+#'   a number of ranks, a measure to rank by, the name of a logical node
+#'   attribute, a logical vector, or the names or positions of the nodes.
+#'   The selection is made once over all the waves, so that the same nodes
+#'   stay labelled from frame to frame.
+#'   For networks of more than 30 nodes, `labels` defaults to no labels at
+#'   all; pass `labels = TRUE` for all of them.
+#'   Unlike `graphr()`, no selection is made for a concept lattice.
 #' @param isolates One of `"keep"` (the default) or `"fade"`.
 #'   `"keep"` retains isolated nodes at their layout positions in every
 #'   wave in which they are present.
@@ -223,7 +233,8 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                      edge_color, edge_size,
                      label_dist, label_repel,
                      .infer_edge_arrows(g_ref,
-                                        .check_edge_arrows(edge_arrows))) +
+                                        .check_edge_arrows(edge_arrows),
+                                        hasse = .is_hasse_layout(layout, ...))) +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
     gganimate::enter_fade() + gganimate::enter_grow() +

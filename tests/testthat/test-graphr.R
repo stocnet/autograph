@@ -859,6 +859,20 @@ test_that("a concept lattice is drawn without arrowheads by default", {
   # Asking for them outright brings them back.
   expect_s3_class(tie_arrow(suppressMessages(
     graphr(lat, labels = FALSE, edge_arrows = TRUE))), "arrow")
+  # They are left off only where the layout draws a Hasse diagram. A layout
+  # that puts no meaning in which end of a tie is higher keeps them, as do
+  # coordinates or ranks the caller gave.
+  expect_null(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, layout = "railway"))))
+  for (lay in c("circle", "stress", "lineage"))
+    expect_s3_class(tie_arrow(suppressMessages(
+      graphr(lat, labels = FALSE, layout = lay))), "arrow")
+  n <- manynet::net_nodes(lat)
+  expect_s3_class(tie_arrow(suppressMessages(
+    graphr(lat, labels = FALSE, x = seq_len(n), y = rev(seq_len(n))))), "arrow")
+  expect_true(autograph:::.is_hasse_layout("layered", ranks = "tight"))
+  expect_false(autograph:::.is_hasse_layout("layered", ranks = "year"))
+  expect_false(autograph:::.is_hasse_layout("layered", manual = TRUE))
   # Any other directed acyclic network keeps its arrowheads.
   tree <- igraph::make_tree(10)
   expect_false(autograph:::.is_concept_lattice(tree))
@@ -897,6 +911,11 @@ test_that("a concept lattice labels the concepts that introduce a node", {
   snm <- manynet::node_names(small)
   expect_setequal(drawn(suppressMessages(graphr(small))),
                   snm[!grepl("^C[0-9]+$", snm)])
+  # A list of lattices is drawn by `graphs()`, which leaves the choice to each
+  # panel rather than labelling the most central concepts of the first.
+  expect_gt(manynet::net_nodes(lat), 30)
+  ps <- suppressMessages(graphr(list(lat, lat)))
+  for (i in 1:2) expect_setequal(drawn(ps[[i]]), nms[sel])
   # Anything that is not a lattice has nothing to say here.
   expect_null(autograph:::.concept_is_labelled(igraph::make_tree(10)))
 })

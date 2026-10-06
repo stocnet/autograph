@@ -213,9 +213,11 @@ does not apply.}
 of a directed network.
 By default (\code{NULL}) this is decided by the network:
 a directed network is drawn with arrowheads,
-except for a concept lattice from \code{manynet::to_concepts()},
-which is read as a Hasse diagram, where the direction of each tie is
+except for a concept lattice from \code{manynet::to_concepts()} in the
+"layered" (its default) or "railway" layout.
+That is read as a Hasse diagram, where the direction of each tie is
 already given by which of its ends is drawn higher.
+In any other layout a concept lattice keeps its arrowheads.
 \code{TRUE} draws arrowheads whatever the network, and \code{FALSE} none.
 Arrowheads follow the width the ties are drawn at:
 2mm long at the default \code{edge_size} of 0.5, and longer on wider ties,
