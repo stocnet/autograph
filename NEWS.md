@@ -1,3 +1,9 @@
+# autograph 1.2.5
+
+## Tutorials
+
+- Trimmed the thumbnail path lengths to less than 100 bytes
+
 # autograph 1.2.4
 
 ## Package

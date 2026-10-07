@@ -528,7 +528,8 @@ thumbs <- list(
 thumb <- function(name) {
   # Written beside the other figures and linked by path: learnr reads an image
   # embedded as base64 as a video wherever its data happens to contain "v/"
-  file <- knitr::fig_path(".png", number = name)
+  # The name is kept short: CRAN notes any path in the package over 100 bytes
+  file <- file.path(dirname(knitr::fig_path()), paste0("aes-", name, ".png"))
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   p <- thumbs[[name]] + ggplot2::coord_cartesian(clip = "off") +
     theme(legend.position = "none",
