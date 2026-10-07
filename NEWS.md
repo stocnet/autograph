@@ -1,3 +1,15 @@
+# autograph 1.2.6
+
+## Package
+
+- Moved the slower `graphr()` examples into `\donttest{}`, and they no longer call `{netrics}`
+
+## Graphing
+
+- Fixed `graphr()` holding labels too far from their nodes
+  - Node size was given to the repel algorithm in points rather than units
+  - Labels on a selection of the nodes now stay against the nodes they name
+
 # autograph 1.2.5
 
 ## Package
