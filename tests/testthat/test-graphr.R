@@ -488,9 +488,34 @@ test_that("a selection keeps node sizes aligned with the labelled nodes", {
   geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
   built <- ggplot2::ggplot_build(p)
   point_size <- built[["data"]][[which(geoms == "GeomLabelRepel")]][["point.size"]]
-  # Sue is the second node, so hers is the size that should have come through
+  # Sue is the second node, so hers is the size that should have come through.
+  # ggrepel reads `point.size` in the units nodes are sized in, so it arrives
+  # as it was given rather than converted to points.
   expect_length(point_size, 1)
-  expect_equal(point_size, 20 * ggplot2::.pt)
+  expect_equal(point_size, 20)
+})
+
+test_that("labels on a selection of nodes are held against their nodes", {
+  skip_on_cran()
+  label_params <- function(p) {
+    geoms <- vapply(p[["layers"]], function(l) class(l[["geom"]])[1], character(1))
+    p[["layers"]][[which(geoms == "GeomLabelRepel")]][["geom_params"]]
+  }
+  gap <- function(params) {
+    grid::convertUnit(params[["point.padding"]], "pt", valueOnly = TRUE)
+  }
+  some <- label_params(graphr(ison_adolescents, labels = c("Sue", "Pam")))
+  expect_equal(gap(some), 2)
+  expect_equal(some[["force_pull"]], 3)
+  expect_equal(some[["box.padding"]], 0.1)
+  expect_equal(some[["min.segment.length"]], 0)
+  # `label_dist` still decides the gap where it is given
+  expect_equal(gap(label_params(graphr(ison_adolescents, labels = c("Sue", "Pam"),
+                                       label_dist = 9))), 9)
+  # Where every node is labelled the labels need their room from each other
+  every <- label_params(graphr(ison_adolescents, labels = TRUE))
+  expect_equal(gap(every), 5)
+  expect_null(every[["force_pull"]])
 })
 
 test_that("large networks label only their most central nodes by default", {

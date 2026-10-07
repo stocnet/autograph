@@ -148,7 +148,9 @@ gap left between labels and node borders -- similar to \code{igraph}'s
 \code{vertex.label.dist}. Node size is always accounted for automatically
 (larger nodes push labels further away without any extra configuration);
 \code{label_dist} adds further spacing on top of that, and defaults to a
-small gap (5pt). Set to \code{0} for labels right at the node border,
+small gap: 5pt where every node is labelled, and 2pt where only a
+selection is, so that each label stays against the node it names.
+Set to \code{0} for labels right at the node border,
 or to a larger value (e.g. \code{15}) for more spacing.
 Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
 (as the padding passed to the repel algorithm) or \code{label_repel = FALSE}

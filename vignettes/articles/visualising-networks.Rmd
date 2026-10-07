@@ -487,7 +487,8 @@ thumbs <- list(
 thumb <- function(name) {
   # Written beside the other figures and linked by path: learnr reads an image
   # embedded as base64 as a video wherever its data happens to contain "v/"
-  file <- knitr::fig_path(".png", number = name)
+  # The name is kept short: CRAN notes any path in the package over 100 bytes
+  file <- file.path(dirname(knitr::fig_path()), paste0("aes-", name, ".png"))
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   p <- thumbs[[name]] + ggplot2::coord_cartesian(clip = "off") +
     theme(legend.position = "none",
@@ -961,7 +962,7 @@ same way.
 Some people are colour-blind,
 whether by deuteranomaly, deuteranopia, protanomaly, or protanopia,
 and so it is worth checking that your
-visualisations are accessible to them.^[The [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) and [colorspace](http://colorspace.r-forge.r-project.org/articles/endrainbow.html) packages have excellent vignettes on this.]
+visualisations are accessible to them.^[The [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) and [colorspace](https://www.zeileis.org/news/endrainbow/) packages have excellent vignettes on this.]
 Others are less sensitive to colour distinctions.
 The old trope is that males are less sensitive to colour distinctions:^[Though see https://blog.xkcd.com/2010/05/03/color-survey-results/ for a more nuanced take.]
 

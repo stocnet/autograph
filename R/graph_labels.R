@@ -17,14 +17,20 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # `node_size` arrives with one value per node when it was mapped from an
   # attribute, and has to be cut down to the labelled nodes alongside the data.
   if (length(node_size) > 1) node_size <- node_size[sel]
-  # `point.size` tells ggrepel the actual rendered diameter (in points) of
-  # each node, so the repel algorithm keeps labels clear of the node's true
-  # border rather than just its (x, y) centre -- ggrepel otherwise assumes a
-  # token 1pt point. `label_dist` (default 5pt) is the *extra* gap beyond
-  # that border, i.e. ggrepel's `point.padding`, mirroring igraph's
-  # `vertex.label.dist`.
-  point_size_pt <- if (!is.null(node_size)) node_size * ggplot2::.pt else 1
-  gap_pt <- if (!is.null(label_dist)) label_dist else 5
+  # `point.size` tells ggrepel the size each node is drawn at, so the repel
+  # algorithm keeps labels clear of the node's true border rather than just
+  # its (x, y) centre -- ggrepel otherwise assumes a token point of size 1.
+  # ggrepel reads it in the units of `geom_point()`'s `size`, which is what
+  # `node_size` already is: converting it to points told ggrepel that every
+  # node was nearly three times as large as it was drawn, and held the labels
+  # that far away.
+  point_size <- if (!is.null(node_size)) node_size else 1
+  # `label_dist` is the *extra* gap beyond that border, i.e. ggrepel's
+  # `point.padding`, mirroring igraph's `vertex.label.dist`. Where only some
+  # of the nodes are labelled, a label that drifts lands among nodes it does
+  # not name, so the gap is smaller there.
+  selective <- !all(sel)
+  gap_pt <- if (!is.null(label_dist)) label_dist else if (selective) 2 else 5
   padding <- ggplot2::unit(gap_pt, "pt")
   # When `label_repel = FALSE` there is no repel algorithm to keep labels off
   # of nodes, so we approximate the same clearance (node radius + gap) as a
@@ -37,7 +43,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # when `repel = TRUE`); plain `GeomText`/`GeomLabel` (`repel = FALSE`) don't
   # know it and would warn about an unknown aesthetic.
   label_aes <- if (label_repel) {
-    ggplot2::aes(label = name, point.size = point_size_pt)
+    ggplot2::aes(label = name, point.size = point_size)
   } else {
     ggplot2::aes(label = name)
   }
@@ -159,6 +165,18 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     if (label_repel) {
       args$point.padding <- padding
       args$seed <- 1234
+      if (selective) {
+        # As for "levels" above: the unlabelled nodes around a label make it
+        # hard to say which one it names, so each label is pulled back hard
+        # towards its own node, allowed to sit closer to the other labels,
+        # and joined to its node by a leader line wherever it still ends up
+        # away from it.
+        args$force_pull <- 3
+        args$box.padding <- 0.1
+        args$min.segment.length <- 0
+        args$segment.size <- 0.2
+        args$segment.colour <- ggplot2::alpha(ag_ink(), 0.5)
+      }
     } else {
       args$nudge_x <- nudge_unit
       args$nudge_y <- nudge_unit
