@@ -67,7 +67,7 @@ The default palettes are designed to be colour-blind friendly.
 There are different types of colour-blindness.
 The most common type, red-green colour-blindness,
 finds it difficult to distinguish between the red and green hues used
-in the \href{https://colorspace.r-forge.r-project.org/articles/endrainbow.html}{rainbow palette},
+in the \href{https://www.zeileis.org/news/endrainbow/}{rainbow palette},
 for instance.
 Fortunately there are a range of palettes that function fairly well for
 those who are color-blind.

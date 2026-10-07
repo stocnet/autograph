@@ -1,5 +1,9 @@
 # autograph 1.2.5
 
+## Package
+
+- Fixed the slow r-forge link in documentation
+
 ## Tutorials
 
 - Trimmed the thumbnail path lengths to less than 100 bytes
