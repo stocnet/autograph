@@ -41,7 +41,7 @@ try run_tute("Visualisation").'><meta property="og:image" content="https://stocn
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -299,7 +299,9 @@ gap left between labels and node borders – similar to <code>igraph</code>'s
 <code>vertex.label.dist</code>. Node size is always accounted for automatically
 (larger nodes push labels further away without any extra configuration);
 <code>label_dist</code> adds further spacing on top of that, and defaults to a
-small gap (5pt). Set to <code>0</code> for labels right at the node border,
+small gap: 5pt where every node is labelled, and 2pt where only a
+selection is, so that each label stays against the node it names.
+Set to <code>0</code> for labels right at the node border,
 or to a larger value (e.g. <code>15</code>) for more spacing.
 Only used when <code>labels = TRUE</code> and <code>label_repel = TRUE</code>
 (as the padding passed to the repel algorithm) or <code>label_repel = FALSE</code>
@@ -421,21 +423,22 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
 <span class="r-plt img"><img src="plot_graphr-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="va">ison_adolescents</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">mutate</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"introvert"</span>,<span class="st">"extrovert"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>         size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu">netrics</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/netrics/reference/mark_nodes.html" class="external-link">node_is_cutpoint</a></span><span class="op">(</span><span class="va">ison_adolescents</span><span class="op">)</span>, <span class="fl">6</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>         size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">6</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">mutate_ties</span><span class="op">(</span>ecolor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"friends"</span>, <span class="st">"acquaintances"</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">graphr</span><span class="op">(</span>node_color <span class="op">=</span> <span class="st">"color"</span>, node_size <span class="op">=</span> <span class="st">"size"</span>,</span></span>
 <span class="r-in"><span>         edge_size <span class="op">=</span> <span class="fl">1.5</span>, edge_color <span class="op">=</span> <span class="st">"ecolor"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="cn">TRUE</span>, label_dist <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="cn">TRUE</span>, label_repel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot_graphr-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># Label a selection of the nodes rather than all of them</span></span></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot_graphr-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="st">"betweenness"</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="plot_graphr-6.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot_graphr-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_adolescents</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alice"</span>, <span class="st">"Betty"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-5.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="cn">TRUE</span>, label_repel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_graphr-6.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="va">ison_southern_women</span>, labels <span class="op">=</span> <span class="st">"betweenness"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">0.1</span><span class="op">)</span>, edge_bundle <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-8.png" alt="" width="700" height="433"></span>
@@ -446,6 +449,7 @@ The last plot can be saved to the file system using <code><a href="https://ggplo
 <span class="r-plt img"><img src="plot_graphr-10.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu">graphr</span><span class="op">(</span><span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_random.html" class="external-link">generate_random</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">0.2</span><span class="op">)</span>, backbone <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_graphr-11.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

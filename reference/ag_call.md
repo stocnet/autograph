@@ -62,9 +62,9 @@ The default palettes are designed to be colour-blind friendly. There are
 different types of colour-blindness. The most common type, red-green
 colour-blindness, finds it difficult to distinguish between the red and
 green hues used in the [rainbow
-palette](https://colorspace.r-forge.r-project.org/articles/endrainbow.html),
-for instance. Fortunately there are a range of palettes that function
-fairly well for those who are color-blind. These include the
+palette](https://www.zeileis.org/news/endrainbow/), for instance.
+Fortunately there are a range of palettes that function fairly well for
+those who are color-blind. These include the
 [viridis](https://CRAN.R-project.org/package=viridis) palette, and the
 ColorBrewer palettes (included in the RColorBrewer package).
 

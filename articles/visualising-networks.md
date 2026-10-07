@@ -441,11 +441,11 @@ sign of the ties.
 
 | Nodes |  |  | Ties |  |  |
 |:---|:--:|:---|:---|:--:|:---|
-| Shape | ![a small graph showing node_shape](visualising-networks_files/figure-html/explain-aesthetics-node_shape.png) | `node_shape=` | Shape (curve) | ![a small graph showing edge_curve](visualising-networks_files/figure-html/explain-aesthetics-edge_curve.png) | *automatic* (reciprocated ties), `edge_bundle=` |
-| Size | ![a small graph showing node_size](visualising-networks_files/figure-html/explain-aesthetics-node_size.png) | `node_size=` | Size (width) | ![a small graph showing edge_size](visualising-networks_files/figure-html/explain-aesthetics-edge_size.png) | `edge_size=` |
-| Colour (categories) | ![a small graph showing node_colour](visualising-networks_files/figure-html/explain-aesthetics-node_colour.png) | `node_colour=`/ `node_color=` | Colour | ![a small graph showing edge_colour](visualising-networks_files/figure-html/explain-aesthetics-edge_colour.png) | `edge_colour=`/ `edge_color=` |
-| Colour (numbers) | ![a small graph showing node_gradient](visualising-networks_files/figure-html/explain-aesthetics-node_gradient.png) | `node_colour=`/ `node_color=` | Linetype (dashed) | ![a small graph showing edge_sign](visualising-networks_files/figure-html/explain-aesthetics-edge_sign.png) | *automatic* (signed ties) |
-| Group | ![a small graph showing node_group](visualising-networks_files/figure-html/explain-aesthetics-node_group.png) | `node_group=` | Arrows | ![a small graph showing edge_arrows](visualising-networks_files/figure-html/explain-aesthetics-edge_arrows.png) | *automatic* (directed ties), `edge_arrows=` |
+| Shape | ![a small graph showing node_shape](visualising-networks_files/figure-html/aes-node_shape.png) | `node_shape=` | Shape (curve) | ![a small graph showing edge_curve](visualising-networks_files/figure-html/aes-edge_curve.png) | *automatic* (reciprocated ties), `edge_bundle=` |
+| Size | ![a small graph showing node_size](visualising-networks_files/figure-html/aes-node_size.png) | `node_size=` | Size (width) | ![a small graph showing edge_size](visualising-networks_files/figure-html/aes-edge_size.png) | `edge_size=` |
+| Colour (categories) | ![a small graph showing node_colour](visualising-networks_files/figure-html/aes-node_colour.png) | `node_colour=`/ `node_color=` | Colour | ![a small graph showing edge_colour](visualising-networks_files/figure-html/aes-edge_colour.png) | `edge_colour=`/ `edge_color=` |
+| Colour (numbers) | ![a small graph showing node_gradient](visualising-networks_files/figure-html/aes-node_gradient.png) | `node_colour=`/ `node_color=` | Linetype (dashed) | ![a small graph showing edge_sign](visualising-networks_files/figure-html/aes-edge_sign.png) | *automatic* (signed ties) |
+| Group | ![a small graph showing node_group](visualising-networks_files/figure-html/aes-node_group.png) | `node_group=` | Arrows | ![a small graph showing edge_arrows](visualising-networks_files/figure-html/aes-edge_arrows.png) | *automatic* (directed ties), `edge_arrows=` |
 
 **Beginner note**: As the table shows, both spellings work:
 `node_colour=` and `node_color=` are the same argument, as are
@@ -2438,9 +2438,8 @@ Here are some of the terms that we have covered in this tutorial:
 
 [^6]: The
     [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
-    and
-    [colorspace](http://colorspace.r-forge.r-project.org/articles/endrainbow.md)
-    packages have excellent vignettes on this.
+    and [colorspace](https://www.zeileis.org/news/endrainbow/) packages
+    have excellent vignettes on this.
 
 [^7]: Though see
     <https://blog.xkcd.com/2010/05/03/color-survey-results/> for a more

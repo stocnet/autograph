@@ -221,13 +221,14 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   labels and node borders – similar to `igraph`'s `vertex.label.dist`.
   Node size is always accounted for automatically (larger nodes push
   labels further away without any extra configuration); `label_dist`
-  adds further spacing on top of that, and defaults to a small gap
-  (5pt). Set to `0` for labels right at the node border, or to a larger
-  value (e.g. `15`) for more spacing. Only used when `labels = TRUE` and
-  `label_repel = TRUE` (as the padding passed to the repel algorithm) or
-  `label_repel = FALSE` (as a fixed nudge away from the node, in the
-  layouts where this makes sense, e.g. "circle"/"concentric", "railway",
-  "lineage").
+  adds further spacing on top of that, and defaults to a small gap: 5pt
+  where every node is labelled, and 2pt where only a selection is, so
+  that each label stays against the node it names. Set to `0` for labels
+  right at the node border, or to a larger value (e.g. `15`) for more
+  spacing. Only used when `labels = TRUE` and `label_repel = TRUE` (as
+  the padding passed to the repel algorithm) or `label_repel = FALSE`
+  (as a fixed nudge away from the node, in the layouts where this makes
+  sense, e.g. "circle"/"concentric", "railway", "lineage").
 
 - label_repel:
 

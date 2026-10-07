@@ -1,5 +1,34 @@
 # Changelog
 
+## autograph 1.2.6
+
+### Package
+
+- Moved the slower
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  examples into `\donttest{}`, and they no longer call
+  [netrics](https://stocnet.github.io/netrics/)
+
+### Graphing
+
+- Fixed
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  holding labels too far from their nodes
+  - Node size was given to the repel algorithm in points rather than
+    units
+  - Labels on a selection of the nodes now stay against the nodes they
+    name
+
+## autograph 1.2.5
+
+### Package
+
+- Fixed the slow r-forge link in documentation
+
+### Tutorials
+
+- Trimmed the thumbnail path lengths to less than 100 bytes
+
 ## autograph 1.2.4
 
 ### Package
