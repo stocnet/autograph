@@ -1,3 +1,9 @@
+# autograph 1.2.7
+
+## Package
+
+- Added design principles to the README and the contributing guide
+
 # autograph 1.2.6
 
 ## Package
