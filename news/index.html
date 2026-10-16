@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,34 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.6" id="autograph-126">autograph 1.2.6<a class="anchor" aria-label="anchor" href="#autograph-126"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.7" id="autograph-127">autograph 1.2.7<a class="anchor" aria-label="anchor" href="#autograph-127"></a></h2>
+<div class="section level3">
+<h3 id="package-1-2-7">Package<a class="anchor" aria-label="anchor" href="#package-1-2-7"></a></h3>
+<ul><li>Added design principles to the README and the contributing guide</li>
+<li>Raised the ‘manynet’ floor to 2.4.0 for <code><a href="https://stocnet.github.io/manynet/reference/mark_format_node.html" class="external-link">manynet::is_spatial()</a></code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="graphing-1-2-7">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-2-7"></a></h3>
+<ul><li>Added <code>plot.stocnet()</code> so that <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> graphs a ‘stocnet’ as it does an ‘mnet’</li>
+<li>Added <code><a href="../reference/layout_spatial.html">layout_spatial()</a></code>, which places each node at its own position
+<ul><li>Used by default for a spatial network, and snapping/backbone are ignored</li>
+<li>Drawn on an equirectangular projection centred on the network’s mean latitude</li>
+</ul></li>
+<li>Improved how <code><a href="../reference/plot_graphr.html">graphr()</a></code> treats tie lengths
+<ul><li>In “stress” and “kk” layouts these are drawns as distances</li>
+<li>In backbone layouts they are used to filter the ties, but not to draw them</li>
+</ul></li>
+<li>Fixed the arcs of <code><a href="../reference/plot_graphr.html">graphr()</a></code> to read reciprocated ties from a network of any class</li>
+</ul></div>
+<div class="section level3">
+<h3 id="theming-1-2-7">Theming<a class="anchor" aria-label="anchor" href="#theming-1-2-7"></a></h3>
+<ul><li>Improved “iheid” theme to prefer Montserrat over Helvetica</li>
+<li>Fixed “iast” theme looking for “Monserrat”</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.6" id="autograph-126">autograph 1.2.6<a class="anchor" aria-label="anchor" href="#autograph-126"></a></h2><p class="text-muted">CRAN release: 2026-10-07</p>
 <div class="section level3">
 <h3 id="package-1-2-6">Package<a class="anchor" aria-label="anchor" href="#package-1-2-6"></a></h3>
 <ul><li>Moved the slower <code><a href="../reference/plot_graphr.html">graphr()</a></code> examples into <code>\donttest{}</code>, and they no longer call <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a>
@@ -919,7 +946,7 @@
 <ul><li>Plots MCMC traces as a line plot with loess smoothing highlighting the trend</li>
 <li>Plots overall density plot of the samples on the right margin</li>
 </ul></li>
-<li>Improved plotting of <code>{MoNAn}</code> trace objects by using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
+<li>Improved plotting of <a href="https://github.com/stocnet/MoNAn" class="external-link">MoNAn</a> trace objects by using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
 </li>
 <li>Added <code>plot.mcmc.list()</code> for plotting MCMC samples from <code><a href="https://rdrr.io/pkg/ergm/man/ergm.html" class="external-link">ergm::ergm</a></code> results objects, using <code><a href="../reference/plot_convergence.html">plot.ag_conv()</a></code>
 </li>

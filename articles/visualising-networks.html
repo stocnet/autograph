@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -754,13 +754,13 @@ the code below means “take <code>fict_lotr</code>, <em>then</em> add a
 Degree attribute to its nodes, <em>then</em> graph it with node colour
 mapped to that attribute”. Piping or ‘chaining’ functions like this is
 very common in modern R, and we use it throughout these tutorials.
-<code><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate()</a></code> and the other <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a>-style verbs for
-networks are covered in <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>’s “Manipulating Network
-Data” tutorial.</p>
+<code><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes()</a></code> and the other <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a>-style
+verbs for networks are covered in <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a>’s “Manipulating
+Network Data” tutorial.</p>
 </div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_colour <span class="op">=</span> <span class="st">"Degree"</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/plot_graphr.html">graphr()</a></code> has not given each degree a colour of its own,
 as it did each race. A number has an order, and distances between its
@@ -790,7 +790,7 @@ continuous variable. <strong>Size the characters by the degree we
 calculated above.</strong></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_size <span class="op">=</span> <span class="st">"Degree"</span><span class="op">)</span></span></code></pre></div>
 <p>Larger nodes are now the better-connected characters, and a size
 legend has been added. Who turns out to be the most connected character
@@ -800,7 +800,7 @@ once. This costs nothing, and helps a reader who is looking at a small
 figure, a greyscale printout, or with a colour vision deficiency.
 <strong>Compare the three encodings of the same variable.</strong></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lotr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">fict_lotr</span>, Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lotr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span><span class="va">fict_lotr</span>, Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">lotr</span>, labels <span class="op">=</span> <span class="cn">FALSE</span>, node_size <span class="op">=</span> <span class="st">"Degree"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Size"</span><span class="op">)</span> <span class="op">|</span></span>
 <span>    <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">lotr</span>, labels <span class="op">=</span> <span class="cn">FALSE</span>, node_colour <span class="op">=</span> <span class="st">"Degree"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Colour"</span><span class="op">)</span> <span class="op">|</span></span>
 <span>    <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">lotr</span>, labels <span class="op">=</span> <span class="cn">FALSE</span>, node_size <span class="op">=</span> <span class="st">"Degree"</span>, node_colour <span class="op">=</span> <span class="st">"Degree"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -895,8 +895,8 @@ by the rule above it is drawn as two categories rather than a
 gradient.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Top <span class="op">=</span> <span class="va">Degree</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Degree</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Top <span class="op">=</span> <span class="va">Degree</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Degree</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_colour <span class="op">=</span> <span class="st">"Top"</span><span class="op">)</span></span></code></pre></div>
 <p>Which node is highlighted here, and why might that be? A legend that
 says only “Top: FALSE, TRUE” does not tell a reader, who cannot see the
@@ -908,8 +908,8 @@ Note that we can use <code>"\n"</code> within the legend title to make
 the title span multiple lines.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fict_lotr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Top <span class="op">=</span> <span class="va">Degree</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Degree</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Degree <span class="op">=</span> <span class="fu"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_deg</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>Top <span class="op">=</span> <span class="va">Degree</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Degree</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>node_colour <span class="op">=</span> <span class="st">"Top"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Most\nconnected"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><code>guides(fill = "none")</code> removes a legend altogether, which
@@ -2412,7 +2412,7 @@ number of different network-related objects, so that
 special function for each object. These include measures of centrality,
 cohesion, and clustering, as well as goodness-of-fit plots for network
 models from packages such as <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a>, <a href="https://statnet.org" class="external-link">ergm</a>,
-and <code>{MoNAn}</code>. Usefully, all these plots use the same theming
+and <a href="https://github.com/stocnet/MoNAn" class="external-link">MoNAn</a>. Usefully, all these plots use the same theming
 system as <code><a href="../reference/plot_graphr.html">graphr()</a></code>, so that you can set a theme once and
 have it apply to all your graphs and plots. <strong>Let’s try this now,
 plotting the distribution of a centrality measure under two

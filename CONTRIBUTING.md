@@ -108,10 +108,103 @@ mind when adding functions:
 - [migraph](https://stocnet.github.io/migraph/): testing and modelling,
   e.g. QAP/MRQAP and diffusion models.
 
-In terms of style, we are aiming for sensible defaults in terms of user
-experience. As a ggplot2 object, most everything can be tweaked before
-or afterwards, but the default presentation should already be
-aesthetically pleasing, informative, and consistent.
+### Style
+
+All `stocnet` packages aim for the same three things: declarative
+simplicity, pleasant predictability, and graceful inclusivity. The
+principles are shared across the packages; the rules and examples below
+are those of [autograph](https://stocnet.github.io/autograph/).
+
+#### Declarative simplicity
+
+Functions should do one clearly named thing with few arguments.
+
+- **Plotting needs one call.** No argument but the object is required,
+  and every other argument has a sensible default. Example: `graphr(x)`
+  draws a network and `plot(result)` plots a result, without layout or
+  aesthetic arguments.
+- **Variants become separate functions.** Example:
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  draws one network,
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  a set of networks side by side, and
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+  a network over time, rather than one function with an option for each.
+- **Scope is signalled by prefix.** The prefix of an argument says which
+  part of the graph it styles, so that the optional arguments are easy
+  to guess. Example: `node_color`, `node_shape`, and `node_size` style
+  the nodes, and `edge_color` and `edge_size` the ties.
+- **Names describe actions.** User-facing functions are snake_case, and
+  usually `verb_noun`, without abbreviations (see [Function
+  names](#function-names)).
+- **Features are detected, not declared.** A function finds out whether
+  a network is directed, weighted, signed, or two-mode, and adjusts, so
+  the user does not supply an argument for it. Example:
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  adds arrows to a directed network, dashes the negative ties of a
+  signed network, and gives the two modes of a two-mode network
+  different shapes.
+
+#### Pleasant predictability
+
+Users should be able to guess a function’s behaviour from its family.
+
+- **Defaults are sensible.** As a ggplot2 object, most everything can be
+  tweaked before or afterwards, but the default presentation should
+  already be aesthetically pleasing, informative, and consistent.
+- **Arguments share names across the family.**
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+  and
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+  take the same aesthetic arguments, so what a user learns for one
+  carries over to the others.
+- **The theme is set once.**
+  [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md)
+  sets the fonts and palettes that every later graph and plot uses, so
+  style code is not repeated.
+- **Outputs are ggplot2 objects.** Every graph and plot can be extended
+  with `+`, combined, or saved in the usual ways.
+
+#### Graceful inclusivity
+
+Functions should accept whatever network or result users bring and
+return something they can use.
+
+- **Inputs span whatever [manynet](https://stocnet.github.io/manynet/)
+  can convert.**
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  draws matrices, edgelists, and `igraph`, `network`, `tidygraph`, and
+  `stocnet` objects alike, and
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) has methods
+  for results from [migraph](https://stocnet.github.io/migraph/),
+  [netrics](https://stocnet.github.io/netrics/),
+  [RSiena](https://www.stats.ox.ac.uk/~snijders/siena/),
+  [ergm](https://statnet.org),
+  [MoNAn](https://github.com/stocnet/MoNAn), and
+  [goldfish](https://stocnet.github.io/goldfish/).
+- **Both spellings are accepted.** Example: `node_colour` and
+  `edge_colour` work as `node_color` and `edge_color` do.
+- **Colours are ones everyone can read.** Palettes are chosen to stay
+  distinguishable under colour vision deficiency, and
+  [`simulate_colorblind()`](https://stocnet.github.io/autograph/reference/theme_colorblind.md)
+  and
+  [`check_contrast()`](https://stocnet.github.io/autograph/reference/check_colors.md)
+  let users test their own.
+- **Only truly unsupported cases fail.** Where what was asked for does
+  not apply, the function draws the nearest thing that does, and says
+  so, rather than failing. Example: a layout that needs two modes, asked
+  of a one-mode network, is replaced by the layout
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  would have chosen unasked. Where a function really cannot proceed, the
+  error says why and shows a call that would work.
+- **Key steps are reported.** Functions say what they did, such as a
+  substituted layout or an interpreted argument, at the verbosity the
+  user has chosen.
+- **Graphs describe themselves.** A graph should carry what the reader
+  needs to interpret it. Example: legends are titled with the variable
+  that each aesthetic maps, and isolates dropped from a graph are noted
+  in its legend or caption.
 
 ### Common commands
 

@@ -49,6 +49,7 @@ Other mapping:
 [`layout_layered()`](https://stocnet.github.io/autograph/reference/layout_layered.md),
 [`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
 [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md),
 [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 [`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),

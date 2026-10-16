@@ -247,22 +247,23 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   Whether, and at what size, to draw arrowheads on the ties of a
   directed network. By default (`NULL`) this is decided by the network:
   a directed network is drawn with arrowheads, except for a concept
-  lattice from `manynet::to_concepts()` in the "layered" (its default)
-  or "railway" layout. That is read as a Hasse diagram, where the
-  direction of each tie is already given by which of its ends is drawn
-  higher. In any other layout a concept lattice keeps its arrowheads.
-  `TRUE` draws arrowheads whatever the network, and `FALSE` none.
-  Arrowheads follow the width the ties are drawn at: 2mm long at the
-  default `edge_size` of 0.5, and longer on wider ties, up to 4mm. Where
-  the widths vary, as when they are mapped from a tie attribute, one
-  size is chosen for all of the arrowheads from the mean width drawn. A
-  number, e.g. `edge_arrows = 3`, draws arrowheads of that length in
-  millimetres instead, whatever the width of the ties. This is the unit
-  that `{ggplot2}` sizes are given in, as `node_size` is, so an
-  arrowhead of 3 is a little longer than a node of 3 is wide. Ties that
-  are not drawn, as with `edge_size = 0`, have no arrowheads. An
-  undirected network has no direction to show, so the argument is
-  ignored there.
+  lattice from
+  [`manynet::to_concepts()`](https://stocnet.github.io/manynet/reference/modif_concepts.html)
+  in the "layered" (its default) or "railway" layout. That is read as a
+  Hasse diagram, where the direction of each tie is already given by
+  which of its ends is drawn higher. In any other layout a concept
+  lattice keeps its arrowheads. `TRUE` draws arrowheads whatever the
+  network, and `FALSE` none. Arrowheads follow the width the ties are
+  drawn at: 2mm long at the default `edge_size` of 0.5, and longer on
+  wider ties, up to 4mm. Where the widths vary, as when they are mapped
+  from a tie attribute, one size is chosen for all of the arrowheads
+  from the mean width drawn. A number, e.g. `edge_arrows = 3`, draws
+  arrowheads of that length in millimetres instead, whatever the width
+  of the ties. This is the unit that `{ggplot2}` sizes are given in, as
+  `node_size` is, so an arrowhead of 3 is a little longer than a node of
+  3 is wide. Ties that are not drawn, as with `edge_size = 0`, have no
+  arrowheads. An undirected network has no direction to show, so the
+  argument is ignored there.
 
 - keep_isolates:
 
@@ -326,6 +327,7 @@ Other mapping:
 [`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
 [`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md),
 [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md),
 [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 [`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md)

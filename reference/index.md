@@ -157,6 +157,9 @@ improved or additional layouts to those offered in
 - [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   [`layout_tbl_graph_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   : Scaling layout
+- [`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md)
+  [`layout_tbl_graph_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md)
+  : Spatial layout
 - [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
   [`layout_tbl_graph_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
   : Valence layout

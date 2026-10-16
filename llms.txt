@@ -32,8 +32,8 @@ problems by providing automatic graph drawing for networks in any of the
 [manynet](https://stocnet.github.io/manynet/) formats, and automatic
 plotting for results from `{stocnet}` packages, including
 [migraph](https://stocnet.github.io/migraph/),
-[RSiena](https://www.stats.ox.ac.uk/~snijders/siena/), and `{MoNAn}`,
-and more.
+[RSiena](https://www.stats.ox.ac.uk/~snijders/siena/), and
+[MoNAn](https://github.com/stocnet/MoNAn), and more.
 
 All you need to do is install the package (loading it last will make
 sure its plotting methods are the default), use
@@ -43,6 +43,33 @@ sure its plotting methods are the default), use
 to graph your networks, or
 [`plot()`](https://rdrr.io/r/graphics/plot.default.html) to plot your
 results. That’s it!
+
+## Design principles
+
+[autograph](https://stocnet.github.io/autograph/) and the other
+[stocnet](https://github.com/stocnet) packages aim for three things:
+
+- **Declarative simplicity**: functions do one clearly named thing with
+  few arguments. For example, `graphr(x)` produces a sensible graph
+  without any layout or aesthetic arguments.
+- **Pleasant predictability**: users can guess a function’s behaviour
+  from its family. For example,
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
+  and
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+  share their `node_*` and `edge_*` arguments, and every graph and plot
+  follows the theme set once with
+  [`stocnet_theme()`](https://stocnet.github.io/autograph/reference/theme_set.md).
+- **Graceful inclusivity**: functions accept whatever network users
+  bring and return something they can use. For example,
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  draws any network that [manynet](https://stocnet.github.io/manynet/)
+  can convert, in colours that everyone can read.
+
+See the [contributing
+guide](https://github.com/stocnet/autograph/blob/main/.github/CONTRIBUTING.md#style)
+for how these principles translate into rules for the package.
 
 ## Drawing graphs
 
@@ -568,6 +595,9 @@ improved or additional layouts to those offered in
 - [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   [`layout_tbl_graph_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   : Scaling layout
+- [`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md)
+  [`layout_tbl_graph_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md)
+  : Spatial layout
 - [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
   [`layout_tbl_graph_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md)
   : Valence layout

@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,8 +89,22 @@
 <li>different visual defaults can frustrate interpretation, and potentially invites errors when comparing plots from different packages</li>
 <li>some plotting methods are available for some networks or network-related results and not others</li>
 </ul>
-<p><a href="https://stocnet.github.io/autograph/">autograph</a> aims to solve these problems by providing automatic graph drawing for networks in any of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> formats, and automatic plotting for results from <code>{stocnet}</code> packages, including <a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a>, <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a>, and <code>{MoNAn}</code>, and more.</p>
+<p><a href="https://stocnet.github.io/autograph/">autograph</a> aims to solve these problems by providing automatic graph drawing for networks in any of the <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> formats, and automatic plotting for results from <code>{stocnet}</code> packages, including <a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a>, <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a>, and <a href="https://github.com/stocnet/MoNAn" class="external-link">MoNAn</a>, and more.</p>
 <p>All you need to do is install the package (loading it last will make sure its plotting methods are the default), use <code><a href="reference/theme_set.html">set_stocnet_theme()</a></code> (once) to set your preferred theme, and then use <code><a href="reference/plot_graphr.html">graphr()</a></code> to graph your networks, or <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> to plot your results. That’s it!</p>
+</div>
+<div class="section level2">
+<h2 id="design-principles">Design principles<a class="anchor" aria-label="anchor" href="#design-principles"></a>
+</h2>
+<p><a href="https://stocnet.github.io/autograph/">autograph</a> and the other <a href="https://github.com/stocnet" class="external-link">stocnet</a> packages aim for three things:</p>
+<ul>
+<li>
+<strong>Declarative simplicity</strong>: functions do one clearly named thing with few arguments. For example, <code>graphr(x)</code> produces a sensible graph without any layout or aesthetic arguments.</li>
+<li>
+<strong>Pleasant predictability</strong>: users can guess a function’s behaviour from its family. For example, <code><a href="reference/plot_graphr.html">graphr()</a></code>, <code><a href="reference/plot_graphs.html">graphs()</a></code>, and <code><a href="reference/plot_grapht.html">grapht()</a></code> share their <code>node_*</code> and <code>edge_*</code> arguments, and every graph and plot follows the theme set once with <code><a href="reference/theme_set.html">stocnet_theme()</a></code>.</li>
+<li>
+<strong>Graceful inclusivity</strong>: functions accept whatever network users bring and return something they can use. For example, <code><a href="reference/plot_graphr.html">graphr()</a></code> draws any network that <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> can convert, in colours that everyone can read.</li>
+</ul>
+<p>See the <a href="https://github.com/stocnet/autograph/blob/main/.github/CONTRIBUTING.md#style" class="external-link">contributing guide</a> for how these principles translate into rules for the package.</p>
 </div>
 <div class="section level2">
 <h2 id="drawing-graphs">Drawing graphs<a class="anchor" aria-label="anchor" href="#drawing-graphs"></a>

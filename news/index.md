@@ -1,6 +1,43 @@
 # Changelog
 
+## autograph 1.2.7
+
+### Package
+
+- Added design principles to the README and the contributing guide
+- Raised the ‘manynet’ floor to 2.4.0 for
+  [`manynet::is_spatial()`](https://stocnet.github.io/manynet/reference/mark_format_node.html)
+
+### Graphing
+
+- Added `plot.stocnet()` so that
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) graphs a
+  ‘stocnet’ as it does an ‘mnet’
+- Added
+  [`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md),
+  which places each node at its own position
+  - Used by default for a spatial network, and snapping/backbone are
+    ignored
+  - Drawn on an equirectangular projection centred on the network’s mean
+    latitude
+- Improved how
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  treats tie lengths
+  - In “stress” and “kk” layouts these are drawns as distances
+  - In backbone layouts they are used to filter the ties, but not to
+    draw them
+- Fixed the arcs of
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  to read reciprocated ties from a network of any class
+
+### Theming
+
+- Improved “iheid” theme to prefer Montserrat over Helvetica
+- Fixed “iast” theme looking for “Monserrat”
+
 ## autograph 1.2.6
+
+CRAN release: 2026-10-07
 
 ### Package
 
@@ -1418,7 +1455,8 @@ CRAN release: 2025-09-10
   - Plots MCMC traces as a line plot with loess smoothing highlighting
     the trend
   - Plots overall density plot of the samples on the right margin
-- Improved plotting of `{MoNAn}` trace objects by using
+- Improved plotting of [MoNAn](https://github.com/stocnet/MoNAn) trace
+  objects by using
   [`plot.ag_conv()`](https://stocnet.github.io/autograph/reference/plot_convergence.md)
 - Added `plot.mcmc.list()` for plotting MCMC samples from
   [`ergm::ergm`](https://rdrr.io/pkg/ergm/man/ergm.html) results

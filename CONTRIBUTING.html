@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,7 +88,52 @@
 <a href="https://stocnet.github.io/autograph/">autograph</a> (this package): drawing graphs and plotting analytic, modelling, or diagnostic results, along with deep (often institutional) theming. <em>All</em> plot methods should live here.</li>
 <li>
 <a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a>: testing and modelling, e.g. QAP/MRQAP and diffusion models.</li>
-</ul><p>In terms of style, we are aiming for sensible defaults in terms of user experience. As a ggplot2 object, most everything can be tweaked before or afterwards, but the default presentation should already be aesthetically pleasing, informative, and consistent.</p>
+</ul></div>
+<div class="section level3">
+<h3 id="style">Style<a class="anchor" aria-label="anchor" href="#style"></a></h3>
+<p>All <code>stocnet</code> packages aim for the same three things: declarative simplicity, pleasant predictability, and graceful inclusivity. The principles are shared across the packages; the rules and examples below are those of <a href="https://stocnet.github.io/autograph/">autograph</a>.</p>
+<div class="section level4">
+<h4 id="declarative-simplicity">Declarative simplicity<a class="anchor" aria-label="anchor" href="#declarative-simplicity"></a></h4>
+<p>Functions should do one clearly named thing with few arguments.</p>
+<ul><li>
+<strong>Plotting needs one call.</strong> No argument but the object is required, and every other argument has a sensible default. Example: <code>graphr(x)</code> draws a network and <code>plot(result)</code> plots a result, without layout or aesthetic arguments.</li>
+<li>
+<strong>Variants become separate functions.</strong> Example: <code><a href="reference/plot_graphr.html">graphr()</a></code> draws one network, <code><a href="reference/plot_graphs.html">graphs()</a></code> a set of networks side by side, and <code><a href="reference/plot_grapht.html">grapht()</a></code> a network over time, rather than one function with an option for each.</li>
+<li>
+<strong>Scope is signalled by prefix.</strong> The prefix of an argument says which part of the graph it styles, so that the optional arguments are easy to guess. Example: <code>node_color</code>, <code>node_shape</code>, and <code>node_size</code> style the nodes, and <code>edge_color</code> and <code>edge_size</code> the ties.</li>
+<li>
+<strong>Names describe actions.</strong> User-facing functions are snake_case, and usually <code>verb_noun</code>, without abbreviations (see <a href="#function-names">Function names</a>).</li>
+<li>
+<strong>Features are detected, not declared.</strong> A function finds out whether a network is directed, weighted, signed, or two-mode, and adjusts, so the user does not supply an argument for it. Example: <code><a href="reference/plot_graphr.html">graphr()</a></code> adds arrows to a directed network, dashes the negative ties of a signed network, and gives the two modes of a two-mode network different shapes.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="pleasant-predictability">Pleasant predictability<a class="anchor" aria-label="anchor" href="#pleasant-predictability"></a></h4>
+<p>Users should be able to guess a function’s behaviour from its family.</p>
+<ul><li>
+<strong>Defaults are sensible.</strong> As a ggplot2 object, most everything can be tweaked before or afterwards, but the default presentation should already be aesthetically pleasing, informative, and consistent.</li>
+<li>
+<strong>Arguments share names across the family.</strong> <code><a href="reference/plot_graphr.html">graphr()</a></code>, <code><a href="reference/plot_graphs.html">graphs()</a></code>, and <code><a href="reference/plot_grapht.html">grapht()</a></code> take the same aesthetic arguments, so what a user learns for one carries over to the others.</li>
+<li>
+<strong>The theme is set once.</strong> <code><a href="reference/theme_set.html">stocnet_theme()</a></code> sets the fonts and palettes that every later graph and plot uses, so style code is not repeated.</li>
+<li>
+<strong>Outputs are ggplot2 objects.</strong> Every graph and plot can be extended with <code>+</code>, combined, or saved in the usual ways.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="graceful-inclusivity">Graceful inclusivity<a class="anchor" aria-label="anchor" href="#graceful-inclusivity"></a></h4>
+<p>Functions should accept whatever network or result users bring and return something they can use.</p>
+<ul><li>
+<strong>Inputs span whatever <a href="https://stocnet.github.io/manynet/" class="external-link">manynet</a> can convert.</strong> <code><a href="reference/plot_graphr.html">graphr()</a></code> draws matrices, edgelists, and <code>igraph</code>, <code>network</code>, <code>tidygraph</code>, and <code>stocnet</code> objects alike, and <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> has methods for results from <a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a>, <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a>, <a href="https://www.stats.ox.ac.uk/~snijders/siena/" class="external-link">RSiena</a>, <a href="https://statnet.org" class="external-link">ergm</a>, <a href="https://github.com/stocnet/MoNAn" class="external-link">MoNAn</a>, and <a href="https://stocnet.github.io/goldfish/" class="external-link">goldfish</a>.</li>
+<li>
+<strong>Both spellings are accepted.</strong> Example: <code>node_colour</code> and <code>edge_colour</code> work as <code>node_color</code> and <code>edge_color</code> do.</li>
+<li>
+<strong>Colours are ones everyone can read.</strong> Palettes are chosen to stay distinguishable under colour vision deficiency, and <code><a href="reference/theme_colorblind.html">simulate_colorblind()</a></code> and <code><a href="reference/check_colors.html">check_contrast()</a></code> let users test their own.</li>
+<li>
+<strong>Only truly unsupported cases fail.</strong> Where what was asked for does not apply, the function draws the nearest thing that does, and says so, rather than failing. Example: a layout that needs two modes, asked of a one-mode network, is replaced by the layout <code><a href="reference/plot_graphr.html">graphr()</a></code> would have chosen unasked. Where a function really cannot proceed, the error says why and shows a call that would work.</li>
+<li>
+<strong>Key steps are reported.</strong> Functions say what they did, such as a substituted layout or an interpreted argument, at the verbosity the user has chosen.</li>
+<li>
+<strong>Graphs describe themselves.</strong> A graph should carry what the reader needs to interpret it. Example: legends are titled with the variable that each aesthetic maps, and isolates dropped from a graph are noted in its legend or caption.</li>
+</ul></div>
 </div>
 <div class="section level3">
 <h3 id="common-commands">Common commands<a class="anchor" aria-label="anchor" href="#common-commands"></a></h3>

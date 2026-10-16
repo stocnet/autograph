@@ -162,6 +162,7 @@ Other mapping:
 [`layout_levels()`](https://stocnet.github.io/autograph/reference/layout_levels.md),
 [`layout_matching()`](https://stocnet.github.io/autograph/reference/layout_matching.md),
 [`layout_scaling()`](https://stocnet.github.io/autograph/reference/layout_scaling.md),
+[`layout_spatial()`](https://stocnet.github.io/autograph/reference/layout_spatial.md),
 [`layout_valence()`](https://stocnet.github.io/autograph/reference/layout_valence.md),
 [`plot_graphr`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 [`plot_graphs`](https://stocnet.github.io/autograph/reference/plot_graphs.md),
@@ -174,6 +175,6 @@ Other mapping:
 #           node_color = "type", node_size = 3)
 #graphr(ison_southern_women, layout = "lineage")
 # ison_adolescents |>
-#   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+#   mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
 #   graphr(layout = "lineage", ranks = "year")
 ```

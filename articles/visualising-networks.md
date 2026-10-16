@@ -577,15 +577,15 @@ right, so the code below means “take `fict_lotr`, *then* add a Degree
 attribute to its nodes, *then* graph it with node colour mapped to that
 attribute”. Piping or ‘chaining’ functions like this is very common in
 modern R, and we use it throughout these tutorials.
-[`mutate()`](https://dplyr.tidyverse.org/reference/mutate.html) and the
-other [dplyr](https://dplyr.tidyverse.org)-style verbs for networks are
-covered in [manynet](https://stocnet.github.io/manynet/)’s “Manipulating
-Network Data” tutorial.
+[`mutate_nodes()`](https://stocnet.github.io/manynet/reference/manip_nodes_attr.html)
+and the other [dplyr](https://dplyr.tidyverse.org)-style verbs for
+networks are covered in [manynet](https://stocnet.github.io/manynet/)’s
+“Manipulating Network Data” tutorial.
 
 ``` r
 
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
   graphr(node_colour = "Degree")
 ```
 
@@ -621,7 +621,7 @@ the characters by the degree we calculated above.**
 ``` r
 
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
   graphr(node_size = "Degree")
 ```
 
@@ -636,7 +636,7 @@ three encodings of the same variable.**
 
 ``` r
 
-lotr <- mutate(fict_lotr, Degree = node_by_deg(fict_lotr))
+lotr <- mutate_nodes(fict_lotr, Degree = node_by_deg(fict_lotr))
 (graphr(lotr, labels = FALSE, node_size = "Degree") + ggtitle("Size") |
     graphr(lotr, labels = FALSE, node_colour = "Degree") + ggtitle("Colour") |
     graphr(lotr, labels = FALSE, node_size = "Degree", node_colour = "Degree") +
@@ -733,8 +733,8 @@ as two categories rather than a gradient.
 ``` r
 
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
-  mutate(Top = Degree == max(Degree)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Top = Degree == max(Degree)) |>
   graphr(node_colour = "Top")
 ```
 
@@ -751,8 +751,8 @@ legend title to make the title span multiple lines.
 ``` r
 
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
-  mutate(Top = Degree == max(Degree)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Top = Degree == max(Degree)) |>
   graphr(node_colour = "Top") +
   guides(fill = ggplot2::guide_legend(title = "Most\nconnected"))
 ```
@@ -2265,8 +2265,9 @@ number of different network-related objects, so that `plot(result)`
 object. These include measures of centrality, cohesion, and clustering,
 as well as goodness-of-fit plots for network models from packages such
 as [RSiena](https://www.stats.ox.ac.uk/~snijders/siena/),
-[ergm](https://statnet.org), and `{MoNAn}`. Usefully, all these plots
-use the same theming system as
+[ergm](https://statnet.org), and
+[MoNAn](https://github.com/stocnet/MoNAn). Usefully, all these plots use
+the same theming system as
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 so that you can set a theme once and have it apply to all your graphs
 and plots. **Let’s try this now, plotting the distribution of a
