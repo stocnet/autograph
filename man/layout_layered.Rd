@@ -153,7 +153,7 @@ like the rails and rungs the names describe.
 #           node_color = "type", node_size = 3)
 #graphr(ison_southern_women, layout = "lineage")
 # ison_adolescents |>
-#   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+#   mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
 #   graphr(layout = "lineage", ranks = "year")
 }
 \seealso{

@@ -3,6 +3,7 @@
 ## Package
 
 - Added design principles to the README and the contributing guide
+- Raised the 'manynet' floor to 2.4.0 for `manynet::is_spatial()`
 
 ## Graphing
 

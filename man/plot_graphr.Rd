@@ -294,7 +294,7 @@ try \code{run_tute("Visualisation")}.
 \examples{
 graphr(ison_adolescents)
 ison_adolescents |>
-  mutate(color = rep(c("introvert","extrovert"), times = 4),
+  mutate_nodes(color = rep(c("introvert","extrovert"), times = 4),
          size = c(3, 6, 3, 3, 3, 6, 6, 3)) |>
   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
   graphr(node_color = "color", node_size = "size",

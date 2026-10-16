@@ -90,7 +90,7 @@ test_that("weighted, unsigned, directed networks graph correctly", {
 test_that("fancy node mods graph correctly", {
   skip_on_cran()
   # one-mode network
-  fmrg <- dplyr::mutate(ag_net(fmrg), nodesize = Appearances/1000)
+  fmrg <- manynet::mutate_nodes(ag_net(fmrg), nodesize = Appearances/1000)
   testcolnodes <- graphr(fmrg, node_color = "Gender",
                          node_size = "Appearances", 
                          node_shape = "Attractive")
@@ -161,7 +161,7 @@ test_that("node_group accepts a membership vector", {
   skip_if_not_installed("ggforce")
   memb <- c(1, 1, 1, 2, 2, 2, 3, 3)
   expect_equal(graphr(ison_adolescents, node_group = memb)[["layers"]][[1]][["data"]][["node_group"]],
-               graphr(ison_adolescents |> dplyr::mutate(grp = memb),
+               graphr(ison_adolescents |> manynet::mutate_nodes(grp = memb),
                       node_group = "grp")[["layers"]][[1]][["data"]][["node_group"]])
   expect_error(graphr(ison_adolescents, node_group = c(1, 2)),
                "membership vector")
@@ -183,7 +183,7 @@ test_that("nodes use fill aesthetic instead of colour", {
   expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], ag_ink())
   # Mapped node_color uses fill in aes
   p2 <- ison_brandes |>
-    dplyr::mutate(color = c(rep(c(1, 2), 5), 1)) |>
+    manynet::mutate_nodes(color = c(rep(c(1, 2), 5), 1)) |>
     graphr(node_color = color)
   expect_false(is.null(p2[["layers"]][[2]][["mapping"]][["fill"]]))
 })
@@ -192,7 +192,7 @@ test_that("node_color with multiple values uses fill scale", {
   skip_on_cran()
   # More than 2 colors triggers scale_fill_manual with qualitative palette
   p <- ison_brandes |>
-    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) |>
+    manynet::mutate_nodes(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
   # Check that fill scale is used (not colour)
@@ -348,7 +348,7 @@ test_that("signs are given a legend wherever the colours no longer carry them", 
 test_that("color legend uses fillable shape when node_shape is also mapped", {
   skip_on_cran()
   p <- ison_brandes |>
-    dplyr::mutate(grp = c(rep(c("a", "b", "c"), 3), "a", "b"),
+    manynet::mutate_nodes(grp = c(rep(c("a", "b", "c"), 3), "a", "b"),
                   cat = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp, node_shape = cat)
   # The fill guide should override shape to 21 so colors render in legend
@@ -359,7 +359,7 @@ test_that("color legend uses fillable shape when node_shape is also mapped", {
 test_that("node_color with 2 values uses highlight palette", {
   skip_on_cran()
   p <- ison_brandes |>
-    dplyr::mutate(grp = c(rep(c("x", "y"), 5), "x")) |>
+    manynet::mutate_nodes(grp = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
   # Should use scale_fill_manual with highlight defaults

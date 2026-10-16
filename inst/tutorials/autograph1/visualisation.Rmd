@@ -704,13 +704,13 @@ on its right, so the code below means
 _then_ graph it with node colour mapped to that attribute".
 Piping or 'chaining' functions like this is very common in modern R,
 and we use it throughout these tutorials.
-`mutate()` and the other `{dplyr}`-style verbs for networks
+`mutate_nodes()` and the other `{dplyr}`-style verbs for networks
 are covered in `{manynet}`'s "Manipulating Network Data" tutorial.
 :::
 
 ```{r colourcont, exercise = TRUE, fig.width=9}
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
   graphr(node_colour = "Degree")
 ```
 
@@ -742,7 +742,7 @@ which makes `node_size` the usual home for a continuous variable.
 
 ```{r degsize, exercise = TRUE, fig.width=9}
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
   graphr(node_size = "Degree")
 ```
 
@@ -756,7 +756,7 @@ a greyscale printout, or with a colour vision deficiency.
 **Compare the three encodings of the same variable.**
 
 ```{r sizecolour, exercise = TRUE, fig.width=9, fig.height=4}
-lotr <- mutate(fict_lotr, Degree = node_by_deg(fict_lotr))
+lotr <- mutate_nodes(fict_lotr, Degree = node_by_deg(fict_lotr))
 (graphr(lotr, labels = FALSE, node_size = "Degree") + ggtitle("Size") |
     graphr(lotr, labels = FALSE, node_colour = "Degree") + ggtitle("Colour") |
     graphr(lotr, labels = FALSE, node_size = "Degree", node_colour = "Degree") +
@@ -864,8 +864,8 @@ so by the rule above it is drawn as two categories rather than a gradient.
 
 ```{r maxbet, exercise = TRUE, fig.width=9}
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
-  mutate(Top = Degree == max(Degree)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Top = Degree == max(Degree)) |>
   graphr(node_colour = "Top")
 ```
 
@@ -881,8 +881,8 @@ span multiple lines.
 
 ```{r legend, exercise=TRUE, fig.width=9}
 fict_lotr |>
-  mutate(Degree = node_by_deg(fict_lotr)) |>
-  mutate(Top = Degree == max(Degree)) |>
+  mutate_nodes(Degree = node_by_deg(fict_lotr)) |>
+  mutate_nodes(Top = Degree == max(Degree)) |>
   graphr(node_colour = "Top") +
   guides(fill = ggplot2::guide_legend(title = "Most\nconnected"))
 ```

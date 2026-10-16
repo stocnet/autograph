@@ -244,7 +244,7 @@ test_that("keep_isolates is deprecated but still honoured", {
 test_that("node aesthetics map with globally consistent levels", {
   set.seed(123)
   tl <- manynet::mutate_ties(
-    manynet::mutate(manynet::ison_adolescents,
+    manynet::mutate_nodes(manynet::ison_adolescents,
                     gender = rep(c("male", "female"), times = 4),
                     age = sample(11:16, 8, replace = TRUE)),
     wave = sample(1995:1998, 10, replace = TRUE))

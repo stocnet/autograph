@@ -129,7 +129,7 @@ layout_tbl_graph_layered <- layout_layered
 #' @examples
 #' #graphr(ison_southern_women, layout = "lineage")
 #' # ison_adolescents |>
-#' #   mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+#' #   mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
 #' #   graphr(layout = "lineage", ranks = "year")
 #' @export
 layout_lineage <- function(.data,
