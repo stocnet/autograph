@@ -6,6 +6,7 @@
 
 ## Graphing
 
+- Added `plot.stocnet()` so that `plot()` graphs a 'stocnet' as it does an 'mnet'
 - Added `layout_spatial()`, which places each node at its own position
   - Used by default for a spatial network, and snapping/backbone are ignored
   - Drawn on an equirectangular projection centred on the network's mean latitude
