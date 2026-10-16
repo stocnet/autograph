@@ -26,6 +26,12 @@ graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
       weights <- .backbone_layout_weights(g, layout, backbone)
       if (!is.null(weights)) args[["weights"]] <- weights
     }
+    # A network that records tie lengths has them drawn as its distances,
+    # where nothing else asks for the tie lengths the layout reads.
+    if (!"weights" %in% names(args)) {
+      weights <- .length_layout_weights(g, layout)
+      if (!is.null(weights)) args[["weights"]] <- weights
+    }
     lo <- suppressWarnings(do.call(ggraph::create_layout, args))
   }
   if ("graph" %in% names(attributes(lo))) {
@@ -42,6 +48,11 @@ graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
   # scales is not the distance the layout placed there.
   # The "correspondence" layout draws distances that can be read in the same
   # way, and names the share of inertia each of its dimensions holds.
+  # A spatial layout draws distances on the ground, and so keeps one scale on
+  # both axes too, though its coordinates are not read off axes.
+  if (identical(layout, "spatial")) {
+    p <- suppressMessages(p + ggplot2::coord_fixed())
+  }
   if (is.character(layout) && length(layout) == 1L &&
       layout %in% c("scaling", "correspondence")) {
     fit <- attr(lo, "fit")

@@ -212,7 +212,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   # rather than an aesthetic, so it must leave the same ties out. Otherwise a
   # full-length (net_ties) vector recycles against the shorter edge set and
   # emits "longer object length is not a multiple" warnings.
-  strength <- ifelse(igraph::which_mutual(g), 0.2, 0)
+  strength <- ifelse(igraph::which_mutual(manynet::as_igraph(g)), 0.2, 0)
   strength[!.tie_is_coincident(g, p)]
 }
 

@@ -70,7 +70,10 @@ test_that("a backbone moves the layouts that read tie lengths", {
   unfixed <- suppressMessages(graphr(manynet::ison_networkers,
                                      layout = "scaling", backbone = FALSE,
                                      labels = FALSE))
-  expect_equal(fixed$data[, c("x", "y")], unfixed$data[, c("x", "y")])
+  # The coordinates are compared without the graph each layout carries.
+  expect_equal(as.data.frame(fixed$data)[, c("x", "y")],
+               as.data.frame(unfixed$data)[, c("x", "y")],
+               ignore_attr = TRUE)
   expect_equal(bb_alphas(fixed), c(0.08, 0.4))
 })
 

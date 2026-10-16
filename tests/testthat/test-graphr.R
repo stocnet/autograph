@@ -133,8 +133,10 @@ test_that("named networks plot correctly", {
 # Test that autographr() works with arguments without quotes
 test_that("node_group works correctly", {
   skip_on_cran()
-  expect_equal(graphr(ison_lawfirm, node_group = gender),
-               graphr(ison_lawfirm, node_group = "gender"))
+  # The drawn layers are compared rather than the plots, since each plot
+  # holds a graph of its own that is never the same object as another's.
+  expect_equal(drawn_layers(graphr(ison_lawfirm, node_group = gender)),
+               drawn_layers(graphr(ison_lawfirm, node_group = "gender")))
 })
 
 test_that("node_group draws overlapping hulls from a membership matrix", {
@@ -167,8 +169,8 @@ test_that("node_group accepts a membership vector", {
 
 test_that("unquoted arguments plot correctly", {
   skip_on_cran()
-  expect_equal(graphr(ison_lawfirm, node_color = "gender"),
-               graphr(ison_lawfirm, node_color = gender))
+  expect_equal(drawn_layers(graphr(ison_lawfirm, node_color = "gender")),
+               drawn_layers(graphr(ison_lawfirm, node_color = gender)))
 })
 
 # Tests for fill aesthetic (color-to-fill change)
@@ -273,8 +275,9 @@ test_that("two-mode shape legends name the modes where the network does", {
   expect_equal(as.character(shapes[!manynet::node_is_mode(ison_southern_women)][1]),
                "women")
   # Networks that do not record their modes keep the old labels.
-  expect_null(manynet::mode_names(irps_revere))
-  expect_equal(levels(.infer_nshape(ag_net(irps_revere), NULL)),
+  unnamed <- manynet::as_igraph(manynet::create_filled(c(2, 3)))
+  expect_null(manynet::mode_names(unnamed))
+  expect_equal(levels(.infer_nshape(ag_net(unnamed), NULL)),
                c("One", "Two"))
   # One-mode networks are unaffected: mode_names() gives them a single name.
   expect_equal(.infer_nshape(ag_net(ison_adolescents), NULL), 21)
@@ -319,7 +322,7 @@ test_that("multiplex networks are coloured by layer rather than by sign", {
   # assumed, since manynet spells it "type" through 2.2.3 and "layer" from
   # 2.3.0, and networks of both spellings are in circulation.
   expect_true(.layer_attribute(marvel) %in% c("type", "layer"))
-  expect_equal(.layer_attribute(ag_net(ison_algebra)), "type")
+  expect_true(.layer_attribute(ag_net(ison_algebra)) %in% c("type", "layer"))
   expect_true(is.na(.layer_attribute(ag_net(ison_adolescents))))
 })
 

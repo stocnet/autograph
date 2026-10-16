@@ -10,6 +10,10 @@
 - Added `layout_spatial()`, which places each node at its own position
   - Used by default for a spatial network, and snapping/backbone are ignored
   - Drawn on an equirectangular projection centred on the network's mean latitude
+- Improved how `graphr()` treats tie lengths
+  - In "stress" and "kk" layouts these are drawns as distances
+  - In backbone layouts they are used to filter the ties, but not to draw them
+- Fixed the arcs of `graphr()` to read reciprocated ties from a network of any class
 
 ## Theming
 

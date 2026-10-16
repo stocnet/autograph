@@ -414,7 +414,7 @@
 # square grid would collapse.
 .fixed_layouts <- function() {
   c("layered", "lineage", "railway", "ladder", "levels", "scaling",
-    "correspondence", "hierarchy", "alluvial", "multilevel")
+    "correspondence", "spatial", "hierarchy", "alluvial", "multilevel")
 }
 
 # Layout applicability ----
@@ -472,6 +472,10 @@
     valence = list(
       check = function(g, ...) manynet::is_signed(g),
       need = "a signed network"),
+    spatial = list(
+      check = function(g, ...) !is.null(.node_positions(g)),
+      need = paste("the nodes' positions, as 'x' and 'y'",
+                   "or 'lon' and 'lat' node attributes")),
     # Correspondence analysis divides by the mass of each node, so a negative
     # tie has no reading. `double` splits the signs into two nonnegative
     # halves, and the layout then applies after all, which is why the

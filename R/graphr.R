@@ -250,7 +250,7 @@
 #' @examples
 #' graphr(ison_adolescents)
 #' ison_adolescents |>
-#'   mutate(color = rep(c("introvert","extrovert"), times = 4),
+#'   mutate_nodes(color = rep(c("introvert","extrovert"), times = 4),
 #'          size = c(3, 6, 3, 3, 3, 6, 6, 3)) |>
 #'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
 #'   graphr(node_color = "color", node_size = "size",
@@ -541,7 +541,11 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   if (is.null(layout)) {
     if(manynet::is_list(g))
       g <- g[[1]]
-    if (manynet::net_nodes(g) <= 6) {
+    # A spatial network's nodes already have their places, which say more
+    # than any arrangement of the ties could.
+    if (manynet::is_spatial(g)) {
+      layout <- "spatial"
+    } else if (manynet::net_nodes(g) <= 6) {
       layout <- "configuration"
     } else if (manynet::is_multilevel(g) && manynet::is_connected(g)) {
       # Checked before `is_twomode()`, which is also TRUE for these networks.
