@@ -71,6 +71,10 @@ plot.mnet <- function(x, ...){
   }
 }
 
+#' @noRd
+#' @export
+plot.stocnet <- plot.mnet
+
 #' @rdname plot.diffusion
 #' @examples
 #' plot(res_migraph_diff)

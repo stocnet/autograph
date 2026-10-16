@@ -58,6 +58,7 @@ plot_fixture_registry <- list(
     manynet::play_learning(manynet::create_ring(6), beliefs = stats::runif(6))
   },
   mnet        = function() manynet::ison_adolescents,
+  stocnet     = function() manynet::as_stocnet(manynet::ison_adolescents),
   matrix      = function() manynet::as_matrix(manynet::ison_adolescents),
   netlm       = function() autograph::res_migraph_reg,
   netlogit    = function() {

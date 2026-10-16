@@ -294,7 +294,7 @@ try \code{run_tute("Visualisation")}.
 \examples{
 graphr(ison_adolescents)
 ison_adolescents |>
-  mutate(color = rep(c("introvert","extrovert"), times = 4),
+  mutate_nodes(color = rep(c("introvert","extrovert"), times = 4),
          size = c(3, 6, 3, 3, 3, 6, 6, 3)) |>
   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
   graphr(node_color = "color", node_size = "size",
@@ -324,6 +324,7 @@ Other mapping:
 \code{\link[=layout_levels]{layout_levels()}},
 \code{\link[=layout_matching]{layout_matching()}},
 \code{\link[=layout_scaling]{layout_scaling()}},
+\code{\link[=layout_spatial]{layout_spatial()}},
 \code{\link[=layout_valence]{layout_valence()}},
 \code{\link{plot_graphs}},
 \code{\link{plot_grapht}}

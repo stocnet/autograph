@@ -58,6 +58,27 @@ sure its plotting methods are the default), use `set_stocnet_theme()`
 (once) to set your preferred theme, and then use `graphr()` to graph
 your networks, or `plot()` to plot your results. That’s it!
 
+## Design principles
+
+`{autograph}` and the other [stocnet](https://github.com/stocnet)
+packages aim for three things:
+
+- **Declarative simplicity**: functions do one clearly named thing with
+  few arguments. For example, `graphr(x)` produces a sensible graph
+  without any layout or aesthetic arguments.
+- **Pleasant predictability**: users can guess a function’s behaviour
+  from its family. For example, `graphr()`, `graphs()`, and `grapht()`
+  share their `node_*` and `edge_*` arguments, and every graph and plot
+  follows the theme set once with `stocnet_theme()`.
+- **Graceful inclusivity**: functions accept whatever network users
+  bring and return something they can use. For example, `graphr()` draws
+  any network that `{manynet}` can convert, in colours that everyone can
+  read.
+
+See the [contributing
+guide](https://github.com/stocnet/autograph/blob/main/.github/CONTRIBUTING.md#style)
+for how these principles translate into rules for the package.
+
 ## Drawing graphs
 
 `{autograph}` includes three one-line graphing functions with sensible

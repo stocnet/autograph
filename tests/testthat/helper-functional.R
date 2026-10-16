@@ -114,7 +114,18 @@ ag_layout_pool <- c(ag_fixtures, local({
     # Two-mode sizes are given as a vector; ison_southern_women is 18/14, so
     # the pool needs an equally sized pair for the ladder layout
     balanced   = manynet::create_ring(c(4, 4)),
-    acyclic    = manynet::create_tree(8, directed = TRUE)
+    acyclic    = manynet::create_tree(8, directed = TRUE),
+    # Nodes with positions, for the spatial layout
+    spatial    = manynet::mutate_nodes(manynet::create_ring(8),
+                                       x = cos(seq(0, 7) * pi / 4),
+                                       y = sin(seq(0, 7) * pi / 4))
   )
 }))
 
+
+# What a plot draws, layer by layer. Two plots of the same network each hold a
+# graph of their own, so the plots themselves never compare equal where the
+# network is converted on the way in; what they draw does.
+drawn_layers <- function(p) {
+  lapply(seq_along(p$layers), function(i) ggplot2::layer_data(p, i))
+}

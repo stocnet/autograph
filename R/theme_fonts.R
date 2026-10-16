@@ -44,13 +44,13 @@ set_font_theme <- function(theme){
 
 theme_fonts <- function(theme){
   switch(theme,
-         "iheid" = c("Helvetica", "Arial", "Verdana"),
+         "iheid" = c("Montserrat", "Helvetica", "Arial", "Verdana"),
          "ethz" = c("DIN Next","Arial"),
          "uzh" = c("Source Sans", "TheSans", "Palatino"),
          "rug" = c("Arial","Parry","Georgia","Open Sans"),
          "oxf" = c("Roboto","Noto Serif","Aktiv Grotesk"),
          "cmu" = c("Open Sans","Source Serif Pro","Helvetica","Times"),
-         "iast" = c("Gogh","Monserrat","Playfair","Roboto","tse"),
+         "iast" = c("Gogh","Montserrat","Playfair","Roboto","tse"),
          "hwu" = c("Univers LT Pro","Baskerville BT","Arial"),
          "neon" = "Comic Sans MS",
          "clay" = c("Styrene B", "Styrene A", "Tiempos Text",

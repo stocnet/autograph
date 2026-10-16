@@ -60,7 +60,10 @@
 # the reader is looking at. Kept in step with `manynet:::.backbone_spec()`.
 .backbone_filter <- function(g, filter) {
   if (!is.null(filter)) return(filter)
-  if (manynet::is_weighted(g)) "lans" else "simmelian"
+  # A network with lengths but no weights is filtered on the inverse of its
+  # lengths, as manynet's `to_backbone()` does.
+  if (manynet::is_weighted(g) || !is.null(.tie_lengths_of(g))) "lans" else
+    "simmelian"
 }
 
 # One logical for each tie of `g`, TRUE where the filter keeps it, or NULL
@@ -175,6 +178,20 @@
 # push the network into a spindle.
 .backbone_ratio <- 4
 
+# The tie lengths a force-directed layout is given, where the network records
+# them, so that a long tie is drawn long. Each family reads the weights it is
+# given its own way (see above): "kk" reads them as lengths, while ggraph
+# inverts those it hands to "stress", so stress is given their inverses.
+# "fr" and "drl" read weights as attraction, which a length is not, and are
+# left as they are.
+.length_layout_weights <- function(g, layout) {
+  if (!is.character(layout) || length(layout) != 1L) return(NULL)
+  if (!layout %in% c("stress", "kk")) return(NULL)
+  len <- .tie_lengths_of(g)
+  if (is.null(len)) return(NULL)
+  if (layout == "stress") 1 / len else len
+}
+
 .backbone_layout_weights <- function(g, layout, mark) {
   if (!.backbone_moves_layout(layout)) return(NULL)
   short <- .backbone_anchored(g, mark)
@@ -194,8 +211,9 @@
                    nbins = igraph::vcount(gi))
   loose <- which(held == 0)
   if (!length(loose)) return(mark)
+  len <- .tie_lengths_of(gi)
   weight <- if (manynet::is_weighted(gi)) igraph::edge_attr(gi, "weight") else
-    rep(1, nrow(el))
+    if (!is.null(len)) 1 / len else rep(1, nrow(el))
   for (v in loose) {
     inc <- which(el[, 1] == v | el[, 2] == v)
     if (length(inc)) mark[inc[which.max(weight[inc])]] <- TRUE

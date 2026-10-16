@@ -2,7 +2,7 @@
 test_that("layered and lineage layouts graph correctly", {
   skip_on_cran()
   test_lin <- ison_adolescents |> 
-    mutate(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
+    mutate_nodes(year = rep(c(1985, 1990, 1995, 2000), times = 2)) |>
     graphr(layout = "lineage", ranks = "year")
   test_hie <- graphr(ison_southern_women,
                      layout = "layered", center = "events")
@@ -31,8 +31,8 @@ test_that("layered and lineage layouts graph correctly", {
 
 test_that("layered layout works for two mode networks", {
   skip_on_cran()
-  tm <- ison_brandes |>
-    mutate(type = twomode_type, name = LETTERS[1:11]) |>
+  tm <- manynet::as_tidygraph(ison_brandes) |>
+    mutate_nodes(type = twomode_type, name = LETTERS[1:11]) |>
     graphr()
   expect_length(unique(tm$data[tm$data$type == TRUE, "y"]), 1)
   expect_length(unique(tm$data[tm$data$type == FALSE, "y"]), 1)
