@@ -4,6 +4,12 @@
 
 - Added design principles to the README and the contributing guide
 
+## Graphing
+
+- Added `layout_spatial()`, which places each node at its own position
+  - Used by default for a spatial network, and snapping/backbone are ignored
+  - Drawn on an equirectangular projection centred on the network's mean latitude
+
 ## Theming
 
 - Improved "iheid" theme to prefer Montserrat over Helvetica
