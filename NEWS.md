@@ -4,6 +4,12 @@
 
 - Added design principles to the README and the contributing guide
 
+## Theming
+
+- Improved "iheid" theme to prefer Montserrat over Helvetica
+- Fixed "iast" theme looking for "Monserrat"
+
+
 # autograph 1.2.6
 
 ## Package

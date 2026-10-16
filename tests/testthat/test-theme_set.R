@@ -62,7 +62,8 @@ test_that("setting fonts works", {
   on.exit(suppressMessages(stocnet_theme("default")), add = TRUE)
   stocnet_theme("iheid")
   p <- plot(monan_gof)
-  expect_equal(p$theme$text$family, "Helvetica")
+  # Montserrat is preferred where it is installed, and Helvetica otherwise.
+  expect_true(p$theme$text$family %in% c("Montserrat", "Helvetica"))
   skip_on_os("windows") # Arial not available on Windows by default
   stocnet_theme("ethz")
   p <- plot(monan_gof)
