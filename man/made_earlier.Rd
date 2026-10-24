@@ -3,6 +3,7 @@
 \docType{data}
 \name{made_earlier}
 \alias{made_earlier}
+\alias{res_infernet_reg}
 \alias{res_migraph_reg}
 \alias{res_migraph_test}
 \alias{res_migraph_diff}
@@ -22,6 +23,8 @@
 \alias{goldfish_fit}
 \title{Precooked results for demonstrating plotting}
 \format{
+An object of class \code{netreg_lm} (inherits from \code{netreg}) of length 15.
+
 An object of class \code{netlm} of length 15.
 
 An object of class \code{network_test} of length 9.
@@ -57,6 +60,8 @@ An object of class \code{goldfishOnset} (inherits from \code{list}) of length 3.
 An object of class \code{goldfishFit} of length 31.
 }
 \usage{
+data(res_infernet_reg)
+
 data(res_migraph_reg)
 
 data(res_migraph_test)

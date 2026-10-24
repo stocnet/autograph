@@ -2,31 +2,41 @@
 % Please edit documentation in R/plot_tests.R
 \name{model_mrqap}
 \alias{model_mrqap}
+\alias{plot.netreg}
 \alias{plot.netlm}
 \alias{plot.netlogit}
 \title{Plotting methods for MRQAP models}
 \usage{
+\method{plot}{netreg}(x, ...)
+
 \method{plot}{netlm}(x, ...)
 
 \method{plot}{netlogit}(x, ...)
 }
 \arguments{
 \item{x}{An object obtained by fitting an MRQAP model to some data.
-For example, \code{migraph::net_regression()}.}
+For example, \code{infernet::net_regression()}.}
 
 \item{...}{Further arguments to be passed on to plot.}
 }
 \value{
 A plot showing the location of observed statistics compared to the
 distribution of statistics from permuted networks.
+The vertical lines mark the 2.5\% and 97.5\% quantiles of each distribution.
+A term with no permuted statistics, such as the intercept where
+predictors are permuted, shows only its observed statistic.
 }
 \description{
 These plotting methods are for results obtained by fitting an MRQAP
 model.
-The S3 classes are "netlm" or "netlogit", and so are compatible with the
-results from either the \code{{sna}} or \code{{migraph}} packages.
+The S3 class "netreg" comes from \code{{infernet}}, and includes its
+"netreg_lm", "netreg_glm", and "netreg_css" results.
+The S3 classes "netlm" and "netlogit" come from the \code{{sna}} package
+or from earlier versions of \code{{migraph}}.
 }
 \examples{
-# Here's something I cooked up with migraph earlier:
+# Here's something I cooked up with infernet earlier:
+plot(res_infernet_reg)
+# And with an earlier version of migraph:
 plot(res_migraph_reg)
 }

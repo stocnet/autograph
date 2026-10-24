@@ -5,6 +5,14 @@
 #'   testing and demonstrating how autograph plots look.
 NULL
 
+# infernet objects ####
+
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_infernet_reg)
+"res_infernet_reg"
+
 # migraph objects ####
 
 #' @docType data

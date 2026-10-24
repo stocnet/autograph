@@ -1,3 +1,10 @@
+# autograph 1.2.8
+
+## Plotting
+
+- Added `plot.netreg()` for MRQAP results from `infernet::net_regression()`
+- Added `res_infernet_reg`, a precooked 'infernet' regression result
+
 # autograph 1.2.7
 
 ## Package
@@ -20,7 +27,6 @@
 
 - Improved "iheid" theme to prefer Montserrat over Helvetica
 - Fixed "iast" theme looking for "Monserrat"
-
 
 # autograph 1.2.6
 
