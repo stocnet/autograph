@@ -60,6 +60,7 @@ plot_fixture_registry <- list(
   mnet        = function() manynet::ison_adolescents,
   stocnet     = function() manynet::as_stocnet(manynet::ison_adolescents),
   matrix      = function() manynet::as_matrix(manynet::ison_adolescents),
+  netreg      = function() autograph::res_infernet_reg,
   netlm       = function() autograph::res_migraph_reg,
   netlogit    = function() {
     testthat::skip_if_not_installed("migraph")

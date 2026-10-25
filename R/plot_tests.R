@@ -67,75 +67,64 @@ plot.network_test <- function(x, ...,
 #' @description
 #'   These plotting methods are for results obtained by fitting an MRQAP
 #'   model.
-#'   The S3 classes are "netlm" or "netlogit", and so are compatible with the
-#'   results from either the `{sna}` or `{migraph}` packages.
+#'   The S3 class "netreg" comes from `{infernet}`, and includes its
+#'   "netreg_lm", "netreg_glm", and "netreg_css" results.
+#'   The S3 classes "netlm" and "netlogit" come from the `{sna}` package
+#'   or from earlier versions of `{migraph}`.
 #' @name model_mrqap
 #' @param x An object obtained by fitting an MRQAP model to some data.
-#'   For example, `migraph::net_regression()`.
+#'   For example, `infernet::net_regression()`.
 #' @param ... Further arguments to be passed on to plot.
 #' @returns A plot showing the location of observed statistics compared to the
 #'   distribution of statistics from permuted networks.
+#'   The vertical lines mark the 2.5% and 97.5% quantiles of each distribution.
+#'   A term with no permuted statistics, such as the intercept where
+#'   predictors are permuted, shows only its observed statistic.
 #' @examples
-#' # Here's something I cooked up with migraph earlier:
+#' # Here's something I cooked up with infernet earlier:
+#' plot(res_infernet_reg)
+#' # And with an earlier version of migraph:
 #' plot(res_migraph_reg)
 #' @export
+plot.netreg <- function(x, ...){
+  plot_mrqap(x$testdist, x$obs)
+}
+
+#' @rdname model_mrqap
+#' @export
 plot.netlm <- function(x, ...){
-  distrib <- x$dist
-  distrib <- as.data.frame(distrib)
-  names(distrib) <- x$names
-  distrib$obs <- seq_len(nrow(distrib))
-  distrib <- stats::reshape(data = distrib, # tidyr::pivot_longer replacement
-                            direction = "long",
-                            varying = colnames(distrib)[-ncol(distrib)],
-                            v.names = "value",
-                            times = colnames(distrib)[-ncol(distrib)],
-                            timevar = "name")
-  rownames(distrib) <- NULL
-  distrib$id <- NULL
-  distrib <- dplyr::arrange(distrib, obs)
-  distrib$coef <- rep(unname(x$coefficients), nrow(x$dist))
-  distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
-  distrib$name <- factor(distrib$name, x$names)
-  ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
-    ggplot2::geom_violin(quantile.color = ag_base(),
-                         quantile.linetype = "solid", 
-                         quantiles = c(0.025, 0.975)) + 
-    ag_theme_minimal() +
-    ylab("") + xlab("Statistic") + 
-    ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
-                        colour = utils::tail(getOption("snet_highlight", 
-                                                default = "red"), n = 1)) +
-    scale_y_discrete(limits=rev)
+  plot_mrqap(stats::setNames(as.data.frame(x$dist), x$names),
+             stats::setNames(x$tstat, x$names))
 }
 
 #' @rdname model_mrqap
 #' @export
 plot.netlogit <- function(x, ...){
-  distrib <- x$dist
-  distrib <- as.data.frame(distrib)
-  names(distrib) <- x$names
-  distrib$obs <- seq_len(nrow(distrib))
-  distrib <- stats::reshape(data = distrib, # tidyr::pivot_longer replacement
-                            direction = "long",
-                            varying = colnames(distrib)[-ncol(distrib)],
-                            v.names = "value",
-                            times = colnames(distrib)[-ncol(distrib)],
-                            timevar = "name")
-  rownames(distrib) <- NULL
-  distrib$id <- NULL
-  distrib <- dplyr::arrange(distrib, obs)
-  distrib$coef <- rep(unname(x$coefficients), nrow(x$dist))
-  distrib$tstat <- rep(unname(x$tstat), nrow(x$dist))
-  distrib$name <- factor(distrib$name, x$names)
+  plot_mrqap(stats::setNames(as.data.frame(x$dist), x$names),
+             stats::setNames(x$tstat, x$names))
+}
+
+# Draws the permuted statistics for each term as a violin, and the observed
+# statistic as a point on it. `draws` has one column for each term, named as
+# `tstat` is; a term whose draws are all NA gets the point alone.
+plot_mrqap <- function(draws, tstat){
+  terms <- names(tstat)
+  draws <- as.data.frame(draws)
+  distrib <- data.frame(name = rep(terms, each = nrow(draws)),
+                        value = unlist(draws[terms], use.names = FALSE))
+  distrib <- distrib[!is.na(distrib$value), ]
+  distrib$name <- factor(distrib$name, terms)
+  observed <- data.frame(name = factor(terms, terms),
+                         tstat = unname(tstat))
   ggplot2::ggplot(distrib, ggplot2::aes(.data$value, .data$name)) + 
     ggplot2::geom_violin(quantile.color = ag_base(),
                          quantile.linetype = "solid", 
                          quantiles = c(0.025, 0.975)) + 
     ag_theme_minimal() +
     ylab("") + xlab("Statistic") + 
-    ggplot2::geom_point(aes(x = .data$tstat), size = 2, 
+    ggplot2::geom_point(data = observed, aes(x = .data$tstat, y = .data$name),
+                        size = 2, 
                         colour = utils::tail(getOption("snet_highlight", 
                                                 default = "red"), n = 1)) +
-    scale_y_discrete(limits=rev)
+    scale_y_discrete(limits = rev, drop = FALSE)
 }
-
