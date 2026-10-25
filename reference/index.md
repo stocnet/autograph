@@ -72,7 +72,8 @@ for results and other objects for stocnet packages.
 - [`plot(`*`<node_motif>`*`)`](https://stocnet.github.io/autograph/reference/map_motifs.md)
   [`plot(`*`<network_motif>`*`)`](https://stocnet.github.io/autograph/reference/map_motifs.md)
   : Plotting tabular motifs
-- [`plot(`*`<netlm>`*`)`](https://stocnet.github.io/autograph/reference/model_mrqap.md)
+- [`plot(`*`<netreg>`*`)`](https://stocnet.github.io/autograph/reference/model_mrqap.md)
+  [`plot(`*`<netlm>`*`)`](https://stocnet.github.io/autograph/reference/model_mrqap.md)
   [`plot(`*`<netlogit>`*`)`](https://stocnet.github.io/autograph/reference/model_mrqap.md)
   : Plotting methods for MRQAP models
 - [`plot(`*`<diff_model>`*`)`](https://stocnet.github.io/autograph/reference/plot.diffusion.md)
@@ -175,7 +176,8 @@ improved or additional layouts to those offered in
 
 ## Results objects from other packages
 
-- [`res_migraph_reg`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+- [`res_infernet_reg`](https://stocnet.github.io/autograph/reference/made_earlier.md)
+  [`res_migraph_reg`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   [`res_migraph_test`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   [`res_migraph_diff`](https://stocnet.github.io/autograph/reference/made_earlier.md)
   [`res_manynet_diff`](https://stocnet.github.io/autograph/reference/made_earlier.md)

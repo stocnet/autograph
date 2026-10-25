@@ -1,5 +1,15 @@
 # Changelog
 
+## autograph 1.2.8
+
+### Plotting
+
+- Added
+  [`plot.netreg()`](https://stocnet.github.io/autograph/reference/model_mrqap.md)
+  for MRQAP results from `infernet::net_regression()` (closes
+  [\#68](https://github.com/stocnet/autograph/issues/68))
+- Added `res_infernet_reg`, a precooked ‘infernet’ regression result
+
 ## autograph 1.2.7
 
 ### Package

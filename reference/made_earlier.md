@@ -6,6 +6,8 @@ testing and demonstrating how autograph plots look.
 ## Usage
 
 ``` r
+data(res_infernet_reg)
+
 data(res_migraph_reg)
 
 data(res_migraph_test)
@@ -42,6 +44,8 @@ data(goldfish_fit)
 ```
 
 ## Format
+
+An object of class `netreg_lm` (inherits from `netreg`) of length 15.
 
 An object of class `netlm` of length 15.
 
