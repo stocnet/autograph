@@ -2,7 +2,7 @@
 
 ## Plotting
 
-- Added `plot.netreg()` for MRQAP results from `infernet::net_regression()`
+- Added `plot.netreg()` for MRQAP results from `infernet::net_regression()` (closes #68)
 - Added `res_infernet_reg`, a precooked 'infernet' regression result
 
 # autograph 1.2.7
