@@ -203,8 +203,11 @@ plot_confusion_matrix <- function(x){
                         round(as.vector(x$confusion_matrix_ci_upper)), "]")
   ggplot2::ggplot(cells, ggplot2::aes(.data$Predicted, .data$Actual)) +
     ggplot2::geom_tile(ggplot2::aes(fill = .data$share), colour = ag_ink()) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), colour = ag_ink(),
-                       family = ag_font(), size = 3.5) +
+    # The label sits on the ground colour, so it stays readable on any tile,
+    # including themes ("bw", "crisp") whose highlight is their ink.
+    ggplot2::geom_label(ggplot2::aes(label = .data$label), colour = ag_ink(),
+                        fill = ag_ground_fill(), linewidth = 0,
+                        family = ag_font(), size = ag_text_size(3.5)) +
     ggplot2::scale_fill_gradient(low = ag_ground_fill(), high = ag_highlight(),
                                  limits = c(0, 1), guide = "none") +
     ggplot2::scale_y_discrete(limits = rev) +
