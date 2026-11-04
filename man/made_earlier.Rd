@@ -4,6 +4,7 @@
 \name{made_earlier}
 \alias{made_earlier}
 \alias{res_infernet_reg}
+\alias{res_netrics_robust}
 \alias{res_migraph_reg}
 \alias{res_migraph_test}
 \alias{res_migraph_diff}
@@ -24,6 +25,8 @@
 \title{Precooked results for demonstrating plotting}
 \format{
 An object of class \code{netreg_lm} (inherits from \code{netreg}) of length 15.
+
+An object of class \code{list} of length 2.
 
 An object of class \code{netlm} of length 15.
 
@@ -62,6 +65,8 @@ An object of class \code{goldfishFit} of length 31.
 \usage{
 data(res_infernet_reg)
 
+data(res_netrics_robust)
+
 data(res_migraph_reg)
 
 data(res_migraph_test)
@@ -99,5 +104,21 @@ data(goldfish_fit)
 \description{
 These are all pre-cooked results objects, saved here to save time in
 testing and demonstrating how autograph plots look.
+}
+\details{
+\code{res_netrics_robust} is a list of two robustness results from
+\code{netrics::net_by_robustness()}, each a "network_measure" with a "curve"
+attribute, on a 50-node scale-free network:
+\code{failure}, robustness to random failure (100 simulations),
+and \code{attack}, robustness to an adaptive attack on degree.
+It was made with:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{set.seed(1234)
+g <- manynet::generate_scalefree(50, 1)
+res_netrics_robust <- list(
+  failure = netrics::net_by_robustness(g, times = 100),
+  attack = netrics::net_by_robustness(g,
+             node_measure = netrics::node_by_degree))
+}\if{html}{\out{</div>}}
 }
 \keyword{datasets}

@@ -1,13 +1,20 @@
 # autograph 1.2.9
 
+## Package
+
+- Replaced the calls to 'migraph' functions that moved to 'infernet' in migraph 2.0.0
+
 ## Plotting
 
 - Added `plot.infernetConfusion()` for `infernet::diagnose_confusion()`
   - `panel=` shows one panel: "roc", "confusion", or "metrics"
+- Adapted `plot.network_measure()` for `netrics::net_by_robustness()` curves (closes #67)
+  - Several results can be compared in one plot, e.g. `plot(failure = a, attack = b)`
+  - A dashed line shows the most robust case, where R = 0.5
+  
+## Data
 
-## Package
-
-- Replaced the calls to 'migraph' functions that moved to 'infernet' in migraph 2.0.0
+- Added `res_netrics_robust`, precooked 'netrics' robustness results
 
 # autograph 1.2.8
 

@@ -84,6 +84,7 @@ plot_fixture_registry <- list(
     class(meas) <- c("network_measures", class(meas))
     meas
   },
+  network_measure = function() autograph::res_netrics_robust$failure,
   node_measure = function() {
     testthat::skip_if_not_installed("netrics")
     netrics::node_by_degree(manynet::ison_adolescents)
@@ -165,6 +166,30 @@ test_that("ergm gof plot obs and sims factor levels are aligned", {
   expect_true(!any(is.na(numeric_vals)),
               info = "Factor levels should be numeric, not R-modified names (e.g. 'X0')")
   expect_equal(numeric_vals, sort(numeric_vals))
+})
+
+test_that("robustness curves plot, alone and together", {
+  skip_on_cran()
+  robust <- autograph::res_netrics_robust
+  expect_buildable(plot(robust$failure))
+  p <- plot(failure = robust$failure, attack = robust$attack)
+  expect_buildable(p)
+  built <- ggplot2::ggplot_build(p)
+  expect_length(unique(built$data[[2]]$colour), 2)
+  expect_equal(p$theme$legend.position, "bottom")
+  expect_equal(levels(p$data$result)[1],
+               paste0("failure (R = ",
+                      format(round(as.numeric(robust$failure), 2), nsmall = 2),
+                      ")"))
+  # Repeated labels are numbered
+  p2 <- plot(robust$failure, robust$failure)
+  expect_match(levels(p2$data$result), "random failure \\([12]\\)")
+})
+
+test_that("a network measure without a curve returns NULL with a message", {
+  meas <- structure(0.5, class = c("network_measure", "numeric"))
+  expect_message(out <- plot(meas), "no curve to plot")
+  expect_null(out)
 })
 
 test_that("network measures over time plot as a trace", {
