@@ -9,7 +9,7 @@
 #'   These functions plot distributions for node, tie, and network measures,
 #'   as defined in the `{manynet}` package.
 #' @name map_measure
-#' @param x An object of "node_measure", "tie_measure", 
+#' @param x An object of "node_measure", "tie_measure", "network_measure",
 #'   or "network_measures" class.
 #' @param ... Other arguments to be passed on.
 #' @param type For node and tie measures, whether the plot should be 
@@ -102,6 +102,99 @@ plot.network_measures <- function(x, ...) {
     ag_theme_minimal() +
     ggplot2::xlab("Time") +
     ggplot2::ylab("Value")
+}
+
+#' @rdname map_measure
+#' @param labels For network measures with a curve, such as robustness,
+#'   an optional character vector of labels, one for each result.
+#'   By default, the names given in the call are used,
+#'   and otherwise the measure's own name.
+#' @returns `plot.network_measure()` returns a plot of the curve that some
+#'   network measures carry, such as the robustness curve returned by
+#'   `netrics::net_by_robustness()`.
+#'   The share of nodes in the largest component is drawn against the share of
+#'   nodes removed.
+#'   The dashed line is the best case, where every remaining node stays in one
+#'   component, and the area under it is the largest robustness possible, 0.5.
+#'   Several results can be passed together to compare them in one plot.
+#'   A measure without a curve is a single value, so nothing is plotted.
+#' @examples
+#' plot(res_netrics_robust$failure)
+#' plot(res_netrics_robust$failure,
+#'      res_netrics_robust$attack)
+#' @export
+plot.network_measure <- function(x, ..., labels = NULL) {
+  items <- list(...)
+  if (!missing(x)) items <- c(list(x), items)
+  has_curve <- vapply(items, function(i) {
+    inherits(i, "network_measure") && !is.null(attr(i, "curve"))
+  }, logical(1))
+  if (!any(has_curve)) {
+    message("This measure is a single value, so there is no curve to plot.")
+    return(invisible(NULL))
+  }
+  items <- items[has_curve]
+  n <- length(items)
+
+  # Labels: given labels, then names in the call, then the measure's own name
+  call_names <- names(items)
+  if (is.null(call_names)) call_names <- rep("", n)
+  measure_names <- vapply(items, function(i) {
+    m <- attr(i, "measure")
+    if (is.null(m)) "network measure" else sub("^robustness to ", "", m)
+  }, character(1))
+  labs <- ifelse(is.na(call_names) | call_names == "",
+                 measure_names, call_names)
+  if (!is.null(labels)) {
+    labels <- as.character(labels)
+    labs[seq_len(min(n, length(labels)))] <- labels[seq_len(min(n, length(labels)))]
+  }
+  dups <- labs %in% labs[duplicated(labs)]
+  if (any(dups)) {
+    labs[dups] <- paste0(labs[dups], " (",
+                         stats::ave(seq_along(labs[dups]), labs[dups],
+                                    FUN = seq_along), ")")
+  }
+  labs <- paste0(labs, " (R = ",
+                 vapply(items, function(i) format(round(as.numeric(i), 2),
+                                                  nsmall = 2), character(1)),
+                 ")")
+
+  data <- do.call(rbind, lapply(seq_len(n), function(k) {
+    curve <- as.data.frame(attr(items[[k]], "curve"))
+    data.frame(removed = curve$removed, giant = curve$giant,
+               result = labs[k])
+  }))
+  data$result <- factor(data$result, levels = labs)
+
+  pct <- function(b) paste0(b * 100, "%")
+  p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$removed,
+                                          y = .data$giant)) +
+    ggplot2::annotate("segment", x = 0, y = 1, xend = 1, yend = 0,
+                      colour = ag_base(), linetype = "dashed")
+  if (n == 1) {
+    p <- p + ggplot2::geom_line(colour = ag_highlight(), linewidth = 1)
+  } else {
+    p <- p +
+      ggplot2::geom_line(ggplot2::aes(colour = .data$result), linewidth = 1) +
+      ggplot2::scale_colour_manual(values = ag_qualitative(n))
+  }
+  p <- p +
+    ggplot2::scale_x_continuous("Share of nodes removed", limits = c(0, 1),
+                                labels = pct, expand = c(0, 0)) +
+    ggplot2::scale_y_continuous("Share of nodes in the largest component",
+                                limits = c(0, 1), labels = pct,
+                                expand = c(0, 0)) +
+    ag_theme_classic() +
+    ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90"),
+                   # room for the "100%" label at the end of the x axis
+                   plot.margin = ggplot2::margin(5.5, 15, 5.5, 5.5))
+  if (n == 1) {
+    p + ggplot2::labs(title = labs)
+  } else {
+    p + ggplot2::theme(legend.position = "bottom",
+                       legend.title = ggplot2::element_blank())
+  }
 }
 
 # Memberships ####

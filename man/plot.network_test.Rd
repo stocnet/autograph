@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An object obtained from a conditional uniform graph or
 quadratic assignment procedure test.
-For example, \code{migraph::test_permutation()}.}
+For example, \code{infernet::test_permutation()}.}
 
 \item{...}{Other arguments to be passed on.}
 

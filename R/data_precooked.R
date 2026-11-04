@@ -13,6 +13,29 @@ NULL
 #' @usage data(res_infernet_reg)
 "res_infernet_reg"
 
+# netrics objects ####
+
+#' @details
+#'   `res_netrics_robust` is a list of two robustness results from
+#'   `netrics::net_by_robustness()`, each a "network_measure" with a "curve"
+#'   attribute, on a 50-node scale-free network:
+#'   `failure`, robustness to random failure (100 simulations),
+#'   and `attack`, robustness to an adaptive attack on degree.
+#'   It was made with:
+#'   ```r
+#'   set.seed(1234)
+#'   g <- manynet::generate_scalefree(50, 1)
+#'   res_netrics_robust <- list(
+#'     failure = netrics::net_by_robustness(g, times = 100),
+#'     attack = netrics::net_by_robustness(g,
+#'                node_measure = netrics::node_by_degree))
+#'   ```
+#' @docType data
+#' @keywords datasets
+#' @rdname made_earlier
+#' @usage data(res_netrics_robust)
+"res_netrics_robust"
+
 # migraph objects ####
 
 #' @docType data

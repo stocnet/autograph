@@ -2658,7 +2658,7 @@ question("One last one: which function graphs a list of related networks as comp
 
 When you are ready, continue with the tutorials in the other `{stocnet}`
 packages — on network structure and centrality in `{netrics}`,
-and on diffusion and regression in `{migraph}` —
+and on diffusion and regression in `{infernet}` —
 where the measures you can now visualise are properly introduced.
 Run `run_tute()` at the console to see all available tutorials.
 

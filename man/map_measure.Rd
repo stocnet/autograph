@@ -5,6 +5,7 @@
 \alias{plot.node_measure}
 \alias{plot.tie_measure}
 \alias{plot.network_measures}
+\alias{plot.network_measure}
 \title{Plotting logical marks
 Plotting numeric measures}
 \usage{
@@ -13,15 +14,22 @@ Plotting numeric measures}
 \method{plot}{tie_measure}(x, type = c("h", "d"), ...)
 
 \method{plot}{network_measures}(x, ...)
+
+\method{plot}{network_measure}(x, ..., labels = NULL)
 }
 \arguments{
-\item{x}{An object of "node_measure", "tie_measure",
+\item{x}{An object of "node_measure", "tie_measure", "network_measure",
 or "network_measures" class.}
 
 \item{type}{For node and tie measures, whether the plot should be
 "h" a histogram or "d" a density plot. By default "h".}
 
 \item{...}{Other arguments to be passed on.}
+
+\item{labels}{For network measures with a curve, such as robustness,
+an optional character vector of labels, one for each result.
+By default, the names given in the call are used,
+and otherwise the measure's own name.}
 }
 \value{
 \code{plot.node_measure()} and \code{plot.tie_measure()} returns a histogram
@@ -29,6 +37,16 @@ and/or density plot of the distribution of the measure.
 
 \code{plot.network_measures()} returns a plot of the measure traced over
 time.
+
+\code{plot.network_measure()} returns a plot of the curve that some
+network measures carry, such as the robustness curve returned by
+\code{netrics::net_by_robustness()}.
+The share of nodes in the largest component is drawn against the share of
+nodes removed.
+The dashed line is the best case, where every remaining node stays in one
+component, and the area under it is the largest robustness possible, 0.5.
+Several results can be passed together to compare them in one plot.
+A measure without a curve is a single value, so nothing is plotted.
 }
 \description{
 These functions plot distributions for node, tie, and network measures,
@@ -37,4 +55,7 @@ as defined in the \code{{manynet}} package.
 \examples{
 plot(netrics::node_by_deg(ison_karateka))
 plot(netrics::tie_by_betweenness(ison_karateka))
+plot(res_netrics_robust$failure)
+plot(failure = res_netrics_robust$failure,
+     attack = res_netrics_robust$attack)
 }

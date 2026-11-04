@@ -8,7 +8,7 @@
 #'   The S3 class is "network_test".
 #' @param x An object obtained from a conditional uniform graph or
 #'   quadratic assignment procedure test.
-#'   For example, `migraph::test_permutation()`.
+#'   For example, `infernet::test_permutation()`.
 #' @inheritParams map_measure
 #' @param threshold The empirical threshold to shade in the plot.
 #' @param tails By default "two" indicating a two-tailed test,
@@ -127,4 +127,109 @@ plot_mrqap <- function(draws, tstat){
                         colour = utils::tail(getOption("snet_highlight", 
                                                 default = "red"), n = 1)) +
     scale_y_discrete(limits = rev, drop = FALSE)
+}
+
+# Confusion ####
+
+#' Plotting how well a model classifies ties
+#' @description
+#'   This plotting method is for the result of
+#'   `infernet::diagnose_confusion()`, which compares the ties that a model of
+#'   a binary outcome predicts with the ties that were observed.
+#'   The S3 class is "infernetConfusion".
+#'
+#'   - The ROC curve gives the true positive rate against the false positive
+#'     rate at every threshold. The diagonal is a model that guesses, and the
+#'     area under the curve (AUC) is in the title.
+#'   - The confusion matrix gives the mean count of each cell over the draws
+#'     of the predicted probabilities, with its 95% interval.
+#'   - The metrics give the accuracy, sensitivity, specificity, precision,
+#'     and F1 on one scale from 0 to 1.
+#' @param x An object of class "infernetConfusion".
+#'   For example, `infernet::diagnose_confusion()`.
+#' @param panel By default "all", which shows the three panels together.
+#'   "roc", "confusion", or "metrics" shows one panel.
+#' @param ... Further arguments to be passed on to plot.
+#' @returns A ggplot2 object, or a patchwork of three of them.
+#' @examples
+#' # Needs 'infernet' (https://github.com/stocnet/infernet)
+#' \dontrun{
+#'   fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age),
+#'                                   manynet::ison_adolescents |>
+#'                                     manynet::mutate_nodes(Age = 12:19),
+#'                                   times = 20, control = list(seed = 1))
+#'   plot(infernet::diagnose_confusion(fit, times = 100))
+#' }
+#' @export
+plot.infernetConfusion <- function(x, panel = c("all", "roc", "confusion",
+                                                 "metrics"), ...){
+  panel <- match.arg(panel)
+  switch(panel,
+         roc = plot_confusion_roc(x),
+         confusion = plot_confusion_matrix(x),
+         metrics = plot_confusion_metrics(x),
+         all = patchwork::wrap_plots(
+           plot_confusion_roc(x),
+           patchwork::wrap_plots(plot_confusion_matrix(x),
+                                 plot_confusion_metrics(x),
+                                 ncol = 1, heights = c(1, 1)),
+           ncol = 2, widths = c(1, 1)))
+}
+
+# The ROC curve is a step function, read from the highest threshold down.
+plot_confusion_roc <- function(x){
+  roc <- as.data.frame(x$roc)
+  ggplot2::ggplot(roc, ggplot2::aes(.data$fpr, .data$tpr)) +
+    ggplot2::annotate("segment", x = 0, y = 0, xend = 1, yend = 1,
+                      colour = ag_base(), linetype = "dashed") +
+    ggplot2::geom_step(colour = ag_highlight(), linewidth = 1) +
+    ggplot2::coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+    ag_theme_minimal() +
+    ggplot2::labs(x = "False positive rate", y = "True positive rate",
+                  title = paste0("ROC curve (AUC = ",
+                                 formatC(x$auc, format = "f", digits = 2), ")"))
+}
+
+# Each cell is shaded by its share of the observed row, so that the
+# cells of a sparse network's ties are as legible as those of its non-ties.
+plot_confusion_matrix <- function(x){
+  cm <- x$confusion_matrix
+  cells <- expand.grid(Actual = rownames(cm), Predicted = colnames(cm),
+                       stringsAsFactors = FALSE)
+  cells$count <- as.vector(cm)
+  cells$share <- cells$count / rowSums(cm)[cells$Actual]
+  cells$label <- paste0(formatC(cells$count, format = "f", digits = 1), "\n[",
+                        round(as.vector(x$confusion_matrix_ci_lower)), ", ",
+                        round(as.vector(x$confusion_matrix_ci_upper)), "]")
+  ggplot2::ggplot(cells, ggplot2::aes(.data$Predicted, .data$Actual)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$share), colour = ag_ink()) +
+    # The label sits on the ground colour, so it stays readable on any tile,
+    # including themes ("bw", "crisp") whose highlight is their ink.
+    ggplot2::geom_label(ggplot2::aes(label = .data$label), colour = ag_ink(),
+                        fill = ag_ground_fill(), linewidth = 0,
+                        family = ag_font(), size = ag_text_size(3.5)) +
+    ggplot2::scale_fill_gradient(low = ag_ground_fill(), high = ag_highlight(),
+                                 limits = c(0, 1), guide = "none") +
+    ggplot2::scale_y_discrete(limits = rev) +
+    ggplot2::coord_equal() +
+    ag_theme_minimal() +
+    ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+    ggplot2::labs(title = "Confusion matrix")
+}
+
+# The metrics from `glance()`, as a lollipop on one scale from 0 to 1.
+plot_confusion_metrics <- function(x){
+  metrics <- c(Accuracy = x$accuracy, Sensitivity = x$sensitivity,
+               Specificity = x$specificity, Precision = x$precision,
+               F1 = x$f1)
+  dat <- data.frame(name = factor(names(metrics), rev(names(metrics))),
+                    value = unname(metrics))
+  ggplot2::ggplot(dat, ggplot2::aes(.data$value, .data$name)) +
+    ggplot2::geom_segment(ggplot2::aes(x = 0, xend = .data$value,
+                                       yend = .data$name),
+                          colour = ag_base()) +
+    ggplot2::geom_point(colour = ag_highlight(), size = 3) +
+    ggplot2::scale_x_continuous(limits = c(0, 1)) +
+    ag_theme_minimal() +
+    ggplot2::labs(x = "", y = "", title = "Metrics")
 }

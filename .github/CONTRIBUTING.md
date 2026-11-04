@@ -311,6 +311,22 @@ Methods are grouped by the *kind of result object*, not by source package:
 New `plot.*` methods must be registered in NAMESPACE via roxygen `@method`/`@export` tags — run `devtools::document()` after adding one.
 Suggestions for new plot methods are welcome.
 
+### Notation
+
+Use one notation for code in issues, reviews, documentation, and NEWS items:
+
+- Give a function or generic backticks and parentheses, e.g. `verb_function()`.
+- Give a specific method its full name, e.g. `verb_function.stocnet()`.
+- Give an argument an equals sign, e.g. `argument=`.
+- Put a value that an argument takes, or a variable, in double quotation marks, e.g. "value".
+- Give a class a leading period when referring to it, e.g. `.stocnet`.
+  A leading period on a name with parentheses is an internal helper instead,
+  e.g. `.helper_function()`.
+- Name a new class in camelCase, after the package plus a noun, e.g. `infernetConfusion`,
+  so that a class does not look like a snake_case function.
+  See "Class names across the stocnet ecosystem" below.
+  Older names, such as `network_test`, stay until they can be renamed with an alias.
+
 ### Class names across the stocnet ecosystem
 
 S3 dispatch matches exact class strings, so two packages that emit the same class string

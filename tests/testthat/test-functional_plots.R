@@ -62,12 +62,21 @@ plot_fixture_registry <- list(
   matrix      = function() manynet::as_matrix(manynet::ison_adolescents),
   netreg      = function() autograph::res_infernet_reg,
   netlm       = function() autograph::res_migraph_reg,
+  # Nothing on CRAN makes a new 'netlogit' since migraph 2.0.0 moved the
+  # regression to infernet, which returns a 'netreg'. A 'netlogit' has the same
+  # fields as a 'netlm', and `plot.netlogit()` reads only those.
   netlogit    = function() {
-    testthat::skip_if_not_installed("migraph")
-    set.seed(123)
-    net <- manynet::add_node_attribute(manynet::ison_adolescents, "smoke",
-                                       rep(c(0, 1), 4))
-    migraph::net_regression(~ alter(smoke), net, times = 20)
+    x <- autograph::res_migraph_reg
+    class(x) <- "netlogit"
+    x
+  },
+  infernetConfusion = function() {
+    # infernet is not in Suggests until it is on CRAN, so skip this class only
+    if (!requireNamespace("infernet", quietly = TRUE)) return(NULL)
+    net <- manynet::mutate_nodes(manynet::ison_adolescents, Age = 12:19)
+    fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age), net,
+                                    times = 20, control = list(seed = 1))
+    infernet::diagnose_confusion(fit, times = 50)
   },
   network_test = function() autograph::res_migraph_test,
   network_measures = function() {
@@ -75,6 +84,7 @@ plot_fixture_registry <- list(
     class(meas) <- c("network_measures", class(meas))
     meas
   },
+  network_measure = function() autograph::res_netrics_robust$failure,
   node_measure = function() {
     testthat::skip_if_not_installed("netrics")
     netrics::node_by_degree(manynet::ison_adolescents)
@@ -117,9 +127,10 @@ test_that("every registered plot method has a fixture and builds", {
     }
     factory <- plot_fixture_registry[[cls]]
     if (is.null(factory)) next # covered elsewhere, see registry comments
-    # suppressWarnings: fixture generators may warn upstream (e.g. migraph)
+    # suppressWarnings: fixture generators may warn upstream (e.g. infernet)
     fixture <- run_or_skip(suppressWarnings(factory()),
                            paste0("plot.", cls), "fixture")
+    if (is.null(fixture)) next # fixture needs a package that is not installed
     p <- run_or_skip(plot(fixture), paste0("plot.", cls), "plot")
     if (is.null(p)) next # methods may validly print a message and return NULL
     # suppressWarnings: data-dependent smoothing warnings (loess etc.) are
@@ -155,6 +166,30 @@ test_that("ergm gof plot obs and sims factor levels are aligned", {
   expect_true(!any(is.na(numeric_vals)),
               info = "Factor levels should be numeric, not R-modified names (e.g. 'X0')")
   expect_equal(numeric_vals, sort(numeric_vals))
+})
+
+test_that("robustness curves plot, alone and together", {
+  skip_on_cran()
+  robust <- autograph::res_netrics_robust
+  expect_buildable(plot(robust$failure))
+  p <- plot(failure = robust$failure, attack = robust$attack)
+  expect_buildable(p)
+  built <- ggplot2::ggplot_build(p)
+  expect_length(unique(built$data[[2]]$colour), 2)
+  expect_equal(p$theme$legend.position, "bottom")
+  expect_equal(levels(p$data$result)[1],
+               paste0("failure (R = ",
+                      format(round(as.numeric(robust$failure), 2), nsmall = 2),
+                      ")"))
+  # Repeated labels are numbered
+  p2 <- plot(robust$failure, robust$failure)
+  expect_match(levels(p2$data$result), "random failure \\([12]\\)")
+})
+
+test_that("a network measure without a curve returns NULL with a message", {
+  meas <- structure(0.5, class = c("network_measure", "numeric"))
+  expect_message(out <- plot(meas), "no curve to plot")
+  expect_null(out)
 })
 
 test_that("network measures over time plot as a trace", {
