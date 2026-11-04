@@ -152,7 +152,8 @@ plot_mrqap <- function(draws, tstat){
 #' @param ... Further arguments to be passed on to plot.
 #' @returns A ggplot2 object, or a patchwork of three of them.
 #' @examples
-#' if (requireNamespace("infernet", quietly = TRUE)) {
+#' # Needs 'infernet' (https://github.com/stocnet/infernet)
+#' \dontrun{
 #'   fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age),
 #'                                   manynet::ison_adolescents |>
 #'                                     manynet::mutate_nodes(Age = 12:19),

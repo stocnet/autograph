@@ -7,7 +7,6 @@
 
 ## Package
 
-- Added 'infernet' to `Suggests`, and removed 'migraph', which no code or test uses now
 - Replaced the calls to 'migraph' functions that moved to 'infernet' in migraph 2.0.0
 
 # autograph 1.2.8

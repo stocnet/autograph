@@ -34,7 +34,8 @@ and F1 on one scale from 0 to 1.
 }
 }
 \examples{
-if (requireNamespace("infernet", quietly = TRUE)) {
+# Needs 'infernet' (https://github.com/stocnet/infernet)
+\dontrun{
   fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age),
                                   manynet::ison_adolescents |>
                                     manynet::mutate_nodes(Age = 12:19),

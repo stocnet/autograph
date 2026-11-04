@@ -71,7 +71,8 @@ plot_fixture_registry <- list(
     x
   },
   infernetConfusion = function() {
-    testthat::skip_if_not_installed("infernet")
+    # infernet is not in Suggests until it is on CRAN, so skip this class only
+    if (!requireNamespace("infernet", quietly = TRUE)) return(NULL)
     net <- manynet::mutate_nodes(manynet::ison_adolescents, Age = 12:19)
     fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age), net,
                                     times = 20, control = list(seed = 1))
@@ -128,6 +129,7 @@ test_that("every registered plot method has a fixture and builds", {
     # suppressWarnings: fixture generators may warn upstream (e.g. infernet)
     fixture <- run_or_skip(suppressWarnings(factory()),
                            paste0("plot.", cls), "fixture")
+    if (is.null(fixture)) next # fixture needs a package that is not installed
     p <- run_or_skip(plot(fixture), paste0("plot.", cls), "plot")
     if (is.null(p)) next # methods may validly print a message and return NULL
     # suppressWarnings: data-dependent smoothing warnings (loess etc.) are
