@@ -295,9 +295,9 @@ test_that("the diffusion plot adds a line for each compartment it holds", {
 
 test_that("multiple diffusions smooth one line per compartment", {
   skip_on_cran()
-  skip_if_not_installed("migraph")
+  skip_if_not_installed("infernet")
   set.seed(1)
-  sir <- migraph::play_diffusions(manynet::create_ring(10), seeds = 1,
+  sir <- infernet::play_diffusions(manynet::create_ring(10), seeds = 1,
                                   latency = 0.9, recovery = 0.4, times = 3)
   expect_true(any(sir$E > 0) && any(sir$R > 0))
   # suppressWarnings: loess on a short series warns about its span, which is

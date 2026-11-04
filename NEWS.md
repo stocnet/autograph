@@ -1,3 +1,15 @@
+# autograph 1.2.9
+
+## Plotting
+
+- Added `plot.infernetConfusion()` for `infernet::diagnose_confusion()`
+  - `panel=` shows one panel: "roc", "confusion", or "metrics"
+
+## Package
+
+- Added 'infernet' to `Suggests`, and removed 'migraph', which no code or test uses now
+- Replaced the calls to 'migraph' functions that moved to 'infernet' in migraph 2.0.0
+
 # autograph 1.2.8
 
 ## Plotting

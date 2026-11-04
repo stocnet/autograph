@@ -62,12 +62,20 @@ plot_fixture_registry <- list(
   matrix      = function() manynet::as_matrix(manynet::ison_adolescents),
   netreg      = function() autograph::res_infernet_reg,
   netlm       = function() autograph::res_migraph_reg,
+  # Nothing on CRAN makes a new 'netlogit' since migraph 2.0.0 moved the
+  # regression to infernet, which returns a 'netreg'. A 'netlogit' has the same
+  # fields as a 'netlm', and `plot.netlogit()` reads only those.
   netlogit    = function() {
-    testthat::skip_if_not_installed("migraph")
-    set.seed(123)
-    net <- manynet::add_node_attribute(manynet::ison_adolescents, "smoke",
-                                       rep(c(0, 1), 4))
-    migraph::net_regression(~ alter(smoke), net, times = 20)
+    x <- autograph::res_migraph_reg
+    class(x) <- "netlogit"
+    x
+  },
+  infernetConfusion = function() {
+    testthat::skip_if_not_installed("infernet")
+    net <- manynet::mutate_nodes(manynet::ison_adolescents, Age = 12:19)
+    fit <- infernet::estimate_mrqap(. ~ ego(Age) + alter(Age), net,
+                                    times = 20, control = list(seed = 1))
+    infernet::diagnose_confusion(fit, times = 50)
   },
   network_test = function() autograph::res_migraph_test,
   network_measures = function() {
@@ -117,7 +125,7 @@ test_that("every registered plot method has a fixture and builds", {
     }
     factory <- plot_fixture_registry[[cls]]
     if (is.null(factory)) next # covered elsewhere, see registry comments
-    # suppressWarnings: fixture generators may warn upstream (e.g. migraph)
+    # suppressWarnings: fixture generators may warn upstream (e.g. infernet)
     fixture <- run_or_skip(suppressWarnings(factory()),
                            paste0("plot.", cls), "fixture")
     p <- run_or_skip(plot(fixture), paste0("plot.", cls), "plot")
