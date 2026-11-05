@@ -2,10 +2,17 @@
 
 ## Graphing
 
-- Fixed `graphs()` on a list of stocnets (stocnet/manynet#186)
-  - Networks with different nodes no longer share one layout
-  - A layout is shared only by networks with the same nodes in the same order
-- Improved `graphs()` so that a single static network is drawn with `graphr()`
+- Improved `graphs()`
+  - Fixed a list of stocnets sharing one layout (closing stocnet/manynet#186)
+  - Improved layout sharing to need the same nodes in the same order
+  - Passing a single static network is now drawn with `graphr()`
+  - Fixed panels with a single signed tie failing to draw, as in `irps_nuclear`
+
+## Layouts
+
+- Accelerated the "layered" layouts
+- Accelerated "stress" layouts on networks of more than 1000 nodes
+  - Looser tolerances for larger networks lays out 3000 nodes in 2 seconds rather than 7
 
 # autograph 1.2.9
 

@@ -319,7 +319,7 @@ test_that("a layered label sits immediately to the right of its own node", {
                   "PositionNudge")
 })
 
-test_that("the offset grows with the nodes and with label_dist", {
+test_that("the offset grows with the nodes and with the label gap", {
   skip_on_cran()
   years <- rep(c(1985, 1990, 1995, 2000), times = 2)
   net <- manynet::add_node_attribute(ison_adolescents, "year", years)
@@ -327,6 +327,15 @@ test_that("the offset grows with the nodes and with label_dist", {
     p <- graphr(net, layout = "lineage", ranks = "year", ...)
     p[["layers"]][[length(p[["layers"]])]][["position"]][["x"]]
   }
-  expect_gt(nudge(label_dist = 20), nudge(label_dist = 0))
+  expect_gt(nudge(label_repel = 20), nudge(label_repel = 0))
   expect_gt(nudge(node_size = 10), nudge(node_size = 2))
+})
+
+test_that("the barycentres are the mean positions of the neighbours", {
+  nbrs <- list(c(2L, 3L), integer(0), c(1L, 1L, 4L), 3L)
+  x_pos <- c(4, 1, 3, 2)
+  index <- .barycentre_index(1:4, nbrs)
+  expected <- vapply(1:4, function(i)
+    if (length(nbrs[[i]])) mean(x_pos[nbrs[[i]]]) else x_pos[i], numeric(1))
+  expect_identical(.barycentres(index, x_pos), expected)
 })

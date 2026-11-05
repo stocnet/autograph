@@ -61,7 +61,7 @@ test_that("a poor fit is reported at the console", {
 test_that("scaling coordinates are kept when snapping is asked for", {
   skip_on_cran()
   snapped <- suppressMessages(
-    graphr(manynet::ison_southern_women, layout = "scaling", snap = TRUE))
+    graphr(manynet::ison_southern_women, layout = "scaling", layout_snap = TRUE))
   plain <- graphr(manynet::ison_southern_women, layout = "scaling")
   # Each plot holds its own copy of the graph, which differs in its igraph
   # pointer alone, so only the coordinates are compared.

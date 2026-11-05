@@ -175,7 +175,7 @@ test_that("correspondence coordinates are kept when snapping is asked for", {
   skip_on_cran()
   snapped <- suppressMessages(
     graphr(manynet::ison_southern_women, layout = "correspondence",
-           snap = TRUE))
+           layout_snap = TRUE))
   plain <- suppressMessages(
     graphr(manynet::ison_southern_women, layout = "correspondence"))
   # Each plot holds its own copy of the graph, which differs in its igraph

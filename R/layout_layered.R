@@ -427,7 +427,7 @@ layout_tbl_graph_ladder <- layout_ladder
 
 # Give every rank the same integer spacing, so that the ranks line up like the
 # rungs of a ladder. This is what "railway" and "ladder" ask for, and it is not
-# what `snap = TRUE` does: that snaps the whole plot to a square grid.
+# what `layout_snap = TRUE` does: that snaps the whole plot to a square grid.
 .align_rungs <- function(pos, rank) {
   for (r in unique(rank)) {
     idx <- which(rank == r)
@@ -531,17 +531,6 @@ layout_tbl_graph_ladder <- layout_ladder
   }
   # Map layers to 0-based indices (used as list keys offset by 1)
   layer_idx <- match(node_layer, layer_vals) - 1L
-  # Build adjacency between original nodes
-  adj <- vector("list", n)
-  radj <- vector("list", n)
-  for (i in seq_len(n)) { adj[[i]] <- integer(0); radj[[i]] <- integer(0) }
-  if (nrow(el) > 0) {
-    for (i in seq_len(nrow(el))) {
-      u <- el[i, 1]; v <- el[i, 2]
-      adj[[u]] <- c(adj[[u]], v)
-      radj[[v]] <- c(radj[[v]], u)
-    }
-  }
   # Insert dummy nodes for edges spanning multiple layers
   dummy_id <- n
   # For barycenter, we need per-layer node lists and inter-layer edges
@@ -583,44 +572,71 @@ layout_tbl_graph_ladder <- layout_ladder
     nodes_in_layer <- layer_nodes[[k]]
     x_pos[nodes_in_layer] <- seq_along(nodes_in_layer)
   }
-  # Build forward/backward adjacency for the expanded graph
-  fwd_adj <- vector("list", total_nodes)
-  bwd_adj <- vector("list", total_nodes)
-  for (i in seq_len(total_nodes)) { fwd_adj[[i]] <- integer(0); bwd_adj[[i]] <- integer(0) }
-  if (!is.null(inter_edges_mat) && nrow(inter_edges_mat) > 0) {
-    for (i in seq_len(nrow(inter_edges_mat))) {
-      u <- inter_edges_mat[i, 1]; v <- inter_edges_mat[i, 2]
-      fwd_adj[[u]] <- c(fwd_adj[[u]], v)
-      bwd_adj[[v]] <- c(bwd_adj[[v]], u)
-    }
-  }
-  # Barycenter crossing minimization sweeps
+  # Build forward/backward adjacency for the expanded graph. `split()` keeps
+  # each node's neighbours in the order of the ties, as appending them did.
+  all_ids <- factor(inter_edges_mat[, 1], levels = seq_len(total_nodes))
+  fwd_adj <- unname(split(inter_edges_mat[, 2], all_ids))
+  bwd_adj <- unname(split(inter_edges_mat[, 1],
+                          factor(inter_edges_mat[, 2],
+                                 levels = seq_len(total_nodes))))
+  # Which neighbours each layer averages over is the same in every sweep, so
+  # it is worked out once here rather than node by node in each sweep.
+  fwd_index <- lapply(layer_nodes, .barycentre_index, nbrs = fwd_adj)
+  bwd_index <- lapply(layer_nodes, .barycentre_index, nbrs = bwd_adj)
+  # Barycenter crossing minimization sweeps. The sweeps are deterministic, so
+  # once an ordering comes round again the sweeps only repeat themselves: a
+  # fixed point stays put, and a cycle goes round. The ordering that the
+  # remaining sweeps would end on is then known without running them.
+  seen <- list(x_pos)
+  keys <- paste(x_pos, collapse = ",")
   for (iter in seq_len(times)) {
     # Forward sweep: layer 1 to n_layers-1
     for (k in 2:n_layers) {
       nodes_k <- layer_nodes[[k]]
       if (length(nodes_k) <= 1) next
-      bc <- sapply(nodes_k, function(nd) {
-        neighbors <- bwd_adj[[nd]]
-        if (length(neighbors) == 0) return(x_pos[nd])
-        mean(x_pos[neighbors])
-      })
-      ord <- order(bc)
+      ord <- order(.barycentres(bwd_index[[k]], x_pos))
       x_pos[nodes_k[ord]] <- seq_along(nodes_k)
     }
     # Backward sweep: layer n_layers-2 to 0
     for (k in (n_layers - 1):1) {
       nodes_k <- layer_nodes[[k]]
       if (length(nodes_k) <= 1) next
-      bc <- sapply(nodes_k, function(nd) {
-        neighbors <- fwd_adj[[nd]]
-        if (length(neighbors) == 0) return(x_pos[nd])
-        mean(x_pos[neighbors])
-      })
-      ord <- order(bc)
+      ord <- order(.barycentres(fwd_index[[k]], x_pos))
       x_pos[nodes_k[ord]] <- seq_along(nodes_k)
     }
+    key <- paste(x_pos, collapse = ",")
+    again <- match(key, keys)
+    if (!is.na(again)) {
+      # `seen[[j]]` is the ordering after sweep j - 1, and the cycle from it
+      # takes `period` sweeps to come round.
+      period <- iter - (again - 1L)
+      x_pos <- seen[[again + (times - (again - 1L)) %% period]]
+      break
+    }
+    seen[[iter + 1L]] <- x_pos
+    keys[iter + 1L] <- key
   }
   # Extract coordinates for original nodes only
   cbind(x_pos[seq_len(n)], node_layer)
+}
+
+# The nodes of one layer, with the neighbours each averages over laid end to
+# end, so that `.barycentres()` can sum them all at once.
+.barycentre_index <- function(nodes, nbrs) {
+  nb <- nbrs[nodes]
+  deg <- lengths(nb)
+  end <- cumsum(deg)
+  list(nodes = nodes, src = unlist(nb, use.names = FALSE),
+       deg = deg, start = end - deg, end = end)
+}
+
+# The mean position of each node's neighbours, or the node's own position
+# where it has none. Positions are whole numbers, so the sums taken from the
+# running total are exact, and the means are those `mean()` would give.
+.barycentres <- function(index, x_pos) {
+  total <- c(0, cumsum(x_pos[index$src]))
+  bc <- (total[index$end + 1L] - total[index$start + 1L]) / index$deg
+  none <- index$deg == 0
+  bc[none] <- x_pos[index$nodes[none]]
+  bc
 }
