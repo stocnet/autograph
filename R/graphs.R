@@ -17,7 +17,7 @@
 #'   By default just the first and last network will be plotted,
 #'   but this can be overridden by the "waves" parameter.
 #'   
-#'   Where the graphs are of the same network (same nodes),
+#'   Where the graphs are of the same network (the same nodes in the same order),
 #'   the graphs may share a layout to facilitate comparison.
 #'   By default, successive graphs will use the layout calculated for 
 #'   the "first" network, but other options include the "last" layout,
@@ -33,6 +33,7 @@
 #'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
 #'   per change point. It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
+#'   A single network that encodes no time is drawn with `graphr()`.
 #' @param waves Numeric, the number of plots to be displayed side-by-side.
 #'   If missing, the number of plots will be reduced to the first and last
 #'   when there are more than four plots.
@@ -61,6 +62,11 @@ graphs <- function(netlist, waves,
   if (!manynet::is_list(netlist) &&
       (manynet::is_manynet(netlist) || inherits(netlist, "diff_model"))) {
     netlist <- .split_time_network(netlist)
+    # A network that encodes no time comes back as it went in. There is nothing
+    # to set side by side, so it is drawn as `graphr()` would draw it, rather
+    # than iterated over as if it were a list of networks.
+    if (!manynet::is_list(netlist) && !inherits(netlist, "diff_model"))
+      return(graphr(netlist, ...))
   }
   if (missing(waves)) {
     if (length(netlist) > 4) {
@@ -94,7 +100,7 @@ graphs <- function(netlist, waves,
   # panel, so that `patchwork` can collect the guides into one legend and the
   # same value is drawn the same way in each panel. See `.shared_aes()`.
   shared <- .shared_aes_from_dots(netlist, list(...))
-  if (length(unique(lapply(netlist, length))) == 1) {
+  if (.same_nodes(netlist)) {
     # Sharing a layout requires every panel to draw every node, so isolates
     # are kept unless the user explicitly asks otherwise
     dots <- list(...)
@@ -193,6 +199,22 @@ graphs <- function(netlist, waves,
                 edge_size = pick("edge_size"),
                 layout = if (is.character(dots[["layout"]])) dots[["layout"]]),
     error = function(e) NULL)
+}
+
+# A shared layout is reused by position, so it suits only networks that draw
+# the same nodes in the same order. `length()` cannot tell this: it counts the
+# nodes of an igraph but the parts of a 'stocnet', which is a list, so every
+# list of stocnets looked alike (stocnet/manynet#186).
+.same_nodes <- function(nlist) {
+  n_nodes <- vapply(nlist, function(x) sum(as.numeric(manynet::net_nodes(x))),
+                    numeric(1))
+  if (length(unique(n_nodes)) != 1) return(FALSE)
+  labelled <- vapply(nlist, manynet::is_labelled, logical(1))
+  if (all(labelled)) {
+    nms <- lapply(nlist, manynet::node_names)
+    return(all(vapply(nms[-1], identical, logical(1), nms[[1]])))
+  }
+  TRUE
 }
 
 is_ego_network <- function(nlist) {

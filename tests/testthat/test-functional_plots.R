@@ -350,6 +350,44 @@ test_that("graphs() handles ego networks and changing networks", {
   expect_s3_class(suppressMessages(graphs(uneven)), "patchwork")
 })
 
+test_that("graphs() lays out a list of stocnets with different nodes", {
+  skip_on_cran()
+  # `length()` of a stocnet counts its list parts, not its nodes, so every list
+  # of stocnets was given one shared layout, and the panels with a different
+  # number of nodes failed to build with "arguments imply differing number of
+  # rows" (stocnet/manynet#186). The error comes when the plot is built.
+  built <- function(p) {
+    for (i in seq_along(p$patches$plots)) ggplot2::ggplot_build(p[[i]])
+    ggplot2::ggplot_build(p[[length(p)]])
+    p
+  }
+  ado <- manynet::as_stocnet(manynet::ison_adolescents)
+  lotr <- manynet::as_stocnet(manynet::fict_lotr)
+  egos <- manynet::to_egos(ado)
+  races <- manynet::to_subgraphs(lotr, "Race")
+  expect_s3_class(built(suppressMessages(graphs(egos, waves = 8))), "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(egos, waves = c(2, 4, 6)))),
+                  "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(races, waves = 1:4))),
+                  "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(races))), "patchwork")
+  # networks of equal size but with different nodes do not share a layout
+  expect_false(.same_nodes(egos[c(2, 3)]))
+  expect_true(.same_nodes(list(ado, ado)))
+})
+
+test_that("graphs() draws a single static network with graphr()", {
+  skip_on_cran()
+  # Before, the network was iterated over as if it were a list, and failed with
+  # "invalid to use names()<- on an S4 object of class 'dgCMatrix'".
+  for (net in list(manynet::ison_adolescents,
+                   manynet::as_stocnet(manynet::ison_adolescents))) {
+    p <- suppressMessages(graphs(net))
+    expect_s3_class(p, "ggplot")
+    expect_false(inherits(p, "patchwork"))
+  }
+})
+
 test_that("graphs() splits a bare longitudinal or dynamic network", {
   skip_on_cran()
   # A single longitudinal network (longitudinal but not "changing") is split

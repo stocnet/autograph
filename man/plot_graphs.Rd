@@ -17,7 +17,8 @@ such as \code{manynet::irps_nuclear} into cumulative time slices via
 \code{manynet::to_slices()}; and interval (spell) networks that record tie
 \code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
 per change point. It can also be a diffusion model result from e.g.
-\code{manynet::play_diffusion()}.}
+\code{manynet::play_diffusion()}.
+A single network that encodes no time is drawn with \code{graphr()}.}
 
 \item{waves}{Numeric, the number of plots to be displayed side-by-side.
 If missing, the number of plots will be reduced to the first and last
@@ -47,7 +48,7 @@ or a list of a network's different types of tie or across time.
 By default just the first and last network will be plotted,
 but this can be overridden by the "waves" parameter.
 
-Where the graphs are of the same network (same nodes),
+Where the graphs are of the same network (the same nodes in the same order),
 the graphs may share a layout to facilitate comparison.
 By default, successive graphs will use the layout calculated for
 the "first" network, but other options include the "last" layout,

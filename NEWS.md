@@ -1,3 +1,12 @@
+# autograph 1.3.0
+
+## Graphing
+
+- Fixed `graphs()` on a list of stocnets (stocnet/manynet#186)
+  - Networks with different nodes no longer share one layout
+  - A layout is shared only by networks with the same nodes in the same order
+- Improved `graphs()` so that a single static network is drawn with `graphr()`
+
 # autograph 1.2.9
 
 ## Package
