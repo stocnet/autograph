@@ -394,12 +394,9 @@ test_that("grapht() aborts clearly when the input cannot be split into waves", {
 # Interval/spell networks (begin/end ties, e.g. irps_wwi) ----
 
 test_that("grapht() splits a begin/end spell network into active-spell slices", {
-  # irps_wwi records tie lifespans as begin/end spells; it is_dynamic() but has
-  # no `time` attribute, so it must not be routed to to_slices().
-  expect_true(autograph:::.grapht_is_spell(manynet::irps_wwi))
-  expect_false(autograph:::.grapht_is_spell(manynet::irps_nuclear))
-
-  slices <- autograph:::.grapht_spell_slices(manynet::irps_wwi)
+  # irps_wwi records tie lifespans as begin/end spells, which to_times() reads
+  # as the ties active at each change point.
+  slices <- autograph:::.split_time_network(manynet::irps_wwi)
   expect_type(slices, "list")
   # One slice per change point (each moment a tie begins or ends), named by year
   # and in order; this mirrors manynet::to_times().

@@ -56,13 +56,13 @@
 #' @param tlist A manynet-compatible network listed according to
 #'   a time attribute, waves, or slices.
 #'   This can also be a single manynet network object that encodes time,
-#'   which will be split automatically:
-#'   longitudinal or changing networks are split into waves via
-#'   `manynet::to_waves()`; dynamic (time-stamped, event-based) networks
-#'   such as `manynet::irps_nuclear` into cumulative time slices via
-#'   `manynet::to_slices()`; and interval (spell) networks that record tie
-#'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
-#'   per change point showing the ties active in that spell.
+#'   which is split automatically by `manynet::to_times()`
+#'   into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+#'   dynamic (time-stamped, event-based) networks such as
+#'   `manynet::irps_nuclear` into the state accumulated by each moment, and
+#'   interval (spell) networks that record tie `begin`/`end` lifespans,
+#'   such as `manynet::irps_wwi`, into one snapshot per change point showing
+#'   the ties active in that spell.
 #'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
 #' @param labels Which nodes to label, if the network is labelled.
@@ -292,7 +292,7 @@ print.grapht <- function(x, ...) {
     manynet::snet_abort(paste(
       "Please declare a manynet-compatible network listed according",
       "to a time attribute, waves, or slices.",
-      "If you split the network yourself, e.g. with `to_waves()`,",
+      "If you split the network yourself, e.g. with `to_times()`,",
       "check that it returned a list of networks",
       "(and that the named attribute exists on the ties)."))
   }
@@ -334,44 +334,25 @@ print.grapht <- function(x, ...) {
 
 # Splits a single time-encoding manynet network into a list of snapshots,
 # shared by grapht() and graphs() so both accept a bare longitudinal or
-# dynamic network directly. Diffusion results and longitudinal or changing
-# networks split into waves (a changing network that already carries its
-# waves as a list attribute is unwrapped directly); spell (begin/end)
-# networks split into per-period snapshots of the ties active in each spell;
-# other dynamic (event) networks split into cumulative time slices. Anything
-# that matches none of these is returned unchanged.
+# dynamic network directly. A changing network that already carries its
+# waves as a list attribute is unwrapped directly, and a diffusion result of
+# the older class is split into its waves. Every other network that records
+# time is split by `to_times()` into the network as it stood at each moment
+# it records, whichever way it records time: the ties of each wave of a
+# panel, the state an event network has accumulated to, or the ties of a
+# spell (begin/end) network active then. Anything that records no time is
+# returned unchanged.
 .split_time_network <- function(x) {
-  if (inherits(x, "diff_model") ||
-      manynet::is_changing(x) || manynet::is_longitudinal(x)) {
-    if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
-      attr(x, "network")
-    else manynet::to_waves(x)
-  } else if (.grapht_is_spell(x)) {
-    .grapht_spell_slices(x)
-  } else if (manynet::is_dynamic(x)) {
-    manynet::to_slices(x)
-  } else x
-}
-
-# A spell (interval) network records each tie's lifespan as `begin`/`end` tie
-# attributes rather than as discrete time-stamped events (a `time` attribute).
-# `manynet::is_dynamic()` is TRUE for both, but only the event form can be split
-# by `to_slices()`, so spell networks are detected and sliced separately here.
-.grapht_is_spell <- function(net) {
-  atts <- manynet::net_tie_attributes(net)
-  "begin" %in% atts && "end" %in% atts && !("time" %in% atts)
-}
-
-# Splits a spell network into one snapshot per change point (each moment at
-# which some tie begins or ends), keeping the ties active during that spell
-# (begin <= t < end). Unlike the cumulative slices of an event network, these
-# show the network as it stood at each moment, so ties that dissolve disappear
-# again. `to_times()` returns a single network where there is only one change
-# point, but grapht() always needs a list of snapshots to iterate over.
-.grapht_spell_slices <- function(net) {
-  out <- manynet::to_times(net)
-  if (!manynet::is_list(out)) out <- list(out)
-  out
+  if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
+    return(attr(x, "network"))
+  if (inherits(x, "diff_model")) return(manynet::to_waves(x))
+  if (manynet::is_changing(x) || manynet::is_longitudinal(x) ||
+      manynet::is_dynamic(x)) {
+    out <- manynet::to_times(x)
+    if (!manynet::is_list(out)) out <- list(out)
+    return(out)
+  }
+  x
 }
 
 # Nodes added to a wave during harmonisation carry NA attributes; fill them

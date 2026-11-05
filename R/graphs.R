@@ -25,13 +25,13 @@
 #' @family mapping
 #' @param netlist A list of manynet-compatible networks.
 #'   This can also be a single manynet network object that encodes time,
-#'   which will be split automatically (as in `grapht()`):
-#'   longitudinal or changing networks are split into waves via
-#'   `manynet::to_waves()`; dynamic (time-stamped, event-based) networks
-#'   such as `manynet::irps_nuclear` into cumulative time slices via
-#'   `manynet::to_slices()`; and interval (spell) networks that record tie
-#'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
-#'   per change point. It can also be a diffusion model result from e.g.
+#'   which is split automatically (as in `grapht()`) by `manynet::to_times()`
+#'   into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+#'   dynamic (time-stamped, event-based) networks such as
+#'   `manynet::irps_nuclear` into the state accumulated by each moment, and
+#'   interval (spell) networks that record tie `begin`/`end` lifespans,
+#'   such as `manynet::irps_wwi`, into one snapshot per change point.
+#'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
 #'   A single network that encodes no time is drawn with `graphr()`.
 #' @param waves Numeric, the number of plots to be displayed side-by-side.
