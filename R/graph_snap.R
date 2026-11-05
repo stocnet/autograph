@@ -1,4 +1,4 @@
-# The grid-snapping step behind `graphr(snap = TRUE)`.
+# The grid-snapping step behind `graphr(layout_snap = TRUE)`.
 #
 # Nothing here is a layout: these functions take the coordinates a layout has
 # already produced and move them onto a square grid. Two routes lead there.
@@ -143,7 +143,7 @@ depth_first_recursive_search <- function(layout) {
 # A basis can be read in eight ways: either vector first, each with either
 # sign. They draw the same grid mirrored or turned, so the one that agrees most
 # with the layout is the one to keep. A reader who runs graphr() and then
-# graphr(snap = TRUE) then sees the same drawing, tidied.
+# graphr(layout_snap = TRUE) then sees the same drawing, tidied.
 .snap_orient <- function(basis, layout) {
   co0 <- as.matrix(layout[, c("x", "y")])
   best <- NULL

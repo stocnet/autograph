@@ -402,6 +402,19 @@ test_that("graphs() splits a bare longitudinal or dynamic network", {
   expect_s3_class(suppressMessages(graphs(manynet::irps_wwi)), "patchwork")
 })
 
+test_that("graphs() draws panels with a single signed tie", {
+  skip_on_cran()
+  # The first slices of irps_nuclear hold one tie each. A single value was
+  # passed to the layer as a literal colour, so the shared category
+  # "Negative" reached grid as a colour name and drawing failed.
+  p <- suppressMessages(graphs(manynet::irps_nuclear))
+  for (i in seq_along(p$patches$plots)) expect_no_error(ggplot2::ggplot_build(p[[i]]))
+  expect_no_error(ggplot2::ggplot_build(p[[length(p)]]))
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_no_error(print(p))
+})
+
 test_that("graphs() splits a longitudinal network with non-character changing attributes", {
   skip_on_cran()
   # fict_starwars is a changing+longitudinal network whose changing node

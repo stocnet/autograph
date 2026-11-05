@@ -1,5 +1,6 @@
 graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
-                         node_size = NULL, labels = TRUE) {
+                         node_size = NULL, labels = TRUE,
+                         label_direction = NULL) {
   # Labelling every node of a dense network hides the network behind its own
   # labels, so `labels` can also select which nodes to label. The selection is
   # resolved once here and the chosen rows handed to the geoms as their `data`,
@@ -39,6 +40,10 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # previous hardcoded nudges (e.g. 0.05 alongside a fixed 5pt default gap).
   radius_pt <- if (!is.null(node_size)) max(node_size, na.rm = TRUE) / 2 * ggplot2::.pt else 0
   nudge_unit <- (radius_pt + gap_pt) * 0.01
+  # A direction the user asked for is the same for every layout, the layered
+  # ones included, since it was asked for outright.
+  if (!is.null(label_direction))
+    return(.label_in_direction(p, ldata, label_direction, radius_pt + gap_pt))
   # `point.size` is only a recognised aesthetic on the ggrepel geoms (used
   # when `repel = TRUE`); plain `GeomText`/`GeomLabel` (`repel = FALSE`) don't
   # know it and would warn about an unknown aesthetic.
@@ -193,6 +198,34 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 .is_structured <- function(layout) {
   is.character(layout) && length(layout) == 1L &&
     layout %in% c("layered", "lineage", "railway", "ladder")
+}
+
+# Puts each label a fixed distance from its node in one direction, with the
+# text anchored at the node's side so that it reads away from the node.
+# "outside" points away from the middle of the layout, so that the labels of
+# the nodes around the edge fall into the space beyond it. `pt` is the distance
+# from the centre of the node, in points.
+.label_in_direction <- function(p, ldata, direction, pt) {
+  xs <- p[["data"]][["x"]]
+  ys <- p[["data"]][["y"]]
+  unit_x <- switch(direction, left = -1, right = 1, 0)
+  unit_y <- switch(direction, above = 1, below = -1, 0)
+  if (direction == "outside") {
+    dx <- ldata[["x"]] - mean(range(xs, na.rm = TRUE))
+    dy <- ldata[["y"]] - mean(range(ys, na.rm = TRUE))
+    phi <- atan2(dy, dx)
+    # A node at the very middle has no outward, so its label goes above.
+    phi[dx == 0 & dy == 0] <- pi / 2
+    unit_x <- cos(phi)
+    unit_y <- sin(phi)
+  }
+  args <- list(mapping = ggplot2::aes(label = name), data = ldata,
+               family = ag_font(), size = ag_text_size(3), colour = ag_ink(),
+               repel = FALSE,
+               hjust = (1 - unit_x) / 2, vjust = (1 - unit_y) / 2,
+               nudge_x = unit_x * .axis_nudge(pt, xs),
+               nudge_y = unit_y * .axis_nudge(pt, ys))
+  p + do.call(ggraph::geom_node_text, args)
 }
 
 # A nudge given in points, as `label_dist` and the node sizes are, has to reach

@@ -383,11 +383,11 @@ test_that("edge_size = 0 fully suppresses arrowheads on directed networks (#50)"
             grid::convertUnit(p_default$layers[[1]]$geom_params$arrow$length, "mm", valueOnly = TRUE))
 })
 
-test_that("label_dist and label_repel are respected (#52)", {
+test_that("a gap given to label_repel is respected (#52)", {
   skip_on_cran()
   net <- ison_adolescents
   p_default <- graphr(net)
-  p_dist <- graphr(net, label_dist = 25)
+  p_dist <- graphr(net, label_repel = 25)
   label_layer <- function(p) p$layers[[length(p$layers)]]
   expect_equal(grid::convertUnit(label_layer(p_dist)$geom_params$point.padding, "pt", valueOnly = TRUE), 25)
   expect_equal(grid::convertUnit(label_layer(p_default)$geom_params$point.padding, "pt", valueOnly = TRUE), 5)
@@ -512,9 +512,9 @@ test_that("labels on a selection of nodes are held against their nodes", {
   expect_equal(some[["force_pull"]], 3)
   expect_equal(some[["box.padding"]], 0.1)
   expect_equal(some[["min.segment.length"]], 0)
-  # `label_dist` still decides the gap where it is given
+  # A gap given to `label_repel` still decides the gap
   expect_equal(gap(label_params(graphr(ison_adolescents, labels = c("Sue", "Pam"),
-                                       label_dist = 9))), 9)
+                                       label_repel = 9))), 9)
   # Where every node is labelled the labels need their room from each other
   every <- label_params(graphr(ison_adolescents, labels = TRUE))
   expect_equal(gap(every), 5)
@@ -946,4 +946,52 @@ test_that("a concept lattice labels the concepts that introduce a node", {
   for (i in 1:2) expect_setequal(drawn(ps[[i]]), nms[sel])
   # Anything that is not a lattice has nothing to say here.
   expect_null(autograph:::.concept_is_labelled(igraph::make_tree(10)))
+})
+
+test_that("label_repel puts labels in a direction", {
+  skip_on_cran()
+  net <- ison_adolescents
+  label_layer <- function(p) p$layers[[length(p$layers)]]
+  above <- label_layer(suppressMessages(graphr(net, label_repel = "above")))
+  expect_true(all(above$position$y > 0))
+  expect_true(all(above$position$x == 0))
+  left <- label_layer(suppressMessages(graphr(net, label_repel = "left")))
+  expect_true(all(left$position$x < 0))
+  # A gap given with the direction moves the labels further out
+  far <- label_layer(suppressMessages(graphr(net, label_repel = c(above = 20))))
+  expect_true(all(far$position$y > above$position$y))
+  # "outside" points every label away from the middle of the layout
+  p <- suppressMessages(graphr(net, label_repel = "outside"))
+  out <- label_layer(p)
+  mid_x <- mean(range(p$data$x))
+  expect_true(all(sign(out$position$x) == sign(p$data$x - mid_x) |
+                    p$data$x == mid_x))
+  # A direction also applies to the layered layouts, which otherwise offset
+  # the labels their own way
+  lay <- label_layer(suppressMessages(
+    graphr(ison_southern_women, layout = "layered", label_repel = "above")))
+  expect_true(all(lay$position$y > 0))
+  expect_error(graphr(net, label_repel = "up"), "label_repel")
+  expect_error(graphr(net, label_repel = c(up = 3)), "label_repel")
+})
+
+test_that("snap and label_dist still work, with a deprecation warning", {
+  skip_on_cran()
+  expect_warning(p <- suppressMessages(graphr(ison_adolescents, snap = TRUE)),
+                 "layout_snap")
+  expect_s3_class(p, "ggplot")
+  expect_warning(p <- graphr(ison_adolescents, label_dist = 25), "label_repel")
+  padding <- p$layers[[length(p$layers)]]$geom_params$point.padding
+  expect_equal(grid::convertUnit(padding, "pt", valueOnly = TRUE), 25)
+})
+
+test_that("a large network is laid out at a looser stress tolerance", {
+  skip_on_cran()
+  old <- options(snet_verbosity = "verbose")
+  on.exit(options(old))
+  big <- manynet::create_ring(.stress_large + 1)
+  expect_message(graphr(big, layout = "stress", labels = FALSE),
+                 "looser stress tolerance")
+  expect_no_message(graphr(big, layout = "stress", labels = FALSE,
+                           tolerance = 1e-4), message = "looser")
 })

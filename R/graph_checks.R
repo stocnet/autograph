@@ -170,6 +170,52 @@
 # `edge_arrows` is a switch that can also carry a size: NULL leaves the choice
 # to the network, TRUE and FALSE make it, and a number makes it and gives the
 # length of the arrowheads too. No length is no arrowhead, so 0 is FALSE.
+# The directions a label can be put in, by `label_repel`. See `graph_labels()`.
+.label_directions <- function() c("outside", "above", "below", "left", "right")
+
+# `label_repel` says both whether to repel the labels and how far from their
+# nodes to put them, so it is resolved here into the three things the label
+# geoms need: whether to repel, the gap in points (NULL for the automatic one),
+# and the direction of a fixed offset (NULL for the layout's own).
+# `label_dist` is its deprecated predecessor, and gives the gap where
+# `label_repel` does not.
+.check_label_repel <- function(label_repel, label_dist = NULL) {
+  dirs <- .label_directions()
+  gap <- NULL
+  direction <- NULL
+  if (isTRUE(label_repel) || isFALSE(label_repel)) {
+    repel <- label_repel
+  } else if (is.numeric(label_repel) && length(label_repel) == 1L &&
+             is.finite(label_repel) && label_repel >= 0 &&
+             (is.null(names(label_repel)) || names(label_repel) == "")) {
+    repel <- TRUE
+    gap <- as.numeric(label_repel)
+  } else if (is.character(label_repel) && length(label_repel) == 1L &&
+             label_repel %in% dirs) {
+    repel <- FALSE
+    direction <- label_repel
+  } else if (is.numeric(label_repel) && length(label_repel) == 1L &&
+             is.finite(label_repel) && label_repel >= 0 &&
+             isTRUE(names(label_repel) %in% dirs)) {
+    repel <- FALSE
+    direction <- names(label_repel)
+    gap <- unname(as.numeric(label_repel))
+  } else {
+    manynet::snet_abort(
+      "{.arg label_repel} should be {.code TRUE} or {.code FALSE},",
+      "a gap in points such as {.code label_repel = 2},",
+      "a direction ({.or {.val {dirs}}}),",
+      "or a direction with a gap, such as {.code label_repel = c(above = 3)}.")
+  }
+  if (is.null(gap) && !is.null(label_dist)) {
+    if (!is.numeric(label_dist) || length(label_dist) != 1L ||
+        !is.finite(label_dist))
+      manynet::snet_abort("{.arg label_dist} should be a single number.")
+    gap <- as.numeric(label_dist)
+  }
+  list(repel = repel, gap = gap, direction = direction)
+}
+
 .check_edge_arrows <- function(edge_arrows) {
   if (is.null(edge_arrows)) return(NULL)
   if (isTRUE(edge_arrows) || isFALSE(edge_arrows)) return(edge_arrows)

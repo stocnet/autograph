@@ -89,12 +89,15 @@
 #'   By default 0.5. Passed to `graphlayouts::layout_as_dynamic()`.
 #' @param keep_isolates Deprecated. Use `isolates = "keep"` or
 #'   `isolates = "fade"` instead.
+#' @param label_dist Deprecated. Give the gap to `label_repel` instead.
 #' @details
 #'   Unlike `graphr()`, `grapht()` does not use `ggrepel`-based label
 #'   repelling (there is no straightforward way to repel labels consistently
-#'   across animation frames), so `label_repel` here instead toggles a fixed
-#'   offset nudging labels away from their nodes, and `label_dist` scales the
-#'   size of that nudge rather than being used as repel padding.
+#'   across animation frames), so `label_repel` here instead gives a fixed
+#'   offset nudging labels away from their nodes: above them for `TRUE`,
+#'   none for `FALSE`, and in the direction named for a direction.
+#'   A gap in points scales the size of that nudge rather than being used as
+#'   repel padding.
 #'
 #'   `labels` can select which nodes to label here too, and the selection is
 #'   resolved once over all the waves so that the same nodes stay labelled from
@@ -137,10 +140,10 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                    edge_color, edge_size,
                    isolates = c("keep", "fade"),
                    alpha = 0.5,
-                   label_dist = NULL, label_repel = TRUE,
+                   label_repel = TRUE,
                    edge_arrows = NULL,
                    keep_isolates = NULL, ...,
-                   node_colour, edge_colour) {
+                   node_colour, edge_colour, label_dist) {
   thisRequires("gganimate")
   thisRequires("gifski")
   # Check arguments ####
@@ -154,6 +157,13 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
       "or {.code isolates = \"fade\"} to fade them in and out, instead.")
     if (isolates_missing) isolates <- ifelse(isTRUE(keep_isolates), "keep", "fade")
   }
+  if (!missing(label_dist)) {
+    manynet::snet_warn(
+      "The {.arg label_dist} argument of {.fn grapht} is deprecated.",
+      "Please give the gap to {.arg label_repel} instead,",
+      "as in {.code label_repel = {label_dist}}.")
+  } else label_dist <- NULL
+  label_place <- .check_label_repel(label_repel, label_dist)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
@@ -231,7 +241,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   p <- .grapht_build(nodes_out, edges_out, g_ref, labels,
                      node_color, node_shape, node_size,
                      edge_color, edge_size,
-                     label_dist, label_repel,
+                     label_place,
                      .infer_edge_arrows(g_ref,
                                         .check_edge_arrows(edge_arrows),
                                         hasse = .is_hasse_layout(layout, ...))) +
@@ -636,7 +646,7 @@ print.grapht <- function(x, ...) {
 .grapht_build <- function(nodes_out, edges_out, g_ref, labels,
                           node_color, node_shape, node_size,
                           edge_color, edge_size,
-                          label_dist, label_repel, edge_arrows = TRUE) {
+                          label_place, edge_arrows = TRUE) {
   directed <- manynet::is_directed(g_ref)
   n_union <- length(unique(nodes_out$name))
   diffusion <- isTRUE(attr(nodes_out, "diffusion"))
@@ -751,23 +761,40 @@ print.grapht <- function(x, ...) {
   # `labels` arrives as the names of the nodes to label (or FALSE for none),
   # already resolved against the reference wave by grapht().
   if (!isFALSE(labels) && length(labels) > 0) {
-    # No ggrepel-based repelling here (see @details in grapht()'s docs);
-    # `label_repel` toggles a fixed offset instead, scaled by `label_dist`
-    # when supplied (calibrated so graphr()'s default `label_dist` of 10
-    # corresponds to the default offset). The offset is applied in data
-    # units, sized to clear the node radius so labels sit above nodes.
-    label_offset <- if (isTRUE(label_repel)) {
-      if (!is.null(label_dist)) label_dist / 50 else 0.2
-    } else 0
+    # No ggrepel-based repelling here (see @details in grapht()'s docs).
+    # `label_repel` gives a fixed offset instead: above the node by default,
+    # or in the direction asked for, scaled by the gap where one is given
+    # (calibrated so that a gap of 10 points is the default offset). The
+    # offset is applied in data units, sized to clear the node radius.
+    gap <- label_place$gap
+    direction <- label_place$direction %||%
+      if (isTRUE(label_place$repel)) "above"
+    label_offset <- if (!is.null(gap)) gap / 50 else if (!is.null(direction)) 0.2 else 0
+    if (is.null(direction)) direction <- "above"
     span <- max(diff(range(nodes_out$x)), diff(range(nodes_out$y)))
     nudge <- if (label_offset > 0 && is.finite(span))
       (0.3 * max(nodes_out$nsize) / 100 + 0.1 * label_offset) * span else 0
+    ldata <- nodes_out[nodes_out$name %in% labels, , drop = FALSE]
+    unit_x <- switch(direction, left = -1, right = 1, 0)
+    unit_y <- switch(direction, above = 1, below = -1, 0)
+    if (direction == "outside") {
+      dx <- ldata$x - mean(range(nodes_out$x))
+      dy <- ldata$y - mean(range(nodes_out$y))
+      phi <- atan2(dy, dx)
+      phi[dx == 0 & dy == 0] <- pi / 2
+      unit_x <- cos(phi)
+      unit_y <- sin(phi)
+    }
+    # Above the node is where the labels have always gone, centred on it.
+    centred <- identical(direction, "above") && is.null(label_place$direction)
     p <- p + ggplot2::geom_text(
       ggplot2::aes(x = .data$x, y = .data$y, label = .data$name,
                    group = .data$name, alpha = .data$nalpha),
-      data = nodes_out[nodes_out$name %in% labels, , drop = FALSE],
+      data = ldata,
       colour = ag_base(), family = ag_font(),
-      nudge_y = nudge, show.legend = FALSE)
+      hjust = if (centred) 0.5 else (1 - unit_x) / 2,
+      vjust = if (centred) 0.5 else (1 - unit_y) / 2,
+      nudge_x = unit_x * nudge, nudge_y = unit_y * nudge, show.legend = FALSE)
   }
 
   p <- p + ggplot2::scale_alpha_identity(guide = "none")

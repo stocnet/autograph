@@ -31,6 +31,9 @@
 #'   six nodes, "levels" for connected multilevel networks,
 #'   "layered" for other two mode networks,
 #'   and "stress" for all other networks.
+#'   The "stress" layout of a network of more than 1000 nodes is run at a
+#'   looser tolerance (`tolerance = 1e-3`) to save time;
+#'   give `tolerance = 1e-4` for the finer layout.
 #'   For "layered" layout, one can further split graph by
 #'   declaring the "center" argument as the "events", "actors",
 #'   or by declaring a node name.
@@ -153,30 +156,30 @@
 #'   If the default layout ("stress") is used, 
 #'   we recommend that the "legend" option is used to avoid isolates crowding
 #'   out the giant component.
-#' @param label_dist Numeric scalar, in points (pt), controlling the extra
-#'   gap left between labels and node borders -- similar to `igraph`'s
-#'   `vertex.label.dist`. Node size is always accounted for automatically
-#'   (larger nodes push labels further away without any extra configuration);
-#'   `label_dist` adds further spacing on top of that, and defaults to a
-#'   small gap: 5pt where every node is labelled, and 2pt where only a
-#'   selection is, so that each label stays against the node it names.
-#'   Set to `0` for labels right at the node border,
-#'   or to a larger value (e.g. `15`) for more spacing.
-#'   Only used when `labels = TRUE` and `label_repel = TRUE`
-#'   (as the padding passed to the repel algorithm) or `label_repel = FALSE`
-#'   (as a fixed nudge away from the node, in the layouts where this makes
-#'   sense, e.g. "circle"/"concentric", "railway", "lineage").
-#' @param label_repel Logical scalar, whether labels should be repelled away
-#'   from each other and from nodes using `ggrepel`
-#'   (via `ggraph`'s `repel` argument). Defaults to `TRUE`.
-#'   Set to `FALSE` to place labels at a fixed offset (see `label_dist`)
-#'   without the (sometimes slow, and non-deterministic between runs for
-#'   some layouts) repelling algorithm.
+#' @param label_repel Where to put the labels.
+#'   - `TRUE` (the default) repels the labels away from each other and from
+#'     the nodes using `ggrepel` (via `ggraph`'s `repel` argument), leaving a
+#'     small gap from each node's border: 5pt where every node is labelled,
+#'     and 2pt where only a selection is, so that each label stays against
+#'     the node it names. Node size is always accounted for.
+#'   - A number, e.g. `label_repel = 10`, repels the labels with a gap of that
+#'     many points instead, similar to `igraph`'s `vertex.label.dist`.
+#'     Set to `0` for labels right at the node border.
+#'   - `FALSE` places each label at a fixed offset from its node, in the
+#'     direction the layout suits (outward in "circle" and "concentric",
+#'     to the right in "lineage"), without the repelling algorithm, which
+#'     can be slow and, for some layouts, differs between runs.
+#'   - A direction, `"outside"`, `"above"`, `"below"`, `"left"`, or `"right"`,
+#'     places every label at a fixed offset in that direction, whatever the
+#'     layout. `"outside"` points away from the middle of the layout.
+#'     A gap can be given with it, as in `label_repel = c(above = 3)`.
+#'
 #'   The layered layouts ("layered", "lineage", "railway" and "ladder")
 #'   place each node in a layer, which is where the reader looks for it,
 #'   so a repelled label there would say less about which node it labels
-#'   than a fixed offset does. They ignore this argument and always offset.
-#' @param snap Logical scalar, whether the layout should be snapped to a grid.
+#'   than a fixed offset does. They offset the labels instead,
+#'   unless a direction is given.
+#' @param layout_snap Logical scalar, whether the layout should be snapped to a grid.
 #'   Where the network repeats a structure, as a lattice does, the two steps it
 #'   repeats are mapped onto the axes, which draws it as a rectangle of rows and
 #'   columns. Where it does not, each node moves to the nearest vacant grid
@@ -236,9 +239,8 @@
 #'   those that already carry meaning in their coordinates such as "layered"
 #'   or "scaling", keeps its coordinates and only fades its ties.
 #'   Does not apply to signed networks.
-#' @param .shared Internal. A list of the aesthetic ranges and categories found
-#'   across a list of networks, which `graphs()` uses to draw and label each of
-#'   its panels against the same scales. Not intended to be set by hand.
+#' @param snap,label_dist Deprecated. Use `layout_snap` instead of `snap`,
+#'   and give the gap to `label_repel` instead of `label_dist`.
 #' @param ... Extra arguments to pass on to the layout algorithm, if necessary.
 #' @return A `ggplot2::ggplot()` object.
 #'   The last plot can be saved to the file system using `ggplot2::ggsave()`.
@@ -255,12 +257,13 @@
 #'   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
 #'   graphr(node_color = "color", node_size = "size",
 #'          edge_size = 1.5, edge_color = "ecolor")
-#' graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+#' graphr(ison_southern_women, labels = TRUE, label_repel = 10)
 #' # Label a selection of the nodes rather than all of them
 #' graphr(ison_southern_women, labels = 2)
 #' graphr(ison_adolescents, labels = c("Alice", "Betty"))
 #' \donttest{
 #' graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+#' graphr(ison_karateka, label_repel = "outside")
 #' graphr(ison_southern_women, labels = "betweenness")
 #' graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 #' # Larger arrowheads than the width of the ties would give, or none at all
@@ -272,10 +275,10 @@
 graphr <- function(.data, layout = NULL, labels = TRUE,
                    node_color, node_shape, node_size, node_group,
                    edge_color, edge_size,
-                   isolates = c("legend","caption","keep"), snap = FALSE,
-                   label_dist = NULL, label_repel = TRUE, edge_bundle = FALSE,
-                   edge_arrows = NULL, backbone = NULL, .shared = NULL, ...,
-                   node_colour, edge_colour) {
+                   isolates = c("legend","caption","keep"), layout_snap = FALSE,
+                   label_repel = TRUE, edge_bundle = FALSE,
+                   edge_arrows = NULL, backbone = NULL, ...,
+                   node_colour, edge_colour, snap, label_dist) {
   # A list of networks is handed to graphs(). The call is forwarded as written,
   # rather than argument by argument, because the aesthetic arguments have no
   # defaults: naming them here would force promises that are still missing.
@@ -288,6 +291,26 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
     names(cl)[names(cl) == ".data"] <- "netlist"
     return(eval(cl, parent.frame()))
   }
+  # `graphs()` passes the scales it found across its networks down to each
+  # panel as `.shared`, which is no business of the layout's, so it is taken
+  # out here and the rest of `...` handed on to the layout.
+  dots <- list(...)
+  .shared <- dots[[".shared"]]
+  dots[[".shared"]] <- NULL
+  # Deprecated arguments ----
+  if (!missing(snap)) {
+    manynet::snet_warn(
+      "The {.arg snap} argument of {.fn graphr} is deprecated.",
+      "Please use {.arg layout_snap} instead.")
+    if (missing(layout_snap)) layout_snap <- snap
+  }
+  if (!missing(label_dist)) {
+    manynet::snet_warn(
+      "The {.arg label_dist} argument of {.fn graphr} is deprecated.",
+      "Please give the gap to {.arg label_repel} instead,",
+      "as in {.code label_repel = {label_dist}}.")
+  } else label_dist <- NULL
+  label_place <- .check_label_repel(label_repel, label_dist)
   labels_missing <- missing(labels)
   g <- .check_network(.data)
   # Checked here, before isolates are dropped below, so that a vector selecting
@@ -339,7 +362,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Substituted here rather than in graph_layout(), since `layout` is also
   # passed to graph_edges(), graph_nodes() and graph_labels(), which would
   # otherwise style the plot for a layout that was not the one drawn.
-  layout <- .check_layout_applies(g, layout, ...)
+  layout <- do.call(.check_layout_applies, c(list(g, layout), dots))
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
@@ -382,9 +405,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # After the isolates are dropped, so that the network read is the one drawn.
   # After the layout is settled too, since a concept lattice goes without
   # arrowheads only where the layout draws it as a Hasse diagram.
-  manual <- all(c("x", "y") %in% names(list(...)))
-  edge_arrows <- .infer_edge_arrows(g, .check_edge_arrows(edge_arrows),
-                                    hasse = .is_hasse_layout(layout, manual, ...))
+  manual <- all(c("x", "y") %in% names(dots))
+  edge_arrows <- .infer_edge_arrows(
+    g, .check_edge_arrows(edge_arrows),
+    hasse = do.call(.is_hasse_layout, c(list(layout, manual), dots)))
   # Find the backbone ----
   # After the layout is settled, since a layout that carries meaning in its
   # coordinates keeps them and fades its ties only, and after the isolates are
@@ -392,7 +416,8 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   backbone <- .infer_backbone(g, .check_backbone(backbone), layout, edge_bundle,
                               manual = manual)
   # Add layout ----
-  p <- graph_layout(g, layout, labels, node_group, snap, backbone, ...)
+  p <- do.call(graph_layout, c(list(g, layout, labels, node_group, layout_snap,
+                                    backbone), dots))
   # Read where the layout left it, since the later steps have no use for it
   # and no reason to carry it. See `layout_scaling()`.
   fit <- attr(p[["data"]], "fit")
@@ -403,9 +428,10 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   p <- graph_nodes(p, g, node_color, node_shape, node_size, layout, .shared)
   # Add labels ----
   if (!isFALSE(labels) && manynet::is_labelled(g)) {
-    p <- graph_labels(p, g, layout, label_dist, label_repel,
+    p <- graph_labels(p, g, layout, label_place$gap, label_place$repel,
                       node_size = .infer_nsize(g, node_size, layout),
-                      labels = labels)
+                      labels = labels,
+                      label_direction = label_place$direction)
   }
   
   # Give the edge nodes room ----

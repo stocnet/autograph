@@ -96,6 +96,8 @@ test_that("an argument whose default is a set of choices offers them", {
 
 test_that("an argument with no known set offers nothing", {
   g <- manynet::as_igraph(manynet::fict_lotr)
+  expect_equal(nrow(autograph:::.completion_values("layout_snap", g)), 0L)
+  # nor does a deprecated argument, which has no default
   expect_equal(nrow(autograph:::.completion_values("snap", g)), 0L)
   expect_equal(nrow(autograph:::.completion_values("", g)), 0L)
   # Without a network there are no attributes to offer.

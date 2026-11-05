@@ -56,6 +56,7 @@
         if (!is.null(g) && manynet::is_labelled(g)) manynet::node_labels(g),
         "node")),
     "backbone" = .completion_frame(.backbone_filters(), "filter"),
+    "label_repel" = .completion_frame(.label_directions(), "direction"),
     "layout" = .completion_layout_values(),
     "theme" = .completion_frame(theme_opts, "theme"),
     # An argument whose default is a vector of choices, as `isolates` and
@@ -158,6 +159,9 @@
 .completion_choices <- function(fun, arg) {
   fmls <- .completion_formals(fun)
   if (!arg %in% names(fmls)) return(character())
+  # An argument with no default, such as a deprecated one after `...`, has
+  # the empty symbol in its place, which cannot be held in a variable.
+  if (identical(fmls[[arg]], quote(expr = ))) return(character())
   default <- fmls[[arg]]
   if (!is.call(default) || !identical(default[[1L]], quote(c))) return(character())
   vals <- tryCatch(eval(default), error = function(e) NULL)

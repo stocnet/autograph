@@ -31,11 +31,11 @@ graphr_arg_values <- list(
   edge_bundle = list("force"),
   edge_arrows = list(TRUE, FALSE, 3), # also test-graphr.R, on directed data
   isolates    = list("legend", "caption", "keep"),
-  snap        = NULL, # exercised in test-functional_layouts.R
+  layout_snap = NULL, # exercised in test-graph_snap.R
+  snap        = NULL, # deprecated alias of layout_snap; test-graphr.R
   backbone    = list(TRUE, FALSE, "simmelian", 0.1), # also test-graph_backbone.R
-  label_dist  = list(0.5),
-  label_repel = list(TRUE, FALSE),
-  .shared     = NULL, # internal, set by graphs(); exercised in test-functional_plots.R
+  label_dist  = NULL, # deprecated; test-graphr.R
+  label_repel = list(TRUE, FALSE, 0.5, "outside", "above", c(left = 3)),
   ...         = NULL
 )
 

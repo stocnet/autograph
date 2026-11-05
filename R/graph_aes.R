@@ -245,6 +245,10 @@
 .infer_ecolor <- function(g, edge_color, levels = NULL){
   vals <- .ecolor_values(g, edge_color)
   if (is.null(vals)) return(if (!is.null(edge_color)) edge_color else ag_ink())
+  # A single category across every panel is given no colour scale, so it is
+  # drawn in ink, as it would be in a panel of its own.
+  if (!is.null(levels) && length(levels) == 1L && is.null(edge_color))
+    return(ag_ink())
   if (!is.null(levels)) return(factor(as.character(vals), levels = levels))
   if (length(unique(vals)) == 1) {
     # An attribute the user named is reported when it cannot distinguish

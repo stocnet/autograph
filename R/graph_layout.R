@@ -8,6 +8,10 @@
   paste0(base, " (", round(share * 100), "% of inertia)")
 }
 
+# The number of nodes above which the "stress" layout is run at a looser
+# tolerance. See `graph_layout()`.
+.stress_large <- 1000
+
 graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
                          ...) {
   name <- NULL
@@ -31,6 +35,17 @@ graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
     if (!"weights" %in% names(args)) {
       weights <- .length_layout_weights(g, layout)
       if (!is.null(weights)) args[["weights"]] <- weights
+    }
+    # Stress majorization slows sharply on larger networks: 3000 nodes take
+    # about 7 seconds at the default tolerance and under 2 at a looser one,
+    # with little to see between the two drawings. A tolerance the user gave
+    # is theirs.
+    if (identical(layout, "stress") && !"tolerance" %in% names(args) &&
+        igraph::vcount(g) > .stress_large) {
+      args[["tolerance"]] <- 1e-3
+      manynet::snet_info(
+        "Laying out {igraph::vcount(g)} nodes with a looser stress tolerance",
+        "to save time. Use {.code tolerance = 1e-4} for the finer layout.")
     }
     lo <- suppressWarnings(do.call(ggraph::create_layout, args))
   }

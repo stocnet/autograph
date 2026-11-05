@@ -1268,7 +1268,7 @@ is only there to keep the picture legible:
 | Spectral: `"eigen"`, `"scaling"`, `"correspondence"` | Both axes are calculated from the network |
 | Layered: `"layered"`, `"railway"`, `"lineage"`, `"ladder"` | One axis is data: a mode, a rank, a generation, a year |
 | Circular: `"concentric"`, `"circle"` | The ring a node is on, or its place around it, can be data |
-| Grid: `"grid"`, or any layout with `snap = TRUE` | Regular positions, chosen to keep labels apart |
+| Grid: `"grid"`, or any layout with `layout_snap = TRUE` | Regular positions, chosen to keep labels apart |
 | Force-directed: `"stress"`, `"fr"`, `"kk"` | A compromise, chosen to keep the whole drawing legible |
 | Manual: `x =` and `y =` | Whatever you decide |
 
@@ -1655,23 +1655,23 @@ Other grid layouts include:
 - grid snapping for other layouts
 
 That last point deserves a demonstration. Rather than committing to a full
-grid, `graphr()`'s `snap = TRUE` argument keeps whatever layout you asked for
+grid, `graphr()`'s `layout_snap = TRUE` argument keeps whatever layout you asked for
 but snaps its coordinates onto a grid — trading a little positional accuracy
 for the label legibility of a grid. **Compare the stress layout with its
 snapped version.**
 
 ```{r snap, exercise=TRUE, fig.width=9}
 (graphr(fict_lotr) + ggtitle("stress") |
-   graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+   graphr(fict_lotr, layout_snap = TRUE) + ggtitle("stress + snap"))
 ```
 
 ```{r snap-Q, echo=FALSE, purl = FALSE}
-question("What does snap = TRUE do to the layout you asked for?",
+question("What does layout_snap = TRUE do to the layout you asked for?",
   answer("It keeps that layout, but moves each node onto the nearest grid coordinate",
          correct = TRUE,
          message = "Exactly — the arrangement stays recognisable, and the nodes just shuffle onto tidier positions. <img src='https://media1.tenor.com/m/06gR6YNAA6IAAAAd/family-guy-cartermiroquai.gif' alt='gif of a cartoon character energetically rearranging the living room furniture'/>"),
   answer("It replaces that layout with the grid layout",
-         message = "That is layout = 'grid'. With snap = TRUE the chosen layout is computed first, and only then rounded onto a grid."),
+         message = "That is layout = 'grid'. With layout_snap = TRUE the chosen layout is computed first, and only then rounded onto a grid."),
   answer("It fixes the layout so that it is the same each time it is run",
          message = "Some layouts, such as 'stress', are already deterministic. Snapping is about grid coordinates, not repeatability."),
   answer("It removes overlapping labels",

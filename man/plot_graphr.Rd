@@ -16,16 +16,16 @@ graphr(
   edge_color,
   edge_size,
   isolates = c("legend", "caption", "keep"),
-  snap = FALSE,
-  label_dist = NULL,
+  layout_snap = FALSE,
   label_repel = TRUE,
   edge_bundle = FALSE,
   edge_arrows = NULL,
   backbone = NULL,
-  .shared = NULL,
   ...,
   node_colour,
-  edge_colour
+  edge_colour,
+  snap,
+  label_dist
 )
 }
 \arguments{
@@ -36,6 +36,9 @@ If not declared, defaults to "configuration" for networks of up to
 six nodes, "levels" for connected multilevel networks,
 "layered" for other two mode networks,
 and "stress" for all other networks.
+The "stress" layout of a network of more than 1000 nodes is run at a
+looser tolerance (\code{tolerance = 1e-3}) to save time;
+give \code{tolerance = 1e-4} for the finer layout.
 For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
@@ -168,37 +171,38 @@ If the default layout ("stress") is used,
 we recommend that the "legend" option is used to avoid isolates crowding
 out the giant component.}
 
-\item{snap}{Logical scalar, whether the layout should be snapped to a grid.
+\item{layout_snap}{Logical scalar, whether the layout should be snapped to a grid.
 Where the network repeats a structure, as a lattice does, the two steps it
 repeats are mapped onto the axes, which draws it as a rectangle of rows and
 columns. Where it does not, each node moves to the nearest vacant grid
 point. Layouts that already carry meaning in their coordinates, such as
 "layered" or "scaling", are left as they are.}
 
-\item{label_dist}{Numeric scalar, in points (pt), controlling the extra
-gap left between labels and node borders -- similar to \code{igraph}'s
-\code{vertex.label.dist}. Node size is always accounted for automatically
-(larger nodes push labels further away without any extra configuration);
-\code{label_dist} adds further spacing on top of that, and defaults to a
-small gap: 5pt where every node is labelled, and 2pt where only a
-selection is, so that each label stays against the node it names.
-Set to \code{0} for labels right at the node border,
-or to a larger value (e.g. \code{15}) for more spacing.
-Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
-(as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
-(as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "railway", "lineage").}
+\item{label_repel}{Where to put the labels.
+\itemize{
+\item \code{TRUE} (the default) repels the labels away from each other and from
+the nodes using \code{ggrepel} (via \code{ggraph}'s \code{repel} argument), leaving a
+small gap from each node's border: 5pt where every node is labelled,
+and 2pt where only a selection is, so that each label stays against
+the node it names. Node size is always accounted for.
+\item A number, e.g. \code{label_repel = 10}, repels the labels with a gap of that
+many points instead, similar to \code{igraph}'s \code{vertex.label.dist}.
+Set to \code{0} for labels right at the node border.
+\item \code{FALSE} places each label at a fixed offset from its node, in the
+direction the layout suits (outward in "circle" and "concentric",
+to the right in "lineage"), without the repelling algorithm, which
+can be slow and, for some layouts, differs between runs.
+\item A direction, \code{"outside"}, \code{"above"}, \code{"below"}, \code{"left"}, or \code{"right"},
+places every label at a fixed offset in that direction, whatever the
+layout. \code{"outside"} points away from the middle of the layout.
+A gap can be given with it, as in \code{label_repel = c(above = 3)}.
+}
 
-\item{label_repel}{Logical scalar, whether labels should be repelled away
-from each other and from nodes using \code{ggrepel}
-(via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
-Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
-without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.
 The layered layouts ("layered", "lineage", "railway" and "ladder")
 place each node in a layer, which is where the reader looks for it,
 so a repelled label there would say less about which node it labels
-than a fixed offset does. They ignore this argument and always offset.}
+than a fixed offset does. They offset the labels instead,
+unless a direction is given.}
 
 \item{edge_bundle}{Edge bundling, off by default (\code{FALSE}). When \code{TRUE} (or
 equivalently \code{"force"}), edges are bundled together using ggraph's
@@ -257,11 +261,10 @@ those that already carry meaning in their coordinates such as "layered"
 or "scaling", keeps its coordinates and only fades its ties.
 Does not apply to signed networks.}
 
-\item{.shared}{Internal. A list of the aesthetic ranges and categories found
-across a list of networks, which \code{graphs()} uses to draw and label each of
-its panels against the same scales. Not intended to be set by hand.}
-
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
+
+\item{snap, label_dist}{Deprecated. Use \code{layout_snap} instead of \code{snap},
+and give the gap to \code{label_repel} instead of \code{label_dist}.}
 }
 \value{
 A \code{ggplot2::ggplot()} object.
@@ -299,12 +302,13 @@ ison_adolescents |>
   mutate_ties(ecolor = rep(c("friends", "acquaintances"), times = 5)) |>
   graphr(node_color = "color", node_size = "size",
          edge_size = 1.5, edge_color = "ecolor")
-graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+graphr(ison_southern_women, labels = TRUE, label_repel = 10)
 # Label a selection of the nodes rather than all of them
 graphr(ison_southern_women, labels = 2)
 graphr(ison_adolescents, labels = c("Alice", "Betty"))
 \donttest{
 graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+graphr(ison_karateka, label_repel = "outside")
 graphr(ison_southern_women, labels = "betweenness")
 graphr(manynet::generate_random(40, 0.1), edge_bundle = TRUE)
 # Larger arrowheads than the width of the ties would give, or none at all

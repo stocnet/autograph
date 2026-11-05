@@ -178,8 +178,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
                 line_type = quote(out[["line_type"]]),
                 ealpha    = quote(out[["ealpha"]]))
   mapping <- list(); params <- list()
+  # A category is mapped however few ties there are: a `graphs()` panel with a
+  # single tie still has its colour named by a category, such as "Negative",
+  # which only the scale can turn into a colour.
   for (nm in names(keys)) {
-    if (length(out[[nm]]) > 1) mapping[[keys[[nm]]]] <- exprs[[nm]]
+    if (length(out[[nm]]) > 1 || is.factor(out[[nm]]))
+      mapping[[keys[[nm]]]] <- exprs[[nm]]
     else params[[keys[[nm]]]] <- out[[nm]]
   }
   list(mapping = mapping, params = params)
