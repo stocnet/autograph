@@ -35,13 +35,13 @@ grapht(
 \item{tlist}{A manynet-compatible network listed according to
 a time attribute, waves, or slices.
 This can also be a single manynet network object that encodes time,
-which will be split automatically:
-longitudinal or changing networks are split into waves via
-\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
-such as \code{manynet::irps_nuclear} into cumulative time slices via
-\code{manynet::to_slices()}; and interval (spell) networks that record tie
-\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
-per change point showing the ties active in that spell.
+which is split automatically by \code{manynet::to_times()}
+into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+dynamic (time-stamped, event-based) networks such as
+\code{manynet::irps_nuclear} into the state accumulated by each moment, and
+interval (spell) networks that record tie \code{begin}/\code{end} lifespans,
+such as \code{manynet::irps_wwi}, into one snapshot per change point showing
+the ties active in that spell.
 It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.}
 
@@ -71,6 +71,12 @@ The layered layouts ("layered", "lineage", "railway" and "ladder")
 accept a "ranks" argument, which takes either one of the methods named
 at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
 as a quoted attribute name or a vector with one value for each node.
+A "lineage" ranked by such values, such as \code{ranks = "year"}, is drawn as a
+timeline, as a historiograph of citations is: the x axis is broken at
+the values, with light vertical gridlines, the ties are curved,
+and the labels are repelled.
+Every "lineage" draws its ties curved and its mapped node sizes by area
+over a wider range.
 The "scaling" layout places the nodes by multidimensional scaling,
 so that the distance between two nodes approximates the number of steps
 between them. Since those coordinates can be read, this layout is drawn

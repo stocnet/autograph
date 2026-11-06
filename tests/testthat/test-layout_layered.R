@@ -295,8 +295,12 @@ test_that("a layered label sits immediately to the right of its own node", {
   skip_on_cran()
   years <- rep(c(1985, 1990, 1995, 2000), times = 2)
   net <- manynet::add_node_attribute(ison_adolescents, "year", years)
+  # A "lineage" ranked by values is a timeline, which repels its labels
+  # unless asked not to. See the timeline tests below.
   for (lo in c("lineage", "ladder", "layered")) {
-    p <- graphr(net, layout = lo, ranks = "year")
+    p <- if (lo == "lineage")
+      graphr(net, layout = lo, ranks = "year", label_repel = FALSE) else
+        graphr(net, layout = lo, ranks = "year")
     labels <- p[["layers"]][[length(p[["layers"]])]]
     # Nothing is repelled, so where a label sits says which node it labels.
     expect_false(inherits(labels[["geom"]], "GeomLabelRepel"))
@@ -314,7 +318,7 @@ test_that("a layered label sits immediately to the right of its own node", {
                 min(diff(sort(unique(p[["data"]][["x"]])))))
   }
   # `label_repel` is asked for by default, and these layouts do not take it.
-  expect_s3_class(graphr(net, layout = "lineage", ranks = "year",
+  expect_s3_class(graphr(net, layout = "ladder", ranks = "year",
                          label_repel = FALSE)[["layers"]][[3]][["position"]],
                   "PositionNudge")
 })
@@ -324,7 +328,7 @@ test_that("the offset grows with the nodes and with the label gap", {
   years <- rep(c(1985, 1990, 1995, 2000), times = 2)
   net <- manynet::add_node_attribute(ison_adolescents, "year", years)
   nudge <- function(...) {
-    p <- graphr(net, layout = "lineage", ranks = "year", ...)
+    p <- graphr(net, layout = "ladder", ranks = "year", ...)
     p[["layers"]][[length(p[["layers"]])]][["position"]][["x"]]
   }
   expect_gt(nudge(label_repel = 20), nudge(label_repel = 0))
@@ -338,4 +342,179 @@ test_that("the barycentres are the mean positions of the neighbours", {
   expected <- vapply(1:4, function(i)
     if (length(nbrs[[i]])) mean(x_pos[nbrs[[i]]]) else x_pos[i], numeric(1))
   expect_identical(.barycentres(index, x_pos), expected)
+})
+
+# A small citation network: each work cites earlier ones, and "E" cites
+# nothing and is cited by nothing.
+.cites_net <- function() {
+  igraph::graph_from_data_frame(
+    data.frame(from = c("B", "C", "D", "D"), to = c("A", "A", "B", "C")),
+    vertices = data.frame(name = c("A", "B", "C", "D", "E"),
+                          year = c(1990, 1995, 2000, 2000, 2005),
+                          cited = c(5, 2, 1, 1, 1)))
+}
+
+test_that("a lineage ranked by years draws a time axis", {
+  skip_on_cran()
+  p <- suppressMessages(graphr(.cites_net(), layout = "lineage", ranks = "year"))
+  b <- ggplot2::ggplot_build(p)
+  # One break at each year, named by the year, in the place the layout put the
+  # works of that year.
+  sc <- b$layout$panel_scales_x[[1]]
+  expect_equal(sc$get_labels(), c("1990", "1995", "2000", "2005"))
+  years <- p[["data"]][["year"]]
+  expect_equal(sort(sc$get_breaks()),
+               sort(unique(p[["data"]][["x"]][match(c(1990, 1995, 2000, 2005),
+                                                     years)])))
+  # The axis text and light vertical gridlines are drawn, and the rest of the
+  # theme stays empty.
+  expect_s3_class(p$theme$axis.text.x, "element_text")
+  expect_s3_class(p$theme$panel.grid.major.x, "element_line")
+  expect_null(p$theme$panel.grid.major.y)
+  expect_buildable(p)
+  # Without values to rank by there is no time to show.
+  q <- suppressMessages(graphr(.cites_net(), layout = "lineage"))
+  expect_null(q$theme$panel.grid.major.x)
+  # Nor for the other layered layouts.
+  r <- suppressMessages(graphr(.cites_net(), layout = "ladder", ranks = "year"))
+  expect_null(r$theme$panel.grid.major.x)
+})
+
+test_that("a lineage keeps its isolates in place unless told otherwise", {
+  skip_on_cran()
+  net <- .cites_net()
+  p <- suppressMessages(graphr(net, layout = "lineage", ranks = "year"))
+  expect_equal(nrow(p[["data"]]), 5L)
+  expect_true("E" %in% p[["data"]][["name"]])
+  # The isolate is drawn at its own year.
+  e <- p[["data"]][p[["data"]][["name"]] == "E", ]
+  expect_equal(e$x, max(p[["data"]][["x"]]))
+  expect_null(p$scales$get_scales("alpha"))
+  # A value the user gave wins.
+  q <- suppressMessages(graphr(net, layout = "lineage", ranks = "year",
+                               isolates = "legend"))
+  expect_equal(nrow(q[["data"]]), 4L)
+  expect_false(is.null(q$scales$get_scales("alpha")))
+  # Other layouts keep the old default.
+  r <- suppressMessages(graphr(net, layout = "ladder", ranks = "year"))
+  expect_equal(nrow(r[["data"]]), 4L)
+})
+
+test_that("a lineage draws curved ties with arrowheads", {
+  skip_on_cran()
+  geoms <- function(p) vapply(p$layers, function(l) class(l$geom)[1], "")
+  p <- suppressMessages(graphr(.cites_net(), layout = "lineage", ranks = "year",
+                               node_size = "cited"))
+  ties <- p$layers[[which(geoms(p) == "GeomEdgePath")[1]]]
+  expect_s3_class(ties$stat, "StatEdgeDiagonal")
+  expect_true(ties$stat_params$flipped)
+  expect_s3_class(ties$geom_params$arrow, "arrow")
+  expect_buildable(p)
+  # Other layouts keep their arcs.
+  q <- suppressMessages(graphr(.cites_net(), layout = "ladder", ranks = "year"))
+  expect_false(any(vapply(q$layers, function(l)
+    inherits(l$stat, "StatEdgeDiagonal"), logical(1))))
+  # A reciprocated dyad would draw one curve over the other, so it keeps arcs.
+  mutual <- igraph::add_edges(.cites_net(), c("A", "B"))
+  m <- suppressMessages(graphr(mutual, layout = "lineage", ranks = "year"))
+  expect_false(any(vapply(m$layers, function(l)
+    inherits(l$stat, "StatEdgeDiagonal"), logical(1))))
+})
+
+test_that("a lineage sizes its nodes over a wider range and repels labels", {
+  skip_on_cran()
+  p <- suppressMessages(graphr(.cites_net(), layout = "lineage", ranks = "year",
+                               node_size = "cited"))
+  sc <- p$scales$get_scales("size")
+  expect_equal(sc$palette(c(0, 1)), autograph:::.lineage_size_range(5))
+  expect_gt(diff(autograph:::.lineage_size_range(30)), 5)
+  labels <- p$layers[[length(p$layers)]]
+  expect_s3_class(labels$geom, "GeomTextRepel")
+  # The end caps follow the sizes the nodes are drawn at.
+  caps <- autograph:::.infer_end_cap(.cites_net(), "cited", "lineage")
+  drawn <- autograph:::.drawn_nsize(.cites_net(), "cited", "lineage")
+  expect_equal(caps[1], drawn[1] / 2 + 0.5)
+  # A part shared by every name is left off the labels.
+  expect_equal(autograph:::.drop_shared_suffix(c("A, 1990, J", "B, 1995, J")),
+               c("A, 1990", "B, 1995"))
+  expect_equal(autograph:::.drop_shared_suffix(c("A, 1990, J", "B, 1995, K")),
+               c("A, 1990, J", "B, 1995, K"))
+})
+
+test_that("a timeline moves nodes off ties that would run through them", {
+  skip_on_cran()
+  dated <- function(from, to) igraph::graph_from_data_frame(
+    data.frame(from = from, to = to),
+    vertices = data.frame(name = c("A", "B", "C", "D"),
+                          year = c(1985, 1991, 1993, 2003)))
+  # Does any tie run straight through a node other than the two it joins?
+  through <- function(g, lo) {
+    el <- igraph::as_edgelist(g, names = FALSE)
+    any(apply(el, 1, function(e) {
+      u <- e[1]; v <- e[2]
+      w <- setdiff(which(lo$x > min(lo$x[c(u, v)]) & lo$x < max(lo$x[c(u, v)])),
+                   c(u, v))
+      if (!length(w)) return(FALSE)
+      line <- lo$y[u] + (lo$y[v] - lo$y[u]) * (lo$x[w] - lo$x[u]) /
+        (lo$x[v] - lo$x[u])
+      any(abs(lo$y[w] - line) < 1e-6)
+    }))
+  }
+  # Each work cites the first, so the three ties to it are drawn apart.
+  star <- dated(c("B", "C", "D"), c("A", "A", "A"))
+  lo <- layout_lineage(star, ranks = "year")
+  expect_false(through(star, lo))
+  expect_gt(length(unique(lo$y)), 1L)
+  # Each work cites only the one before it, so the chain stays in one row.
+  chain <- dated(c("B", "C", "D"), c("A", "B", "C"))
+  lo <- layout_lineage(chain, ranks = "year")
+  expect_length(unique(lo$y), 1L)
+  # A chain that also cites the first work shows that citation apart.
+  both <- dated(c("B", "C", "D", "D"), c("A", "B", "C", "A"))
+  expect_false(through(both, layout_lineage(both, ranks = "year")))
+  # The engine for the other layouts is left as it was.
+  expect_equal(autograph:::.clear_ties(star, c(1, 2), c(0, 0)), c(0, 0))
+})
+
+test_that("a timeline puts two tied works of one year next to each other", {
+  skip_on_cran()
+  # B, C and D are all of 2000, and D cites B. A and E pull B and D apart
+  # so that C would sit between them.
+  net <- igraph::graph_from_data_frame(
+    data.frame(from = c("B", "C", "D", "E", "D"),
+               to   = c("A", "A", "A", "B", "B")),
+    vertices = data.frame(name = c("A", "B", "C", "D", "E"),
+                          year = c(1990, 2000, 2000, 2000, 2010)))
+  lo <- layout_lineage(net, ranks = "year")
+  col <- which(net |> igraph::V() |> names() %in% c("B", "C", "D"))
+  ys <- lo$y[col]
+  names(ys) <- c("B", "C", "D")
+  # No work of 2000 lies between the two ends of the tie from D to B.
+  between <- ys["C"] > min(ys[c("B", "D")]) & ys["C"] < max(ys[c("B", "D")])
+  expect_false(unname(between))
+})
+
+test_that("a timeline undoes the crossings that a better order would", {
+  # Two layers of two, tied across, drawn as an X.
+  el <- rbind(c(3L, 1L), c(4L, 2L))
+  at <- c(1, 1, 2, 2)
+  pos <- c(0, 1, 1, 0)
+  expect_equal(autograph:::.count_crossings(el, at, pos), 1L)
+  g <- igraph::graph_from_edgelist(el)
+  out <- autograph:::.uncross_ties(g, at, pos)
+  expect_equal(autograph:::.count_crossings(el, at, out), 0L)
+  # Ties that meet at a node do not cross.
+  expect_equal(autograph:::.count_crossings(rbind(c(3L, 1L), c(4L, 1L)),
+                                            at, pos), 0L)
+  # Moving nodes to undo crossings never puts a node back on a tie.
+  set.seed(1)
+  yrs <- sample(1980:2000, 30, TRUE)
+  net <- igraph::sample_gnm(30, 60, directed = TRUE)
+  ties <- igraph::as_edgelist(net)
+  ties <- ties[yrs[ties[, 1]] > yrs[ties[, 2]], ]
+  net <- igraph::add_edges(igraph::make_empty_graph(30), t(ties))
+  igraph::V(net)$year <- yrs
+  lo <- layout_lineage(net, ranks = "year")
+  y <- lo$y / min(diff(sort(unique(lo$y))))
+  expect_length(autograph:::.ties_through(ties, yrs, y), 0L)
 })

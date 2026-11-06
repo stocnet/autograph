@@ -10,13 +10,13 @@ graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 \arguments{
 \item{netlist}{A list of manynet-compatible networks.
 This can also be a single manynet network object that encodes time,
-which will be split automatically (as in \code{grapht()}):
-longitudinal or changing networks are split into waves via
-\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
-such as \code{manynet::irps_nuclear} into cumulative time slices via
-\code{manynet::to_slices()}; and interval (spell) networks that record tie
-\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
-per change point. It can also be a diffusion model result from e.g.
+which is split automatically (as in \code{grapht()}) by \code{manynet::to_times()}
+into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+dynamic (time-stamped, event-based) networks such as
+\code{manynet::irps_nuclear} into the state accumulated by each moment, and
+interval (spell) networks that record tie \code{begin}/\code{end} lifespans,
+such as \code{manynet::irps_wwi}, into one snapshot per change point.
+It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.
 A single network that encodes no time is drawn with \code{graphr()}.}
 

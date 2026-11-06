@@ -57,6 +57,12 @@ The layered layouts ("layered", "lineage", "railway" and "ladder")
 accept a "ranks" argument, which takes either one of the methods named
 at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
 as a quoted attribute name or a vector with one value for each node.
+A "lineage" ranked by such values, such as \code{ranks = "year"}, is drawn as a
+timeline, as a historiograph of citations is: the x axis is broken at
+the values, with light vertical gridlines, the ties are curved,
+and the labels are repelled.
+Every "lineage" draws its ties curved and its mapped node sizes by area
+over a wider range.
 The "scaling" layout places the nodes by multidimensional scaling,
 so that the distance between two nodes approximates the number of steps
 between them. Since those coordinates can be read, this layout is drawn
@@ -167,6 +173,9 @@ Edges can also be sized by declaring a numeric size or vector instead.}
 "legend" (default) will remove isolates from the graph but note them in the legend.
 "caption" will remove isolates from the graph but note them in the caption.
 If there are no isolates, this argument will be ignored.
+The "lineage" layout defaults to "keep" instead, since it gives every
+node a place in its layers, such as a year;
+an \code{isolates} value that is given is used for it as for any other layout.
 If the default layout ("stress") is used,
 we recommend that the "legend" option is used to avoid isolates crowding
 out the giant component.}

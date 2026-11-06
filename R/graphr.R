@@ -52,6 +52,12 @@
 #'   accept a "ranks" argument, which takes either one of the methods named
 #'   at `?layout_layered` or a numeric node attribute to lay the layers out by,
 #'   as a quoted attribute name or a vector with one value for each node.
+#'   A "lineage" ranked by such values, such as `ranks = "year"`, is drawn as a
+#'   timeline, as a historiograph of citations is: the x axis is broken at
+#'   the values, with light vertical gridlines, the ties are curved,
+#'   and the labels are repelled.
+#'   Every "lineage" draws its ties curved and its mapped node sizes by area
+#'   over a wider range.
 #'   The "scaling" layout places the nodes by multidimensional scaling,
 #'   so that the distance between two nodes approximates the number of steps
 #'   between them. Since those coordinates can be read, this layout is drawn
@@ -153,7 +159,10 @@
 #'   "legend" (default) will remove isolates from the graph but note them in the legend.
 #'   "caption" will remove isolates from the graph but note them in the caption.
 #'   If there are no isolates, this argument will be ignored.
-#'   If the default layout ("stress") is used, 
+#'   The "lineage" layout defaults to "keep" instead, since it gives every
+#'   node a place in its layers, such as a year;
+#'   an `isolates` value that is given is used for it as for any other layout.
+#'   If the default layout ("stress") is used,
 #'   we recommend that the "legend" option is used to avoid isolates crowding
 #'   out the giant component.
 #' @param label_repel Where to put the labels.
@@ -323,6 +332,12 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # which does not always force its argument: an unrecognised `isolates` would
   # otherwise be caught or ignored depending on whether the network happens to
   # have isolates.
+  # A "lineage" places each node at its own layer, a date say, so an isolate
+  # still has a place to be drawn, and a reader looks for it there rather than
+  # in the legend. The layout is checked here for that reason, before the
+  # isolates are dropped. An `isolates` the user gave is theirs.
+  layout <- .check_layout(layout)
+  if (missing(isolates) && .keeps_isolates(layout)) isolates <- "keep"
   isolates <- .check_choice(isolates, c("legend", "caption", "keep"), "isolates")
   isolates <- .infer_isolates(g, isolates)
   if(isolates != "keep"){
@@ -358,7 +373,7 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
       "{.code labels = 25} to label more, or {.code labels = FALSE} for none.")
   }
 
-  layout <- .infer_layout(g, .check_layout(layout))
+  layout <- .infer_layout(g, layout)
   # Substituted here rather than in graph_layout(), since `layout` is also
   # passed to graph_edges(), graph_nodes() and graph_labels(), which would
   # otherwise style the plot for a layout that was not the one drawn.
@@ -406,6 +421,9 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # After the layout is settled too, since a concept lattice goes without
   # arrowheads only where the layout draws it as a Hasse diagram.
   manual <- all(c("x", "y") %in% names(dots))
+  # A "lineage" ranked by values, such as years, is a timeline: a
+  # historiograph, when the network is one of citations. See `.is_timeline()`.
+  timeline <- !manual && .is_timeline(layout, dots)
   edge_arrows <- .infer_edge_arrows(
     g, .check_edge_arrows(edge_arrows),
     hasse = do.call(.is_hasse_layout, c(list(layout, manual), dots)))
@@ -429,15 +447,19 @@ graphr <- function(.data, layout = NULL, labels = TRUE,
   # Add labels ----
   if (!isFALSE(labels) && manynet::is_labelled(g)) {
     p <- graph_labels(p, g, layout, label_place$gap, label_place$repel,
-                      node_size = .infer_nsize(g, node_size, layout),
+                      node_size = .drawn_nsize(g, node_size, layout),
                       labels = labels,
-                      label_direction = label_place$direction)
+                      label_direction = label_place$direction,
+                      timeline = timeline)
   }
-  
+  # Add the time axis ----
+  # After the labels, which may set the x scale this gives its breaks to.
+  if (timeline) p <- .add_time_axis(p, g, dots[["ranks"]] %||% dots[["rank"]])
+
   # Give the edge nodes room ----
   # After the labels, since a layered or lineage layout sets its own expansion
   # there and this widens that rather than replacing it.
-  p <- .pad_for_nodes(p, .infer_nsize(g, node_size, layout))
+  p <- .pad_for_nodes(p, .drawn_nsize(g, node_size, layout))
 
   # Note isolates ----
   if(isolates == "legend"){

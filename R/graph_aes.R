@@ -42,6 +42,25 @@
 
 .default_nsize <- function(n) min(20, (250 / n) / 2)
 
+# The sizes a "lineage" draws mapped node sizes between. Other layouts squeeze
+# a mapped size into a narrow range, which for the 30 works of a
+# historiograph is between 1.7 and 3.3, too close to tell a work cited three
+# times from one cited 25 times. A "lineage" leaves room for its nodes along
+# each layer, so it draws them by area up to a larger maximum, which still
+# shrinks as the network grows.
+.lineage_size_range <- function(n) c(2, min(10, max(5, 270 / n)))
+
+# The size each node is drawn at, in the units of `geom_point()`'s `size`.
+# That is the size a mapped attribute is scaled to by `scale_size()`, by area,
+# for a "lineage". Every other layout is given `.infer_nsize()` as it was, so
+# that nothing else changes for them.
+.drawn_nsize <- function(g, node_size, layout = NULL) {
+  nsize <- .infer_nsize(g, node_size, layout)
+  if (!identical(layout, "lineage") || length(unique(nsize)) < 2L) return(nsize)
+  rng <- .lineage_size_range(as.numeric(manynet::net_nodes(g)))
+  rng[1] + diff(rng) * sqrt(.rescale(nsize))
+}
+
 # Room at the panel edge for the nodes drawn there.
 #
 # A node is drawn at an absolute size, in millimetres, but a scale is expanded

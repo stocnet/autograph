@@ -45,9 +45,13 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
     }
   }
   # Consider rescaling nodes
-  p <- p + ggplot2::scale_size(range = c(1/manynet::net_nodes(g)*50, 
-                                         1/manynet::net_nodes(g)*100),
-                               limits = shared[["nsize"]])
+  # A "lineage" draws its nodes over a wider range, so that the sizes can be
+  # told apart. `.drawn_nsize()` gives the same sizes to the end caps and the
+  # labels.
+  range <- if (identical(layout, "lineage"))
+    .lineage_size_range(as.numeric(manynet::net_nodes(g))) else
+      c(1/manynet::net_nodes(g)*50, 1/manynet::net_nodes(g)*100)
+  p <- p + ggplot2::scale_size(range = range, limits = shared[["nsize"]])
   p
 }
 

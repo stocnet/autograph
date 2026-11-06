@@ -45,6 +45,17 @@
 #'   The values run in the same direction as the layers the engine works out:
 #'   down the page in a "layered" or "railway" layout, and left to right in a
 #'   "lineage" or "ladder" layout, so that the smallest value comes first.
+#'   A "lineage" given values lays out all of its nodes together, rather than
+#'   one component at a time, so that an isolate or a small component sits in
+#'   the column of its own value. `graphr()` draws it as a timeline.
+#'   A node that a tie would run straight through, other than the two nodes
+#'   the tie joins, is moved off that tie, so that several works citing one
+#'   earlier work can be told from a chain of works each citing the one
+#'   before. Two tied nodes with the same value are put next to each other,
+#'   and nodes are moved within their layer where that leaves fewer ties
+#'   crossing. That last step is left out of larger networks, where the
+#'   number of nodes times the number of ties is more than 5000,
+#'   to save time.
 #' @param alignment How each layer is spread out:
 #'   "straight" (the default) draws the ties as close to straight as the
 #'   ordering allows, which groups the nodes that belong together;
@@ -139,7 +150,15 @@ layout_lineage <- function(.data,
   ranks <- .absorb_rank(ranks, rank)
   # The same coordinates as "layered", with the axes exchanged, so that the
   # layers run left to right rather than bottom to top.
-  lo <- .layer_axes(.data, ranks = ranks, alignment = alignment, times = times)
+  # Ranks given as values make a timeline, where a work of 2011 is looked for
+  # in the column of 2011 whatever it cites. Packing the components side by
+  # side would stack the small ones and the isolates far off along each year,
+  # so a timeline lays its nodes out in one pass instead.
+  # A timeline also moves a node off any tie that would otherwise run
+  # straight through it. See `.clear_ties()`.
+  timeline <- .ranks_given(ranks)
+  lo <- .layer_axes(.data, ranks = ranks, alignment = alignment, times = times,
+                    pack = !timeline, clear = timeline)
   # The layer axis is negated so that the layers run left to right, as they run
   # top to bottom in "layered".
   out <- .to_lo(cbind(-lo[, 2], lo[, 1]))
@@ -177,6 +196,59 @@ layout_ladder <- function(.data,
 #' @rdname layout_layered
 #' @export
 layout_tbl_graph_ladder <- layout_ladder
+
+# Drawing a lineage ---------------------------------------------------------
+
+# A "lineage" gives every node its own layer, so an isolate has a place in the
+# layout as much as any other node. See `graphr()`.
+.keeps_isolates <- function(layout) identical(layout, "lineage")
+
+# A "lineage" whose ranks are values, such as years, places its layers in
+# proportion to those values, so the x axis can be read as a time axis.
+.is_timeline <- function(layout, dots) {
+  identical(layout, "lineage") &&
+    .ranks_given(dots[["ranks"]] %||% dots[["rank"]])
+}
+
+# Breaks the x axis at the values the layers were ranked by, with a light
+# gridline at each, and keeps the rest of the theme empty. The layout rescales
+# those values, so the breaks are put where the layout placed them. More than
+# 40 distinct values would crowd the axis, so those get pretty breaks instead.
+.add_time_axis <- function(p, g, ranks) {
+  if (is.character(ranks) && length(ranks) == 1L) {
+    nm <- .match_name(ranks, igraph::vertex_attr_names(manynet::as_igraph(g)),
+                      "ranks", what = "node attribute")
+    raw <- manynet::node_attribute(g, nm)
+  } else raw <- ranks
+  vals <- as.numeric(raw)
+  xs <- p[["data"]][["x"]]
+  if (length(vals) != length(xs) || length(unique(vals)) < 2L) return(p)
+  at <- sort(unique(vals))
+  if (length(at) > 40L) {
+    at <- pretty(vals, n = 10)
+    at <- at[at >= min(vals) & at <= max(vals)]
+  }
+  # The layout placed the values on a line, so two points fix where any value
+  # falls along it.
+  lo <- which.min(vals)
+  hi <- which.max(vals)
+  breaks <- xs[lo] + (at - vals[lo]) / (vals[hi] - vals[lo]) * (xs[hi] - xs[lo])
+  labels <- if (inherits(raw, "Date")) format(as.Date(at)) else
+    if (inherits(raw, "POSIXct")) format(as.POSIXct(at)) else
+      format(at, trim = TRUE)
+  sc <- p[["scales"]]$get_scales("x")
+  if (is.null(sc)) {
+    p <- p + ggplot2::scale_x_continuous(breaks = breaks, labels = labels)
+  } else {
+    sc[["breaks"]] <- breaks
+    sc[["labels"]] <- labels
+  }
+  p + ggplot2::theme(
+    axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1,
+                                        colour = ag_ink(), size = ggplot2::rel(0.8)),
+    panel.grid.major.x = ggplot2::element_line(
+      colour = ggplot2::alpha(ag_ink(), 0.12), linewidth = 0.3))
+}
 
 # Axes --------------------------------------------------------------------
 
@@ -231,7 +303,8 @@ layout_tbl_graph_ladder <- layout_ladder
 # along the bottom, so its layers ascend with y. A one-mode network's layers do
 # have a direction -- a tie points from the earlier layer to the later -- so
 # they descend with y, putting parents above their children.
-.layer_axes <- function(.data, ranks, alignment, times) {
+.layer_axes <- function(.data, ranks, alignment, times, pack = TRUE,
+                        clear = FALSE) {
   g <- manynet::as_igraph(.data)
   twomode <- manynet::is_twomode(.data)
   spec <- .resolve_ranks(.data, ranks)
@@ -239,7 +312,7 @@ layout_tbl_graph_ladder <- layout_ladder
     if (twomode) ifelse(igraph::V(g)$type, 2, 1) else NULL
   lo <- .layer_coords(g, layers = layers, ranks = spec$method,
                       alignment = alignment, times = times,
-                      pack = !twomode)
+                      pack = pack && !twomode)
   x <- lo$pos
   y <- if (twomode) lo$rank else -lo$rank
   # `as_igraph()` can reorder the nodes of a two-mode network, so the
@@ -256,10 +329,235 @@ layout_tbl_graph_ladder <- layout_ladder
   # proportion to themselves rather than at even steps. They descend the page
   # like the layers the engine works out, so that the smallest value -- the
   # earliest date, the first generation -- is at the top.
-  if (!is.null(spec$values)) y <- -spec$values
+  if (!is.null(spec$values)) {
+    if (clear && !twomode) {
+      x <- .clear_ties(g, spec$values, x)
+      x <- .uncross_ties(g, spec$values, x)
+    }
+    y <- -spec$values
+  }
   if (length(unique(x)) > 1) x <- .rescale(x)
   if (length(unique(y)) > 1) y <- .rescale(y)
   cbind(x, y)
+}
+
+# Where the values place a layer, a tie can run from one layer to one several
+# layers away, and `.straighten()` pulls the nodes that cite one work onto the
+# row of that work. A tie from the last of them then runs straight through all
+# the others, and a reader cannot tell whether each cites the work or each
+# cites the one before it. So a node that a tie runs through, other than the
+# two it joins, is moved off that tie, to whichever side leaves the fewest
+# such nodes, and its layer is spaced out again. A chain, in which each node
+# cites only the one before it, has no tie that runs through a node, and so
+# stays in its row.
+#
+# A tie between two works of one year runs along their column, through every
+# work placed between them, and moving those works up or down the column
+# cannot take them off it. So the column is put in another order instead:
+# one end of the tie is moved next to the other.
+#
+# `at` is where each node is along the layers (its value) and `pos` where it is
+# within its layer, one apart at the closest. Each pass looks at every tie
+# against every node, so a network of more than 500 nodes is left as it is,
+# and the passes stop at 200.
+.clear_ties <- function(g, at, pos, sep = 1, passes = 200) {
+  el <- igraph::as_edgelist(g, names = FALSE)
+  n <- length(pos)
+  if (!nrow(el) || n > 500L || length(unique(at)) < 3L) return(pos)
+  el <- el[el[, 1] != el[, 2], , drop = FALSE]
+  passed <- function(pos) .ties_through(el, at, pos, sep)
+  respace <- function(pos, layer) .respace_layer(at, pos, layer, sep)
+  # Of the positions tried, the one that leaves the fewest nodes on ties. It
+  # is kept only where it leaves fewer than before, so the passes cannot go
+  # round in a circle, and the passes stop where nothing can be moved to that
+  # end.
+  best <- function(tries, hit) {
+    left <- vapply(tries, function(p) length(passed(p)), integer(1))
+    if (min(left) < length(hit)) tries[[which.min(left)]]
+  }
+  # Half a step either way clears a tie across the layers; a whole step is
+  # tried as well, for where half a step lands on the next tie.
+  shift <- function(pos, w, hit) {
+    best(lapply(c(0.5, -0.5, 1, -1) * sep, function(d) {
+      new <- pos
+      new[w] <- new[w] + d
+      respace(new, at[w])
+    }), hit)
+  }
+  # Either end of a tie within a layer, put on either side of the other end.
+  regroup <- function(pos, hit) {
+    within <- el[at[el[, 1]] == at[el[, 2]], , drop = FALSE]
+    for (k in seq_len(nrow(within))) {
+      u <- within[k, 1]; v <- within[k, 2]
+      if (abs(pos[u] - pos[v]) <= sep * 1.01) next
+      tries <- list()
+      for (e in list(c(u, v), c(v, u))) for (d in c(0.5, -0.5) * sep) {
+        new <- pos
+        new[e[1]] <- new[e[2]] + d
+        tries[[length(tries) + 1L]] <- respace(new, at[u])
+      }
+      if (!is.null(out <- best(tries, hit))) return(out)
+    }
+    NULL
+  }
+  for (i in seq_len(passes)) {
+    hit <- passed(pos)
+    if (!length(hit)) break
+    new <- NULL
+    for (w in hit) if (!is.null(new <- shift(pos, w, hit))) break
+    if (is.null(new)) new <- regroup(pos, hit)
+    if (is.null(new)) break
+    pos <- new
+  }
+  pos
+}
+
+# The nodes that some tie runs through, other than the two it joins. A tie
+# across the layers is taken as straight, and a node within a quarter step of
+# it is on it. A tie within a layer runs through every node of that layer
+# between its two ends.
+.ties_through <- function(el, at, pos, sep = 1) {
+  n <- length(pos)
+  tol <- sep / 4
+  hit <- logical(n)
+  for (k in seq_len(nrow(el))) {
+    u <- el[k, 1]; v <- el[k, 2]
+    if (at[u] == at[v]) {
+      hit[at == at[u] & pos > min(pos[u], pos[v]) &
+            pos < max(pos[u], pos[v])] <- TRUE
+      next
+    }
+    w <- which(at > min(at[u], at[v]) & at < max(at[u], at[v]))
+    if (!length(w)) next
+    line <- pos[u] + (pos[v] - pos[u]) * (at[w] - at[u]) / (at[v] - at[u])
+    hit[w[abs(pos[w] - line) < tol]] <- TRUE
+  }
+  which(hit)
+}
+
+# Put the nodes of one layer back at least one step apart, in the order their
+# positions now give them.
+.respace_layer <- function(at, pos, layer, sep = 1) {
+  idx <- which(at == layer)
+  idx <- idx[order(pos[idx])]
+  pos[idx] <- .place_layer(pos[idx], sep)
+  pos
+}
+
+# How many pairs of ties cross, taking each tie as straight, between the ties
+# `a` and the ties `b` (rows of `el`). Two ties that share a node are not
+# counted, since they meet there rather than cross. Pairs that are in both `a`
+# and `b` are counted twice.
+.cross_pairs <- function(el, at, pos, a = seq_len(nrow(el)), b = a) {
+  if (!length(a) || !length(b)) return(0L)
+  p1 <- el[a, 1]; p2 <- el[a, 2]; q1 <- el[b, 1]; q2 <- el[b, 2]
+  # The side of the line through p and q that r falls on, for every tie of
+  # `a` (rows) against every node r of `b` (columns).
+  side <- function(p, q, r) {
+    dx <- at[q] - at[p]; dy <- pos[q] - pos[p]
+    val <- dx * outer(pos[p], pos[r], function(y0, y) y - y0) -
+      dy * outer(at[p], at[r], function(x0, x) x - x0)
+    # Points on the line itself would otherwise fall to one side or the other
+    # by rounding alone.
+    sign(val) * (abs(val) > 1e-9)
+  }
+  sideT <- function(p, q, r) t(side(p, q, r))
+  x <- side(p1, p2, q1) * side(p1, p2, q2) < 0 &
+    sideT(q1, q2, p1) * sideT(q1, q2, p2) < 0
+  meet <- outer(p1, q1, "==") | outer(p1, q2, "==") |
+    outer(p2, q1, "==") | outer(p2, q2, "==")
+  as.integer(sum(x & !meet))
+}
+
+.count_crossings <- function(el, at, pos) .cross_pairs(el, at, pos) %/% 2L
+
+# How many times a node lies on a tie that does not join it, between the ties
+# `a` and the nodes `w`. As in `.ties_through()`, a tie across the layers is
+# taken as straight, and a tie within a layer runs through the nodes of that
+# layer between its ends.
+.through_pairs <- function(el, at, pos, a, w, sep = 1) {
+  if (!length(a) || !length(w)) return(0L)
+  u <- el[a, 1]; v <- el[a, 2]
+  lo <- pmin(at[u], at[v]); hi <- pmax(at[u], at[v])
+  flat <- lo == hi
+  ends <- outer(u, w, "==") | outer(v, w, "==")
+  across <- outer(lo, at[w], "<") & outer(hi, at[w], ">")
+  frac <- outer(-at[u], at[w], "+") / ifelse(flat, 1, at[v] - at[u])
+  line <- pos[u] + (pos[v] - pos[u]) * frac
+  near <- abs(line - rep(pos[w], each = length(a))) < sep / 4
+  inlayer <- flat & outer(lo, at[w], "==") &
+    outer(pmin(pos[u], pos[v]), pos[w], "<") &
+    outer(pmax(pos[u], pos[v]), pos[w], ">")
+  as.integer(sum(!ends & ((!flat & across & near) | inlayer)))
+}
+
+# The sweeps that ordered the layers saw only the layers next to each other,
+# and a timeline's ties often span many layers, so some of its crossings are
+# ones a better order would undo. Each node in turn is tried in every gap of
+# its layer and a step up or down it, and moved to wherever leaves the fewest
+# crossings without putting a node on a tie it does not join (see
+# `.clear_ties()`). This repeats until no move helps. Only the ties of the
+# nodes a move changes are counted again, so a move costs the number of
+# those ties times the number of ties. Even so, the time grows with the
+# number of nodes times the number of ties: 50 nodes and 67 ties take under a
+# second, but 100 nodes and 149 ties take more than five. So a network where
+# that product is more than 5000 is left as it is, and the passes stop at 10.
+# A historiograph is usually drawn from 20 to 50 works.
+.uncross_ties <- function(g, at, pos, sep = 1, passes = 10) {
+  el <- igraph::as_edgelist(g, names = FALSE)
+  el <- el[el[, 1] != el[, 2], , drop = FALSE]
+  n <- length(pos)
+  m <- nrow(el)
+  if (m < 2L || n * m > 5000) return(pos)
+  all_ties <- seq_len(m)
+  all_nodes <- seq_len(n)
+  ties_of <- lapply(all_nodes, function(v) which(el[, 1] == v | el[, 2] == v))
+  # The part of the score that the nodes `moved` take part in.
+  part <- function(p, moved) {
+    a <- unique(unlist(ties_of[moved]))
+    b <- setdiff(all_ties, a)
+    c(.through_pairs(el, at, p, a, all_nodes, sep) +
+        .through_pairs(el, at, p, b, moved, sep),
+      .cross_pairs(el, at, p, a, b) + .cross_pairs(el, at, p, a, a) %/% 2L)
+  }
+  for (i in seq_len(passes)) {
+    moved_any <- FALSE
+    for (w in all_nodes) {
+      layer <- which(at == at[w])
+      if (!length(unlist(ties_of[layer]))) next
+      others <- sort(pos[setdiff(layer, w)])
+      # A step either way, every gap in the layer, and the row of each node
+      # it is tied to, which lets a node that is alone in its layer move too.
+      nbrs <- setdiff(unique(c(el[ties_of[[w]], ])), w)
+      spots <- c(pos[w] + c(-1, -0.5, 0.5, 1) * sep, pos[nbrs],
+                 if (length(others)) c(others[1] - sep,
+                                       (others[-1] + others[-length(others)]) / 2,
+                                       others[length(others)] + sep))
+      base <- NULL
+      best <- NULL
+      gain <- c(0, 0)
+      for (y in spots) {
+        new <- pos
+        new[w] <- y
+        new <- .respace_layer(at, new, at[w], sep)
+        moved <- layer[new[layer] != pos[layer]]
+        if (!length(moved)) next
+        after <- part(new, moved)
+        before <- part(pos, moved)
+        d <- after - before
+        if (d[1] < gain[1] || (d[1] == gain[1] && d[1] <= 0 && d[2] < gain[2])) {
+          gain <- d
+          best <- new
+        }
+      }
+      if (!is.null(best)) {
+        pos <- best
+        moved_any <- TRUE
+      }
+    }
+    if (!moved_any) break
+  }
+  pos
 }
 
 # Nodes sharing a layer value land on the same coordinate, so nudge them apart.

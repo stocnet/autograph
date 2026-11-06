@@ -19,6 +19,15 @@
 
 ## Layouts
 
+- Improved "lineage" layouts ranked by a time variable as historiographs (closing #72)
+  - Added a time axis, e.g. `graphr(x, layout = "lineage", ranks = "year")`
+  - Added curved ties with arrowheads at the cited node
+  - Improved node positions so that no tie runs through a node it does not join, unless they form a chain
+  - Improved the order within each year, so that two works of one year that are tied sit together
+  - Reduced tie crossings by moving works within their year, for timelines of up to about 50 works
+  - Improved `isolates=` to default to "keep", so that isolates sit at their own year
+  - Improved labels to repel each other and to stay within the plot
+  - Improved node sizes to scale by area over a wider range
 - Accelerated the "layered" layouts
 - Accelerated "stress" layouts on networks of more than 1000 nodes
   - Looser tolerances for larger networks lays out 3000 nodes in 2 seconds rather than 7
