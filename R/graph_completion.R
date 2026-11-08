@@ -82,7 +82,8 @@
   nms <- .completion_attrs(g, what)
   if (!length(nms)) return(.completion_frame())
   vals <- lapply(nms, function(nm) tryCatch(
-    if (what == "node") igraph::vertex_attr(g, nm) else igraph::edge_attr(g, nm),
+    if (what == "node") manynet::node_attribute(g, nm)
+    else manynet::tie_attribute(g, nm),
     error = function(e) NULL))
   if (logical_only) {
     keep <- vapply(vals, is.logical, logical(1))
@@ -98,11 +99,15 @@
 .completion_attrs <- function(g, what = c("node", "tie")) {
   what <- match.arg(what)
   if (is.null(g)) return(character())
+  # Read through manynet rather than igraph, so that a 'stocnet', whose
+  # variables are columns of its node and tie tables, offers them too.
   nms <- tryCatch(
-    if (what == "node") igraph::vertex_attr_names(g) else igraph::edge_attr_names(g),
+    if (what == "node") manynet::net_node_attributes(g)
+    else manynet::net_tie_attributes(g),
     error = function(e) character())
-  # `name` holds the node labels rather than a variable to map an aesthetic to.
-  setdiff(nms, if (what == "node") "name" else character())
+  # `name` (igraph) and `label` (stocnet) hold the node labels rather than a
+  # variable to map an aesthetic to.
+  setdiff(nms, if (what == "node") c("name", "label") else character())
 }
 
 # What kind of variable this is, in the words graphr()'s documentation uses.
@@ -321,6 +326,10 @@
   if (!grepl("^[A-Za-z._][A-Za-z0-9._]*$", text)) return(NULL)
   obj <- tryCatch(get0(text, envir = envir), error = function(e) NULL)
   if (is.null(obj)) return(NULL)
+  # A 'stocnet' is read as it is, since manynet reads its variables directly.
+  # Any other class is coerced to igraph, which also drops the bookkeeping
+  # attributes a 'network' carries, such as `na` and `vertex.names`.
+  if (inherits(obj, "stocnet")) return(obj)
   tryCatch(manynet::as_igraph(obj), error = function(e) NULL)
 }
 

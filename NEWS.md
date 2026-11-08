@@ -16,6 +16,7 @@
 - Improved `grapht()` arguments
   - Added the same label directions and gaps to `label_repel`
   - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
+- Fixed `stocnet_completion()` offering no node or tie variables for a `.stocnet`
 
 ## Layouts
 
