@@ -19,7 +19,7 @@ test_that("layered and lineage layouts graph correctly", {
 # test_that("graphr works for diff_model objects", {
 #   skip_on_cran()
 #   skip_on_ci()
-#   test_diff <- graphr(play_diffusion(ison_brandes, old_version = TRUE))
+#   test_diff <- graphr(play_diffusion(ison_centrality, old_version = TRUE))
 #   if (inherits(test_diff$guides, "Guides")) {
 #     expect_s3_class(test_diff[["guides"]][["guides"]][["shape"]], "GuideLegend")
 #     expect_s3_class(test_diff[["guides"]][["guides"]][["colour"]], "GuideColourbar")
@@ -31,7 +31,7 @@ test_that("layered and lineage layouts graph correctly", {
 
 test_that("layered layout works for two mode networks", {
   skip_on_cran()
-  tm <- manynet::as_tidygraph(ison_brandes) |>
+  tm <- manynet::as_tidygraph(ison_centrality) |>
     mutate_nodes(type = twomode_type, name = LETTERS[1:11]) |>
     graphr()
   expect_length(unique(tm$data[tm$data$type == TRUE, "y"]), 1)

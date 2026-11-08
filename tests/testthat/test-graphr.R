@@ -25,7 +25,7 @@ fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
 test_that("unweighted, unsigned, undirected networks graph correctly", {
   skip_on_cran()
   # Unweighted, unsigned, undirected network
-  test_brandes <- graphr(ison_brandes)
+  test_brandes <- graphr(ison_centrality)
   # Node position
   expect_equal(round(test_brandes[["data"]][["x"]][[1]]), 3)
   expect_equal(round(test_brandes[["data"]][["y"]][[1]]), -1)
@@ -112,11 +112,11 @@ test_that("fancy node mods graph correctly", {
 
 test_that("edge colours and edge size graph correctly", {
   skip_on_cran()
-  ison_brandes2 <- ison_brandes |>
+  ison_centrality2 <- ison_centrality |>
     add_tie_attribute("tiecolour",
                       c("A", "B", "A", "B", "B", "B", "B", "B", "B", "B", "B", "B")) |>
     add_tie_attribute("weight", c(rep(1:6, 2)))
-  test_brandes2 <- graphr(ison_brandes2, edge_color = "tiecolour", edge_size = "weight")
+  test_brandes2 <- graphr(ison_centrality2, edge_color = "tiecolour", edge_size = "weight")
   expect_false(is.null(test_brandes2$layers[[1]]$mapping$edge_colour))
   expect_false(is.null(test_brandes2$layers[[1]]$mapping$edge_width))
 })
@@ -177,12 +177,12 @@ test_that("unquoted arguments plot correctly", {
 test_that("nodes use fill aesthetic instead of colour", {
   skip_on_cran()
   # Default node uses fill parameter
-  p <- graphr(ison_brandes)
+  p <- graphr(ison_centrality)
   # The default node fill is the colour the theme writes with, which is a
   # near-black on a white ground and a near-white on a dark one.
   expect_equal(p[["layers"]][[2]][["aes_params"]][["fill"]], ag_ink())
   # Mapped node_color uses fill in aes
-  p2 <- ison_brandes |>
+  p2 <- ison_centrality |>
     manynet::mutate_nodes(color = c(rep(c(1, 2), 5), 1)) |>
     graphr(node_color = color)
   expect_false(is.null(p2[["layers"]][[2]][["mapping"]][["fill"]]))
@@ -191,7 +191,7 @@ test_that("nodes use fill aesthetic instead of colour", {
 test_that("node_color with multiple values uses fill scale", {
   skip_on_cran()
   # More than 2 colors triggers scale_fill_manual with qualitative palette
-  p <- ison_brandes |>
+  p <- ison_centrality |>
     manynet::mutate_nodes(grp = c(rep(c("a", "b", "c"), 3), "a", "b")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
@@ -347,7 +347,7 @@ test_that("signs are given a legend wherever the colours no longer carry them", 
 
 test_that("color legend uses fillable shape when node_shape is also mapped", {
   skip_on_cran()
-  p <- ison_brandes |>
+  p <- ison_centrality |>
     manynet::mutate_nodes(grp = c(rep(c("a", "b", "c"), 3), "a", "b"),
                   cat = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp, node_shape = cat)
@@ -358,7 +358,7 @@ test_that("color legend uses fillable shape when node_shape is also mapped", {
 
 test_that("node_color with 2 values uses highlight palette", {
   skip_on_cran()
-  p <- ison_brandes |>
+  p <- ison_centrality |>
     manynet::mutate_nodes(grp = c(rep(c("x", "y"), 5), "x")) |>
     graphr(node_color = grp)
   expect_s3_class(p, c("ggraph", "gg", "ggplot"))
