@@ -11,13 +11,14 @@
 #'   `plot.diff_model()` draws one line for each value of the attribute
 #'   that the diffusion changes,
 #'   and bars for the nodes that become infectious at each step.
-#'   A diffusion in the values S, E, I, and R names them
-#'   "Susceptible", "Exposed", "Infected", and "Recovered".
+#'   A diffusion in the values S, E, I, R, and D names them
+#'   "Susceptible", "Exposed", "Infected", "Recovered", and "Dead".
 #'   A diffusion in values of its own,
 #'   as from `manynet::play_diffusion(compartments = )`,
 #'   names the lines by these values.
 #'   The roles in `attr(x, "compartments")` give the colours:
-#'   blue for S, yellow for E, red for I, and green for R.
+#'   blue for S, yellow for E, red for I, green for R,
+#'   and black for D.
 #'   The bars count the new nodes in the first value of I.
 #' @importFrom dplyr left_join
 #' @importFrom ggplot2 geom_histogram
@@ -124,11 +125,15 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
 }
 
 # Gives each role its usual colour: S blue, E yellow, I red, R green, and D
-# grey. The first value of a role takes the colour of the role; the other
+# black. The first value of a role takes the colour of the role; the other
 # values, and values without a role, take other colours of the palette.
 .diffusion_colors <- function(values, comps){
   role_cols <- c(S = "#4575b4", E = "#E6AB02", I = "#d73027", R = "#66A61E")
   base <- stats::setNames(match_color(role_cols), names(role_cols))
+  # D is black in every theme, and is not matched to the palette. The darkest
+  # colour of a palette can be near the colour of I, as plum is near maroon in
+  # "iheid"; black is darker than all the colours of S, E, I, and R.
+  base <- c(base, D = "#000000")
   pal <- ag_qualitative()
   rest <- setdiff(pal, base)
   out <- stats::setNames(rep(NA_character_, length(values)), values)

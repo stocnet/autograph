@@ -24,6 +24,40 @@ test_that("a diffusion in S, I, and R is named and coloured by its roles", {
   expect_equal(line_labels(p), c("Susceptible", "Infected"))
 })
 
+test_that("a diffusion with fatality draws the dead in black", {
+  skip_on_cran()
+  testthat::skip_if_not("fatality" %in% names(formals(manynet::play_diffusion)),
+                        "manynet::play_diffusion() has no `fatality`")
+  set.seed(1)
+  sird <- manynet::play_diffusion(manynet::ison_networkers, seeds = 1:3,
+                                  recovery = 0.1, fatality = 0.1, steps = 30)
+  skip_if_not(max(manynet::as_diffusion(sird)$D) > 0,
+              "manynet::as_diffusion() does not count the dead in D")
+  expect_no_warning(p <- plot(sird))
+  expect_buildable(p)
+  expect_equal(line_labels(p),
+               c("Susceptible", "Infected", "Recovered", "Dead"))
+  cols <- ggplot2::ggplot_build(p)$plot$scales$get_scales("colour")$palette.cache
+  expect_equal(unname(cols[4]), "#000000")
+})
+
+test_that("a diffusion with a value of its own for D names it", {
+  skip_on_cran()
+  skip_if_no_compartments()
+  testthat::skip_if_not("fatality" %in% names(formals(manynet::play_diffusion)),
+                        "manynet::play_diffusion() has no `fatality`")
+  set.seed(2)
+  y <- manynet::play_diffusion(manynet::ison_networkers, seeds = 1:3,
+                               recovery = 0.1, fatality = 0.1, steps = 30,
+                               compartments = c(S = "healthy", I = "sick",
+                                                R = "immune", D = "deceased"))
+  skip_if_not(max(manynet::as_diffusion(y)$deceased) > 0,
+              "manynet::as_diffusion() does not count the dead in D")
+  expect_no_warning(p <- plot(y))
+  expect_buildable(p)
+  expect_true("deceased" %in% line_labels(p))
+})
+
 test_that("a diffusion in values of its own is named by its values", {
   skip_on_cran()
   skip_if_no_compartments()

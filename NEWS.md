@@ -24,8 +24,9 @@
 
 - Improved `plot.diff_model()` for custom diffusions
   - Draws one line for each value, named by the value, e.g. "associate"
-  - Colours each value by its role: S blue, E yellow, I red, R green
+  - Colours each value by its role: S blue, E yellow, I red, R green, D black
   - Draws bars for the new nodes in the first value of I
+  - Added a line for the nodes that die from `fatality=`, named "Dead"
   - Fixed the warnings about the uninitialised columns `E` and `R`
 - Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
   - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`

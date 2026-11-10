@@ -34,13 +34,14 @@ Plotting diffusion models
 \code{plot.diff_model()} draws one line for each value of the attribute
 that the diffusion changes,
 and bars for the nodes that become infectious at each step.
-A diffusion in the values S, E, I, and R names them
-"Susceptible", "Exposed", "Infected", and "Recovered".
+A diffusion in the values S, E, I, R, and D names them
+"Susceptible", "Exposed", "Infected", "Recovered", and "Dead".
 A diffusion in values of its own,
 as from \code{manynet::play_diffusion(compartments = )},
 names the lines by these values.
 The roles in \code{attr(x, "compartments")} give the colours:
-blue for S, yellow for E, red for I, and green for R.
+blue for S, yellow for E, red for I, green for R,
+and black for D.
 The bars count the new nodes in the first value of I.
 }
 \examples{
