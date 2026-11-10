@@ -53,6 +53,12 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
+  mobilityModel = function() {
+    set.seed(123)
+    places <- manynet::add_node_attribute(manynet::create_lattice(25), "group",
+                                          rep(c(0, 1, NA, 1, 0), 5))
+    manynet::as_mobility(manynet::play_mobility(places, "group"))
+  },
   learn_model = function() {
     set.seed(123)
     manynet::play_learning(manynet::create_ring(6), beliefs = stats::runif(6))

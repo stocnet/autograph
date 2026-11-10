@@ -18,6 +18,11 @@ interval (spell) networks that record tie \code{begin}/\code{end} lifespans,
 such as \code{manynet::irps_wwi}, into one snapshot per change point.
 It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.
+A network of places with a record of moves, as from
+\code{manynet::play_mobility()}, is drawn at the start, the middle,
+and the last move, coloured by the attribute of the occupants,
+with the empty places blank.
+For such a network, \code{waves} select the steps, where 1 is the start.
 A single network that encodes no time is drawn with \code{graphr()}.}
 
 \item{waves}{Numeric, the number of plots to be displayed side-by-side.

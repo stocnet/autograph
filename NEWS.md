@@ -15,6 +15,8 @@
   - Passing a single static network is now drawn with `graphr()`
   - Fixed panels with a single signed tie failing to draw, as in `irps_nuclear`
 - Fixed `graphs()` showing one legend per wave when the waves hold different values
+- Improved `graphs()` drawing a network of places from `play_mobility()`
+  - Colours the places by the attribute of the occupants, and leaves empty places blank
 - Improved `grapht()` arguments
   - Added the same label directions and gaps to `label_repel`
   - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
@@ -30,6 +32,8 @@
   - Fixed the warnings about the uninitialised columns `E` and `R`
 - Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
   - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
+- Added `plot.mobilityModel()` to draw the dissatisfied occupants at each move
+- Improved `plot()` for a 'stocnet' from `play_mobility()` to draw its moves
 
 ## Layouts
 

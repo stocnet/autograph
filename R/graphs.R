@@ -33,6 +33,11 @@
 #'   such as `manynet::irps_wwi`, into one snapshot per change point.
 #'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
+#'   A network of places with a record of moves, as from
+#'   `manynet::play_mobility()`, is drawn at the start, the middle,
+#'   and the last move, coloured by the attribute of the occupants,
+#'   with the empty places blank.
+#'   For such a network, `waves` select the steps, where 1 is the start.
 #'   A single network that encodes no time is drawn with `graphr()`.
 #' @param waves Numeric, the number of plots to be displayed side-by-side.
 #'   If missing, the number of plots will be reduced to the first and last
@@ -52,6 +57,10 @@
 graphs <- function(netlist, waves,
                    based_on = c("first", "last", "both"), ...) {
   based_on <- .check_choice(based_on, c("first", "last", "both"), "based_on")
+  # A network of places with a record of moves is drawn at some steps, coloured
+  # by the attribute of the occupants. See `.graphs_mobility()`.
+  if (!manynet::is_list(netlist) && .is_mobility(netlist))
+    return(.graphs_mobility(netlist, waves, based_on, ...))
   # A single manynet network that encodes time is split into a list of
   # snapshots, mirroring grapht()'s handling (see .split_time_network()):
   # longitudinal/changing networks (and diffusion results) into waves,

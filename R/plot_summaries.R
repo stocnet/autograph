@@ -153,7 +153,9 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
 #' @noRd
 #' @export
 plot.mnet <- function(x, ...){
-  if(manynet::is_changing(x)){
+  if(.is_mobility(x)){
+    plot(.as_mobility(x), ...)
+  } else if(manynet::is_changing(x)){
     plot(manynet::as_diffusion(x, attribute = .diffusion_attribute(x)), ...)
   } else {
     graphr(x)
@@ -251,6 +253,119 @@ plot.learn_model <- function(x, ...){
     ggplot2::geom_line(show.legend = FALSE) + ag_theme_minimal() +
     ggplot2::scale_color_manual(values = ag_qualitative(ncol(x))) +
     ggplot2::ylab("Belief")
+}
+
+#' Plotting mobility models
+#' @name plot.mobility
+#' @param x A 'mobilityModel', as from `manynet::as_mobility()`.
+#' @param ... Other arguments to be passed.
+#' @details
+#'   `plot.mobilityModel()` draws the number of dissatisfied occupants
+#'   after each move.
+#'   `plot()` of a network of places with a record of moves,
+#'   as from `manynet::play_mobility()`, draws the same line,
+#'   and adds the number of dissatisfied occupants at the start, step 0.
+#'   A 'mobilityModel' alone does not hold the start,
+#'   so its line begins at the first move.
+#'
+#'   To draw the places at the start, the middle, and the last move,
+#'   use `graphs()` on the network of places.
+#' @returns `plot.mobilityModel()` returns a line plot of the number of
+#'   dissatisfied occupants at each step.
+#' @examples
+#' places <- manynet::add_node_attribute(manynet::create_lattice(25), "group",
+#'   rep(c(0, 1, NA, 1, 0), 5))
+#' moved <- manynet::play_mobility(places, "group")
+#' plot(moved)
+#' plot(manynet::as_mobility(moved))
+#' graphs(moved)
+#' @export
+plot.mobilityModel <- function(x, ...){
+  time <- dissatisfied <- NULL # initialize variables to avoid CMD check notes
+  data <- data.frame(time = as.numeric(x$time),
+                     dissatisfied = as.numeric(x$dissatisfied))
+  start <- attr(x, "start")
+  if(!is.null(start))
+    data <- rbind(data.frame(time = 0, dissatisfied = as.numeric(start)), data)
+  if(!nrow(data) || all(is.na(data$dissatisfied))){
+    if(!nrow(x)) manynet::snet_warn(
+      "No occupant moved, so there is nothing to plot.",
+      "Check that some places are empty and that some occupants are dissatisfied.") else
+        manynet::snet_warn(
+          "The moves have no record of {.var satisfied}, so there is nothing to plot.",
+          "Use a network from {.fn manynet::play_mobility}.")
+    return(invisible(NULL))
+  }
+  ggplot2::ggplot(data, ggplot2::aes(x = time, y = dissatisfied)) +
+    ggplot2::geom_line(linewidth = 1.25, colour = ag_qualitative(1)) +
+    ggplot2::geom_point(colour = ag_qualitative(1)) +
+    ag_theme_minimal() +
+    ggplot2::expand_limits(y = 0) +
+    ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n = 6)) +
+    ggplot2::ylab("Dissatisfied occupants") + ggplot2::xlab("Steps")
+}
+
+# A network of places with a record of moves, as from manynet::play_mobility():
+# it has an `occupant` node attribute, and changes to it.
+.is_mobility <- function(x){
+  if(!manynet::is_manynet(x) || inherits(x, "mobilityModel") ||
+     !"occupant" %in% manynet::net_node_attributes(x)) return(FALSE)
+  changes <- manynet::as_changelist(x)
+  !is.null(changes) && "var" %in% names(changes) &&
+    "occupant" %in% changes$var
+}
+
+# The attribute of the occupants: kept in `info$mobility` of a stocnet, else
+# the first attribute that moves with the occupants.
+.mobility_attribute <- function(x){
+  if(inherits(x, "stocnet") && !is.null(x$info$mobility$attribute))
+    return(x$info$mobility$attribute)
+  vars <- unique(as.character(manynet::as_changelist(x)$var))
+  vars <- setdiff(vars, c("occupant", "satisfied", "active"))
+  if(length(vars)) vars[1] else "occupant"
+}
+
+# The 'mobilityModel' of a network of places, with the number of dissatisfied
+# occupants at the start, which the model alone does not hold.
+.as_mobility <- function(x){
+  out <- manynet::as_mobility(x, .mobility_attribute(x))
+  satisfied <- manynet::as_stocnet(x)$nodes$satisfied
+  if(!is.null(satisfied))
+    attr(out, "start") <- sum(!as.logical(satisfied), na.rm = TRUE)
+  out
+}
+
+# The network of places at some steps, for `graphs()`. `waves` select the steps
+# as they select networks in a list: the first is the start, step 0.
+.graphs_mobility <- function(x, waves, based_on, ...){
+  changes <- manynet::as_changelist(x)
+  last <- max(c(0, changes$time[changes$var == "occupant"]))
+  steps <- 0:last
+  if(missing(waves)) at <- unique(c(0, round(last/2), last)) else {
+    if(!is.numeric(waves) || any(is.na(waves)))
+      manynet::snet_abort(
+        "{.arg waves} should be the number of steps to plot, or a vector of",
+        "which steps to plot, but a value of class {.cls {class(waves)}}",
+        "was given.")
+    if(any(waves < 1) || any(waves > length(steps)))
+      manynet::snet_abort(
+        "{.arg waves} should be between 1 (the start) and {length(steps)}",
+        "(the last move), but {.val {waves}} was given.")
+    at <- if(length(waves) == 1) steps[seq_len(waves)] else steps[waves]
+  }
+  nets <- lapply(at, function(t) manynet::to_time(x, t))
+  names(nets) <- paste("Step", at)
+  dots <- list(...)
+  if(!any(c("node_color", "node_colour") %in% names(dots)))
+    dots$node_color <- .mobility_attribute(x)
+  p <- do.call(graphs, c(list(nets, waves = seq_along(nets),
+                              based_on = based_on), dots))
+  # The empty places are drawn blank
+  for(i in seq_along(nets)){
+    fill <- p[[i]]$scales$get_scales("fill")
+    if(!is.null(fill)) fill$na.value <- "white"
+  }
+  p
 }
 
 #' #' Plot agreements network

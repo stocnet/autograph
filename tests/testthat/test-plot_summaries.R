@@ -132,3 +132,50 @@ test_that("graphs() shows one legend for a diffusion over its waves", {
                                      character(1)))
   expect_length(guides, 1)
 })
+
+# Mobility ####
+
+mobility_fixture <- function() {
+  set.seed(1)
+  group <- stats::rbinom(25, 1, 0.5)
+  group[sample(25, 5)] <- NA
+  places <- manynet::add_node_attribute(manynet::create_lattice(25),
+                                        "group", group)
+  manynet::play_mobility(places, "group", 0.2)
+}
+
+test_that("plot() of a mobility draws one point for each move and the start", {
+  skip_if_not(exists("as_mobility", asNamespace("manynet")),
+              "manynet has no as_mobility()")
+  moved <- mobility_fixture()
+  model <- manynet::as_mobility(moved)
+  expect_no_warning(p <- plot(moved))
+  expect_s3_class(p, "ggplot")
+  points <- ggplot2::ggplot_build(p)$data[[2]]
+  expect_equal(nrow(points), nrow(model) + 1)
+  expect_equal(points$y[1], sum(!moved$nodes$satisfied, na.rm = TRUE))
+  expect_equal(points$y[-1], model$dissatisfied)
+  # The model alone does not hold the start
+  expect_equal(nrow(ggplot2::ggplot_build(plot(model))$data[[2]]), nrow(model))
+})
+
+test_that("graphs() of a mobility draws the start, middle, and last move", {
+  skip_if_not(exists("as_mobility", asNamespace("manynet")),
+              "manynet has no as_mobility()")
+  moved <- mobility_fixture()
+  last <- max(manynet::as_mobility(moved)$time)
+  p <- graphs(moved)
+  titles <- vapply(seq_len(length(p)), function(i) p[[i]]$labels$title,
+                   character(1))
+  expect_equal(titles, paste("Step", c(0, round(last/2), last)))
+  # At the start, the places are coloured as the network that is returned,
+  # with the empty places blank
+  fill <- ggplot2::ggplot_build(p[[1]])$data[[2]]$fill
+  group <- moved$nodes$group
+  expect_true(all(fill[is.na(group)] == "white"))
+  by_group <- tapply(fill[!is.na(group)], group[!is.na(group)], unique)
+  expect_true(all(lengths(by_group) == 1))
+  expect_false(any(duplicated(unlist(by_group))))
+  expect_length(graphs(moved, waves = c(1, 2)), 2)
+  expect_error(graphs(moved, waves = 99), "between 1")
+})
