@@ -7,65 +7,149 @@
 #' @param ... Other arguments to be passed.
 #' @param all_steps Whether all steps should be plotted or just those where
 #'   there is change in the distributions.
+#' @details
+#'   `plot.diff_model()` draws one line for each value of the attribute
+#'   that the diffusion changes,
+#'   and bars for the nodes that become infectious at each step.
+#'   A diffusion in the values S, E, I, and R names them
+#'   "Susceptible", "Exposed", "Infected", and "Recovered".
+#'   A diffusion in values of its own,
+#'   as from `manynet::play_diffusion(compartments = )`,
+#'   names the lines by these values.
+#'   The roles in `attr(x, "compartments")` give the colours:
+#'   blue for S, yellow for E, red for I, and green for R.
+#'   The bars count the new nodes in the first value of I.
 #' @importFrom dplyr left_join
 #' @importFrom ggplot2 geom_histogram
 #' @returns `plot.diff_model()` returns a bar chart of the number of new 
 #'   infected nodes at each time point, as well as an overlay line plot of the
-#'   total of infected
+#'   total in each value
 #' @examples
 #' plot(res_manynet_diff)
 #' @export
 plot.diff_model <- function(x, ..., all_steps = TRUE){
-  if(nrow(x)==1) manynet::snet_warn(
-    "No diffusion was observed, so there is nothing to plot.",
-    "The diffusion ran for a single step, which happens when no node was",
-    "seeded or when the seeds had no one to infect.",
-    "Check the {.arg seeds} given to {.fn manynet::play_diffusion},",
-    "and that the network has ties.") else {
-    data <- x
-    if(!all_steps) data <- data |> 
-        dplyr::filter(!(data$I==data$I[length(data$I)] *
-                          duplicated(data$I==data$I[length(data$I)])))
-    p <- ggplot2::ggplot(data) + 
-      ggplot2::geom_line(ggplot2::aes(x = time, y = S/n, color = "A"), 
-                         linewidth = 1.25) +
-      ggplot2::geom_line(ggplot2::aes(x = time, y = I/n, color = "C"), 
-                         linewidth = 1.25) +
-      ggplot2::geom_col(ggplot2::aes(x = time, y = I_new/n), 
-                        alpha = 0.4) +
-      ag_theme_minimal() + 
-      # using coord_cartesian to avoid printing warnings
-      ggplot2::coord_cartesian(ylim = c(0,1)) + 
-      ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
-      ggplot2::ylab("Proportion") + ggplot2::xlab("Steps")
-    labs <- c("Susceptible", "Infected")
-    if(any(data$E>0)){
-      p <- p +
-        ggplot2::geom_line(ggplot2::aes(x = time, y = E/n, color = "B"), 
-                           linewidth = 1.25)
-      labs <- c("Susceptible", "Exposed", "Infected")
-    }
-    if(any(data$R>0)){
-      p <- p +
-        ggplot2::geom_line(ggplot2::aes(x = time, y = R/n, color = "D"),
-                           linewidth = 1.25)
-      labs <- c(labs, "Recovered")
-    }
-    
-    colval <- structure(match_color(c("#4575b4","#E6AB02","#d73027","#66A61E")), 
-                         names = c("A","B","C","D"))
-    p + ggplot2::scale_color_manual("Legend", 
-                                    labels = labs,
-                                    values = colval,
-                                    guide = "legend")
+  value <- prop <- new <- NULL # initialize variables to avoid CMD check notes
+  attribute <- attr(x, "attribute")
+  if(is.null(attribute)) attribute <- "diffusion"
+  if(nrow(x) <= 1){
+    if(identical(attribute, "diffusion")) manynet::snet_warn(
+      "No diffusion was observed, so there is nothing to plot.",
+      "The diffusion ran for a single step, which happens when no node was",
+      "seeded or when the seeds had no one to infect.",
+      "Check the {.arg seeds} given to {.fn manynet::play_diffusion},",
+      "and that the network has ties.") else manynet::snet_warn(
+        "No change in {.val {attribute}} was observed, so there is nothing to plot.",
+        "The diffusion ran for a single step, which happens when no node was",
+        "infectious or when the infectious nodes had no one to infect.",
+        "Check the start values of {.val {attribute}}",
+        "and the {.arg compartments} given to {.fn manynet::play_diffusion},",
+        "and that the network has ties.")
+    return(invisible(NULL))
   }
+  data <- as.data.frame(x)
+  tcol <- if("time" %in% names(data)) "time" else "t"
+  n <- if("n" %in% names(data)) data$n else
+    rowSums(data[, .diffusion_values(data), drop = FALSE])
+  values <- .diffusion_values(data)
+  comps <- .diffusion_roles(attr(x, "compartments"), values)
+  infectious <- if(length(comps$I)) as.character(comps$I[1]) else NULL
+  if(!is.null(infectious) && !infectious %in% values) infectious <- NULL
+  seir <- all(values %in% c("S", "E", "I", "R", "D")) &&
+    all(vapply(names(comps), function(r) identical(as.character(comps[[r]]), r),
+               logical(1)))
+  if(!all_steps && !is.null(infectious)){
+    last <- data[[infectious]][nrow(data)]
+    data <- data[!(data[[infectious]] == last *
+                     duplicated(data[[infectious]] == last)), , drop = FALSE]
+    n <- if("n" %in% names(data)) data$n else n[seq_len(nrow(data))]
+  }
+  # A record in S, E, I, and R always has the four columns, but draws E and R
+  # only where some node is in them, as it always has.
+  drawn <- if(seir) values[values %in% c("S", "I") |
+                             vapply(values, function(v) any(data[[v]] > 0),
+                                    logical(1))] else values
+  long <- do.call(rbind, lapply(drawn, function(v)
+    data.frame(time = data[[tcol]], value = v, prop = data[[v]]/n)))
+  long$value <- factor(long$value, levels = drawn)
+  labs <- if(seir) c(S = "Susceptible", E = "Exposed", I = "Infected",
+                     R = "Recovered", D = "Dead")[drawn] else drawn
+  # The lines of S and I are drawn under the bars, and the other lines over
+  # them, as they always have been.
+  under <- as.character(long$value) %in% unlist(comps[c("S", "I")])
+  p <- ggplot2::ggplot(long) + 
+    ggplot2::geom_line(ggplot2::aes(x = time, y = prop, color = value), 
+                       data = long[under, , drop = FALSE], linewidth = 1.25)
+  if(!is.null(infectious))
+    p <- p + ggplot2::geom_col(ggplot2::aes(x = time, y = new), 
+                               data = data.frame(time = data[[tcol]], 
+                                                 new = data[[paste0(infectious, "_new")]]/n),
+                               alpha = 0.4)
+  if(any(!under))
+    p <- p + ggplot2::geom_line(ggplot2::aes(x = time, y = prop, color = value), 
+                                data = long[!under, , drop = FALSE], 
+                                linewidth = 1.25)
+  p + ag_theme_minimal() + 
+    # using coord_cartesian to avoid printing warnings
+    ggplot2::coord_cartesian(ylim = c(0,1)) + 
+    ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n=6)) +
+    ggplot2::ylab("Proportion") + ggplot2::xlab("Steps") +
+    ggplot2::scale_color_manual(if(seir) "Legend" else attribute, 
+                                labels = unname(labs),
+                                values = .diffusion_colors(drawn, comps),
+                                breaks = drawn,
+                                guide = "legend")
+}
+
+# The value columns of a diffusion report: the columns that are not the time,
+# the number of nodes, the number exposed, or the new nodes in each value.
+.diffusion_values <- function(data){
+  nm <- names(data)
+  nm[!nm %in% c("time", "t", "n", "s") & !grepl("_new$", nm)]
+}
+
+# The roles of the values as a named list of character vectors. A report from
+# before the compartments were kept is read as S, E, I, and R where its values
+# are these, and as FALSE and TRUE where its values are logical.
+.diffusion_roles <- function(comps, values){
+  comps <- comps[!vapply(comps, is.null, logical(1))]
+  if(is.null(names(comps)) || !length(comps)) comps <- NULL
+  if(is.null(comps)){
+    if(all(values %in% c("S", "E", "I", "R", "D")))
+      comps <- as.list(stats::setNames(values, values)) else
+        if(setequal(values, c("FALSE", "TRUE")) || identical(values, "FALSE") ||
+           identical(values, "TRUE"))
+          comps <- list(S = "FALSE", I = "TRUE") else comps <- list()
+  }
+  lapply(comps, as.character)
+}
+
+# Gives each role its usual colour: S blue, E yellow, I red, R green, and D
+# grey. The first value of a role takes the colour of the role; the other
+# values, and values without a role, take other colours of the palette.
+.diffusion_colors <- function(values, comps){
+  role_cols <- c(S = "#4575b4", E = "#E6AB02", I = "#d73027", R = "#66A61E")
+  base <- stats::setNames(match_color(role_cols), names(role_cols))
+  pal <- ag_qualitative()
+  rest <- setdiff(pal, base)
+  out <- stats::setNames(rep(NA_character_, length(values)), values)
+  for(r in names(comps)){
+    first <- comps[[r]][1]
+    if(first %in% values && r %in% names(base)) out[first] <- base[[r]]
+  }
+  free <- names(out)[is.na(out)]
+  if(length(free)){
+    extra <- if(length(free) <= length(rest)) rest[seq_along(free)] else
+      ag_qualitative(length(free) + length(base))[-seq_along(base)][seq_along(free)]
+    out[free] <- extra
+  }
+  out
 }
 
 #' @noRd
 #' @export
 plot.mnet <- function(x, ...){
   if(manynet::is_changing(x)){
-    plot(manynet::as_diffusion(x))
+    plot(manynet::as_diffusion(x, attribute = .diffusion_attribute(x)), ...)
   } else {
     graphr(x)
   }
@@ -74,6 +158,40 @@ plot.mnet <- function(x, ...){
 #' @noRd
 #' @export
 plot.stocnet <- plot.mnet
+
+# The attribute whose changes record a diffusion: "diffusion" where it changes,
+# else the changing attribute whose values have roles in `info$compartments`,
+# else a logical attribute that changes, else the first attribute that changes.
+.diffusion_attribute <- function(x){
+  changes <- manynet::as_changelist(x)
+  vars <- if(!is.null(changes) && "var" %in% names(changes))
+    unique(as.character(changes$var)) else character(0)
+  # "active" records when nodes are present, not a diffusion
+  vars <- setdiff(vars, "active")
+  if(!length(vars) || "diffusion" %in% vars) return("diffusion")
+  comps <- .net_compartments(x)
+  if(!is.null(comps)){
+    roled <- as.character(unlist(comps, use.names = FALSE))
+    for(v in vars){
+      vals <- as.character(unlist(changes$value[changes$var == v]))
+      if(length(vals) && all(vals %in% roled)) return(v)
+    }
+  }
+  # a logical attribute needs no compartments: FALSE is S and TRUE is I
+  for(v in vars){
+    vals <- unlist(changes$value[changes$var == v])
+    if(is.logical(vals)) return(v)
+  }
+  vars[1]
+}
+
+# The compartments that a network keeps: in `info` for a stocnet, and as a
+# graph attribute once it is coerced to an igraph or tidygraph.
+.net_compartments <- function(x){
+  if(inherits(x, "stocnet")) return(x$info$compartments)
+  if(inherits(x, "igraph")) return(igraph::graph_attr(x, "compartments"))
+  NULL
+}
 
 #' @rdname plot.diffusion
 #' @examples

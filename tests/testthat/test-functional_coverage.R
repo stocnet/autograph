@@ -271,9 +271,12 @@ test_that("the diffusion plot adds a line for each compartment it holds", {
     manynet::play_diffusion(manynet::create_ring(10), seeds = 1))
   expect_false(any(si$E > 0))
   expect_false(any(si$R > 0))
+  # The lines are counted by their colours, since one layer can draw several.
   n_lines <- function(p) {
-    sum(vapply(p[["layers"]],
-               function(l) inherits(l[["geom"]], "GeomLine"), logical(1)))
+    built <- ggplot2::ggplot_build(p)
+    is_line <- vapply(p[["layers"]],
+                      function(l) inherits(l[["geom"]], "GeomLine"), logical(1))
+    length(unique(unlist(lapply(built$data[is_line], `[[`, "colour"))))
   }
   expect_equal(n_lines(si_p <- plot(si)), 2L)
   expect_buildable(si_p)

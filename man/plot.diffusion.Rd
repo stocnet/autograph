@@ -25,10 +25,23 @@ there is change in the distributions.}
 \value{
 \code{plot.diff_model()} returns a bar chart of the number of new
 infected nodes at each time point, as well as an overlay line plot of the
-total of infected
+total in each value
 }
 \description{
 Plotting diffusion models
+}
+\details{
+\code{plot.diff_model()} draws one line for each value of the attribute
+that the diffusion changes,
+and bars for the nodes that become infectious at each step.
+A diffusion in the values S, E, I, and R names them
+"Susceptible", "Exposed", "Infected", and "Recovered".
+A diffusion in values of its own,
+as from \code{manynet::play_diffusion(compartments = )},
+names the lines by these values.
+The roles in \code{attr(x, "compartments")} give the colours:
+blue for S, yellow for E, red for I, and green for R.
+The bars count the new nodes in the first value of I.
 }
 \examples{
 plot(res_manynet_diff)

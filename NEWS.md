@@ -8,15 +8,27 @@
   - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
   - Renamed `snap` to `layout_snap`; `snap` is deprecated
   - Improved the signature by hiding the internal `.shared` argument
+- Improved `graphr()` illustrating custom times of adoption
 - Improved `graphs()` handling of edge cases
   - Fixed a list of stocnets sharing one layout (closing stocnet/manynet#186)
   - Improved layout sharing to need the same nodes in the same order
   - Passing a single static network is now drawn with `graphr()`
   - Fixed panels with a single signed tie failing to draw, as in `irps_nuclear`
+- Fixed `graphs()` showing one legend per wave when the waves hold different values
 - Improved `grapht()` arguments
   - Added the same label directions and gaps to `label_repel`
   - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
 - Fixed `stocnet_completion()` offering no node or tie variables for a `.stocnet`
+
+## Plotting
+
+- Improved `plot.diff_model()` for custom diffusions
+  - Draws one line for each value, named by the value, e.g. "associate"
+  - Colours each value by its role: S blue, E yellow, I red, R green
+  - Draws bars for the new nodes in the first value of I
+  - Fixed the warnings about the uninitialised columns `E` and `R`
+- Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
+  - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
 
 ## Layouts
 
