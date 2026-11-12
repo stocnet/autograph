@@ -20,7 +20,7 @@ for (nm in graphr_smoke_data) {
   })
 }
 
-fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
+fmrg <- to_giant(to_layer(fict_marvel, "relationship"))
 
 test_that("unweighted, unsigned, undirected networks graph correctly", {
   skip_on_cran()
@@ -303,7 +303,7 @@ test_that("multiplex networks are coloured by layer rather than by sign", {
   expect_true(.has_layers(ag_net(ison_monks)))
   # Signed networks without layers still show their signs, and now treat an
   # absent sign as positive, as the linetype always did.
-  signed <- ag_net(manynet::to_uniplex(fict_marvel, "relationship"))
+  signed <- ag_net(manynet::to_layer(fict_marvel, "relationship"))
   expect_equal(manynet::net_layers(signed), 1L)
   expect_false(.has_layers(signed))
   expect_setequal(levels(.infer_ecolor(signed, NULL)), c("Positive", "Negative"))
@@ -340,7 +340,7 @@ test_that("signs are given a legend wherever the colours no longer carry them", 
   expect_true("Sign" %in% guide_titles(graphr(fict_marvel)))
   # A signed network without layers is coloured by sign, so a second legend
   # saying the same thing is not drawn.
-  signed <- manynet::to_giant(manynet::to_uniplex(fict_marvel, "relationship"))
+  signed <- manynet::to_giant(manynet::to_layer(fict_marvel, "relationship"))
   expect_false("Sign" %in% guide_titles(signed |> graphr()))
   expect_buildable(graphr(fict_marvel))
 })
@@ -601,7 +601,7 @@ test_that("graphr() on a complex network (self-loops) emits no recycling warning
   # preserving `strength` parameter must exclude loop edges. Otherwise a full-
   # length vector recycles against the loop-free edge set, emitting ~14 "longer
   # object length is not a multiple" / "items to replace" warnings at build time.
-  expect_true(manynet::is_complex(manynet::ison_emotions))
+  expect_true(manynet::is_looped(manynet::ison_emotions))
   p <- graphr(manynet::ison_emotions)
   expect_s3_class(p, "ggplot")
   expect_no_warning(ggplot2::ggplot_build(p))
@@ -676,7 +676,7 @@ test_that("padding widens the room a layout asked for without replacing it", {
   # A scale that set nothing is given the padding on both sides.
   expect_equal(autograph:::.widen_expand(NULL, 0.12),
                ggplot2::expansion(mult = 0.12))
-  thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
+  thrones <- manynet::to_layer(manynet::fict_thrones, "parent")
   sc <- graphr(thrones)$scales$get_scales("x")
   expect_equal(sc$expand[[4]], 0)
   expect_equal(sc$expand[[3]], 0.25)

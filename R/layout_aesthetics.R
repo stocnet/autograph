@@ -211,7 +211,7 @@
 #' # Is there room between the ties that meet at a node?
 #' attr(check_angles(circled), "min")
 #' # And where the layout has rows, how long and how straight are its ties?
-#' thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
+#' thrones <- manynet::to_layer(manynet::fict_thrones, "parent")
 #' drawn <- graphr(thrones)
 #' attr(check_span(drawn), "total")
 #' attr(check_offset(drawn), "mean")

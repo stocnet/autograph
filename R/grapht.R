@@ -212,7 +212,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   node_size <- .check_node_size(g_ref, node_size)
   edge_color <- .check_edge_color(g_ref, edge_color)
   edge_size <- .check_edge_size(g_ref, edge_size)
-  if (manynet::is_complex(manynet::as_igraph(g_ref)))
+  if (manynet::is_looped(manynet::as_igraph(g_ref)))
     manynet::snet_info("Self-loops are not drawn in animations.")
 
   # Layout ####

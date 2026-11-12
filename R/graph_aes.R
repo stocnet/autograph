@@ -295,8 +295,8 @@
 }
 
 # Whether the ties are divided between layers to tell apart. This is not
-# `is_multiplex()`, which is TRUE for any network carrying a non-reserved tie
-# attribute or parallel ties, whether or not those distinguish layers. A
+# `is_multiplex()`, which is TRUE wherever the ties carry a 'layer' or 'type'
+# column, even where that column holds only one layer. A
 # single test covers both that the layers are recorded per tie -- which naming
 # them, as `layer_names()` does, need not imply -- and that there are at least
 # two of them to tell apart.

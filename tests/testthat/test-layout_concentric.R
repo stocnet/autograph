@@ -1,7 +1,7 @@
 # Layouts
 test_that("concentric and circular layouts graph correctly", {
   skip_on_cran()
-  fmrg <- to_giant(to_uniplex(fict_marvel, "relationship"))
+  fmrg <- to_giant(to_layer(fict_marvel, "relationship"))
   test_circle <- graphr(fmrg, layout = "circle")
   test_conc <- graphr(fmrg, layout = "concentric", membership = "Gender")
   expect_equal(test_circle$plot_env$layout, "circle")

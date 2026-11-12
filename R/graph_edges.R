@@ -32,7 +32,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
       p <- .map_edges(p, g, out)
     }
   }
-  if (manynet::is_complex(g)) {
+  if (manynet::is_looped(g)) {
     # Resolved here rather than inside aes(), which would evaluate it lazily
     # against whatever `p` held by the time the plot was built.
     loop_strength <- .infer_loop_strength(p)
@@ -252,8 +252,8 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 
 # Whether any two ties join the same pair of nodes in the same way, so that a
 # straight line or a single arc would draw one on top of the other. This is not
-# `is_multiplex()`, which is TRUE for a network that only carries a non-reserved
-# tie attribute (see `.has_layers()` in R/graph_aes.R), and it is not
+# `is_multiplex()`, which asks only whether the ties carry a layer column
+# (see `.has_layers()` in R/graph_aes.R), and it is not
 # `which_mutual()`, which flags the two ties of a reciprocated dyad that
 # `geom_edge_arc()` already draws apart. `which_multiple()` respects direction:
 # it flags a repeated undirected pair, and a repeated directed pair, but not a

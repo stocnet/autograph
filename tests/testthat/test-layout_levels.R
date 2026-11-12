@@ -13,7 +13,7 @@ test_that("levels is the default layout for multilevel networks", {
   expect_equal(graphr(ison_southern_women)$plot_env$layout, "layered")
   expect_equal(graphr(ison_adolescents)$plot_env$layout, "stress")
   # The one-mode layer of fict_marvel on its own is not multilevel.
-  expect_equal(graphr(to_giant(to_uniplex(fict_marvel,
+  expect_equal(graphr(to_giant(to_layer(fict_marvel,
                                           "relationship")))$plot_env$layout,
                "stress")
 })
