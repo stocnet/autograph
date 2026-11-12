@@ -525,8 +525,8 @@ plot.mobilityModel <- function(x, ...){
 #' plot_map <- function(dataset, actor = "stateID", treaty_type = NULL,
 #'                      date = "2019-12-31", theme = "light") {
 #'   # check packages
-#'   thisRequires("cshapes")
-#'   thisRequires("manydata")
+#'   manynet::snet_requires("cshapes")
+#'   manynet::snet_requires("manydata")
 #'   # Checks for correct input
 #'   weight <- .data <- NULL
 #'   # Step 1: get membership list

@@ -78,7 +78,7 @@ graph_layout <- function(g, layout, labels, node_group, snap, backbone = NULL,
     p <- suppressMessages(p + ggplot2::coord_fixed())
   }
   if (!is.null(node_group)) {
-    # thisRequires("ggforce")
+    # manynet::snet_requires("ggforce")
     # A membership matrix repeats a node's coordinates once for each group it
     # belongs to, so a node in several groups is inside several hulls and the
     # hulls overlap. One long data frame draws them all: ggforce draws one hull

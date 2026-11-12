@@ -144,8 +144,8 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                    edge_arrows = NULL,
                    keep_isolates = NULL, ...,
                    node_colour, edge_colour, label_dist) {
-  thisRequires("gganimate")
-  thisRequires("gifski")
+  manynet::snet_requires("gganimate")
+  manynet::snet_requires("gifski")
   # Check arguments ####
   labels_missing <- missing(labels)
   isolates_missing <- missing(isolates)

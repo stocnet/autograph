@@ -61,7 +61,7 @@ scale_y_mdate <- function(..., FUN = messydates::vmin) {
 # anything that is not already a Date. The scale is otherwise untouched, so
 # its breaks, labels and guides stay those of a date axis.
 .mdate_scale <- function(aesthetic, ..., FUN) {
-  thisRequires("messydates")
+  manynet::snet_requires("messydates")
   scale <- if (aesthetic == "x") ggplot2::scale_x_date(...) else
     ggplot2::scale_y_date(...)
   transformation <- if (is.null(scale$get_transformation)) scale$trans else

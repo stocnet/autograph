@@ -164,7 +164,7 @@ graphs <- function(netlist, waves,
       shared_graphr(netlist[[i]], list(x = x, y = y)) +
         ggtitle(names(netlist)[i]))
   } else {
-    thisRequires("methods")
+    manynet::snet_requires("methods")
     if (!methods::hasArg("layout") & is_ego_network(netlist)) {
       gs <- lapply(1:length(netlist), function(i)
         graphr(netlist[[i]], layout = "star", center = names(netlist)[[i]],

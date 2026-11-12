@@ -1,15 +1,4 @@
 # nocov start
-# Helper function for checking and downloading packages
-thisRequires <- function(pkgname){
-  if (!requireNamespace(pkgname, quietly = TRUE) & interactive()) {
-    if(utils::askYesNo(msg = paste("The", pkgname, 
-                                   "package is required to run this function. Would you like to install", pkgname, "from CRAN?"))) {
-      utils::install.packages(pkgname)
-    } else {
-      manynet::snet_abort(paste("Please install", pkgname, "from CRAN to run this function."))
-    }
-  }
-}
 # nocov end
 
 add_spaces <- function(CamelString) {

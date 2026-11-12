@@ -302,7 +302,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 # each mode, so both modes are labelled rather than only the denser one.
 .select_labels <- function(g, ranks, criterion, automatic = FALSE) {
   n <- as.numeric(manynet::net_nodes(g))
-  # Ranking nodes needs {netrics}, which is only suggested. thisRequires() asks
+  # Ranking nodes needs {netrics}, which is only suggested. manynet::snet_requires() asks
   # to install it when interactive but does nothing otherwise, and labelling is
   # too incidental to a plot to stop it: an automatic selection falls back to
   # the random sample, which needs nothing, while a selection the user asked
