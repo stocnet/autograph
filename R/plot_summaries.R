@@ -257,6 +257,113 @@ plot.learn_model <- function(x, ...){
     ggplot2::ylab("Belief")
 }
 
+
+#' Plotting opinion models
+#' @name plot.opinion
+#' @param x An 'opinionModel', as from `manynet::as_opinion()`.
+#' @param ... Other arguments to be passed.
+#' @param stubbornness Optionally, the stubbornness of each node,
+#'   as one number or one number for each node, from 0 to 1.
+#'   The nodes with a stubbornness above 0 are drawn with a thicker line,
+#'   and a square at the last step.
+#'   By default `NULL`, which marks no node.
+#' @details
+#'   `plot.opinionModel()` draws one line for each node,
+#'   from its first opinion at step 0 to its opinion at the last step.
+#'   The colour of each line is the first opinion of its node,
+#'   on the sequential palette of the theme,
+#'   so that the colours meet where the opinions converge.
+#'   Where all the nodes end at one opinion, a dashed line marks it.
+#'
+#'   `plot()` of a network with a record of opinions,
+#'   as from `manynet::play_opinion()`,
+#'   draws the same plot.
+#'   It marks the stubborn nodes where the network has a node attribute
+#'   named "stubbornness",
+#'   as when `manynet::play_opinion(stubbornness = "stubbornness")` is used.
+#' @returns `plot.opinionModel()` returns a line plot of the opinion of each
+#'   node at each step.
+#' @examples
+#' set.seed(1)
+#' net <- manynet::add_node_attribute(manynet::ison_networkers, "stubbornness",
+#'   c(1, 0.5, rep(0, 30)))
+#' opined <- manynet::play_opinion(net, opinions = stats::runif(32),
+#'   stubbornness = "stubbornness")
+#' plot(opined)
+#' plot(manynet::as_opinion(opined))
+#' @export
+plot.opinionModel <- function(x, ..., stubbornness = NULL){
+  step <- opinion <- start <- node <- stubborn <- limit <- NULL # avoid CMD check notes
+  y <- as.matrix(as.data.frame(x))
+  n <- ncol(y)
+  if(!nrow(y) || !n){
+    manynet::snet_warn("The opinion model is empty, so there is nothing to plot.")
+    return(invisible(NULL))
+  }
+  if(is.null(stubbornness)) stubbornness <- 0
+  if(!is.numeric(stubbornness) || !length(stubbornness) %in% c(1, n) ||
+     anyNA(stubbornness))
+    manynet::snet_abort(
+      "{.arg stubbornness} must be one number or {n} numbers, one for each node,",
+      "but a value of length {length(stubbornness)} was given.")
+  stubbornness <- rep_len(stubbornness, n)
+  nodes <- colnames(y)
+  if(is.null(nodes)) nodes <- as.character(seq_len(n))
+  long <- data.frame(step = rep(seq_len(nrow(y)) - 1, times = n),
+                     node = factor(rep(nodes, each = nrow(y)), levels = nodes),
+                     opinion = as.vector(y),
+                     start = rep(y[1, ], each = nrow(y)),
+                     stubborn = rep(stubbornness > 0, each = nrow(y)))
+  p <- ggplot2::ggplot(long, ggplot2::aes(x = step, y = opinion, group = node,
+                                          colour = start)) +
+    ggplot2::geom_line(data = long[!long$stubborn, , drop = FALSE],
+                       linewidth = 0.6, alpha = 0.8)
+  # The last opinions, where all the nodes hold one opinion, are the limit.
+  last <- y[nrow(y), ]
+  spread <- diff(range(y, na.rm = TRUE))
+  if(nrow(y) > 1 && all(is.finite(last)) &&
+     diff(range(last)) <= 1e-3 * max(spread, 1e-8))
+    p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept = limit,
+                                              linetype = "Consensus"),
+                                 data = data.frame(limit = mean(last)),
+                                 colour = ag_ink(), inherit.aes = FALSE) +
+      ggplot2::scale_linetype_manual(NULL, values = c("Consensus" = "dashed"))
+  if(any(stubbornness > 0)){
+    held <- long[long$stubborn, , drop = FALSE]
+    ends <- held[held$step == max(held$step), , drop = FALSE]
+    # An outline in ink sets the stubborn nodes apart from the others,
+    # whatever their colour on the gradient.
+    p <- p + ggplot2::geom_line(data = held, linewidth = 2.4, colour = ag_ink()) +
+      ggplot2::geom_line(data = held, linewidth = 1.2) +
+      ggplot2::geom_point(ggplot2::aes(shape = "Stubborn"), data = ends,
+                          size = 3, colour = ag_ink()) +
+      ggplot2::scale_shape_manual(NULL, values = c("Stubborn" = 15))
+  }
+  p + ggplot2::scale_colour_gradientn("First opinion", colours = ag_sequential(9)) +
+    ag_theme_minimal() +
+    ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n = 6)) +
+    ggplot2::ylab("Opinion") + ggplot2::xlab("Steps")
+}
+
+# A network with a record of opinions, as from manynet::play_opinion(): its
+# changes are to a numeric node attribute named "opinions".
+.is_opinion <- function(x){
+  if(!manynet::is_manynet(x) ||
+     !"opinions" %in% manynet::net_node_attributes(x)) return(FALSE)
+  changes <- manynet::as_changelist(x)
+  !is.null(changes) && "var" %in% names(changes) &&
+    "opinions" %in% changes$var &&
+    is.numeric(manynet::node_attribute(x, "opinions"))
+}
+
+.plot_opinion_network <- function(x, ...){
+  dots <- list(...)
+  if(is.null(dots$stubbornness) &&
+     "stubbornness" %in% manynet::net_node_attributes(x))
+    dots$stubbornness <- as.numeric(manynet::node_attribute(x, "stubbornness"))
+  do.call(plot.opinionModel, c(list(manynet::as_opinion(x, "opinions")), dots))
+}
+
 #' Plotting mobility models
 #' @name plot.mobility
 #' @param x A 'mobilityModel', as from `manynet::as_mobility()`.

@@ -53,6 +53,12 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
+  opinionModel = function() {
+    if (!exists("play_opinion", asNamespace("manynet"))) return(NULL)
+    set.seed(123)
+    manynet::as_opinion(manynet::play_opinion(manynet::create_ring(6),
+                                              opinions = stats::runif(6)))
+  },
   mobilityModel = function() {
     set.seed(123)
     places <- manynet::add_node_attribute(manynet::create_lattice(25), "group",

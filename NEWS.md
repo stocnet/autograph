@@ -33,6 +33,10 @@
   - Fixed the warnings about the uninitialised columns `E` and `R`
 - Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
   - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
+- Added `plot.opinionModel()` to draw the opinion of each node at each step
+  - Colours each node by its first opinion, and dashes a consensus
+  - Marks stubborn nodes, e.g. from a node attribute "stubbornness"
+- Improved `plot()` for a 'stocnet' from `play_opinion()` to draw its opinions
 - Added `plot.mobilityModel()` to draw the dissatisfied occupants at each move
 - Improved `plot()` for a 'stocnet' from `play_mobility()` to draw its moves
   - Draws the occupant of each place at each step as a grid, with the moves outlined
