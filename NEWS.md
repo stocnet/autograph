@@ -35,6 +35,8 @@
   - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
 - Added `plot.mobilityModel()` to draw the dissatisfied occupants at each move
 - Improved `plot()` for a 'stocnet' from `play_mobility()` to draw its moves
+  - Draws the occupant of each place at each step as a grid, with the moves outlined
+  - Draws the dissatisfied occupants at each step in the margin
 
 ## Layouts
 

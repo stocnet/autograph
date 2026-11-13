@@ -154,7 +154,9 @@ plot.diff_model <- function(x, ..., all_steps = TRUE){
 #' @export
 plot.mnet <- function(x, ...){
   if(.is_mobility(x)){
-    plot(.as_mobility(x), ...)
+    .plot_mobility_grid(x)
+  } else if(.is_opinion(x)){
+    .plot_opinion_network(x, ...)
   } else if(manynet::is_changing(x)){
     plot(manynet::as_diffusion(x, attribute = .diffusion_attribute(x)), ...)
   } else {
@@ -262,16 +264,26 @@ plot.learn_model <- function(x, ...){
 #' @details
 #'   `plot.mobilityModel()` draws the number of dissatisfied occupants
 #'   after each move.
-#'   `plot()` of a network of places with a record of moves,
-#'   as from `manynet::play_mobility()`, draws the same line,
-#'   and adds the number of dissatisfied occupants at the start, step 0.
 #'   A 'mobilityModel' alone does not hold the start,
 #'   so its line begins at the first move.
+#'
+#'   `plot()` of a network of places with a record of moves,
+#'   as from `manynet::play_mobility()`, draws more:
+#'   a grid with a row for each step, from the start at step 0,
+#'   and a column for each place.
+#'   Each tile is filled by the attribute of its occupant,
+#'   and an empty place is left blank.
+#'   A cross marks a dissatisfied occupant,
+#'   and an outline marks the place that an occupant moved to at that step.
+#'   In the margin, a bar gives the number of dissatisfied occupants
+#'   at each step.
 #'
 #'   To draw the places at the start, the middle, and the last move,
 #'   use `graphs()` on the network of places.
 #' @returns `plot.mobilityModel()` returns a line plot of the number of
 #'   dissatisfied occupants at each step.
+#'   `plot()` of a network of places returns a grid of the occupants of the
+#'   places at each step, with a bar plot of the dissatisfied occupants.
 #' @examples
 #' places <- manynet::add_node_attribute(manynet::create_lattice(25), "group",
 #'   rep(c(0, 1, NA, 1, 0), 5))
@@ -333,6 +345,64 @@ plot.mobilityModel <- function(x, ...){
   if(!is.null(satisfied))
     attr(out, "start") <- sum(!as.logical(satisfied), na.rm = TRUE)
   out
+}
+
+# The occupants of each place at each step, as a grid, with the number of
+# dissatisfied occupants at each step in the margin.
+.plot_mobility_grid <- function(x){
+  place <- step <- group <- dissatisfied <- NULL # avoid CMD check notes
+  model <- .as_mobility(x)
+  if(!nrow(model)) return(plot(model))
+  attribute <- .mobility_attribute(x)
+  last <- max(model$time)
+  grid <- do.call(rbind, lapply(0:last, function(t){
+    g <- manynet::to_time(x, t)
+    satisfied <- if("satisfied" %in% manynet::net_node_attributes(g))
+      as.logical(manynet::node_attribute(g, "satisfied")) else
+        rep(NA, manynet::net_nodes(g))
+    data.frame(step = t, place = seq_len(manynet::net_nodes(g)),
+               group = manynet::node_attribute(g, attribute),
+               dissatisfied = !satisfied)
+  }))
+  continuous <- .is_continuous(grid$group)
+  if(!continuous) grid$group <- factor(grid$group)
+  moves <- data.frame(step = as.numeric(model$time),
+                      place = as.numeric(model$destination))
+  moves <- moves[!is.na(moves$place), , drop = FALSE]
+  steps <- function(x) pretty(x, n = min(last + 1, 8))
+  grid_plot <- ggplot2::ggplot(grid, ggplot2::aes(x = place, y = step)) +
+    ggplot2::geom_tile(ggplot2::aes(fill = group), colour = ag_ground_fill(),
+                       linewidth = 0.4) +
+    ggplot2::geom_point(data = grid[grid$dissatisfied %in% TRUE, , drop = FALSE],
+                        shape = 4, size = 1.4, colour = ag_ink()) +
+    ggplot2::geom_tile(data = moves, fill = NA, colour = ag_ink(),
+                       linewidth = 0.8) +
+    (if(continuous)
+      ggplot2::scale_fill_gradientn(attribute, colours = ag_sequential(9),
+                                    na.value = ag_ground_fill()) else
+      ggplot2::scale_fill_manual(attribute,
+                                 values = ag_qualitative(nlevels(grid$group)),
+                                 na.value = ag_ground_fill(),
+                                 na.translate = FALSE)) +
+    ggplot2::scale_y_reverse(breaks = steps, expand = c(0, 0)) +
+    ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n = 6),
+                                expand = c(0, 0)) +
+    ag_theme_minimal() +
+    ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+    ggplot2::xlab("Places") + ggplot2::ylab("Steps")
+  counts <- data.frame(step = as.numeric(model$time),
+                       dissatisfied = as.numeric(model$dissatisfied))
+  start <- attr(model, "start")
+  if(!is.null(start))
+    counts <- rbind(data.frame(step = 0, dissatisfied = as.numeric(start)), counts)
+  margin_plot <- ggplot2::ggplot(counts, ggplot2::aes(x = dissatisfied, y = step)) +
+    ggplot2::geom_col(orientation = "y", fill = ag_missing(), width = 0.8) +
+    ggplot2::scale_y_reverse(breaks = NULL, expand = c(0, 0),
+                             limits = c(last + 0.5, -0.5)) +
+    ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n = 3)) +
+    ag_theme_minimal() +
+    ggplot2::xlab("Dissatisfied") + ggplot2::ylab(NULL)
+  patchwork::wrap_plots(grid_plot, margin_plot, widths = c(5, 1))
 }
 
 # The network of places at some steps, for `graphs()`. `waves` select the steps

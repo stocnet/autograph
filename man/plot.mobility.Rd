@@ -15,6 +15,8 @@
 \value{
 \code{plot.mobilityModel()} returns a line plot of the number of
 dissatisfied occupants at each step.
+\code{plot()} of a network of places returns a grid of the occupants of the
+places at each step, with a bar plot of the dissatisfied occupants.
 }
 \description{
 Plotting mobility models
@@ -22,11 +24,19 @@ Plotting mobility models
 \details{
 \code{plot.mobilityModel()} draws the number of dissatisfied occupants
 after each move.
-\code{plot()} of a network of places with a record of moves,
-as from \code{manynet::play_mobility()}, draws the same line,
-and adds the number of dissatisfied occupants at the start, step 0.
 A 'mobilityModel' alone does not hold the start,
 so its line begins at the first move.
+
+\code{plot()} of a network of places with a record of moves,
+as from \code{manynet::play_mobility()}, draws more:
+a grid with a row for each step, from the start at step 0,
+and a column for each place.
+Each tile is filled by the attribute of its occupant,
+and an empty place is left blank.
+A cross marks a dissatisfied occupant,
+and an outline marks the place that an occupant moved to at that step.
+In the margin, a bar gives the number of dissatisfied occupants
+at each step.
 
 To draw the places at the start, the middle, and the last move,
 use \code{graphs()} on the network of places.
