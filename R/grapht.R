@@ -188,6 +188,10 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   }
 
   # Normalise input into harmonised waves over the union of nodes ####
+  # A diffusion in an attribute of its own is coloured by the roles of its
+  # values, as the lines of `plot()` are. See `.diffusion_fill()`.
+  dfill <- if (is.null(node_color)) .diffusion_fill(tlist) else NULL
+  if (!is.null(dfill)) node_color <- dfill$attribute
   wl <- .grapht_waves(tlist)
   if (!wl$has_names) labels <- FALSE
   waves <- wl$waves
@@ -244,7 +248,12 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                      label_place,
                      .infer_edge_arrows(g_ref,
                                         .check_edge_arrows(edge_arrows),
-                                        hasse = .is_hasse_layout(layout, ...))) +
+                                        hasse = .is_hasse_layout(layout, ...)))
+  if (!is.null(dfill))
+    p <- suppressMessages(p + ggplot2::scale_fill_manual(
+      dfill$attribute, values = dfill$values, limits = names(dfill$values),
+      drop = FALSE))
+  p <- p +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
     gganimate::enter_fade() + gganimate::enter_grow() +

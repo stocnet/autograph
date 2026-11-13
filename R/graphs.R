@@ -61,6 +61,20 @@ graphs <- function(netlist, waves,
   # by the attribute of the occupants. See `.graphs_mobility()`.
   if (!manynet::is_list(netlist) && .is_mobility(netlist))
     return(.graphs_mobility(netlist, waves, based_on, ...))
+  # A diffusion in an attribute of its own is coloured by the roles of its
+  # values, as the lines of `plot()` are. See `.diffusion_fill()`.
+  if (!any(c("node_color", "node_colour") %in% names(list(...)))) {
+    dfill <- .diffusion_fill(netlist)
+    if (!is.null(dfill)) {
+      p <- graphs(netlist, waves, based_on = based_on,
+                  node_color = dfill$attribute, ...)
+      # The scales and layers are changed in place, as in
+      # `.graphs_mobility()`, so that the panels stay as `graphs()` set them.
+      panels <- if (inherits(p, "patchwork")) p$patches$plots else list()
+      for (q in c(panels, list(p))) .recolour_diffusion(q, dfill)
+      return(p)
+    }
+  }
   # A single manynet network that encodes time is split into a list of
   # snapshots, mirroring grapht()'s handling (see .split_time_network()):
   # longitudinal/changing networks (and diffusion results) into waves,

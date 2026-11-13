@@ -17,6 +17,7 @@
 - Fixed `graphs()` showing one legend per wave when the waves hold different values
 - Improved `graphs()` drawing a network of places from `play_mobility()`
   - Colours the places by the attribute of the occupants, and leaves empty places blank
+- Improved `graphs()` and `grapht()` colouring a diffusion in any attribute
 - Improved `grapht()` arguments
   - Added the same label directions and gaps to `label_repel`
   - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
