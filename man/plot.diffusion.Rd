@@ -5,13 +5,16 @@
 \alias{plot.diff_model}
 \alias{plot.diffs_model}
 \alias{plot.learn_model}
+\alias{plot.diffusionModel}
 \title{Plotting diffusion models}
 \usage{
 \method{plot}{diff_model}(x, ..., all_steps = TRUE)
 
-\method{plot}{diffs_model}(x, ...)
+\method{plot}{diffs_model}(x, ..., observed = NULL, level = 0.95)
 
 \method{plot}{learn_model}(x, ...)
+
+\method{plot}{diffusionModel}(x, ..., all_steps = TRUE)
 }
 \arguments{
 \item{x}{A "diff_model" of "diffs_model" class of object.
@@ -21,11 +24,24 @@ E.g. as a result from \code{manynet::play_diffusion()}.}
 
 \item{all_steps}{Whether all steps should be plotted or just those where
 there is change in the distributions.}
+
+\item{observed}{Optionally, an observed diffusion to draw over the
+simulated diffusions:
+a network with a record of a diffusion,
+as from \code{manynet::play_diffusion()},
+or a 'diffusionModel', as from \code{manynet::as_diffusion()}.}
+
+\item{level}{The share of the simulated diffusions that the band
+holds at each step. By default 0.95.}
 }
 \value{
 \code{plot.diff_model()} returns a bar chart of the number of new
 infected nodes at each time point, as well as an overlay line plot of the
 total in each value
+
+\code{plot.diffs_model()} returns a line plot of the simulated
+diffusions, or, with \code{observed}, a band of the simulated diffusions
+with the observed diffusion over it.
 }
 \description{
 Plotting diffusion models
@@ -43,9 +59,28 @@ The roles in \code{attr(x, "compartments")} give the colours:
 blue for S, yellow for E, red for I, green for R,
 and black for D.
 The bars count the new nodes in the first value of I.
+
+\code{plot.diffs_model()} draws the simulated diffusions,
+as from \code{infernet::play_diffusions()}.
+Without \code{observed}, it draws a smoothed line for each value.
+With \code{observed}, it draws the proportion of the nodes in the
+infectious value at each step:
+a band that holds the middle \code{level} of the simulated diffusions,
+a dashed line for their median,
+and the observed diffusion over them.
+This is the curve that \code{infernet::test_gof()} compares.
+A diffusion that ends before the others keeps its last value
+until the last step, as in \code{infernet::test_gof()}.
+
+\code{plot.diffusionModel()} draws a 'diffusionModel',
+as from \code{manynet::as_diffusion()},
+as \code{plot.diff_model()} does.
 }
 \examples{
 plot(res_manynet_diff)
 plot(res_migraph_diff)
 plot(play_learning(ison_networkers, beliefs = runif(net_nodes(ison_networkers))))
+set.seed(1)
+plot(manynet::as_diffusion(manynet::play_diffusion(manynet::ison_adolescents,
+  seeds = 1, transmissibility = 0.5)))
 }

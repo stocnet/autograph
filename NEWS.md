@@ -33,6 +33,12 @@
   - Fixed the warnings about the uninitialised columns `E` and `R`
 - Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
   - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
+- Improved `plot.diffs_model()` comparing an observed diffusion with simulations
+  - Added `observed=` to draw an observed diffusion over the simulated ones
+  - Added `level=` for the share of the simulations that the band holds
+- Added `plot.diffusionModel()` for the class that `as_diffusion()` returns
+- Added `plot.diffusionTransitions()` to draw the values and transitions
+  - e.g. `plot(net$info$transitions)`
 - Added `plot.opinionModel()` to draw the opinion of each node at each step
   - Colours each node by its first opinion, and dashes a consensus
   - Marks stubborn nodes, e.g. from a node attribute "stubbornness"

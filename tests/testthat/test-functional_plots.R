@@ -53,6 +53,19 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
+  diffusionModel = function() {
+    set.seed(123)
+    manynet::as_diffusion(manynet::play_diffusion(manynet::ison_adolescents,
+                                                  seeds = 1,
+                                                  transmissibility = 0.5))
+  },
+  diffusionTransitions = function() {
+    set.seed(123)
+    net <- manynet::play_diffusion(manynet::ison_adolescents, seeds = 1,
+                                   recovery = 0.2)
+    if (!inherits(net, "stocnet")) return(NULL)
+    net$info$transitions
+  },
   opinionModel = function() {
     if (!exists("play_opinion", asNamespace("manynet"))) return(NULL)
     set.seed(123)
