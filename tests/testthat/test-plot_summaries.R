@@ -298,7 +298,7 @@ test_that("plot() of a transitions table draws the values and transitions", {
   skip_on_cran()
   set.seed(1)
   net <- manynet::play_diffusion(manynet::ison_adolescents, seeds = 1,
-                                 transmissibility = 0.5, latency = 0.4,
+                                 transmissibility = 0.5, onset = 0.6,
                                  recovery = 0.2, waning = 0.05)
   tr <- net$info$transitions
   skip_if_not(inherits(tr, "diffusionTransitions"),

@@ -447,7 +447,7 @@ plot.diffusionModel <- function(x, ..., all_steps = TRUE){
 #' @examples
 #' set.seed(1)
 #' net <- manynet::play_diffusion(manynet::ison_adolescents, seeds = 1,
-#'   transmissibility = 0.5, latency = 0.4, recovery = 0.2, waning = 0.05)
+#'   transmissibility = 0.5, onset = 0.6, recovery = 0.2, waning = 0.05)
 #' plot(net$info$transitions)
 #' @export
 plot.diffusionTransitions <- function(x, ..., compartments = NULL){
