@@ -3,9 +3,17 @@
 \name{plot.opinion}
 \alias{plot.opinion}
 \alias{plot.opinionModel}
+\alias{plot.opinionSweep}
 \title{Plotting opinion models}
 \usage{
 \method{plot}{opinionModel}(x, ..., stubbornness = NULL)
+
+\method{plot}{opinionSweep}(
+  x,
+  ...,
+  outcome = c("clusters", "consensus", "spread", "mean", "steps"),
+  level = 0.95
+)
 }
 \arguments{
 \item{x}{An 'opinionModel', as from \code{manynet::as_opinion()}.}
@@ -17,10 +25,20 @@ as one number or one number for each node, from 0 to 1.
 The nodes with a stubbornness above 0 are drawn with a thicker line,
 and a square at the last step.
 By default \code{NULL}, which marks no node.}
+
+\item{outcome}{For \code{plot.opinionSweep()}, the measure of the opinions at
+the end to draw: \code{"clusters"} (the default), \code{"consensus"} (the share of
+the runs that reach one), \code{"spread"}, \code{"mean"}, or \code{"steps"}.}
+
+\item{level}{For \code{plot.opinionSweep()}, the share of the runs that the
+band holds for each setting. By default 0.95.}
 }
 \value{
 \code{plot.opinionModel()} returns a line plot of the opinion of each
 node at each step.
+
+\code{plot.opinionSweep()} returns a plot of a measure of the opinions
+at the end for each setting of a sweep.
 }
 \description{
 Plotting opinion models
@@ -39,6 +57,14 @@ draws the same plot.
 It marks the stubborn nodes where the network has a node attribute
 named "stubbornness",
 as when \code{manynet::play_opinion(stubbornness = "stubbornness")} is used.
+
+\code{plot.opinionSweep()} draws a measure of the opinions at the end for each
+setting of a sweep, as from \code{infernet::sweep_opinion()}:
+by default, the number of opinion clusters.
+The first argument in \code{vary} is on the horizontal axis,
+and a second argument, if any, gives the colour.
+A line joins the median of the runs for each setting,
+and a band holds the middle \code{level} of them.
 }
 \examples{
 set.seed(1)

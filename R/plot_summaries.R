@@ -387,8 +387,7 @@ plot.diffs_model <- function(x, ..., observed = NULL, level = 0.95){
 #' @rdname plot.diffusion
 #' @details
 #'   `plot.diffusionSweep()` draws the share of the nodes that were infected
-#'   for each setting of a sweep, as from
-#'   `infernet::play_diffusions(vary = )`.
+#'   for each setting of a sweep, as from `infernet::sweep_diffusion()`.
 #'   The first argument in `vary` is on the horizontal axis,
 #'   and a second argument, if any, gives the colour.
 #'   A line joins the median of the runs for each setting,
@@ -400,30 +399,40 @@ plot.diffs_model <- function(x, ..., observed = NULL, level = 0.95){
 #'   infected for each setting of a sweep.
 #' @export
 plot.diffusionSweep <- function(x, ..., level = 0.95){
-  setting <- infected <- lower <- upper <- group <- NULL # avoid CMD check notes
+  vary <- attr(x, "vary")
+  ends <- .sweep_ends(x, vary)
+  .plot_sweep(ends, vary, "infected", "Share infected", level, top = 1)
+}
+
+# A plot of `value` in each run of a sweep against the first argument in
+# `vary`: the median of the runs for each setting, with a band (or a bar,
+# where the settings are not numbers) that holds the middle `level` of them,
+# and a colour for each value of the other arguments in `vary`.
+# The vertical axis starts at 0, and reaches at least `top`.
+.plot_sweep <- function(ends, vary, value, label, level, top = NULL){
+  setting <- middle <- lower <- upper <- group <- NULL # avoid CMD check notes
   if(!is.numeric(level) || length(level) != 1 || is.na(level) ||
      level <= 0 || level >= 1)
     manynet::snet_abort(
       "{.arg level} must be one number between 0 and 1, such as 0.95,",
       "but {.val {level}} was given.")
-  vary <- attr(x, "vary")
-  ends <- .sweep_ends(x, vary)
   ends$setting <- ends[[vary[1]]]
   ends$group <- if(length(vary) > 1)
     factor(interaction(ends[vary[-1]], sep = ", ", lex.order = TRUE)) else "all"
+  ends$value <- as.numeric(ends[[value]])
   key <- interaction(ends$setting, ends$group, drop = TRUE, lex.order = TRUE)
   tails <- (1 - level) / 2
   first <- !duplicated(key)
   data <- ends[first, c("setting", "group"), drop = FALSE]
-  q <- function(p) as.numeric(tapply(ends$infected, key, stats::quantile,
-                                     probs = p, names = FALSE)[as.character(key[first])])
-  data$infected <- q(0.5)
+  q <- function(p) as.numeric(tapply(ends$value, key, stats::quantile,
+                                     probs = p, names = FALSE, na.rm = TRUE)[as.character(key[first])])
+  data$middle <- q(0.5)
   data$lower <- q(tails)
   data$upper <- q(1 - tails)
   colour <- length(vary) > 1
   aesthetics <- if(colour)
-    ggplot2::aes(x = setting, y = infected, colour = group, fill = group, group = group) else
-    ggplot2::aes(x = setting, y = infected, group = group)
+    ggplot2::aes(x = setting, y = middle, colour = group, fill = group, group = group) else
+    ggplot2::aes(x = setting, y = middle, group = group)
   p <- ggplot2::ggplot(data, aesthetics)
   # one colour, unless a second argument in `vary` gives the colour
   red <- match_color("#d73027")
@@ -441,8 +450,8 @@ plot.diffusionSweep <- function(x, ..., level = 0.95){
                            position = ggplot2::position_dodge(width = 0.4)))
   }
   p <- p + ag_theme_minimal() +
-    ggplot2::coord_cartesian(ylim = c(0, max(1, data$upper, na.rm = TRUE))) +
-    ggplot2::ylab("Share infected") + ggplot2::xlab(vary[1])
+    ggplot2::coord_cartesian(ylim = c(0, max(top, data$upper, na.rm = TRUE))) +
+    ggplot2::ylab(label) + ggplot2::xlab(vary[1])
   if(colour) p <- p + ggplot2::labs(colour = paste(vary[-1], collapse = ", "),
                                     fill = paste(vary[-1], collapse = ", "))
   p
@@ -455,7 +464,7 @@ plot.diffusionSweep <- function(x, ..., level = 0.95){
   if(is.null(vary) || !all(c(vary, "sim", "n", "I") %in% names(y)))
     manynet::snet_abort(
       "A {.cls diffusionSweep} needs a column for each setting, and {.val sim}, {.val n}, and {.val I}.",
-      "Make one with {.fn infernet::play_diffusions} and {.arg vary}.")
+      "Make one with {.fn infernet::sweep_diffusion}.")
   key <- interaction(y[c(vary, "sim")], drop = TRUE, lex.order = TRUE)
   # the seeds are the new infections at the first step of each run
   new <- if("I_new" %in% names(y)) y$I_new else
@@ -767,6 +776,41 @@ plot.opinionModel <- function(x, ..., stubbornness = NULL){
     ag_theme_minimal() +
     ggplot2::scale_x_continuous(breaks = function(x) pretty(x, n = 6)) +
     ggplot2::ylab("Opinion") + ggplot2::xlab("Steps")
+}
+
+#' @rdname plot.opinion
+#' @param outcome For `plot.opinionSweep()`, the measure of the opinions at
+#'   the end to draw: `"clusters"` (the default), `"consensus"` (the share of
+#'   the runs that reach one), `"spread"`, `"mean"`, or `"steps"`.
+#' @param level For `plot.opinionSweep()`, the share of the runs that the
+#'   band holds for each setting. By default 0.95.
+#' @details
+#'   `plot.opinionSweep()` draws a measure of the opinions at the end for each
+#'   setting of a sweep, as from `infernet::sweep_opinion()`:
+#'   by default, the number of opinion clusters.
+#'   The first argument in `vary` is on the horizontal axis,
+#'   and a second argument, if any, gives the colour.
+#'   A line joins the median of the runs for each setting,
+#'   and a band holds the middle `level` of them.
+#' @returns `plot.opinionSweep()` returns a plot of a measure of the opinions
+#'   at the end for each setting of a sweep.
+#' @export
+plot.opinionSweep <- function(x, ..., outcome = c("clusters", "consensus",
+                                                  "spread", "mean", "steps"),
+                              level = 0.95){
+  outcome <- match.arg(outcome)
+  vary <- attr(x, "vary")
+  ends <- as.data.frame(x)
+  if(is.null(vary) || !all(c(vary, "sim", outcome) %in% names(ends)))
+    manynet::snet_abort(
+      "An {.cls opinionSweep} needs a column for each setting, and {.val sim} and {.val {outcome}}.",
+      "Make one with {.fn infernet::sweep_opinion}.")
+  label <- switch(outcome, clusters = "Opinion clusters",
+                  consensus = "Share reaching consensus",
+                  spread = "Spread of opinions", mean = "Mean opinion",
+                  steps = "Steps")
+  .plot_sweep(ends, vary, outcome, label, level,
+              top = if(outcome %in% c("consensus", "clusters")) 1 else NULL)
 }
 
 # A network with a record of opinions, as from manynet::play_opinion(): its

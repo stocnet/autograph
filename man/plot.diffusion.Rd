@@ -79,8 +79,7 @@ A diffusion that ends before the others keeps its last value
 until the last step, as in \code{infernet::test_gof()}.
 
 \code{plot.diffusionSweep()} draws the share of the nodes that were infected
-for each setting of a sweep, as from
-\code{infernet::play_diffusions(vary = )}.
+for each setting of a sweep, as from \code{infernet::sweep_diffusion()}.
 The first argument in \code{vary} is on the horizontal axis,
 and a second argument, if any, gives the colour.
 A line joins the median of the runs for each setting,

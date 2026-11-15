@@ -39,11 +39,13 @@
 - Added `plot.diffusionModel()` for the class that `as_diffusion()` returns
 - Added `plot.diffusionTransitions()` to draw the values and transitions
   - e.g. `plot(net$info$transitions)`
-- Added `plot.diffusionSweep()` to draw the share infected for each setting of a sweep
-  - e.g. `plot(play_diffusions(net, vary = list(transmissibility = c(0.1, 0.5))))`
+- Added `plot.diffusionSweep()` to draw the share infected for each setting
+  - e.g. `plot(sweep_diffusion(net, vary = list(transmissibility = c(0.1, 0.5))))`
 - Added `plot.opinionModel()` to draw the opinion of each node at each step
   - Colours each node by its first opinion, and dashes a consensus
   - Marks stubborn nodes, e.g. from a node attribute "stubbornness"
+- Added `plot.opinionSweep()` to draw the opinion clusters for each setting
+  - e.g. `plot(sweep_opinion(net, opinions, vary = list(confidence = c(0.1, 0.3))))`
 - Improved `plot()` for a 'stocnet' from `play_opinion()` to draw its opinions
 - Added `plot.mobilityModel()` to draw the dissatisfied occupants at each move
 - Improved `plot()` for a 'stocnet' from `play_mobility()` to draw its moves

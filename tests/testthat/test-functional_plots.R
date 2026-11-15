@@ -53,7 +53,7 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
-  # A sweep as `infernet::play_diffusions(vary = )` binds it, made here so that
+  # A sweep as `infernet::sweep_diffusion()` binds it, made here so that
   # the test does not need infernet.
   diffusionSweep = function() {
     set.seed(123)
@@ -66,6 +66,16 @@ plot_fixture_registry <- list(
     out <- dplyr::as_tibble(do.call(rbind, unlist(runs, recursive = FALSE)))
     class(out) <- c("diffusionSweep", class(out))
     attr(out, "vary") <- "transmissibility"
+    out
+  },
+  # The measures of each run as `infernet::sweep_opinion()` binds them.
+  opinionSweep = function() {
+    out <- dplyr::tibble(confidence = rep(c(0.1, 0.3), each = 3), sim = rep(1:3, 2),
+                         clusters = c(5, 6, 5, 2, 2, 1), consensus = c(rep(FALSE, 5), TRUE),
+                         spread = c(0.3, 0.3, 0.28, 0.1, 0.12, 0),
+                         mean = 0.5, steps = 20, settled = TRUE)
+    class(out) <- c("opinionSweep", class(out))
+    attr(out, "vary") <- "confidence"
     out
   },
   diffusionModel = function() {
