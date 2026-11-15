@@ -214,6 +214,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 # The works sit close together, so the gap from each node is small, unless
 # `label_repel` gave one (`padding`).
 .label_timeline <- function(p, ldata, point_size, padding = NULL) {
+  .label <- NULL # initialize variables to avoid CMD check notes
   ldata[[".label"]] <- .drop_shared_suffix(ldata[["name"]], p[["data"]][["name"]])
   args <- list(mapping = ggplot2::aes(label = .label, point.size = point_size),
                data = ldata, repel = TRUE,
