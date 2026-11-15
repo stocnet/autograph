@@ -4,6 +4,7 @@
 \alias{plot.diffusion}
 \alias{plot.diff_model}
 \alias{plot.diffs_model}
+\alias{plot.diffusionSweep}
 \alias{plot.learn_model}
 \alias{plot.diffusionModel}
 \title{Plotting diffusion models}
@@ -12,12 +13,14 @@
 
 \method{plot}{diffs_model}(x, ..., observed = NULL, level = 0.95)
 
+\method{plot}{diffusionSweep}(x, ..., level = 0.95)
+
 \method{plot}{learn_model}(x, ...)
 
 \method{plot}{diffusionModel}(x, ..., all_steps = TRUE)
 }
 \arguments{
-\item{x}{A "diff_model" of "diffs_model" class of object.
+\item{x}{A "diff_model", "diffs_model", or "diffusionSweep" class of object.
 E.g. as a result from \code{manynet::play_diffusion()}.}
 
 \item{...}{Other arguments to be passed.}
@@ -42,6 +45,9 @@ total in each value
 \code{plot.diffs_model()} returns a line plot of the simulated
 diffusions, or, with \code{observed}, a band of the simulated diffusions
 with the observed diffusion over it.
+
+\code{plot.diffusionSweep()} returns a plot of the share of the nodes
+infected for each setting of a sweep.
 }
 \description{
 Plotting diffusion models
@@ -71,6 +77,17 @@ and the observed diffusion over them.
 This is the curve that \code{infernet::test_gof()} compares.
 A diffusion that ends before the others keeps its last value
 until the last step, as in \code{infernet::test_gof()}.
+
+\code{plot.diffusionSweep()} draws the share of the nodes that were infected
+for each setting of a sweep, as from
+\code{infernet::play_diffusions(vary = )}.
+The first argument in \code{vary} is on the horizontal axis,
+and a second argument, if any, gives the colour.
+A line joins the median of the runs for each setting,
+and a band holds the middle \code{level} of them.
+Where the settings are not numbers, a point and a bar replace the line
+and the band, side by side for each colour.
+A node that is reinfected counts again, so the share can be above 1.
 
 \code{plot.diffusionModel()} draws a 'diffusionModel',
 as from \code{manynet::as_diffusion()},

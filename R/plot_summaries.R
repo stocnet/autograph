@@ -2,7 +2,7 @@
 
 #' Plotting diffusion models
 #' @name plot.diffusion
-#' @param x A "diff_model" of "diffs_model" class of object.
+#' @param x A "diff_model", "diffs_model", or "diffusionSweep" class of object.
 #'   E.g. as a result from `manynet::play_diffusion()`.
 #' @param ... Other arguments to be passed.
 #' @param all_steps Whether all steps should be plotted or just those where
@@ -382,6 +382,89 @@ plot.diffs_model <- function(x, ..., observed = NULL, level = 0.95){
     ggplot2::ylab(paste("Proportion", if(identical(infectious, "I"))
       "infected" else paste("in", infectious))) +
     ggplot2::xlab("Steps")
+}
+
+#' @rdname plot.diffusion
+#' @details
+#'   `plot.diffusionSweep()` draws the share of the nodes that were infected
+#'   for each setting of a sweep, as from
+#'   `infernet::play_diffusions(vary = )`.
+#'   The first argument in `vary` is on the horizontal axis,
+#'   and a second argument, if any, gives the colour.
+#'   A line joins the median of the runs for each setting,
+#'   and a band holds the middle `level` of them.
+#'   Where the settings are not numbers, a point and a bar replace the line
+#'   and the band, side by side for each colour.
+#'   A node that is reinfected counts again, so the share can be above 1.
+#' @returns `plot.diffusionSweep()` returns a plot of the share of the nodes
+#'   infected for each setting of a sweep.
+#' @export
+plot.diffusionSweep <- function(x, ..., level = 0.95){
+  setting <- infected <- lower <- upper <- group <- NULL # avoid CMD check notes
+  if(!is.numeric(level) || length(level) != 1 || is.na(level) ||
+     level <= 0 || level >= 1)
+    manynet::snet_abort(
+      "{.arg level} must be one number between 0 and 1, such as 0.95,",
+      "but {.val {level}} was given.")
+  vary <- attr(x, "vary")
+  ends <- .sweep_ends(x, vary)
+  ends$setting <- ends[[vary[1]]]
+  ends$group <- if(length(vary) > 1)
+    factor(interaction(ends[vary[-1]], sep = ", ", lex.order = TRUE)) else "all"
+  key <- interaction(ends$setting, ends$group, drop = TRUE, lex.order = TRUE)
+  tails <- (1 - level) / 2
+  first <- !duplicated(key)
+  data <- ends[first, c("setting", "group"), drop = FALSE]
+  q <- function(p) as.numeric(tapply(ends$infected, key, stats::quantile,
+                                     probs = p, names = FALSE)[as.character(key[first])])
+  data$infected <- q(0.5)
+  data$lower <- q(tails)
+  data$upper <- q(1 - tails)
+  colour <- length(vary) > 1
+  aesthetics <- if(colour)
+    ggplot2::aes(x = setting, y = infected, colour = group, fill = group, group = group) else
+    ggplot2::aes(x = setting, y = infected, group = group)
+  p <- ggplot2::ggplot(data, aesthetics)
+  # one colour, unless a second argument in `vary` gives the colour
+  red <- match_color("#d73027")
+  fixed <- function(...) if(colour) list(...) else list(..., colour = red)
+  if(is.numeric(data$setting)){
+    p <- p + do.call(ggplot2::geom_ribbon,
+                     c(list(ggplot2::aes(ymin = lower, ymax = upper), alpha = 0.2,
+                            colour = NA), if(!colour) list(fill = red))) +
+      do.call(ggplot2::geom_line, fixed()) +
+      do.call(ggplot2::geom_point, fixed())
+  } else {
+    # side by side, so that equal values of the groups do not hide each other
+    p <- p + do.call(ggplot2::geom_pointrange,
+                     fixed(ggplot2::aes(ymin = lower, ymax = upper),
+                           position = ggplot2::position_dodge(width = 0.4)))
+  }
+  p <- p + ag_theme_minimal() +
+    ggplot2::coord_cartesian(ylim = c(0, max(1, data$upper, na.rm = TRUE))) +
+    ggplot2::ylab("Share infected") + ggplot2::xlab(vary[1])
+  if(colour) p <- p + ggplot2::labs(colour = paste(vary[-1], collapse = ", "),
+                                    fill = paste(vary[-1], collapse = ", "))
+  p
+}
+
+# The share of the nodes infected in each run of a sweep: the new infections,
+# with the seeds, over the number of nodes.
+.sweep_ends <- function(x, vary){
+  y <- as.data.frame(x)
+  if(is.null(vary) || !all(c(vary, "sim", "n", "I") %in% names(y)))
+    manynet::snet_abort(
+      "A {.cls diffusionSweep} needs a column for each setting, and {.val sim}, {.val n}, and {.val I}.",
+      "Make one with {.fn infernet::play_diffusions} and {.arg vary}.")
+  key <- interaction(y[c(vary, "sim")], drop = TRUE, lex.order = TRUE)
+  # the seeds are the new infections at the first step of each run
+  new <- if("I_new" %in% names(y)) y$I_new else
+    stats::ave(y$I, key, FUN = function(v) c(v[1], pmax(diff(v), 0)))
+  first <- !duplicated(key)
+  out <- y[first, c(vary, "sim"), drop = FALSE]
+  out$infected <- as.numeric(tapply(new, key, sum)[as.character(key[first])]) /
+    y$n[first]
+  out
 }
 
 #' @rdname plot.diffusion

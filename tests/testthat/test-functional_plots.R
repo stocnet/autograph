@@ -53,6 +53,21 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
+  # A sweep as `infernet::play_diffusions(vary = )` binds it, made here so that
+  # the test does not need infernet.
+  diffusionSweep = function() {
+    set.seed(123)
+    runs <- lapply(c(0.2, 0.8), function(p) lapply(1:3, function(j) {
+      d <- as.data.frame(manynet::as_diffusion(manynet::play_diffusion(
+        manynet::ison_adolescents, seeds = 1, transmissibility = p, steps = 5)))
+      names(d)[names(d) == "t"] <- "time"
+      data.frame(transmissibility = p, sim = j, d)
+    }))
+    out <- dplyr::as_tibble(do.call(rbind, unlist(runs, recursive = FALSE)))
+    class(out) <- c("diffusionSweep", class(out))
+    attr(out, "vary") <- "transmissibility"
+    out
+  },
   diffusionModel = function() {
     set.seed(123)
     manynet::as_diffusion(manynet::play_diffusion(manynet::ison_adolescents,
