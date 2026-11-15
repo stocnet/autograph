@@ -25,6 +25,7 @@
 
 ## Plotting
 
+- Fixed `plot()` of a node or tie measure failing where the measure holds `NA` or `Inf`
 - Improved `plot.diff_model()` for custom diffusions
   - Draws one line for each value, named by the value, e.g. "associate"
   - Colours each value by its role: S blue, E yellow, I red, R green, D black

@@ -343,3 +343,61 @@ test_that("graphs() colours a diffusion in an attribute of its own", {
   expect_null(.diffusion_fill(manynet::ison_adolescents))
   expect_s3_class(graphs(d, node_color = "status"), "ggplot")
 })
+
+# A sweep as `infernet::sweep_diffusion()` binds it, made here so that the
+# test does not need infernet: `settings` gives each run's setting.
+sweep_fixture <- function(settings, vary = "seeds") {
+  set.seed(1)
+  runs <- lapply(seq_along(settings), function(i) {
+    d <- as.data.frame(manynet::as_diffusion(manynet::play_diffusion(
+      manynet::ison_adolescents, seeds = 1, transmissibility = settings[[i]]$p,
+      steps = 5)))
+    names(d)[names(d) == "t"] <- "time"
+    out <- data.frame(sim = 1, d)
+    for (a in setdiff(names(settings[[i]]), "p")) out[[a]] <- settings[[i]][[a]]
+    out
+  })
+  out <- dplyr::as_tibble(do.call(rbind, runs))
+  out <- out[c(vary, setdiff(names(out), vary))]
+  class(out) <- c("diffusionSweep", class(out))
+  attr(out, "vary") <- vary
+  out
+}
+
+test_that("a sweep of named settings draws labelled bars, a panel for each other argument", {
+  sweep <- sweep_fixture(list(
+    list(p = 0, seeds = factor("one", c("one", "two")), threshold = 1),
+    list(p = 1, seeds = factor("two", c("one", "two")), threshold = 1),
+    list(p = 0, seeds = factor("one", c("one", "two")), threshold = 2),
+    list(p = 1, seeds = factor("two", c("one", "two")), threshold = 2)),
+    vary = c("seeds", "threshold"))
+  p <- plot(sweep)
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  expect_true(all(c("GeomCol", "GeomText") %in% geoms))
+  expect_s3_class(p$facet, "FacetWrap")
+  expect_identical(p$labels$x, "Seeds")
+  built <- ggplot2::ggplot_build(p)
+  # one seed of 8 nodes is 12.5%, which rounds to 12%
+  expect_setequal(built$data[[2]]$label, c("12%", "100%"))
+})
+
+test_that("a sweep of numbers also draws bars, in the order of the numbers", {
+  sweep <- sweep_fixture(list(list(p = 1, transmissibility = 1),
+                              list(p = 0, transmissibility = 0.25)),
+                         vary = "transmissibility")
+  p <- plot(sweep)
+  geoms <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  expect_true("GeomCol" %in% geoms)
+  expect_false(any(c("GeomLine", "GeomRibbon") %in% geoms))
+  expect_identical(levels(p$data$setting), c("0.25", "1"))
+  expect_match(p$labels$caption, "One run")
+})
+
+test_that("a measure with NA or infinite values still plots its finite values", {
+  x <- structure(c(0, 0.25, 0.5, NA, Inf, 1), class = c("node_measure", "numeric"))
+  p <- plot(x)
+  expect_equal(nrow(p$data), 4)
+  expect_no_error(ggplot2::ggplot_build(p))
+  expect_error(plot(structure(c(NA, Inf), class = c("node_measure", "numeric"))),
+               "no finite values")
+})

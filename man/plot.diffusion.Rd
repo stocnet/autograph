@@ -80,13 +80,13 @@ until the last step, as in \code{infernet::test_gof()}.
 
 \code{plot.diffusionSweep()} draws the share of the nodes that were infected
 for each setting of a sweep, as from \code{infernet::sweep_diffusion()}.
-The first argument in \code{vary} is on the horizontal axis,
-and a second argument, if any, gives the colour.
-A line joins the median of the runs for each setting,
-and a band holds the middle \code{level} of them.
-Where the settings are not numbers, a point and a bar replace the line
-and the band, side by side for each colour.
-A node that is reinfected counts again, so the share can be above 1.
+The first argument in \code{vary} is on the horizontal axis.
+A sweep compares settings, so each setting is a bar, even where the
+settings are numbers: the median of its runs, labelled with its value
+where there are 12 bars or fewer, with a line for the middle \code{level} of
+the runs where they differ.
+Each value of any other argument in \code{vary} has a panel of its own.
+A node that is reinfected counts again, so the share can be above 100\%.
 
 \code{plot.diffusionModel()} draws a 'diffusionModel',
 as from \code{manynet::as_diffusion()},

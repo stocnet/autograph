@@ -388,72 +388,103 @@ plot.diffs_model <- function(x, ..., observed = NULL, level = 0.95){
 #' @details
 #'   `plot.diffusionSweep()` draws the share of the nodes that were infected
 #'   for each setting of a sweep, as from `infernet::sweep_diffusion()`.
-#'   The first argument in `vary` is on the horizontal axis,
-#'   and a second argument, if any, gives the colour.
-#'   A line joins the median of the runs for each setting,
-#'   and a band holds the middle `level` of them.
-#'   Where the settings are not numbers, a point and a bar replace the line
-#'   and the band, side by side for each colour.
-#'   A node that is reinfected counts again, so the share can be above 1.
+#'   The first argument in `vary` is on the horizontal axis.
+#'   A sweep compares settings, so each setting is a bar, even where the
+#'   settings are numbers: the median of its runs, labelled with its value
+#'   where there are 12 bars or fewer, with a line for the middle `level` of
+#'   the runs where they differ.
+#'   Each value of any other argument in `vary` has a panel of its own.
+#'   A node that is reinfected counts again, so the share can be above 100%.
 #' @returns `plot.diffusionSweep()` returns a plot of the share of the nodes
 #'   infected for each setting of a sweep.
 #' @export
 plot.diffusionSweep <- function(x, ..., level = 0.95){
   vary <- attr(x, "vary")
   ends <- .sweep_ends(x, vary)
-  .plot_sweep(ends, vary, "infected", "Share infected", level, top = 1)
+  .plot_sweep(ends, vary, "infected", "Share of nodes infected", level,
+              percent = TRUE, fill = .diffusion_colors("I", list(I = "I"))[["I"]],
+              names = attr(x, "names_of_vary"))
 }
 
 # A plot of `value` in each run of a sweep against the first argument in
-# `vary`: the median of the runs for each setting, with a band (or a bar,
-# where the settings are not numbers) that holds the middle `level` of them,
-# and a colour for each value of the other arguments in `vary`.
-# The vertical axis starts at 0, and reaches at least `top`.
-.plot_sweep <- function(ends, vary, value, label, level, top = NULL){
-  setting <- middle <- lower <- upper <- group <- NULL # avoid CMD check notes
+# `vary`. A sweep compares settings: it is not one path through time, so each
+# setting is a bar, even where the settings are numbers. Each bar shows the
+# median of its runs, labelled with its value where there are few enough bars
+# to read the labels, and, where the runs differ, a line for the middle
+# `level` of them. Each value of the other arguments has a panel of its own.
+# `percent` draws the values as percentages, and `whole` as whole numbers;
+# `fill` is the colour of a plot with one line or one set of bars;
+# `names` can give the horizontal axis a longer name than the argument.
+.plot_sweep <- function(ends, vary, value, label, level, percent = FALSE,
+                        whole = FALSE, fill = ag_qualitative(1), names = NULL){
+  setting <- middle <- lower <- upper <- group <- text <- NULL # avoid CMD check notes
   if(!is.numeric(level) || length(level) != 1 || is.na(level) ||
      level <= 0 || level >= 1)
     manynet::snet_abort(
       "{.arg level} must be one number between 0 and 1, such as 0.95,",
       "but {.val {level}} was given.")
   ends$setting <- ends[[vary[1]]]
-  ends$group <- if(length(vary) > 1)
-    factor(interaction(ends[vary[-1]], sep = ", ", lex.order = TRUE)) else "all"
+  others <- vary[-1]
+  ends$group <- if(length(others))
+    factor(interaction(lapply(others, function(a)
+      paste(a, "=", ends[[a]])), sep = ", ", lex.order = TRUE)) else
+        factor("all")
   ends$value <- as.numeric(ends[[value]])
   key <- interaction(ends$setting, ends$group, drop = TRUE, lex.order = TRUE)
-  tails <- (1 - level) / 2
   first <- !duplicated(key)
+  at <- as.character(key[first])
   data <- ends[first, c("setting", "group"), drop = FALSE]
-  q <- function(p) as.numeric(tapply(ends$value, key, stats::quantile,
-                                     probs = p, names = FALSE, na.rm = TRUE)[as.character(key[first])])
+  q <- function(p) as.numeric(tapply(ends$value, key, stats::quantile, probs = p,
+                                     names = FALSE, na.rm = TRUE)[at])
+  tails <- (1 - level) / 2
   data$middle <- q(0.5)
   data$lower <- q(tails)
   data$upper <- q(1 - tails)
-  colour <- length(vary) > 1
-  aesthetics <- if(colour)
-    ggplot2::aes(x = setting, y = middle, colour = group, fill = group, group = group) else
-    ggplot2::aes(x = setting, y = middle, group = group)
-  p <- ggplot2::ggplot(data, aesthetics)
-  # one colour, unless a second argument in `vary` gives the colour
-  red <- match_color("#d73027")
-  fixed <- function(...) if(colour) list(...) else list(..., colour = red)
+  runs <- max(table(key))
+  spread <- any(data$upper > data$lower, na.rm = TRUE)
+  groups <- nlevels(droplevels(data$group))
+  show <- function(v) if(percent) paste0(round(100 * v), "%") else
+    vapply(round(v, 2), format, character(1), trim = TRUE, drop0trailing = TRUE)
+  # numbers become categories in their own order, named as they were given
   if(is.numeric(data$setting)){
-    p <- p + do.call(ggplot2::geom_ribbon,
-                     c(list(ggplot2::aes(ymin = lower, ymax = upper), alpha = 0.2,
-                            colour = NA), if(!colour) list(fill = red))) +
-      do.call(ggplot2::geom_line, fixed()) +
-      do.call(ggplot2::geom_point, fixed())
-  } else {
-    # side by side, so that equal values of the groups do not hide each other
-    p <- p + do.call(ggplot2::geom_pointrange,
-                     fixed(ggplot2::aes(ymin = lower, ymax = upper),
-                           position = ggplot2::position_dodge(width = 0.4)))
+    values <- sort(unique(data$setting))
+    data$setting <- factor(data$setting, levels = values,
+                           labels = format(values, trim = TRUE, drop0trailing = TRUE))
   }
-  p <- p + ag_theme_minimal() +
-    ggplot2::coord_cartesian(ylim = c(0, max(top, data$upper, na.rm = TRUE))) +
-    ggplot2::ylab(label) + ggplot2::xlab(vary[1])
-  if(colour) p <- p + ggplot2::labs(colour = paste(vary[-1], collapse = ", "),
-                                    fill = paste(vary[-1], collapse = ", "))
+  data$text <- show(data$middle)
+  # the panels share the width, so count the bars in all of them
+  bars <- nrow(data)
+  p <- ggplot2::ggplot(data, ggplot2::aes(x = setting, y = middle)) +
+    ggplot2::geom_col(fill = fill, width = 0.7)
+  if(spread) p <- p + ggplot2::geom_linerange(ggplot2::aes(ymin = lower, ymax = upper),
+                                              colour = ag_ink(), linewidth = 0.6)
+  # labels crowd one another past a dozen bars, so leave them to the axis
+  if(bars <= 12)
+    p <- p + ggplot2::geom_text(ggplot2::aes(y = if(spread) upper else middle,
+                                             label = text),
+                                vjust = -0.6, family = ag_font(),
+                                size = ag_text_size(if(bars > 8) 3 else 3.5),
+                                colour = ag_ink())
+  if(groups > 1) p <- p + ggplot2::facet_wrap(~ group)
+  top <- max(if(percent) 1 else 0, data$upper, data$middle, na.rm = TRUE)
+  breaks <- if(percent) seq(0, 1, 0.25) else if(whole)
+    function(l) unique(floor(pretty(l))) else ggplot2::waiver()
+  xname <- if(!is.null(names) && !is.na(names[vary[1]])) names[[vary[1]]] else vary[1]
+  xname <- paste0(toupper(substr(xname, 1, 1)), substring(xname, 2))
+  caption <- if(runs == 1) "One run for each setting." else if(!spread)
+    paste(runs, "runs for each setting, which all give the same result.") else
+      paste0("The median of ", runs, " runs for each setting, with the middle ",
+             round(100 * level), "% of the runs.")
+  p <- p + ggplot2::scale_y_continuous(
+    breaks = breaks,
+    labels = if(percent) function(v) paste0(round(100 * v), "%") else ggplot2::waiver(),
+    expand = ggplot2::expansion(mult = c(0, 0.1))) +
+    ggplot2::coord_cartesian(ylim = c(0, top * 1.08)) +
+    ggplot2::labs(x = xname, y = label, caption = caption) +
+    ag_theme_minimal() +
+    ggplot2::theme(legend.position = "top",
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_blank())
   p
 }
 
@@ -788,10 +819,9 @@ plot.opinionModel <- function(x, ..., stubbornness = NULL){
 #'   `plot.opinionSweep()` draws a measure of the opinions at the end for each
 #'   setting of a sweep, as from `infernet::sweep_opinion()`:
 #'   by default, the number of opinion clusters.
-#'   The first argument in `vary` is on the horizontal axis,
-#'   and a second argument, if any, gives the colour.
-#'   A line joins the median of the runs for each setting,
-#'   and a band holds the middle `level` of them.
+#'   It draws the settings as `plot.diffusionSweep()` does:
+#'   a bar for each setting, and a panel for each value of any other argument
+#'   in `vary`.
 #' @returns `plot.opinionSweep()` returns a plot of a measure of the opinions
 #'   at the end for each setting of a sweep.
 #' @export
@@ -805,12 +835,14 @@ plot.opinionSweep <- function(x, ..., outcome = c("clusters", "consensus",
     manynet::snet_abort(
       "An {.cls opinionSweep} needs a column for each setting, and {.val sim} and {.val {outcome}}.",
       "Make one with {.fn infernet::sweep_opinion}.")
-  label <- switch(outcome, clusters = "Opinion clusters",
-                  consensus = "Share reaching consensus",
-                  spread = "Spread of opinions", mean = "Mean opinion",
-                  steps = "Steps")
+  label <- switch(outcome, clusters = "Clusters of opinion at the end",
+                  consensus = "Share of runs reaching a consensus",
+                  spread = "Spread of opinions at the end (sd)",
+                  mean = "Mean opinion at the end", steps = "Steps played")
   .plot_sweep(ends, vary, outcome, label, level,
-              top = if(outcome %in% c("consensus", "clusters")) 1 else NULL)
+              percent = outcome == "consensus",
+              whole = outcome %in% c("clusters", "steps"),
+              names = attr(x, "names_of_vary"))
 }
 
 # A network with a record of opinions, as from manynet::play_opinion(): its

@@ -61,10 +61,9 @@ as when \code{manynet::play_opinion(stubbornness = "stubbornness")} is used.
 \code{plot.opinionSweep()} draws a measure of the opinions at the end for each
 setting of a sweep, as from \code{infernet::sweep_opinion()}:
 by default, the number of opinion clusters.
-The first argument in \code{vary} is on the horizontal axis,
-and a second argument, if any, gives the colour.
-A line joins the median of the runs for each setting,
-and a band holds the middle \code{level} of them.
+It draws the settings as \code{plot.diffusionSweep()} does:
+a bar for each setting, and a panel for each value of any other argument
+in \code{vary}.
 }
 \examples{
 set.seed(1)
