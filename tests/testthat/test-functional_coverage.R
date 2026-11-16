@@ -271,9 +271,12 @@ test_that("the diffusion plot adds a line for each compartment it holds", {
     manynet::play_diffusion(manynet::create_ring(10), seeds = 1))
   expect_false(any(si$E > 0))
   expect_false(any(si$R > 0))
+  # The lines are counted by their colours, since one layer can draw several.
   n_lines <- function(p) {
-    sum(vapply(p[["layers"]],
-               function(l) inherits(l[["geom"]], "GeomLine"), logical(1)))
+    built <- ggplot2::ggplot_build(p)
+    is_line <- vapply(p[["layers"]],
+                      function(l) inherits(l[["geom"]], "GeomLine"), logical(1))
+    length(unique(unlist(lapply(built$data[is_line], `[[`, "colour"))))
   }
   expect_equal(n_lines(si_p <- plot(si)), 2L)
   expect_buildable(si_p)
@@ -287,7 +290,7 @@ test_that("the diffusion plot adds a line for each compartment it holds", {
   set.seed(2)
   seir <- manynet::as_diffusion(
     manynet::play_diffusion(manynet::create_ring(10), seeds = 1,
-                            latency = 0.9))
+                            onset = 0.1))
   expect_true(any(seir$E > 0))
   expect_equal(n_lines(seir_p <- plot(seir)), 3L)
   expect_buildable(seir_p)
@@ -298,7 +301,7 @@ test_that("multiple diffusions smooth one line per compartment", {
   skip_if_not_installed("infernet")
   set.seed(1)
   sir <- infernet::play_diffusions(manynet::create_ring(10), seeds = 1,
-                                  latency = 0.9, recovery = 0.4, times = 3)
+                                  onset = 0.1, recovery = 0.4, times = 3)
   expect_true(any(sir$E > 0) && any(sir$R > 0))
   # suppressWarnings: loess on a short series warns about its span, which is
   # not what this is checking.

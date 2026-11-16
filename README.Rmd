@@ -1,7 +1,7 @@
 ---
 output:
   github_document:
-    html_preview: false
+    html_preview: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -108,7 +108,9 @@ results and not others
 
 `{autograph}` aims to solve these problems by providing automatic graph drawing
 for networks in any of the `{manynet}` formats,
-and automatic plotting for results from `{stocnet}` packages, including `{migraph}`, `{RSiena}`, and `{MoNAn}`, and more.
+and automatic plotting for results from `{stocnet}` packages,
+including `{migraph}`, `{RSiena}`, `{MoNAn}`, and `{goldfish}`,
+as well as for the diffusion, opinion, and mobility simulations in `{manynet}`.
 
 All you need to do is install the package 
 (loading it last will make sure its plotting methods are the default), 
@@ -116,6 +118,22 @@ use `set_stocnet_theme()` (once) to set your preferred theme,
 and then use `graphr()` to graph your networks,
 or `plot()` to plot your results.
 That's it!
+
+- [Design principles](#design-principles)
+- [Drawing graphs](#drawing-graphs)
+  - [More options](#more-options)
+  - [More layouts](#more-layouts)
+  - [More networks](#more-networks)
+  - [More time](#more-time)
+- [Generating plots](#generating-plots)
+  - [Plotting simulations](#plotting-simulations)
+  - [Setting a theme](#setting-a-theme)
+  - [Colours everyone can read](#colours-everyone-can-read)
+- [Installation](#installation)
+  - [Stable](#stable)
+  - [Development](#development)
+  - [Other sources](#other-sources)
+- [Funding details](#funding-details)
 
 ## Design principles
 
@@ -234,6 +252,25 @@ p <- (graphr(ison_southern_women, layout = "concentric") + ggtitle("Concentric l
 ggsave(site_figure("README-more-layouts-1.png"), p, width = 7, height = 5, dpi = 250)
 ```
 
+A "lineage" layout ranked by a time variable draws a network of citations
+or descent as a historiograph:
+each work sits at its own year along a time axis,
+and curved ties point to the work cited.
+
+<img src="https://www.jameshollway.com/post/autograph/README-lineage-1.png" alt="Graph of a citation network drawn as a historiograph, with each work placed at its year"/>
+
+```{r lineage, echo = FALSE, message=FALSE, eval = have_site}
+works <- create_explicit(B-+A, C-+A, D-+B, D-+C, E-+C, F-+D, F-+E, G-+E,
+                         H-+F, H-+G, I-+B, H-+I, J-+G, J-+I, K-+H, K-+J)
+years <- c(A = 1980, B = 1985, C = 1987, D = 1992, E = 1994, I = 1996,
+           F = 2000, G = 2003, J = 2006, H = 2010, K = 2015)
+works <- add_node_attribute(works, "year", unname(years[node_names(works)]))
+p <- graphr(works, layout = "lineage", ranks = "year", node_size = 3) +
+  ggtitle("Lineage layout",
+          subtitle = "graphr(works, layout = 'lineage', ranks = 'year')")
+ggsave(site_figure("README-lineage-1.png"), p, width = 7, height = 4, dpi = 250)
+```
+
 ### More networks
 
 The second graph drawing function included, `graphs()`, 
@@ -338,6 +375,34 @@ this is just for illustrative purposes.)
 ```{r siena-ergm-gof, echo = FALSE, dpi = 250, fig.height=2.5, message=FALSE, fig.path = site_prefix, fig.show = "hide", eval = have_site}
 plot(siena_gof) + ggtitle("SAOM goodness-of-fit")
 plot(ergm_gof) + ggtitle("ERGM goodness-of-fit")
+```
+
+### Plotting simulations
+
+`plot()` also draws the simulations that `{manynet}` runs on a network.
+A diffusion shows the share of nodes in each compartment at each step,
+an opinion model shows how each node's opinion moves towards consensus,
+with stubborn nodes marked,
+and a mobility model shows who occupies each place at each step,
+with the moves outlined and the dissatisfied occupants counted in the margin.
+
+<img src="https://www.jameshollway.com/post/autograph/README-simulations-1.png" alt="Plots of a diffusion, an opinion model, and a mobility model simulated on networks"/>
+
+```{r simulations, echo = FALSE, message=FALSE, eval = have_site}
+set.seed(1)
+diffused <- play_diffusion(ison_adolescents, seeds = 1, transmissibility = 0.5,
+                           onset = 0.6, recovery = 0.2)
+stubborn <- add_node_attribute(ison_networkers, "stubbornness",
+                               c(1, 0.5, rep(0, 30)))
+opined <- play_opinion(stubborn, opinions = runif(32),
+                       stubbornness = "stubbornness")
+places <- add_node_attribute(create_lattice(25), "group",
+                             rep(c(0, 1, NA, 1, 0), 5))
+moved <- play_mobility(places, "group")
+p <- ((plot(diffused) + ggtitle("plot(play_diffusion(...))")) |
+      (plot(opined) + ggtitle("plot(play_opinion(...))"))) /
+  wrap_elements(plot(moved) + plot_annotation(title = "plot(play_mobility(...))"))
+ggsave(site_figure("README-simulations-1.png"), p, width = 10, height = 8, dpi = 250)
 ```
 
 ### Setting a theme

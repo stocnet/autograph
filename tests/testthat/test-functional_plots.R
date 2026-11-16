@@ -53,6 +53,56 @@ plot_fixture_registry <- list(
   },
   diff_model  = function() autograph::res_manynet_diff,
   diffs_model = function() autograph::res_migraph_diff,
+  # A sweep as `infernet::sweep_diffusion()` binds it, made here so that
+  # the test does not need infernet.
+  diffusionSweep = function() {
+    set.seed(123)
+    runs <- lapply(c(0.2, 0.8), function(p) lapply(1:3, function(j) {
+      d <- as.data.frame(manynet::as_diffusion(manynet::play_diffusion(
+        manynet::ison_adolescents, seeds = 1, transmissibility = p, steps = 5)))
+      names(d)[names(d) == "t"] <- "time"
+      data.frame(transmissibility = p, sim = j, d)
+    }))
+    out <- dplyr::as_tibble(do.call(rbind, unlist(runs, recursive = FALSE)))
+    class(out) <- c("diffusionSweep", class(out))
+    attr(out, "vary") <- "transmissibility"
+    out
+  },
+  # The measures of each run as `infernet::sweep_opinion()` binds them.
+  opinionSweep = function() {
+    out <- dplyr::tibble(confidence = rep(c(0.1, 0.3), each = 3), sim = rep(1:3, 2),
+                         clusters = c(5, 6, 5, 2, 2, 1), consensus = c(rep(FALSE, 5), TRUE),
+                         spread = c(0.3, 0.3, 0.28, 0.1, 0.12, 0),
+                         mean = 0.5, steps = 20, settled = TRUE)
+    class(out) <- c("opinionSweep", class(out))
+    attr(out, "vary") <- "confidence"
+    out
+  },
+  diffusionModel = function() {
+    set.seed(123)
+    manynet::as_diffusion(manynet::play_diffusion(manynet::ison_adolescents,
+                                                  seeds = 1,
+                                                  transmissibility = 0.5))
+  },
+  diffusionTransitions = function() {
+    set.seed(123)
+    net <- manynet::play_diffusion(manynet::ison_adolescents, seeds = 1,
+                                   recovery = 0.2)
+    if (!inherits(net, "stocnet")) return(NULL)
+    net$info$transitions
+  },
+  opinionModel = function() {
+    if (!exists("play_opinion", asNamespace("manynet"))) return(NULL)
+    set.seed(123)
+    manynet::as_opinion(manynet::play_opinion(manynet::create_ring(6),
+                                              opinions = stats::runif(6)))
+  },
+  mobilityModel = function() {
+    set.seed(123)
+    places <- manynet::add_node_attribute(manynet::create_lattice(25), "group",
+                                          rep(c(0, 1, NA, 1, 0), 5))
+    manynet::as_mobility(manynet::play_mobility(places, "group"))
+  },
   learn_model = function() {
     set.seed(123)
     manynet::play_learning(manynet::create_ring(6), beliefs = stats::runif(6))
@@ -350,6 +400,44 @@ test_that("graphs() handles ego networks and changing networks", {
   expect_s3_class(suppressMessages(graphs(uneven)), "patchwork")
 })
 
+test_that("graphs() lays out a list of stocnets with different nodes", {
+  skip_on_cran()
+  # `length()` of a stocnet counts its list parts, not its nodes, so every list
+  # of stocnets was given one shared layout, and the panels with a different
+  # number of nodes failed to build with "arguments imply differing number of
+  # rows" (stocnet/manynet#186). The error comes when the plot is built.
+  built <- function(p) {
+    for (i in seq_along(p$patches$plots)) ggplot2::ggplot_build(p[[i]])
+    ggplot2::ggplot_build(p[[length(p)]])
+    p
+  }
+  ado <- manynet::as_stocnet(manynet::ison_adolescents)
+  lotr <- manynet::as_stocnet(manynet::fict_lotr)
+  egos <- manynet::to_egos(ado)
+  races <- manynet::to_subgraphs(lotr, "Race")
+  expect_s3_class(built(suppressMessages(graphs(egos, waves = 8))), "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(egos, waves = c(2, 4, 6)))),
+                  "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(races, waves = 1:4))),
+                  "patchwork")
+  expect_s3_class(built(suppressMessages(graphs(races))), "patchwork")
+  # networks of equal size but with different nodes do not share a layout
+  expect_false(.same_nodes(egos[c(2, 3)]))
+  expect_true(.same_nodes(list(ado, ado)))
+})
+
+test_that("graphs() draws a single static network with graphr()", {
+  skip_on_cran()
+  # Before, the network was iterated over as if it were a list, and failed with
+  # "invalid to use names()<- on an S4 object of class 'dgCMatrix'".
+  for (net in list(manynet::ison_adolescents,
+                   manynet::as_stocnet(manynet::ison_adolescents))) {
+    p <- suppressMessages(graphs(net))
+    expect_s3_class(p, "ggplot")
+    expect_false(inherits(p, "patchwork"))
+  }
+})
+
 test_that("graphs() splits a bare longitudinal or dynamic network", {
   skip_on_cran()
   # A single longitudinal network (longitudinal but not "changing") is split
@@ -362,6 +450,19 @@ test_that("graphs() splits a bare longitudinal or dynamic network", {
   expect_s3_class(suppressMessages(graphs(manynet::irps_nuclear)), "patchwork")
   # An interval (spell) network is split into per-period snapshots.
   expect_s3_class(suppressMessages(graphs(manynet::irps_wwi)), "patchwork")
+})
+
+test_that("graphs() draws panels with a single signed tie", {
+  skip_on_cran()
+  # The first slices of irps_nuclear hold one tie each. A single value was
+  # passed to the layer as a literal colour, so the shared category
+  # "Negative" reached grid as a colour name and drawing failed.
+  p <- suppressMessages(graphs(manynet::irps_nuclear))
+  for (i in seq_along(p$patches$plots)) expect_no_error(ggplot2::ggplot_build(p[[i]]))
+  expect_no_error(ggplot2::ggplot_build(p[[length(p)]]))
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_no_error(print(p))
 })
 
 test_that("graphs() splits a longitudinal network with non-character changing attributes", {

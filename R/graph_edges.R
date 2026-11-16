@@ -3,6 +3,7 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
                         backbone = NULL, edge_arrows = TRUE) {
   bundle_geom <- .infer_bundle_geom(edge_bundle)
   fan <- .has_parallel_ties(g)
+  diagonal <- .draws_diagonals(g, layout)
   if (manynet::is_directed(g)) {
     out <- .infer_directed_edge_mapping(g, edge_color, edge_size, node_size,
                                         layout, shared, backbone)
@@ -13,6 +14,8 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
       p <- .map_bundled_edges(p, g, out, bundle_geom, arrow = arrow)
     } else if (fan) {
       p <- .map_fanned_edges(p, g, out, directed = TRUE, arrow = arrow)
+    } else if (diagonal) {
+      p <- .map_diagonal_edges(p, g, out, directed = TRUE, arrow = arrow)
     } else {
       p <- .map_directed_edges(p, g, out, arrow)
     }
@@ -23,11 +26,13 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
       p <- .map_bundled_edges(p, g, out, bundle_geom)
     } else if (fan) {
       p <- .map_fanned_edges(p, g, out, directed = FALSE)
+    } else if (diagonal) {
+      p <- .map_diagonal_edges(p, g, out, directed = FALSE)
     } else {
       p <- .map_edges(p, g, out)
     }
   }
-  if (manynet::is_complex(g)) {
+  if (manynet::is_looped(g)) {
     # Resolved here rather than inside aes(), which would evaluate it lazily
     # against whatever `p` held by the time the plot was built.
     loop_strength <- .infer_loop_strength(p)
@@ -143,6 +148,15 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 }
 
 .infer_end_cap <- function(g, node_size, layout = NULL) {
+  # A "lineage" scales its nodes to the sizes they are drawn at, so the end of
+  # each tie is capped at the edge of the node it points to, with the
+  # arrowhead clear of it. See `.drawn_nsize()`.
+  if (identical(layout, "lineage")) {
+    nsize <- .drawn_nsize(g, node_size, layout) / 2 + 0.5
+    if (length(nsize) == 1L) return(rep(nsize, manynet::net_ties(g)))
+    to <- igraph::as_edgelist(manynet::as_igraph(g), names = FALSE)[, 2]
+    return(nsize[to])
+  }
   nsize <- .infer_nsize(g, node_size, layout)/2
   # Accounts for rescaling
   if (length(unique(nsize)) == 1) {
@@ -178,8 +192,12 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
                 line_type = quote(out[["line_type"]]),
                 ealpha    = quote(out[["ealpha"]]))
   mapping <- list(); params <- list()
+  # A category is mapped however few ties there are: a `graphs()` panel with a
+  # single tie still has its colour named by a category, such as "Negative",
+  # which only the scale can turn into a colour.
   for (nm in names(keys)) {
-    if (length(out[[nm]]) > 1) mapping[[keys[[nm]]]] <- exprs[[nm]]
+    if (length(out[[nm]]) > 1 || is.factor(out[[nm]]))
+      mapping[[keys[[nm]]]] <- exprs[[nm]]
     else params[[keys[[nm]]]] <- out[[nm]]
   }
   list(mapping = mapping, params = params)
@@ -234,8 +252,8 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
 
 # Whether any two ties join the same pair of nodes in the same way, so that a
 # straight line or a single arc would draw one on top of the other. This is not
-# `is_multiplex()`, which is TRUE for a network that only carries a non-reserved
-# tie attribute (see `.has_layers()` in R/graph_aes.R), and it is not
+# `is_multiplex()`, which asks only whether the ties carry a layer column
+# (see `.has_layers()` in R/graph_aes.R), and it is not
 # `which_mutual()`, which flags the two ties of a reciprocated dyad that
 # `geom_edge_arc()` already draws apart. `which_multiple()` respects direction:
 # it flags a repeated undirected pair, and a repeated directed pair, but not a
@@ -267,6 +285,37 @@ graph_edges <- function(p, g, edge_color, edge_size, node_size,
   if (length(parts$mapping))
     args$mapping <- do.call(ggplot2::aes, parts$mapping)
   .scale_edge_aes(p + do.call(ggraph::geom_edge_fan, args), parts)
+}
+
+# A "lineage" runs its layers left to right, so a tie runs from one layer to a
+# later or an earlier one. A curve that leaves and meets each node flat, along
+# the layers, shows which way a tie runs, and where several ties share a node
+# they fan out from it instead of lying on top of each other. That is how a
+# historiograph draws its citations. The two ties of a reciprocated dyad
+# would draw the same curve, so a network with any keeps its arcs, which draw
+# the two apart.
+.draws_diagonals <- function(g, layout) {
+  identical(layout, "lineage") && manynet::net_ties(g) > 0 &&
+    !any(igraph::which_mutual(manynet::as_igraph(g)) &
+           manynet::is_directed(g))
+}
+
+# Less than `geom_edge_diagonal()`'s full strength, so that a tie between two
+# nodes far apart in one layer does not run along the layer before it turns.
+.diagonal_strength <- function() 0.6
+
+.map_diagonal_edges <- function(p, g, out, directed = FALSE, arrow = NULL) {
+  parts <- .split_edge_aes(out)
+  # `flipped` since the layers run along x rather than down y, as in a tree.
+  args <- c(list(strength = .diagonal_strength(), flipped = TRUE),
+            parts$params)
+  if (directed) {
+    parts$mapping$end_cap <- quote(ggraph::circle(c(out[["end_cap"]]), 'mm'))
+    args$arrow <- arrow
+  }
+  if (length(parts$mapping))
+    args$mapping <- do.call(ggplot2::aes, parts$mapping)
+  .scale_edge_aes(p + do.call(ggraph::geom_edge_diagonal, args), parts)
 }
 
 .infer_bundle_geom <- function(edge_bundle) {

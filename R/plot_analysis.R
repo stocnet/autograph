@@ -24,6 +24,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
   density <- NULL
   if (is.null(attr(x, "mode"))) attr(x, "mode") <- rep(FALSE, length(x))
   data <- data.frame(Score = x, Mode = attr(x, "mode"))
+  data <- data[.finite_scores(x), , drop = FALSE]
   if (length(type) == 2) {
     p <- ggplot2::ggplot(data = data, ggplot2::aes(x = .data$Score)) +
       ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
@@ -62,6 +63,7 @@ plot.node_measure <- function(x, type = c("h", "d"), ...) {
 plot.tie_measure <- function(x, type = c("h", "d"), ...) {
   # type <- match.arg(type)
   data <- data.frame(Score = x)
+  data <- data[.finite_scores(x), , drop = FALSE]
   if (length(type) == 2) {
     p <- ggplot2::ggplot(data = data, ggplot2::aes(x = .data$Score)) +
       ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
@@ -499,4 +501,18 @@ plot.network_motif <- function(x, ...) {
     "{.fn manynet::net_by_dyad}.",
     "If you would like these motifs illustrated too, please raise an issue at",
     "{.url https://github.com/stocnet/autograph/issues}.")
+}
+
+# Which scores a histogram can draw. A measure can hold NA, as the adoption
+# threshold of a seed does, or Inf, as that of a node that never adopts does.
+# They left the bin width NA, so the histogram failed to draw; now they are
+# left out, with a note of how many.
+.finite_scores <- function(x){
+  keep <- is.finite(as.numeric(x))
+  if (!any(keep))
+    manynet::snet_abort("The measure has no finite values to plot.")
+  if (any(!keep))
+    manynet::snet_info("Leaving out {sum(!keep)} value{?s} that {?is/are} not",
+                       "finite: {sum(is.na(x))} NA and {sum(is.infinite(x))} infinite.")
+  keep
 }

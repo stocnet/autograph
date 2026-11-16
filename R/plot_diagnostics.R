@@ -664,10 +664,12 @@ gf_onset_accrual_panel <- function(x, summary, context) {
 #' @return A patchwork composition of the available panels.
 #' @name plot_goldfish_fit
 #' @examples
-#' plot(goldfish_fit)
+#' if (requireNamespace("goldfish", quietly = TRUE)) {
+#'   plot(goldfish_fit)
+#' }
 #' @export
 plot.goldfishFit <- function(x, ..., effects = 4) {
-  thisRequires("goldfish")
+  manynet::snet_requires("goldfish")
   panels <- list(
     gf_overview_deviance(x),
     gf_overview_schoenfeld(x, effects),

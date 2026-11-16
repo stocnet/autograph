@@ -1,3 +1,73 @@
+# autograph 1.3.0
+
+## Graphing
+
+- Improved `graphr()` arguments
+  - Added label directions to `label_repel`, e.g. `label_repel = "outside"`
+  - Added a label gap to `label_repel`, e.g. `label_repel = 10`
+  - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
+  - Renamed `snap` to `layout_snap`; `snap` is deprecated
+  - Improved the signature by hiding the internal `.shared` argument
+- Improved `graphr()` illustrating custom times of adoption
+- Improved `graphs()` handling of edge cases
+  - Fixed a list of stocnets sharing one layout (closing stocnet/manynet#186)
+  - Improved layout sharing to need the same nodes in the same order
+  - Passing a single static network is now drawn with `graphr()`
+  - Fixed panels with a single signed tie failing to draw, as in `irps_nuclear`
+- Fixed `graphs()` showing one legend per wave when the waves hold different values
+- Improved `graphs()` drawing a network of places from `play_mobility()`
+  - Colours the places by the attribute of the occupants, and leaves empty places blank
+- Improved `graphs()` and `grapht()` colouring a diffusion in any attribute
+- Improved `grapht()` arguments
+  - Added the same label directions and gaps to `label_repel`
+  - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is deprecated
+- Fixed `stocnet_completion()` offering no node or tie variables for a `.stocnet`
+
+## Plotting
+
+- Fixed `plot()` of a node or tie measure failing where the measure holds `NA` or `Inf`
+- Improved `plot.diff_model()` for custom diffusions
+  - Draws one line for each value, named by the value, e.g. "associate"
+  - Colours each value by its role: S blue, E yellow, I red, R green, D black
+  - Draws bars for the new nodes in the first value of I
+  - Added a line for the nodes that die from `fatality=`, named "Dead"
+  - Fixed the warnings about the uninitialised columns `E` and `R`
+- Improved `plot()` for a changing 'stocnet' to find the attribute that diffuses
+  - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
+- Improved `plot.diffs_model()` comparing an observed diffusion with simulations
+  - Added `observed=` to draw an observed diffusion over the simulated ones
+  - Added `level=` for the share of the simulations that the band holds
+- Added `plot.diffusionModel()` for the class that `as_diffusion()` returns
+- Added `plot.diffusionTransitions()` to draw the values and transitions
+  - e.g. `plot(net$info$transitions)`
+- Added `plot.diffusionSweep()` to draw the share infected for each setting
+  - e.g. `plot(sweep_diffusion(net, vary = list(transmissibility = c(0.1, 0.5))))`
+- Added `plot.opinionModel()` to draw the opinion of each node at each step
+  - Colours each node by its first opinion, and dashes a consensus
+  - Marks stubborn nodes, e.g. from a node attribute "stubbornness"
+- Added `plot.opinionSweep()` to draw the opinion clusters for each setting
+  - e.g. `plot(sweep_opinion(net, opinions, vary = list(confidence = c(0.1, 0.3))))`
+- Improved `plot()` for a 'stocnet' from `play_opinion()` to draw its opinions
+- Added `plot.mobilityModel()` to draw the dissatisfied occupants at each move
+- Improved `plot()` for a 'stocnet' from `play_mobility()` to draw its moves
+  - Draws the occupant of each place at each step as a grid, with the moves outlined
+  - Draws the dissatisfied occupants at each step in the margin
+
+## Layouts
+
+- Improved "lineage" layouts ranked by a time variable as historiographs (closes #72)
+  - Added a time axis, e.g. `graphr(x, layout = "lineage", ranks = "year")`
+  - Added curved ties with arrowheads at the cited node
+  - Improved node positions so that no tie runs through a node it does not join, unless they form a chain
+  - Improved the order within each year, so that two works of one year that are tied sit together
+  - Reduced tie crossings by moving works within their year, for timelines of up to about 50 works
+  - Improved `isolates=` to default to "keep", so that isolates sit at their own year
+  - Improved labels to repel each other and to stay within the plot
+  - Improved node sizes to scale by area over a wider range
+- Accelerated the "layered" layouts
+- Accelerated "stress" layouts on networks of more than 1000 nodes
+  - Looser tolerances for larger networks lays out 3000 nodes in 2 seconds rather than 7
+
 # autograph 1.2.9
 
 ## Package

@@ -1,9 +1,9 @@
-# The grid-snapping step behind `graphr(snap = TRUE)`, and the layouts it
+# The grid-snapping step behind `graphr(layout_snap = TRUE)`, and the layouts it
 # deliberately leaves alone. See R/graph_snap.R and `.fixed_layouts()`.
 
 test_that("snapping a layout to the grid yields integer-ish unique positions", {
   skip_on_cran()
-  p <- graphr(manynet::ison_adolescents, snap = TRUE)
+  p <- graphr(manynet::ison_adolescents, layout_snap = TRUE)
   expect_buildable(p)
   # depth_first_recursive_search() assigns each node its own grid point
   expect_false(any(duplicated(p$data[, c("x", "y")])))
@@ -20,7 +20,7 @@ test_that("lattice networks snap onto a full rectangular grid", {
                  manynet::create_lattice(16),
                  manynet::create_lattice(12, width = 4),
                  manynet::create_lattice(20, width = 4))) {
-    p <- suppressMessages(graphr(g, snap = TRUE))
+    p <- suppressMessages(graphr(g, layout_snap = TRUE))
     expect_buildable(p)
     d <- p$data[, c("x", "y")]
     expect_equal(d$x, round(d$x))
@@ -40,7 +40,7 @@ test_that("networks without a repeating structure take the fallback", {
                  manynet::create_tree(15))) {
     lo <- ggraph::create_layout(manynet::as_tidygraph(g), "stress")
     expect_null(.snap_basis(lo, manynet::as_igraph(g)))
-    p <- suppressMessages(graphr(g, snap = TRUE))
+    p <- suppressMessages(graphr(g, layout_snap = TRUE))
     expect_buildable(p)
     expect_false(any(duplicated(p$data[, c("x", "y")])))
   }
@@ -51,7 +51,7 @@ test_that("snapping a named network reads its ties by position", {
   # Regression: .edge_angle_deviation() read the tie ends with
   # igraph::as_edgelist(graph), which returns node names for a named network.
   # Indexing the coordinates by name gave NA, and the rotation score with it.
-  p <- suppressMessages(graphr(manynet::fict_lotr, snap = TRUE))
+  p <- suppressMessages(graphr(manynet::fict_lotr, layout_snap = TRUE))
   expect_buildable(p)
   expect_false(anyNA(p$data[, c("x", "y")]))
 })
@@ -75,9 +75,9 @@ test_that("snapping a two-mode (layered) layout falls back gracefully", {
   old <- options(snet_verbosity = "verbose")
   on.exit(options(old), add = TRUE)
   expect_message(
-    graphr(manynet::ison_southern_women, snap = TRUE),
+    graphr(manynet::ison_southern_women, layout_snap = TRUE),
     "layered")
-  snapped <- suppressMessages(graphr(manynet::ison_southern_women, snap = TRUE))
+  snapped <- suppressMessages(graphr(manynet::ison_southern_women, layout_snap = TRUE))
   plain   <- graphr(manynet::ison_southern_women)
   expect_buildable(snapped)
   # Each plot holds its own copy of the graph, which differs in its igraph
@@ -89,7 +89,7 @@ test_that("snapping a two-mode (layered) layout falls back gracefully", {
 test_that("snapping still works on a two-mode network with a force layout", {
   skip_on_cran()
   p <- suppressMessages(
-    graphr(manynet::ison_southern_women, layout = "stress", snap = TRUE))
+    graphr(manynet::ison_southern_women, layout = "stress", layout_snap = TRUE))
   expect_buildable(p)
   # every node lands on its own grid point
   expect_false(any(duplicated(p$data[, c("x", "y")])))

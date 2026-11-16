@@ -20,13 +20,13 @@ grapht(
   edge_size,
   isolates = c("keep", "fade"),
   alpha = 0.5,
-  label_dist = NULL,
   label_repel = TRUE,
   edge_arrows = NULL,
   keep_isolates = NULL,
   ...,
   node_colour,
-  edge_colour
+  edge_colour,
+  label_dist
 )
 
 \method{print}{grapht}(x, ...)
@@ -35,13 +35,13 @@ grapht(
 \item{tlist}{A manynet-compatible network listed according to
 a time attribute, waves, or slices.
 This can also be a single manynet network object that encodes time,
-which will be split automatically:
-longitudinal or changing networks are split into waves via
-\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
-such as \code{manynet::irps_nuclear} into cumulative time slices via
-\code{manynet::to_slices()}; and interval (spell) networks that record tie
-\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
-per change point showing the ties active in that spell.
+which is split automatically by \code{manynet::to_times()}
+into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+dynamic (time-stamped, event-based) networks such as
+\code{manynet::irps_nuclear} into the state accumulated by each moment, and
+interval (spell) networks that record tie \code{begin}/\code{end} lifespans,
+such as \code{manynet::irps_wwi}, into one snapshot per change point showing
+the ties active in that spell.
 It can also be a diffusion model result from e.g.
 \code{manynet::play_diffusion()}.}
 
@@ -50,6 +50,9 @@ If not declared, defaults to "configuration" for networks of up to
 six nodes, "levels" for connected multilevel networks,
 "layered" for other two mode networks,
 and "stress" for all other networks.
+The "stress" layout of a network of more than 1000 nodes is run at a
+looser tolerance (\code{tolerance = 1e-3}) to save time;
+give \code{tolerance = 1e-4} for the finer layout.
 For "layered" layout, one can further split graph by
 declaring the "center" argument as the "events", "actors",
 or by declaring a node name.
@@ -68,6 +71,12 @@ The layered layouts ("layered", "lineage", "railway" and "ladder")
 accept a "ranks" argument, which takes either one of the methods named
 at \code{?layout_layered} or a numeric node attribute to lay the layers out by,
 as a quoted attribute name or a vector with one value for each node.
+A "lineage" ranked by such values, such as \code{ranks = "year"}, is drawn as a
+timeline, as a historiograph of citations is: the x axis is broken at
+the values, with light vertical gridlines, the ties are curved,
+and the labels are repelled.
+Every "lineage" draws its ties curved and its mapped node sizes by area
+over a wider range.
 The "scaling" layout places the nodes by multidimensional scaling,
 so that the distance between two nodes approximates the number of steps
 between them. Since those coordinates can be read, this layout is drawn
@@ -143,30 +152,31 @@ is used. 0 computes each wave's layout freely,
 1 fixes all nodes at their aggregate-network positions.
 By default 0.5. Passed to \code{graphlayouts::layout_as_dynamic()}.}
 
-\item{label_dist}{Numeric scalar, in points (pt), controlling the extra
-gap left between labels and node borders -- similar to \code{igraph}'s
-\code{vertex.label.dist}. Node size is always accounted for automatically
-(larger nodes push labels further away without any extra configuration);
-\code{label_dist} adds further spacing on top of that, and defaults to a
-small gap: 5pt where every node is labelled, and 2pt where only a
-selection is, so that each label stays against the node it names.
-Set to \code{0} for labels right at the node border,
-or to a larger value (e.g. \code{15}) for more spacing.
-Only used when \code{labels = TRUE} and \code{label_repel = TRUE}
-(as the padding passed to the repel algorithm) or \code{label_repel = FALSE}
-(as a fixed nudge away from the node, in the layouts where this makes
-sense, e.g. "circle"/"concentric", "railway", "lineage").}
+\item{label_repel}{Where to put the labels.
+\itemize{
+\item \code{TRUE} (the default) repels the labels away from each other and from
+the nodes using \code{ggrepel} (via \code{ggraph}'s \code{repel} argument), leaving a
+small gap from each node's border: 5pt where every node is labelled,
+and 2pt where only a selection is, so that each label stays against
+the node it names. Node size is always accounted for.
+\item A number, e.g. \code{label_repel = 10}, repels the labels with a gap of that
+many points instead, similar to \code{igraph}'s \code{vertex.label.dist}.
+Set to \code{0} for labels right at the node border.
+\item \code{FALSE} places each label at a fixed offset from its node, in the
+direction the layout suits (outward in "circle" and "concentric",
+to the right in "lineage"), without the repelling algorithm, which
+can be slow and, for some layouts, differs between runs.
+\item A direction, \code{"outside"}, \code{"above"}, \code{"below"}, \code{"left"}, or \code{"right"},
+places every label at a fixed offset in that direction, whatever the
+layout. \code{"outside"} points away from the middle of the layout.
+A gap can be given with it, as in \code{label_repel = c(above = 3)}.
+}
 
-\item{label_repel}{Logical scalar, whether labels should be repelled away
-from each other and from nodes using \code{ggrepel}
-(via \code{ggraph}'s \code{repel} argument). Defaults to \code{TRUE}.
-Set to \code{FALSE} to place labels at a fixed offset (see \code{label_dist})
-without the (sometimes slow, and non-deterministic between runs for
-some layouts) repelling algorithm.
 The layered layouts ("layered", "lineage", "railway" and "ladder")
 place each node in a layer, which is where the reader looks for it,
 so a repelled label there would say less about which node it labels
-than a fixed offset does. They ignore this argument and always offset.}
+than a fixed offset does. They offset the labels instead,
+unless a direction is given.}
 
 \item{edge_arrows}{Whether, and at what size, to draw arrowheads on the ties
 of a directed network.
@@ -195,6 +205,8 @@ so the argument is ignored there.}
 \code{isolates = "fade"} instead.}
 
 \item{...}{Extra arguments to pass on to the layout algorithm, if necessary.}
+
+\item{label_dist}{Deprecated. Give the gap to \code{label_repel} instead.}
 
 \item{x}{A grapht object to print.}
 }
@@ -260,9 +272,11 @@ A progress bar is shown if it takes some time to encode all the
 \details{
 Unlike \code{graphr()}, \code{grapht()} does not use \code{ggrepel}-based label
 repelling (there is no straightforward way to repel labels consistently
-across animation frames), so \code{label_repel} here instead toggles a fixed
-offset nudging labels away from their nodes, and \code{label_dist} scales the
-size of that nudge rather than being used as repel padding.
+across animation frames), so \code{label_repel} here instead gives a fixed
+offset nudging labels away from their nodes: above them for \code{TRUE},
+none for \code{FALSE}, and in the direction named for a direction.
+A gap in points scales the size of that nudge rather than being used as
+repel padding.
 
 \code{labels} can select which nodes to label here too, and the selection is
 resolved once over all the waves so that the same nodes stay labelled from

@@ -56,6 +56,6 @@ as defined in the \code{{manynet}} package.
 plot(netrics::node_by_deg(ison_karateka))
 plot(netrics::tie_by_betweenness(ison_karateka))
 plot(res_netrics_robust$failure)
-plot(failure = res_netrics_robust$failure,
-     attack = res_netrics_robust$attack)
+plot(res_netrics_robust$failure,
+     res_netrics_robust$attack)
 }

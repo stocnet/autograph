@@ -25,3 +25,5 @@ vignettes/precompile\.R
 ^man-roxygen$
 ^inst/autograph_old\.png$
 ^Rplots\.pdf$
+^.*-Ex\.R$
+^.*\.Rcheck$

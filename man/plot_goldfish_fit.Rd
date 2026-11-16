@@ -57,5 +57,7 @@ ranked by their cumulative-score statistic, since a model with a dozen
 terms makes a facet grid unreadable at overview size.
 }
 \examples{
-plot(goldfish_fit)
+if (requireNamespace("goldfish", quietly = TRUE)) {
+  plot(goldfish_fit)
+}
 }

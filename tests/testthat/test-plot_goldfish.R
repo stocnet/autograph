@@ -296,6 +296,7 @@ test_that("an ordinal fit has no waiting-time panel", {
 })
 
 test_that("a fit with nothing stored says so instead of drawing", {
+  skip_if_not_installed("goldfish")
   bare <- goldfish_fit
   for (component in c(
     "interval_log_lik", "event_scores", "conditional_scores",

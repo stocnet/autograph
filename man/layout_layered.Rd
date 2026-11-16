@@ -101,7 +101,18 @@ axis in proportion to them rather than at even steps, so that a network
 of dated nodes is drawn as a timeline.
 The values run in the same direction as the layers the engine works out:
 down the page in a "layered" or "railway" layout, and left to right in a
-"lineage" or "ladder" layout, so that the smallest value comes first.}
+"lineage" or "ladder" layout, so that the smallest value comes first.
+A "lineage" given values lays out all of its nodes together, rather than
+one component at a time, so that an isolate or a small component sits in
+the column of its own value. \code{graphr()} draws it as a timeline.
+A node that a tie would run straight through, other than the two nodes
+the tie joins, is moved off that tie, so that several works citing one
+earlier work can be told from a chain of works each citing the one
+before. Two tied nodes with the same value are put next to each other,
+and nodes are moved within their layer where that leaves fewer ties
+crossing. That last step is left out of larger networks, where the
+number of nodes times the number of ties is more than 5000,
+to save time.}
 
 \item{alignment}{How each layer is spread out:
 "straight" (the default) draws the ties as close to straight as the

@@ -56,13 +56,13 @@
 #' @param tlist A manynet-compatible network listed according to
 #'   a time attribute, waves, or slices.
 #'   This can also be a single manynet network object that encodes time,
-#'   which will be split automatically:
-#'   longitudinal or changing networks are split into waves via
-#'   `manynet::to_waves()`; dynamic (time-stamped, event-based) networks
-#'   such as `manynet::irps_nuclear` into cumulative time slices via
-#'   `manynet::to_slices()`; and interval (spell) networks that record tie
-#'   `begin`/`end` lifespans, such as `manynet::irps_wwi`, into one snapshot
-#'   per change point showing the ties active in that spell.
+#'   which is split automatically by `manynet::to_times()`
+#'   into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+#'   dynamic (time-stamped, event-based) networks such as
+#'   `manynet::irps_nuclear` into the state accumulated by each moment, and
+#'   interval (spell) networks that record tie `begin`/`end` lifespans,
+#'   such as `manynet::irps_wwi`, into one snapshot per change point showing
+#'   the ties active in that spell.
 #'   It can also be a diffusion model result from e.g.
 #'   `manynet::play_diffusion()`.
 #' @param labels Which nodes to label, if the network is labelled.
@@ -89,12 +89,15 @@
 #'   By default 0.5. Passed to `graphlayouts::layout_as_dynamic()`.
 #' @param keep_isolates Deprecated. Use `isolates = "keep"` or
 #'   `isolates = "fade"` instead.
+#' @param label_dist Deprecated. Give the gap to `label_repel` instead.
 #' @details
 #'   Unlike `graphr()`, `grapht()` does not use `ggrepel`-based label
 #'   repelling (there is no straightforward way to repel labels consistently
-#'   across animation frames), so `label_repel` here instead toggles a fixed
-#'   offset nudging labels away from their nodes, and `label_dist` scales the
-#'   size of that nudge rather than being used as repel padding.
+#'   across animation frames), so `label_repel` here instead gives a fixed
+#'   offset nudging labels away from their nodes: above them for `TRUE`,
+#'   none for `FALSE`, and in the direction named for a direction.
+#'   A gap in points scales the size of that nudge rather than being used as
+#'   repel padding.
 #'
 #'   `labels` can select which nodes to label here too, and the selection is
 #'   resolved once over all the waves so that the same nodes stay labelled from
@@ -137,12 +140,12 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
                    edge_color, edge_size,
                    isolates = c("keep", "fade"),
                    alpha = 0.5,
-                   label_dist = NULL, label_repel = TRUE,
+                   label_repel = TRUE,
                    edge_arrows = NULL,
                    keep_isolates = NULL, ...,
-                   node_colour, edge_colour) {
-  thisRequires("gganimate")
-  thisRequires("gifski")
+                   node_colour, edge_colour, label_dist) {
+  manynet::snet_requires("gganimate")
+  manynet::snet_requires("gifski")
   # Check arguments ####
   labels_missing <- missing(labels)
   isolates_missing <- missing(isolates)
@@ -154,6 +157,13 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
       "or {.code isolates = \"fade\"} to fade them in and out, instead.")
     if (isolates_missing) isolates <- ifelse(isTRUE(keep_isolates), "keep", "fade")
   }
+  if (!missing(label_dist)) {
+    manynet::snet_warn(
+      "The {.arg label_dist} argument of {.fn grapht} is deprecated.",
+      "Please give the gap to {.arg label_repel} instead,",
+      "as in {.code label_repel = {label_dist}}.")
+  } else label_dist <- NULL
+  label_place <- .check_label_repel(label_repel, label_dist)
   if (missing(node_color) && missing(node_colour)) {
     node_color <- NULL
   } else if (missing(node_color)) {
@@ -178,6 +188,10 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   }
 
   # Normalise input into harmonised waves over the union of nodes ####
+  # A diffusion in an attribute of its own is coloured by the roles of its
+  # values, as the lines of `plot()` are. See `.diffusion_fill()`.
+  dfill <- if (is.null(node_color)) .diffusion_fill(tlist) else NULL
+  if (!is.null(dfill)) node_color <- dfill$attribute
   wl <- .grapht_waves(tlist)
   if (!wl$has_names) labels <- FALSE
   waves <- wl$waves
@@ -202,7 +216,7 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   node_size <- .check_node_size(g_ref, node_size)
   edge_color <- .check_edge_color(g_ref, edge_color)
   edge_size <- .check_edge_size(g_ref, edge_size)
-  if (manynet::is_complex(manynet::as_igraph(g_ref)))
+  if (manynet::is_looped(manynet::as_igraph(g_ref)))
     manynet::snet_info("Self-loops are not drawn in animations.")
 
   # Layout ####
@@ -231,10 +245,15 @@ grapht <- function(tlist, layout = NULL, labels = TRUE,
   p <- .grapht_build(nodes_out, edges_out, g_ref, labels,
                      node_color, node_shape, node_size,
                      edge_color, edge_size,
-                     label_dist, label_repel,
+                     label_place,
                      .infer_edge_arrows(g_ref,
                                         .check_edge_arrows(edge_arrows),
-                                        hasse = .is_hasse_layout(layout, ...))) +
+                                        hasse = .is_hasse_layout(layout, ...)))
+  if (!is.null(dfill))
+    p <- suppressMessages(p + ggplot2::scale_fill_manual(
+      dfill$attribute, values = dfill$values, limits = names(dfill$values),
+      drop = FALSE))
+  p <- p +
     gganimate::transition_states(states = frame, transition_length = 5,
                                  state_length = 10, wrap = FALSE) +
     gganimate::enter_fade() + gganimate::enter_grow() +
@@ -282,7 +301,7 @@ print.grapht <- function(x, ...) {
     manynet::snet_abort(paste(
       "Please declare a manynet-compatible network listed according",
       "to a time attribute, waves, or slices.",
-      "If you split the network yourself, e.g. with `to_waves()`,",
+      "If you split the network yourself, e.g. with `to_times()`,",
       "check that it returned a list of networks",
       "(and that the named attribute exists on the ties)."))
   }
@@ -324,44 +343,25 @@ print.grapht <- function(x, ...) {
 
 # Splits a single time-encoding manynet network into a list of snapshots,
 # shared by grapht() and graphs() so both accept a bare longitudinal or
-# dynamic network directly. Diffusion results and longitudinal or changing
-# networks split into waves (a changing network that already carries its
-# waves as a list attribute is unwrapped directly); spell (begin/end)
-# networks split into per-period snapshots of the ties active in each spell;
-# other dynamic (event) networks split into cumulative time slices. Anything
-# that matches none of these is returned unchanged.
+# dynamic network directly. A changing network that already carries its
+# waves as a list attribute is unwrapped directly, and a diffusion result of
+# the older class is split into its waves. Every other network that records
+# time is split by `to_times()` into the network as it stood at each moment
+# it records, whichever way it records time: the ties of each wave of a
+# panel, the state an event network has accumulated to, or the ties of a
+# spell (begin/end) network active then. Anything that records no time is
+# returned unchanged.
 .split_time_network <- function(x) {
-  if (inherits(x, "diff_model") ||
-      manynet::is_changing(x) || manynet::is_longitudinal(x)) {
-    if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
-      attr(x, "network")
-    else manynet::to_waves(x)
-  } else if (.grapht_is_spell(x)) {
-    .grapht_spell_slices(x)
-  } else if (manynet::is_dynamic(x)) {
-    manynet::to_slices(x)
-  } else x
-}
-
-# A spell (interval) network records each tie's lifespan as `begin`/`end` tie
-# attributes rather than as discrete time-stamped events (a `time` attribute).
-# `manynet::is_dynamic()` is TRUE for both, but only the event form can be split
-# by `to_slices()`, so spell networks are detected and sliced separately here.
-.grapht_is_spell <- function(net) {
-  atts <- manynet::net_tie_attributes(net)
-  "begin" %in% atts && "end" %in% atts && !("time" %in% atts)
-}
-
-# Splits a spell network into one snapshot per change point (each moment at
-# which some tie begins or ends), keeping the ties active during that spell
-# (begin <= t < end). Unlike the cumulative slices of an event network, these
-# show the network as it stood at each moment, so ties that dissolve disappear
-# again. `to_times()` returns a single network where there is only one change
-# point, but grapht() always needs a list of snapshots to iterate over.
-.grapht_spell_slices <- function(net) {
-  out <- manynet::to_times(net)
-  if (!manynet::is_list(out)) out <- list(out)
-  out
+  if (manynet::is_changing(x) && manynet::is_list(attr(x, "network")))
+    return(attr(x, "network"))
+  if (inherits(x, "diff_model")) return(manynet::to_waves(x))
+  if (manynet::is_changing(x) || manynet::is_longitudinal(x) ||
+      manynet::is_dynamic(x)) {
+    out <- manynet::to_times(x)
+    if (!manynet::is_list(out)) out <- list(out)
+    return(out)
+  }
+  x
 }
 
 # Nodes added to a wave during harmonisation carry NA attributes; fill them
@@ -636,7 +636,7 @@ print.grapht <- function(x, ...) {
 .grapht_build <- function(nodes_out, edges_out, g_ref, labels,
                           node_color, node_shape, node_size,
                           edge_color, edge_size,
-                          label_dist, label_repel, edge_arrows = TRUE) {
+                          label_place, edge_arrows = TRUE) {
   directed <- manynet::is_directed(g_ref)
   n_union <- length(unique(nodes_out$name))
   diffusion <- isTRUE(attr(nodes_out, "diffusion"))
@@ -751,23 +751,40 @@ print.grapht <- function(x, ...) {
   # `labels` arrives as the names of the nodes to label (or FALSE for none),
   # already resolved against the reference wave by grapht().
   if (!isFALSE(labels) && length(labels) > 0) {
-    # No ggrepel-based repelling here (see @details in grapht()'s docs);
-    # `label_repel` toggles a fixed offset instead, scaled by `label_dist`
-    # when supplied (calibrated so graphr()'s default `label_dist` of 10
-    # corresponds to the default offset). The offset is applied in data
-    # units, sized to clear the node radius so labels sit above nodes.
-    label_offset <- if (isTRUE(label_repel)) {
-      if (!is.null(label_dist)) label_dist / 50 else 0.2
-    } else 0
+    # No ggrepel-based repelling here (see @details in grapht()'s docs).
+    # `label_repel` gives a fixed offset instead: above the node by default,
+    # or in the direction asked for, scaled by the gap where one is given
+    # (calibrated so that a gap of 10 points is the default offset). The
+    # offset is applied in data units, sized to clear the node radius.
+    gap <- label_place$gap
+    direction <- label_place$direction %||%
+      if (isTRUE(label_place$repel)) "above"
+    label_offset <- if (!is.null(gap)) gap / 50 else if (!is.null(direction)) 0.2 else 0
+    if (is.null(direction)) direction <- "above"
     span <- max(diff(range(nodes_out$x)), diff(range(nodes_out$y)))
     nudge <- if (label_offset > 0 && is.finite(span))
       (0.3 * max(nodes_out$nsize) / 100 + 0.1 * label_offset) * span else 0
+    ldata <- nodes_out[nodes_out$name %in% labels, , drop = FALSE]
+    unit_x <- switch(direction, left = -1, right = 1, 0)
+    unit_y <- switch(direction, above = 1, below = -1, 0)
+    if (direction == "outside") {
+      dx <- ldata$x - mean(range(nodes_out$x))
+      dy <- ldata$y - mean(range(nodes_out$y))
+      phi <- atan2(dy, dx)
+      phi[dx == 0 & dy == 0] <- pi / 2
+      unit_x <- cos(phi)
+      unit_y <- sin(phi)
+    }
+    # Above the node is where the labels have always gone, centred on it.
+    centred <- identical(direction, "above") && is.null(label_place$direction)
     p <- p + ggplot2::geom_text(
       ggplot2::aes(x = .data$x, y = .data$y, label = .data$name,
                    group = .data$name, alpha = .data$nalpha),
-      data = nodes_out[nodes_out$name %in% labels, , drop = FALSE],
+      data = ldata,
       colour = ag_base(), family = ag_font(),
-      nudge_y = nudge, show.legend = FALSE)
+      hjust = if (centred) 0.5 else (1 - unit_x) / 2,
+      vjust = if (centred) 0.5 else (1 - unit_y) / 2,
+      nudge_x = unit_x * nudge, nudge_y = unit_y * nudge, show.legend = FALSE)
   }
 
   p <- p + ggplot2::scale_alpha_identity(guide = "none")

@@ -115,8 +115,10 @@ test_that("a network without a backbone to draw is drawn as it was", {
   expect_null(.infer_backbone(ag_net(manynet::fict_marvel),
                               list(filter = NULL, threshold = NULL)))
   # A two-mode network holds no triangle, so a Simmelian filter keeps no tie.
-  expect_null(.infer_backbone(ag_net(manynet::ison_southern_women),
-                              list(filter = NULL, threshold = NULL)))
+  expect_warning(
+    expect_null(.infer_backbone(ag_net(manynet::ison_southern_women),
+                                list(filter = NULL, threshold = NULL))),
+    "retains no tie")
   # An empty network has no tie to mark.
   expect_null(.infer_backbone(ag_net(manynet::create_empty(10)),
                               list(filter = NULL, threshold = NULL)))

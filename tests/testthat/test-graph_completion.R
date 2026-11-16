@@ -96,6 +96,8 @@ test_that("an argument whose default is a set of choices offers them", {
 
 test_that("an argument with no known set offers nothing", {
   g <- manynet::as_igraph(manynet::fict_lotr)
+  expect_equal(nrow(autograph:::.completion_values("layout_snap", g)), 0L)
+  # nor does a deprecated argument, which has no default
   expect_equal(nrow(autograph:::.completion_values("snap", g)), 0L)
   expect_equal(nrow(autograph:::.completion_values("", g)), 0L)
   # Without a network there are no attributes to offer.
@@ -151,11 +153,45 @@ test_that("a mark is labelled as one, and only marks are offered for labels", {
   expect_true("is_hobbit" %in% autograph:::.completion_marks(g))
 })
 
+test_that("a stocnet offers its node and tie variables, as an igraph does", {
+  # A 'stocnet' keeps its variables as columns of its node and tie tables,
+  # where igraph's accessors do not find them.
+  marvel <- manynet::fict_marvel
+  expect_s3_class(marvel, "stocnet")
+  nodes <- values("node_color", marvel)
+  expect_true(all(c("Gender", "Appearances", "PowerOrigin") %in% nodes))
+  expect_true("weight" %in% values("edge_color", marvel))
+  # The node labels are not a variable, under either class's name for them.
+  expect_false("label" %in% nodes)
+  expect_false("name" %in% nodes)
+  expect_false("name" %in% values("node_color", manynet::as_igraph(marvel)))
+  # Both classes offer the same variables, described in the same way.
+  vals <- autograph:::.completion_values("node_color", marvel)
+  ivals <- autograph:::.completion_values("node_color", manynet::as_igraph(marvel))
+  shared <- intersect(vals$value, ivals$value)
+  expect_true(all(c("Gender", "Appearances") %in% shared))
+  expect_equal(vals[vals$value %in% shared, c("label", "meta")],
+               ivals[match(vals$value[vals$value %in% shared], ivals$value),
+                     c("label", "meta")],
+               ignore_attr = TRUE)
+  expect_equal(vals$label[vals$value == "Appearances"], "numeric")
+  # Node labels are offered for `labels` from a stocnet too.
+  expect_true("Black Widow" %in% values("labels", marvel))
+  # A stocnet without tie variables offers none, rather than failing.
+  expect_s3_class(manynet::fict_lotr, "stocnet")
+  expect_true("Race" %in% values("node_color", manynet::fict_lotr))
+  expect_equal(nrow(autograph:::.completion_values("edge_color", manynet::fict_lotr)), 0)
+})
+
 # Finding the network ----
 
 test_that("only a symbol is looked up, and never a call", {
   net <- manynet::fict_lotr
+  # A stocnet is read as it is; any other class is coerced to igraph.
+  expect_s3_class(autograph:::.completion_object("net", environment()), "stocnet")
+  net <- manynet::as_network(manynet::fict_lotr)
   expect_s3_class(autograph:::.completion_object("net", environment()), "igraph")
+  net <- manynet::fict_lotr
   expect_null(autograph:::.completion_object("to_undirected(net)", environment()))
   expect_null(autograph:::.completion_object("nosuchobject", environment()))
   expect_null(autograph:::.completion_object("", environment()))
@@ -184,6 +220,17 @@ test_that("what is offered narrows to what has been typed", {
   expect_null(autograph:::.completion_suggest('graphr(fict_lotr, node_color = "zz',
                                               environment()))
   expect_null(autograph:::.completion_suggest("mean(x, na.rm = ", environment()))
+})
+
+test_that("a stocnet named in the call offers its variables", {
+  fict_marvel <- manynet::fict_marvel
+  out <- autograph:::.completion_suggest('graphr(fict_marvel, node_color = "Gen',
+                                         environment())
+  expect_equal(out$values$value, "Gender")
+  out <- autograph:::.completion_suggest('graphs(fict_marvel, node_size = "',
+                                         environment())
+  expect_true("Appearances" %in% out$values$value)
+  expect_false("label" %in% out$values$value)
 })
 
 # The RStudio hook ----

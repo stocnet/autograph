@@ -1,5 +1,6 @@
 graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
-                         node_size = NULL, labels = TRUE) {
+                         node_size = NULL, labels = TRUE,
+                         label_direction = NULL, timeline = FALSE) {
   # Labelling every node of a dense network hides the network behind its own
   # labels, so `labels` can also select which nodes to label. The selection is
   # resolved once here and the chosen rows handed to the geoms as their `data`,
@@ -8,6 +9,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # away from them either).
   sel <- .infer_labels(g, labels)
   if (!any(sel)) return(p)
+  repel_asked <- label_repel
   # These layouts put every node in a place that means something: a layer, a
   # ring, a rank. A repelled label leaves that place, and the reader has to
   # work out which node it belongs to. Each label is offset by a fixed amount
@@ -39,6 +41,16 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
   # previous hardcoded nudges (e.g. 0.05 alongside a fixed 5pt default gap).
   radius_pt <- if (!is.null(node_size)) max(node_size, na.rm = TRUE) / 2 * ggplot2::.pt else 0
   nudge_unit <- (radius_pt + gap_pt) * 0.01
+  # A direction the user asked for is the same for every layout, the layered
+  # ones included, since it was asked for outright.
+  if (!is.null(label_direction))
+    return(.label_in_direction(p, ldata, label_direction, radius_pt + gap_pt))
+  # A timeline puts the works of one year in one column, close together, and a
+  # label to the right of its node runs into the next years. So its labels are
+  # repelled, unless `label_repel = FALSE` asks for the fixed offset.
+  if (timeline && isTRUE(repel_asked))
+    return(.label_timeline(p, ldata, point_size,
+                           if (!is.null(label_dist)) padding))
   # `point.size` is only a recognised aesthetic on the ggrepel geoms (used
   # when `repel = TRUE`); plain `GeomText`/`GeomLabel` (`repel = FALSE`) don't
   # know it and would warn about an unknown aesthetic.
@@ -195,6 +207,72 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
     layout %in% c("layered", "lineage", "railway", "ladder")
 }
 
+# Labels a "lineage" ranked by values, as a historiograph is labelled: small
+# plain text, repelled from the other labels and from the nodes, with a leader
+# line where a label has to move away from its node. Nothing is hidden for
+# lack of room, since a work without its name cannot be read off the plot.
+# The works sit close together, so the gap from each node is small, unless
+# `label_repel` gave one (`padding`).
+.label_timeline <- function(p, ldata, point_size, padding = NULL) {
+  .label <- NULL # initialize variables to avoid CMD check notes
+  ldata[[".label"]] <- .drop_shared_suffix(ldata[["name"]], p[["data"]][["name"]])
+  args <- list(mapping = ggplot2::aes(label = .label, point.size = point_size),
+               data = ldata, repel = TRUE,
+               family = ag_font(), size = ag_text_size(2.6), colour = ag_ink(),
+               point.padding = padding %||% ggplot2::unit(1, "pt"),
+               box.padding = ggplot2::unit(2, "pt"),
+               max.overlaps = Inf, seed = 1234,
+               min.segment.length = ggplot2::unit(2, "mm"),
+               segment.size = 0.2,
+               segment.colour = ggplot2::alpha(ag_ink(), 0.4))
+  p + do.call(ggraph::geom_node_text, args) +
+    # Room at both ends for the labels of the first and last years, which
+    # ggrepel otherwise pushes back over the nodes beside them.
+    ggplot2::scale_x_continuous(
+      expand = ggplot2::expansion(mult = c(0.06, 0.06)))
+}
+
+# A historiograph of one journal names every work with the same journal at its
+# end, as in "SMALL H, 1985, SCIENTOMETRICS", and that last part tells no work
+# from another. Where the last comma-separated part of every node name is the
+# same, it is left off the labels. `all` is every node name, since the labels
+# drawn may be only a selection of them.
+.drop_shared_suffix <- function(x, all = x) {
+  if (!is.character(all) || length(all) < 2L) return(x)
+  last <- vapply(strsplit(all, ", ", fixed = TRUE), function(s)
+    if (length(s) > 1L) s[length(s)] else NA_character_, character(1))
+  if (anyNA(last) || length(unique(last)) != 1L) return(x)
+  substr(x, 1L, nchar(x) - nchar(last[1]) - 2L)
+}
+
+# Puts each label a fixed distance from its node in one direction, with the
+# text anchored at the node's side so that it reads away from the node.
+# "outside" points away from the middle of the layout, so that the labels of
+# the nodes around the edge fall into the space beyond it. `pt` is the distance
+# from the centre of the node, in points.
+.label_in_direction <- function(p, ldata, direction, pt) {
+  xs <- p[["data"]][["x"]]
+  ys <- p[["data"]][["y"]]
+  unit_x <- switch(direction, left = -1, right = 1, 0)
+  unit_y <- switch(direction, above = 1, below = -1, 0)
+  if (direction == "outside") {
+    dx <- ldata[["x"]] - mean(range(xs, na.rm = TRUE))
+    dy <- ldata[["y"]] - mean(range(ys, na.rm = TRUE))
+    phi <- atan2(dy, dx)
+    # A node at the very middle has no outward, so its label goes above.
+    phi[dx == 0 & dy == 0] <- pi / 2
+    unit_x <- cos(phi)
+    unit_y <- sin(phi)
+  }
+  args <- list(mapping = ggplot2::aes(label = name), data = ldata,
+               family = ag_font(), size = ag_text_size(3), colour = ag_ink(),
+               repel = FALSE,
+               hjust = (1 - unit_x) / 2, vjust = (1 - unit_y) / 2,
+               nudge_x = unit_x * .axis_nudge(pt, xs),
+               nudge_y = unit_y * .axis_nudge(pt, ys))
+  p + do.call(ggraph::geom_node_text, args)
+}
+
 # A nudge given in points, as `label_dist` and the node sizes are, has to reach
 # the geoms as a distance along an axis. The panel is not measured until the
 # plot is drawn, so the conversion takes a nominal panel of 500pt, about a
@@ -225,7 +303,7 @@ graph_labels <- function(p, g, layout, label_dist = NULL, label_repel = TRUE,
 # each mode, so both modes are labelled rather than only the denser one.
 .select_labels <- function(g, ranks, criterion, automatic = FALSE) {
   n <- as.numeric(manynet::net_nodes(g))
-  # Ranking nodes needs {netrics}, which is only suggested. thisRequires() asks
+  # Ranking nodes needs {netrics}, which is only suggested. manynet::snet_requires() asks
   # to install it when interactive but does nothing otherwise, and labelling is
   # too incidental to a plot to stop it: an automatic selection falls back to
   # the random sample, which needs nothing, while a selection the user asked

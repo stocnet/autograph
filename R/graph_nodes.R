@@ -45,9 +45,13 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
     }
   }
   # Consider rescaling nodes
-  p <- p + ggplot2::scale_size(range = c(1/manynet::net_nodes(g)*50, 
-                                         1/manynet::net_nodes(g)*100),
-                               limits = shared[["nsize"]])
+  # A "lineage" draws its nodes over a wider range, so that the sizes can be
+  # told apart. `.drawn_nsize()` gives the same sizes to the end caps and the
+  # labels.
+  range <- if (identical(layout, "lineage"))
+    .lineage_size_range(as.numeric(manynet::net_nodes(g))) else
+      c(1/manynet::net_nodes(g)*50, 1/manynet::net_nodes(g)*100)
+  p <- p + ggplot2::scale_size(range = range, limits = shared[["nsize"]])
   p
 }
 
@@ -97,7 +101,9 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
   if (!is.null(limits))
     limits <- .diffusion_levels[.diffusion_levels %in% limits]
   p + ggraph::geom_node_point(ggplot2::aes(fill = node_color),
-                              size = out[["nsize"]], shape = out[["nshape"]]) +
+                              size = out[["nsize"]], shape = out[["nshape"]],
+                              show.legend = if (is.null(limits)) NA else
+                                c(fill = TRUE)) +
     ggplot2::scale_fill_manual(name = NULL, guide = ggplot2::guide_legend(""),
                                limits = limits, drop = FALSE,
                                 values = c("Infected" = cols[1],
@@ -107,7 +113,6 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
 }
 
 .map_diff_model_nodes <- function(p, g, out, shared = NULL) {
-  dm <- manynet::as_diffusion(g)
   node_adopts <- .node_adoption_time(g)
   nshape <- ifelse(node_adopts == min(node_adopts), "Seed(s)",
                    ifelse(node_adopts == Inf, "Non-Adopter", "Adopter"))
@@ -159,6 +164,11 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
   }
   args <- params
   if (length(mapping)) args$mapping <- do.call(ggplot2::aes, mapping)
+  # A panel of `graphs()` draws keys only for the colours it uses, unless told
+  # to draw them all. Panels with different keys give different legends,
+  # which ggplot2 then shows once for each panel rather than once for all.
+  if (!is.null(mapping[["fill"]]) && !is.null(shared[["ncolor"]]))
+    args$show.legend <- c(fill = TRUE)
   # Naming the shapes by the categories they stand for, where `graphs()` has
   # worked out what those are across its panels, stops a panel that is missing
   # one of them from giving the rest each other's shapes.
@@ -171,11 +181,23 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
                                 drop = is.null(slevels))
 }
 
+# The infectious value of a diffusion: the first value of I in the
+# compartments a stocnet keeps, TRUE for a logical attribute, and "I" otherwise.
+.diffusion_infectious <- function(.data, attribute = .diffusion_attribute(.data)){
+  comps <- .net_compartments(.data)
+  if(!is.null(comps$I)) return(as.character(comps$I[1]))
+  if(attribute %in% manynet::net_node_attributes(.data) &&
+     is.logical(manynet::node_attribute(.data, attribute))) return("TRUE")
+  "I"
+}
+
 .node_adoption_time <- function(.data){
   
   if(inherits(.data, "diff_model")){
     net <- attr(.data, "network") 
-    out <- summary(.data) |> dplyr::filter(event == "I") |> 
+    comps <- attr(.data, "compartments")
+    infectious <- if(!is.null(comps$I)) as.character(comps$I[1]) else "I"
+    out <- summary(.data) |> dplyr::filter(as.character(event) == infectious) |> 
       dplyr::distinct(nodes, .keep_all = TRUE) |> 
       dplyr::select(nodes,t)
     if(!manynet::is_labelled(net))
@@ -192,9 +214,31 @@ graph_nodes <- function(p, g, node_color, node_shape, node_size,
     }
   } else {
     net <- .data
-    out <- manynet::as_changelist(.data) |> dplyr::filter(value == "I") |> 
+    # The adoption is the change to the infectious value of the attribute the
+    # diffusion changes, "I" by default or the first value of I in the
+    # compartments, as in `play_diffusion(compartments = )`.
+    attribute <- .diffusion_attribute(.data)
+    infectious <- .diffusion_infectious(.data, attribute)
+    changes <- manynet::as_changelist(.data)
+    if("var" %in% names(changes))
+      changes <- changes[as.character(changes$var) == attribute, , drop = FALSE]
+    changes$value <- as.character(unlist(changes$value))
+    out <- changes |> dplyr::filter(value == infectious) |> 
       dplyr::distinct(node, .keep_all = TRUE) |> 
       dplyr::select(node,time)
+    # A node that starts in the infectious value, which the record does not
+    # write when the attribute holds the start, adopts at the start.
+    if(attribute %in% manynet::net_node_attributes(.data)){
+      state <- as.character(manynet::node_attribute(.data, attribute))
+      starters <- setdiff(which(state == infectious), out$node)
+      if(length(starters)){
+        begin <- min(manynet::as_diffusion(.data, attribute = attribute)$time)
+        if (inherits(out$time, "Date")) begin <- as.Date(begin)
+        begin <- min(c(begin, out$time))
+        out <- dplyr::bind_rows(out, dplyr::tibble(node = starters, time = begin)) |>
+          dplyr::arrange(time)
+      }
+    }
     if(!manynet::is_labelled(net))
       out <- dplyr::arrange(out, node) else if (is.numeric(out$node))
         out$node <- manynet::node_names(net)[out$node]

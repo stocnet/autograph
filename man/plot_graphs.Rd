@@ -10,14 +10,20 @@ graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 \arguments{
 \item{netlist}{A list of manynet-compatible networks.
 This can also be a single manynet network object that encodes time,
-which will be split automatically (as in \code{grapht()}):
-longitudinal or changing networks are split into waves via
-\code{manynet::to_waves()}; dynamic (time-stamped, event-based) networks
-such as \code{manynet::irps_nuclear} into cumulative time slices via
-\code{manynet::to_slices()}; and interval (spell) networks that record tie
-\code{begin}/\code{end} lifespans, such as \code{manynet::irps_wwi}, into one snapshot
-per change point. It can also be a diffusion model result from e.g.
-\code{manynet::play_diffusion()}.}
+which is split automatically (as in \code{grapht()}) by \code{manynet::to_times()}
+into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+dynamic (time-stamped, event-based) networks such as
+\code{manynet::irps_nuclear} into the state accumulated by each moment, and
+interval (spell) networks that record tie \code{begin}/\code{end} lifespans,
+such as \code{manynet::irps_wwi}, into one snapshot per change point.
+It can also be a diffusion model result from e.g.
+\code{manynet::play_diffusion()}.
+A network of places with a record of moves, as from
+\code{manynet::play_mobility()}, is drawn at the start, the middle,
+and the last move, coloured by the attribute of the occupants,
+with the empty places blank.
+For such a network, \code{waves} select the steps, where 1 is the start.
+A single network that encodes no time is drawn with \code{graphr()}.}
 
 \item{waves}{Numeric, the number of plots to be displayed side-by-side.
 If missing, the number of plots will be reduced to the first and last
@@ -47,7 +53,7 @@ or a list of a network's different types of tie or across time.
 By default just the first and last network will be plotted,
 but this can be overridden by the "waves" parameter.
 
-Where the graphs are of the same network (same nodes),
+Where the graphs are of the same network (the same nodes in the same order),
 the graphs may share a layout to facilitate comparison.
 By default, successive graphs will use the layout calculated for
 the "first" network, but other options include the "last" layout,
