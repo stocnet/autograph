@@ -68,13 +68,13 @@ grapht(
   edge_size,
   isolates = c("keep", "fade"),
   alpha = 0.5,
-  label_dist = NULL,
   label_repel = TRUE,
   edge_arrows = NULL,
   keep_isolates = NULL,
   ...,
   node_colour,
-  edge_colour
+  edge_colour,
+  label_dist
 )
 
 # S3 method for class 'grapht'
@@ -91,15 +91,14 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 
   A manynet-compatible network listed according to a time attribute,
   waves, or slices. This can also be a single manynet network object
-  that encodes time, which will be split automatically: longitudinal or
-  changing networks are split into waves via
-  [`manynet::to_waves()`](https://stocnet.github.io/manynet/reference/modif_split.html);
-  dynamic (time-stamped, event-based) networks such as
+  that encodes time, which is split automatically by
+  [`manynet::to_times()`](https://stocnet.github.io/manynet/reference/modif_split.html)
+  into the network as it stood at each moment it records: longitudinal
+  or changing networks into waves, dynamic (time-stamped, event-based)
+  networks such as
   [`manynet::irps_nuclear`](https://stocnet.github.io/manynet/reference/irps_nuclear.html)
-  into cumulative time slices via
-  [`manynet::to_slices()`](https://stocnet.github.io/manynet/reference/modif_split.html);
-  and interval (spell) networks that record tie `begin`/`end` lifespans,
-  such as
+  into the state accumulated by each moment, and interval (spell)
+  networks that record tie `begin`/`end` lifespans, such as
   [`manynet::irps_wwi`](https://stocnet.github.io/manynet/reference/irps_wwi.html),
   into one snapshot per change point showing the ties active in that
   spell. It can also be a diffusion model result from e.g.
@@ -110,28 +109,36 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   An igraph, ggraph, or manynet layout algorithm. If not declared,
   defaults to "configuration" for networks of up to six nodes, "levels"
   for connected multilevel networks, "layered" for other two mode
-  networks, and "stress" for all other networks. For "layered" layout,
-  one can further split graph by declaring the "center" argument as the
-  "events", "actors", or by declaring a node name. For "concentric"
-  layout algorithm please declare the "membership" as an extra argument.
-  The "membership" argument expects either a quoted node attribute
-  present in data or vector with the same length as nodes to draw
-  concentric circles. For "levels" layout algorithm one may declare the
-  "level" as extra argument. The "level" argument expects either a
-  quoted node attribute present in data or vector with the same length
-  as nodes to hierarchically order categories. If "level" is missing,
-  the levels are taken from a 'lvl' node attribute where there is one,
-  or else from the two modes of a two mode network. The layered layouts
-  ("layered", "lineage", "railway" and "ladder") accept a "ranks"
-  argument, which takes either one of the methods named at
+  networks, and "stress" for all other networks. The "stress" layout of
+  a network of more than 1000 nodes is run at a looser tolerance
+  (`tolerance = 1e-3`) to save time; give `tolerance = 1e-4` for the
+  finer layout. For "layered" layout, one can further split graph by
+  declaring the "center" argument as the "events", "actors", or by
+  declaring a node name. For "concentric" layout algorithm please
+  declare the "membership" as an extra argument. The "membership"
+  argument expects either a quoted node attribute present in data or
+  vector with the same length as nodes to draw concentric circles. For
+  "levels" layout algorithm one may declare the "level" as extra
+  argument. The "level" argument expects either a quoted node attribute
+  present in data or vector with the same length as nodes to
+  hierarchically order categories. If "level" is missing, the levels are
+  taken from a 'lvl' node attribute where there is one, or else from the
+  two modes of a two mode network. The layered layouts ("layered",
+  "lineage", "railway" and "ladder") accept a "ranks" argument, which
+  takes either one of the methods named at
   [`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
   or a numeric node attribute to lay the layers out by, as a quoted
-  attribute name or a vector with one value for each node. The "scaling"
-  layout places the nodes by multidimensional scaling, so that the
-  distance between two nodes approximates the number of steps between
-  them. Since those coordinates can be read, this layout is drawn with
-  labelled axes on one scale, and captioned with how well two dimensions
-  hold the distances; see
+  attribute name or a vector with one value for each node. A "lineage"
+  ranked by such values, such as `ranks = "year"`, is drawn as a
+  timeline, as a historiograph of citations is: the x axis is broken at
+  the values, with light vertical gridlines, the ties are curved, and
+  the labels are repelled. Every "lineage" draws its ties curved and its
+  mapped node sizes by area over a wider range. The "scaling" layout
+  places the nodes by multidimensional scaling, so that the distance
+  between two nodes approximates the number of steps between them. Since
+  those coordinates can be read, this layout is drawn with labelled axes
+  on one scale, and captioned with how well two dimensions hold the
+  distances; see
   [`?layout_scaling`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   and
   [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md).
@@ -215,32 +222,36 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
   aggregate-network positions. By default 0.5. Passed to
   [`graphlayouts::layout_as_dynamic()`](https://schochastics.github.io/graphlayouts/reference/layout_dynamic.html).
 
-- label_dist:
-
-  Numeric scalar, in points (pt), controlling the extra gap left between
-  labels and node borders – similar to `igraph`'s `vertex.label.dist`.
-  Node size is always accounted for automatically (larger nodes push
-  labels further away without any extra configuration); `label_dist`
-  adds further spacing on top of that, and defaults to a small gap: 5pt
-  where every node is labelled, and 2pt where only a selection is, so
-  that each label stays against the node it names. Set to `0` for labels
-  right at the node border, or to a larger value (e.g. `15`) for more
-  spacing. Only used when `labels = TRUE` and `label_repel = TRUE` (as
-  the padding passed to the repel algorithm) or `label_repel = FALSE`
-  (as a fixed nudge away from the node, in the layouts where this makes
-  sense, e.g. "circle"/"concentric", "railway", "lineage").
-
 - label_repel:
 
-  Logical scalar, whether labels should be repelled away from each other
-  and from nodes using `ggrepel` (via `ggraph`'s `repel` argument).
-  Defaults to `TRUE`. Set to `FALSE` to place labels at a fixed offset
-  (see `label_dist`) without the (sometimes slow, and non-deterministic
-  between runs for some layouts) repelling algorithm. The layered
-  layouts ("layered", "lineage", "railway" and "ladder") place each node
-  in a layer, which is where the reader looks for it, so a repelled
-  label there would say less about which node it labels than a fixed
-  offset does. They ignore this argument and always offset.
+  Where to put the labels.
+
+  - `TRUE` (the default) repels the labels away from each other and from
+    the nodes using `ggrepel` (via `ggraph`'s `repel` argument), leaving
+    a small gap from each node's border: 5pt where every node is
+    labelled, and 2pt where only a selection is, so that each label
+    stays against the node it names. Node size is always accounted for.
+
+  - A number, e.g. `label_repel = 10`, repels the labels with a gap of
+    that many points instead, similar to `igraph`'s `vertex.label.dist`.
+    Set to `0` for labels right at the node border.
+
+  - `FALSE` places each label at a fixed offset from its node, in the
+    direction the layout suits (outward in "circle" and "concentric", to
+    the right in "lineage"), without the repelling algorithm, which can
+    be slow and, for some layouts, differs between runs.
+
+  - A direction, `"outside"`, `"above"`, `"below"`, `"left"`, or
+    `"right"`, places every label at a fixed offset in that direction,
+    whatever the layout. `"outside"` points away from the middle of the
+    layout. A gap can be given with it, as in
+    `label_repel = c(above = 3)`.
+
+  The layered layouts ("layered", "lineage", "railway" and "ladder")
+  place each node in a layer, which is where the reader looks for it, so
+  a repelled label there would say less about which node it labels than
+  a fixed offset does. They offset the labels instead, unless a
+  direction is given.
 
 - edge_arrows:
 
@@ -273,6 +284,10 @@ https://blog.schochastics.net/posts/2021-09-15_animating-network-evolutions-with
 
   Extra arguments to pass on to the layout algorithm, if necessary.
 
+- label_dist:
+
+  Deprecated. Give the gap to `label_repel` instead.
+
 - x:
 
   A grapht object to print.
@@ -293,9 +308,10 @@ Unlike
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md),
 `grapht()` does not use `ggrepel`-based label repelling (there is no
 straightforward way to repel labels consistently across animation
-frames), so `label_repel` here instead toggles a fixed offset nudging
-labels away from their nodes, and `label_dist` scales the size of that
-nudge rather than being used as repel padding.
+frames), so `label_repel` here instead gives a fixed offset nudging
+labels away from their nodes: above them for `TRUE`, none for `FALSE`,
+and in the direction named for a direction. A gap in points scales the
+size of that nudge rather than being used as repel padding.
 
 `labels` can select which nodes to label here too, and the selection is
 resolved once over all the waves so that the same nodes stay labelled

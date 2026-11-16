@@ -11,7 +11,7 @@ ego or component subgraphs of a network,
 or a list of a network's different types of tie or across time.
 By default just the first and last network will be plotted,
 but this can be overridden by the &quot;waves&quot; parameter.
-Where the graphs are of the same network (same nodes),
+Where the graphs are of the same network (the same nodes in the same order),
 the graphs may share a layout to facilitate comparison.
 By default, successive graphs will use the layout calculated for
 the &quot;first&quot; network, but other options include the &quot;last&quot; layout,
@@ -27,7 +27,7 @@ ego or component subgraphs of a network,
 or a list of a network's different types of tie or across time.
 By default just the first and last network will be plotted,
 but this can be overridden by the &quot;waves&quot; parameter.
-Where the graphs are of the same network (same nodes),
+Where the graphs are of the same network (the same nodes in the same order),
 the graphs may share a layout to facilitate comparison.
 By default, successive graphs will use the layout calculated for
 the &quot;first&quot; network, but other options include the &quot;last&quot; layout,
@@ -39,7 +39,7 @@ or a mix, &quot;both&quot;, of them."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,7 @@ ego or component subgraphs of a network,
 or a list of a network's different types of tie or across time.
 By default just the first and last network will be plotted,
 but this can be overridden by the "waves" parameter.</p>
-<p>Where the graphs are of the same network (same nodes),
+<p>Where the graphs are of the same network (the same nodes in the same order),
 the graphs may share a layout to facilitate comparison.
 By default, successive graphs will use the layout calculated for
 the "first" network, but other options include the "last" layout,
@@ -108,14 +108,20 @@ or a mix, "both", of them.</p>
 <dl><dt id="arg-netlist">netlist<a class="anchor" aria-label="anchor" href="#arg-netlist"></a></dt>
 <dd><p>A list of manynet-compatible networks.
 This can also be a single manynet network object that encodes time,
-which will be split automatically (as in <code><a href="plot_grapht.html">grapht()</a></code>):
-longitudinal or changing networks are split into waves via
-<code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_waves()</a></code>; dynamic (time-stamped, event-based) networks
-such as <code><a href="https://stocnet.github.io/manynet/reference/irps_nuclear.html" class="external-link">manynet::irps_nuclear</a></code> into cumulative time slices via
-<code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_slices()</a></code>; and interval (spell) networks that record tie
-<code>begin</code>/<code>end</code> lifespans, such as <code><a href="https://stocnet.github.io/manynet/reference/irps_wwi.html" class="external-link">manynet::irps_wwi</a></code>, into one snapshot
-per change point. It can also be a diffusion model result from e.g.
-<code><a href="https://stocnet.github.io/manynet/reference/make_play.html" class="external-link">manynet::play_diffusion()</a></code>.</p></dd>
+which is split automatically (as in <code><a href="plot_grapht.html">grapht()</a></code>) by <code><a href="https://stocnet.github.io/manynet/reference/modif_split.html" class="external-link">manynet::to_times()</a></code>
+into the network as it stood at each moment it records: longitudinal or changing networks into waves,
+dynamic (time-stamped, event-based) networks such as
+<code><a href="https://stocnet.github.io/manynet/reference/irps_nuclear.html" class="external-link">manynet::irps_nuclear</a></code> into the state accumulated by each moment, and
+interval (spell) networks that record tie <code>begin</code>/<code>end</code> lifespans,
+such as <code><a href="https://stocnet.github.io/manynet/reference/irps_wwi.html" class="external-link">manynet::irps_wwi</a></code>, into one snapshot per change point.
+It can also be a diffusion model result from e.g.
+<code><a href="https://stocnet.github.io/manynet/reference/make_play.html" class="external-link">manynet::play_diffusion()</a></code>.
+A network of places with a record of moves, as from
+<code><a href="https://stocnet.github.io/manynet/reference/make_mobility.html" class="external-link">manynet::play_mobility()</a></code>, is drawn at the start, the middle,
+and the last move, coloured by the attribute of the occupants,
+with the empty places blank.
+For such a network, <code>waves</code> select the steps, where 1 is the start.
+A single network that encodes no time is drawn with <code><a href="plot_graphr.html">graphr()</a></code>.</p></dd>
 
 
 <dt id="arg-waves">waves<a class="anchor" aria-label="anchor" href="#arg-waves"></a></dt>

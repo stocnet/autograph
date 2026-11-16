@@ -1131,7 +1131,7 @@ legible:
 | Spectral: `"eigen"`, `"scaling"`, `"correspondence"` | Both axes are calculated from the network |
 | Layered: `"layered"`, `"railway"`, `"lineage"`, `"ladder"` | One axis is data: a mode, a rank, a generation, a year |
 | Circular: `"concentric"`, `"circle"` | The ring a node is on, or its place around it, can be data |
-| Grid: `"grid"`, or any layout with `snap = TRUE` | Regular positions, chosen to keep labels apart |
+| Grid: `"grid"`, or any layout with `layout_snap = TRUE` | Regular positions, chosen to keep labels apart |
 | Force-directed: `"stress"`, `"fr"`, `"kk"` | A compromise, chosen to keep the whole drawing legible |
 | Manual: `x =` and `y =` | Whatever you decide |
 
@@ -1375,7 +1375,7 @@ among the characters of Westeros.**
 
 ``` r
 
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 graphr(thrones)
 ```
 
@@ -1390,7 +1390,7 @@ difference.
 
 ``` r
 
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 spans <- sapply(c("generation", "compact", "tight"), function(r) {
   span <- check_span(graphr(thrones, ranks = r))
   c(total = attr(span, "total"), `over one row` = mean(span > 1), max = max(span))
@@ -1413,7 +1413,7 @@ rule. **Compare the two alignments.**
 
 ``` r
 
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 c(straight = attr(check_offset(graphr(thrones)), "mean"),
   rungs = attr(check_offset(graphr(thrones, alignment = "rungs")), "mean"))
 ```
@@ -1493,15 +1493,15 @@ Other grid layouts include:
 That last point deserves a demonstration. Rather than committing to a
 full grid,
 [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)’s
-`snap = TRUE` argument keeps whatever layout you asked for but snaps its
-coordinates onto a grid — trading a little positional accuracy for the
-label legibility of a grid. **Compare the stress layout with its snapped
-version.**
+`layout_snap = TRUE` argument keeps whatever layout you asked for but
+snaps its coordinates onto a grid — trading a little positional accuracy
+for the label legibility of a grid. **Compare the stress layout with its
+snapped version.**
 
 ``` r
 
 (graphr(fict_lotr) + ggtitle("stress") |
-   graphr(fict_lotr, snap = TRUE) + ggtitle("stress + snap"))
+   graphr(fict_lotr, layout_snap = TRUE) + ggtitle("stress + snap"))
 ```
 
 **Try it yourself**: This section includes an interactive quiz in the
@@ -2366,9 +2366,9 @@ live tutorial — run `run_tute()` at the R console to try it.
 When you are ready, continue with the tutorials in the other `{stocnet}`
 packages — on network structure and centrality in
 [netrics](https://stocnet.github.io/netrics/), and on diffusion and
-regression in [migraph](https://stocnet.github.io/migraph/) — where the
-measures you can now visualise are properly introduced. Run `run_tute()`
-at the console to see all available tutorials.
+regression in `{infernet}` — where the measures you can now visualise
+are properly introduced. Run `run_tute()` at the console to see all
+available tutorials.
 
 ### Glossary
 

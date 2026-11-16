@@ -75,6 +75,8 @@ terms makes a facet grid unreadable at overview size.
 ## Examples
 
 ``` r
-plot(goldfish_fit)
+if (requireNamespace("goldfish", quietly = TRUE)) {
+  plot(goldfish_fit)
+}
 #> This fit stores no diagnostic primitive to plot.
 ```

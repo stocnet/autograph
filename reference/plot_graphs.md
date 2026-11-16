@@ -14,10 +14,11 @@ subgraphs of a network, or a list of a network's different types of tie
 or across time. By default just the first and last network will be
 plotted, but this can be overridden by the "waves" parameter.
 
-Where the graphs are of the same network (same nodes), the graphs may
-share a layout to facilitate comparison. By default, successive graphs
-will use the layout calculated for the "first" network, but other
-options include the "last" layout, or a mix, "both", of them.
+Where the graphs are of the same network (the same nodes in the same
+order), the graphs may share a layout to facilitate comparison. By
+default, successive graphs will use the layout calculated for the
+"first" network, but other options include the "last" layout, or a mix,
+"both", of them.
 
 ## Usage
 
@@ -30,21 +31,28 @@ graphs(netlist, waves, based_on = c("first", "last", "both"), ...)
 - netlist:
 
   A list of manynet-compatible networks. This can also be a single
-  manynet network object that encodes time, which will be split
-  automatically (as in
-  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)):
-  longitudinal or changing networks are split into waves via
-  [`manynet::to_waves()`](https://stocnet.github.io/manynet/reference/modif_split.html);
-  dynamic (time-stamped, event-based) networks such as
+  manynet network object that encodes time, which is split automatically
+  (as in
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md))
+  by
+  [`manynet::to_times()`](https://stocnet.github.io/manynet/reference/modif_split.html)
+  into the network as it stood at each moment it records: longitudinal
+  or changing networks into waves, dynamic (time-stamped, event-based)
+  networks such as
   [`manynet::irps_nuclear`](https://stocnet.github.io/manynet/reference/irps_nuclear.html)
-  into cumulative time slices via
-  [`manynet::to_slices()`](https://stocnet.github.io/manynet/reference/modif_split.html);
-  and interval (spell) networks that record tie `begin`/`end` lifespans,
-  such as
+  into the state accumulated by each moment, and interval (spell)
+  networks that record tie `begin`/`end` lifespans, such as
   [`manynet::irps_wwi`](https://stocnet.github.io/manynet/reference/irps_wwi.html),
   into one snapshot per change point. It can also be a diffusion model
   result from e.g.
   [`manynet::play_diffusion()`](https://stocnet.github.io/manynet/reference/make_play.html).
+  A network of places with a record of moves, as from
+  [`manynet::play_mobility()`](https://stocnet.github.io/manynet/reference/make_mobility.html),
+  is drawn at the start, the middle, and the last move, coloured by the
+  attribute of the occupants, with the empty places blank. For such a
+  network, `waves` select the steps, where 1 is the start. A single
+  network that encodes no time is drawn with
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md).
 
 - waves:
 

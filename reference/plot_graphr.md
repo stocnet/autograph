@@ -35,16 +35,16 @@ graphr(
   edge_color,
   edge_size,
   isolates = c("legend", "caption", "keep"),
-  snap = FALSE,
-  label_dist = NULL,
+  layout_snap = FALSE,
   label_repel = TRUE,
   edge_bundle = FALSE,
   edge_arrows = NULL,
   backbone = NULL,
-  .shared = NULL,
   ...,
   node_colour,
-  edge_colour
+  edge_colour,
+  snap,
+  label_dist
 )
 ```
 
@@ -59,28 +59,36 @@ graphr(
   An igraph, ggraph, or manynet layout algorithm. If not declared,
   defaults to "configuration" for networks of up to six nodes, "levels"
   for connected multilevel networks, "layered" for other two mode
-  networks, and "stress" for all other networks. For "layered" layout,
-  one can further split graph by declaring the "center" argument as the
-  "events", "actors", or by declaring a node name. For "concentric"
-  layout algorithm please declare the "membership" as an extra argument.
-  The "membership" argument expects either a quoted node attribute
-  present in data or vector with the same length as nodes to draw
-  concentric circles. For "levels" layout algorithm one may declare the
-  "level" as extra argument. The "level" argument expects either a
-  quoted node attribute present in data or vector with the same length
-  as nodes to hierarchically order categories. If "level" is missing,
-  the levels are taken from a 'lvl' node attribute where there is one,
-  or else from the two modes of a two mode network. The layered layouts
-  ("layered", "lineage", "railway" and "ladder") accept a "ranks"
-  argument, which takes either one of the methods named at
+  networks, and "stress" for all other networks. The "stress" layout of
+  a network of more than 1000 nodes is run at a looser tolerance
+  (`tolerance = 1e-3`) to save time; give `tolerance = 1e-4` for the
+  finer layout. For "layered" layout, one can further split graph by
+  declaring the "center" argument as the "events", "actors", or by
+  declaring a node name. For "concentric" layout algorithm please
+  declare the "membership" as an extra argument. The "membership"
+  argument expects either a quoted node attribute present in data or
+  vector with the same length as nodes to draw concentric circles. For
+  "levels" layout algorithm one may declare the "level" as extra
+  argument. The "level" argument expects either a quoted node attribute
+  present in data or vector with the same length as nodes to
+  hierarchically order categories. If "level" is missing, the levels are
+  taken from a 'lvl' node attribute where there is one, or else from the
+  two modes of a two mode network. The layered layouts ("layered",
+  "lineage", "railway" and "ladder") accept a "ranks" argument, which
+  takes either one of the methods named at
   [`?layout_layered`](https://stocnet.github.io/autograph/reference/layout_layered.md)
   or a numeric node attribute to lay the layers out by, as a quoted
-  attribute name or a vector with one value for each node. The "scaling"
-  layout places the nodes by multidimensional scaling, so that the
-  distance between two nodes approximates the number of steps between
-  them. Since those coordinates can be read, this layout is drawn with
-  labelled axes on one scale, and captioned with how well two dimensions
-  hold the distances; see
+  attribute name or a vector with one value for each node. A "lineage"
+  ranked by such values, such as `ranks = "year"`, is drawn as a
+  timeline, as a historiograph of citations is: the x axis is broken at
+  the values, with light vertical gridlines, the ties are curved, and
+  the labels are repelled. Every "lineage" draws its ties curved and its
+  mapped node sizes by area over a wider range. The "scaling" layout
+  places the nodes by multidimensional scaling, so that the distance
+  between two nodes approximates the number of steps between them. Since
+  those coordinates can be read, this layout is drawn with labelled axes
+  on one scale, and captioned with how well two dimensions hold the
+  distances; see
   [`?layout_scaling`](https://stocnet.github.io/autograph/reference/layout_scaling.md)
   and
   [`check_stress()`](https://stocnet.github.io/autograph/reference/check_layout.md).
@@ -197,11 +205,14 @@ graphr(
   the graph as they are. "legend" (default) will remove isolates from
   the graph but note them in the legend. "caption" will remove isolates
   from the graph but note them in the caption. If there are no isolates,
-  this argument will be ignored. If the default layout ("stress") is
-  used, we recommend that the "legend" option is used to avoid isolates
-  crowding out the giant component.
+  this argument will be ignored. The "lineage" layout defaults to "keep"
+  instead, since it gives every node a place in its layers, such as a
+  year; an `isolates` value that is given is used for it as for any
+  other layout. If the default layout ("stress") is used, we recommend
+  that the "legend" option is used to avoid isolates crowding out the
+  giant component.
 
-- snap:
+- layout_snap:
 
   Logical scalar, whether the layout should be snapped to a grid. Where
   the network repeats a structure, as a lattice does, the two steps it
@@ -210,32 +221,36 @@ graphr(
   vacant grid point. Layouts that already carry meaning in their
   coordinates, such as "layered" or "scaling", are left as they are.
 
-- label_dist:
-
-  Numeric scalar, in points (pt), controlling the extra gap left between
-  labels and node borders – similar to `igraph`'s `vertex.label.dist`.
-  Node size is always accounted for automatically (larger nodes push
-  labels further away without any extra configuration); `label_dist`
-  adds further spacing on top of that, and defaults to a small gap: 5pt
-  where every node is labelled, and 2pt where only a selection is, so
-  that each label stays against the node it names. Set to `0` for labels
-  right at the node border, or to a larger value (e.g. `15`) for more
-  spacing. Only used when `labels = TRUE` and `label_repel = TRUE` (as
-  the padding passed to the repel algorithm) or `label_repel = FALSE`
-  (as a fixed nudge away from the node, in the layouts where this makes
-  sense, e.g. "circle"/"concentric", "railway", "lineage").
-
 - label_repel:
 
-  Logical scalar, whether labels should be repelled away from each other
-  and from nodes using `ggrepel` (via `ggraph`'s `repel` argument).
-  Defaults to `TRUE`. Set to `FALSE` to place labels at a fixed offset
-  (see `label_dist`) without the (sometimes slow, and non-deterministic
-  between runs for some layouts) repelling algorithm. The layered
-  layouts ("layered", "lineage", "railway" and "ladder") place each node
-  in a layer, which is where the reader looks for it, so a repelled
-  label there would say less about which node it labels than a fixed
-  offset does. They ignore this argument and always offset.
+  Where to put the labels.
+
+  - `TRUE` (the default) repels the labels away from each other and from
+    the nodes using `ggrepel` (via `ggraph`'s `repel` argument), leaving
+    a small gap from each node's border: 5pt where every node is
+    labelled, and 2pt where only a selection is, so that each label
+    stays against the node it names. Node size is always accounted for.
+
+  - A number, e.g. `label_repel = 10`, repels the labels with a gap of
+    that many points instead, similar to `igraph`'s `vertex.label.dist`.
+    Set to `0` for labels right at the node border.
+
+  - `FALSE` places each label at a fixed offset from its node, in the
+    direction the layout suits (outward in "circle" and "concentric", to
+    the right in "lineage"), without the repelling algorithm, which can
+    be slow and, for some layouts, differs between runs.
+
+  - A direction, `"outside"`, `"above"`, `"below"`, `"left"`, or
+    `"right"`, places every label at a fixed offset in that direction,
+    whatever the layout. `"outside"` points away from the middle of the
+    layout. A gap can be given with it, as in
+    `label_repel = c(above = 3)`.
+
+  The layered layouts ("layered", "lineage", "railway" and "ladder")
+  place each node in a layer, which is where the reader looks for it, so
+  a repelled label there would say less about which node it labels than
+  a fixed offset does. They offset the labels instead, unless a
+  direction is given.
 
 - edge_bundle:
 
@@ -296,17 +311,14 @@ graphr(
   "scaling", keeps its coordinates and only fades its ties. Does not
   apply to signed networks.
 
-- .shared:
-
-  Internal. A list of the aesthetic ranges and categories found across a
-  list of networks, which
-  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
-  uses to draw and label each of its panels against the same scales. Not
-  intended to be set by hand.
-
 - ...:
 
   Extra arguments to pass on to the layout algorithm, if necessary.
+
+- snap, label_dist:
+
+  Deprecated. Use `layout_snap` instead of `snap`, and give the gap to
+  `label_repel` instead of `label_dist`.
 
 ## Value
 
@@ -344,7 +356,7 @@ ison_adolescents |>
   graphr(node_color = "color", node_size = "size",
          edge_size = 1.5, edge_color = "ecolor")
 
-graphr(ison_southern_women, labels = TRUE, label_dist = 10)
+graphr(ison_southern_women, labels = TRUE, label_repel = 10)
 
 # Label a selection of the nodes rather than all of them
 graphr(ison_southern_women, labels = 2)
@@ -353,6 +365,8 @@ graphr(ison_adolescents, labels = c("Alice", "Betty"))
 
 # \donttest{
 graphr(ison_southern_women, labels = TRUE, label_repel = FALSE)
+
+graphr(ison_karateka, label_repel = "outside")
 
 graphr(ison_southern_women, labels = "betweenness")
 

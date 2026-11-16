@@ -271,7 +271,7 @@ attr(check_lengths(circled), "cv")
 attr(check_angles(circled), "min")
 #> [1] 5.625
 # And where the layout has rows, how long and how straight are its ties?
-thrones <- manynet::to_uniplex(manynet::fict_thrones, "parent")
+thrones <- manynet::to_layer(manynet::fict_thrones, "parent")
 drawn <- graphr(thrones)
 attr(check_span(drawn), "total")
 #> [1] 270

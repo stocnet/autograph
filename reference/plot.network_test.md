@@ -18,7 +18,7 @@ plot(x, ..., threshold = 0.95, tails = c("two", "one"))
 
   An object obtained from a conditional uniform graph or quadratic
   assignment procedure test. For example,
-  [`migraph::test_permutation()`](https://stocnet.github.io/migraph/reference/tests.html).
+  `infernet::test_permutation()`.
 
 - ...:
 

@@ -8,6 +8,8 @@ testing and demonstrating how autograph plots look.
 ``` r
 data(res_infernet_reg)
 
+data(res_netrics_robust)
+
 data(res_migraph_reg)
 
 data(res_migraph_test)
@@ -46,6 +48,8 @@ data(goldfish_fit)
 ## Format
 
 An object of class `netreg_lm` (inherits from `netreg`) of length 15.
+
+An object of class `list` of length 2.
 
 An object of class `netlm` of length 15.
 
@@ -88,3 +92,18 @@ An object of class `goldfishTimeTest` (inherits from `list`) of length
 An object of class `goldfishOnset` (inherits from `list`) of length 3.
 
 An object of class `goldfishFit` of length 31.
+
+## Details
+
+`res_netrics_robust` is a list of two robustness results from
+`netrics::net_by_robustness()`, each a "network_measure" with a "curve"
+attribute, on a 50-node scale-free network: `failure`, robustness to
+random failure (100 simulations), and `attack`, robustness to an
+adaptive attack on degree. It was made with:
+
+    set.seed(1234)
+    g <- manynet::generate_scalefree(50, 1)
+    res_netrics_robust <- list(
+      failure = netrics::net_by_robustness(g, times = 100),
+      attack = netrics::net_by_robustness(g,
+                 node_measure = netrics::node_by_degree))

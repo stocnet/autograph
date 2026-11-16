@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,7 +150,7 @@
 </li>
 <li>Lint: <code><a href="https://lintr.r-lib.org/reference/lint.html" class="external-link">lintr::lint_package()</a></code>
 </li>
-<li>Spell check: <code><a href="https://docs.ropensci.org/spelling//reference/spell_check_package.html" class="external-link">spelling::spell_check_package()</a></code>
+<li>Spell check: <code><a href="https://docs.ropensci.org/spelling/reference/spell_check_package.html" class="external-link">spelling::spell_check_package()</a></code>
 </li>
 <li>Rebuild <code>README.md</code> from <code>README.Rmd</code>: <code><a href="https://devtools.r-lib.org/reference/build_readme.html" class="external-link">devtools::build_readme()</a></code>
 </li>
@@ -233,6 +233,16 @@
 <td>‘many’ data plots; the whole file is commented out at present</td>
 </tr></tbody></table><p>New <code>plot.*</code> methods must be registered in NAMESPACE via roxygen <code>@method</code>/<code>@export</code> tags — run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> after adding one. Suggestions for new plot methods are welcome.</p>
 </div>
+<div class="section level3">
+<h3 id="notation">Notation<a class="anchor" aria-label="anchor" href="#notation"></a></h3>
+<p>Use one notation for code in issues, reviews, documentation, and NEWS items:</p>
+<ul><li>Give a function or generic backticks and parentheses, e.g. <code>verb_function()</code>.</li>
+<li>Give a specific method its full name, e.g. <code>verb_function.stocnet()</code>.</li>
+<li>Give an argument an equals sign, e.g. <code>argument=</code>.</li>
+<li>Put a value that an argument takes, or a variable, in double quotation marks, e.g. “value”.</li>
+<li>Give a class a leading period when referring to it, e.g. <code>.stocnet</code>. A leading period on a name with parentheses is an internal helper instead, e.g. <code>.helper_function()</code>.</li>
+<li>Name a new class in camelCase, after the package plus a noun, e.g. <code>infernetConfusion</code>, so that a class does not look like a snake_case function. See “Class names across the stocnet ecosystem” below. Older names, such as <code>network_test</code>, stay until they can be renamed with an alias.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="class-names-across-the-stocnet-ecosystem">Class names across the stocnet ecosystem<a class="anchor" aria-label="anchor" href="#class-names-across-the-stocnet-ecosystem"></a></h3>
 <p>S3 dispatch matches exact class strings, so two packages that emit the same class string collide: <code>autograph</code> cannot tell the objects apart, and neither can a user’s <code><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits()</a></code> check. A name such as <code>test_gof</code> or <code>margin_table</code> is the name any sibling package would pick for the same idea, so it is not safe.</p>

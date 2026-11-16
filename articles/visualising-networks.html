@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1279,7 +1279,7 @@ the picture legible:</p>
 </tr>
 <tr class="even">
 <td>Grid: <code>"grid"</code>, or any layout with
-<code>snap = TRUE</code>
+<code>layout_snap = TRUE</code>
 </td>
 <td>Regular positions, chosen to keep labels apart</td>
 </tr>
@@ -1528,7 +1528,7 @@ obscures this ordering, <code><a href="../reference/plot_graphr.html">graphr()</
 <code>"layered"</code> layout to make it clear. <strong>Draw the parent
 ties among the characters of Westeros.</strong></p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_plexity.html" class="external-link">to_uniplex</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_layers.html" class="external-link">to_layer</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">thrones</span><span class="op">)</span></span></code></pre></div>
 <p>This layout tries to minimise two costs. The first is which layer
 each node goes in. Ranking each node by its distance from a root sounds
@@ -1538,7 +1538,7 @@ a long tie to reach them. The <code>ranks</code> argument chooses the
 rule, and <code><a href="../reference/check_layout.html">check_span()</a></code> reports how many rows each tie
 crosses, so you can measure the difference.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_plexity.html" class="external-link">to_uniplex</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_layers.html" class="external-link">to_layer</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
 <span><span class="va">spans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"generation"</span>, <span class="st">"compact"</span>, <span class="st">"tight"</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">span</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/check_layout.html">check_span</a></span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">thrones</span>, ranks <span class="op">=</span> <span class="va">r</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">span</span>, <span class="st">"total"</span><span class="op">)</span>, `over one row` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">span</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span>, max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">span</span><span class="op">)</span><span class="op">)</span></span>
@@ -1556,7 +1556,7 @@ down scores zero. Again, you are wanting to minimise this, and the
 <code>alignment</code> argument chooses the rule. <strong>Compare the
 two alignments.</strong></p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_plexity.html" class="external-link">to_uniplex</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">thrones</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/modif_layers.html" class="external-link">to_layer</a></span><span class="op">(</span><span class="va">fict_thrones</span>, <span class="st">"parent"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>straight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_layout.html">check_offset</a></span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">thrones</span><span class="op">)</span><span class="op">)</span>, <span class="st">"mean"</span><span class="op">)</span>,</span>
 <span>  rungs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="fu"><a href="../reference/check_layout.html">check_offset</a></span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">thrones</span>, alignment <span class="op">=</span> <span class="st">"rungs"</span><span class="op">)</span><span class="op">)</span>, <span class="st">"mean"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><code>alignment = "rungs"</code> gives every row the same spacing,
@@ -1570,7 +1570,7 @@ nodes are placed along the axis in proportion to them rather than at
 even steps, so a network of dated nodes is drawn as a timeline.
 <strong>Rank the adolescents by a year of your choosing.</strong></p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ison_adolescents</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/coerce_graph.html" class="external-link">as_stocnet</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="va">ison_adolescents</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://stocnet.github.io/manynet/reference/coerce_stocnet.html" class="external-link">as_stocnet</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://stocnet.github.io/manynet/reference/manip_nodes_attr.html" class="external-link">mutate_nodes</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1985</span>, <span class="fl">1990</span>, <span class="fl">1995</span>, <span class="fl">2000</span><span class="op">)</span>, times <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>,</span>
 <span>               label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">label</span>, <span class="st">" ("</span>, <span class="va">year</span>, <span class="st">")"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span>layout <span class="op">=</span> <span class="st">"lineage"</span>, ranks <span class="op">=</span> <span class="st">"year"</span><span class="op">)</span></span></code></pre></div>
@@ -1626,14 +1626,14 @@ difficult to distinguish whether some nodes are tied or not.</p>
 <li>grid snapping for other layouts</li>
 </ul>
 <p>That last point deserves a demonstration. Rather than committing to a
-full grid, <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>snap = TRUE</code> argument
-keeps whatever layout you asked for but snaps its coordinates onto a
-grid — trading a little positional accuracy for the label legibility of
-a grid. <strong>Compare the stress layout with its snapped
+full grid, <code><a href="../reference/plot_graphr.html">graphr()</a></code>’s <code>layout_snap = TRUE</code>
+argument keeps whatever layout you asked for but snaps its coordinates
+onto a grid — trading a little positional accuracy for the label
+legibility of a grid. <strong>Compare the stress layout with its snapped
 version.</strong></p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"stress"</span><span class="op">)</span> <span class="op">|</span></span>
-<span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, snap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"stress + snap"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>   <span class="fu"><a href="../reference/plot_graphr.html">graphr</a></span><span class="op">(</span><span class="va">fict_lotr</span>, layout_snap <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"stress + snap"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="callout">
 <p><span class="callout-label"><strong>Try it yourself</strong>:</span>
 This section includes an interactive quiz in the live tutorial — run
@@ -2576,7 +2576,7 @@ This section includes an interactive quiz in the live tutorial — run
 <p>When you are ready, continue with the tutorials in the other
 <code>{stocnet}</code> packages — on network structure and centrality in
 <a href="https://stocnet.github.io/netrics/" class="external-link">netrics</a>, and on diffusion and regression in
-<a href="https://stocnet.github.io/migraph/" class="external-link">migraph</a> — where the measures you can now visualise are
+<code>{infernet}</code> — where the measures you can now visualise are
 properly introduced. Run <code>run_tute()</code> at the console to see
 all available tutorials.</p>
 <div class="section level3">

@@ -9,7 +9,7 @@ testing and demonstrating how autograph plots look."><meta property="og:image" c
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +55,8 @@ testing and demonstrating how autograph plots look.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">res_infernet_reg</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">res_netrics_robust</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">res_migraph_reg</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">res_migraph_test</span><span class="op">)</span></span>
@@ -93,6 +95,7 @@ testing and demonstrating how autograph plots look.</p>
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
     <p>An object of class <code>netreg_lm</code> (inherits from <code>netreg</code>) of length 15.</p>
+<p>An object of class <code>list</code> of length 2.</p>
 <p>An object of class <code>netlm</code> of length 15.</p>
 <p>An object of class <code>network_test</code> of length 9.</p>
 <p>An object of class <code>diffs_model</code> (inherits from <code>data.frame</code>) with 20 rows and 11 columns.</p>
@@ -110,6 +113,21 @@ testing and demonstrating how autograph plots look.</p>
 <p>An object of class <code>goldfishTimeTest</code> (inherits from <code>list</code>) of length 3.</p>
 <p>An object of class <code>goldfishOnset</code> (inherits from <code>list</code>) of length 3.</p>
 <p>An object of class <code>goldfishFit</code> of length 31.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>res_netrics_robust</code> is a list of two robustness results from
+<code>netrics::net_by_robustness()</code>, each a "network_measure" with a "curve"
+attribute, on a 50-node scale-free network:
+<code>failure</code>, robustness to random failure (100 simulations),
+and <code>attack</code>, robustness to an adaptive attack on degree.
+It was made with:</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">manynet</span><span class="fu">::</span><span class="fu"><a href="https://stocnet.github.io/manynet/reference/make_growth.html" class="external-link">generate_scalefree</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">res_netrics_robust</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  failure <span class="op">=</span> <span class="fu">netrics</span><span class="fu">::</span><span class="fu">net_by_robustness</span><span class="op">(</span><span class="va">g</span>, times <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>,</span>
+<span>  attack <span class="op">=</span> <span class="fu">netrics</span><span class="fu">::</span><span class="fu">net_by_robustness</span><span class="op">(</span><span class="va">g</span>,</span>
+<span>             node_measure <span class="op">=</span> <span class="fu">netrics</span><span class="fu">::</span><span class="va"><a href="https://stocnet.github.io/netrics/reference/measure_central_degree.html" class="external-link">node_by_degree</a></span><span class="op">)</span><span class="op">)</span></span></code></pre><p></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

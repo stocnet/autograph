@@ -1,6 +1,165 @@
 # Changelog
 
+## autograph 1.3.0
+
+### Graphing
+
+- Improved
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  arguments
+  - Added label directions to `label_repel`,
+    e.g. `label_repel = "outside"`
+  - Added a label gap to `label_repel`, e.g. `label_repel = 10`
+  - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is
+    deprecated
+  - Renamed `snap` to `layout_snap`; `snap` is deprecated
+  - Improved the signature by hiding the internal `.shared` argument
+- Improved
+  [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  illustrating custom times of adoption
+- Improved
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  handling of edge cases
+  - Fixed a list of stocnets sharing one layout (closing
+    stocnet/manynet#186)
+  - Improved layout sharing to need the same nodes in the same order
+  - Passing a single static network is now drawn with
+    [`graphr()`](https://stocnet.github.io/autograph/reference/plot_graphr.md)
+  - Fixed panels with a single signed tie failing to draw, as in
+    `irps_nuclear`
+- Fixed
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  showing one legend per wave when the waves hold different values
+- Improved
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  drawing a network of places from
+  [`play_mobility()`](https://stocnet.github.io/manynet/reference/make_mobility.html)
+  - Colours the places by the attribute of the occupants, and leaves
+    empty places blank
+- Improved
+  [`graphs()`](https://stocnet.github.io/autograph/reference/plot_graphs.md)
+  and
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+  colouring a diffusion in any attribute
+- Improved
+  [`grapht()`](https://stocnet.github.io/autograph/reference/plot_grapht.md)
+  arguments
+  - Added the same label directions and gaps to `label_repel`
+  - Renamed `label_dist` to a gap in `label_repel`; `label_dist` is
+    deprecated
+- Fixed
+  [`stocnet_completion()`](https://stocnet.github.io/autograph/reference/completion.md)
+  offering no node or tie variables for a `.stocnet`
+
+### Plotting
+
+- Fixed [`plot()`](https://rdrr.io/r/graphics/plot.default.html) of a
+  node or tie measure failing where the measure holds `NA` or `Inf`
+- Improved
+  [`plot.diff_model()`](https://stocnet.github.io/autograph/reference/plot.diffusion.md)
+  for custom diffusions
+  - Draws one line for each value, named by the value, e.g. “associate”
+  - Colours each value by its role: S blue, E yellow, I red, R green, D
+    black
+  - Draws bars for the new nodes in the first value of I
+  - Added a line for the nodes that die from `fatality=`, named “Dead”
+  - Fixed the warnings about the uninitialised columns `E` and `R`
+- Improved [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+  a changing ‘stocnet’ to find the attribute that diffuses
+  - e.g. `plot(play_diffusion(ison_lawfirm, "status", compartments = ...))`
+- Improved
+  [`plot.diffs_model()`](https://stocnet.github.io/autograph/reference/plot.diffusion.md)
+  comparing an observed diffusion with simulations
+  - Added `observed=` to draw an observed diffusion over the simulated
+    ones
+  - Added `level=` for the share of the simulations that the band holds
+- Added
+  [`plot.diffusionModel()`](https://stocnet.github.io/autograph/reference/plot.diffusion.md)
+  for the class that
+  [`as_diffusion()`](https://stocnet.github.io/manynet/reference/make_play.html)
+  returns
+- Added
+  [`plot.diffusionTransitions()`](https://stocnet.github.io/autograph/reference/plot.transitions.md)
+  to draw the values and transitions
+  - e.g. `plot(net$info$transitions)`
+- Added
+  [`plot.diffusionSweep()`](https://stocnet.github.io/autograph/reference/plot.diffusion.md)
+  to draw the share infected for each setting
+  - e.g. `plot(sweep_diffusion(net, vary = list(transmissibility = c(0.1, 0.5))))`
+- Added
+  [`plot.opinionModel()`](https://stocnet.github.io/autograph/reference/plot.opinion.md)
+  to draw the opinion of each node at each step
+  - Colours each node by its first opinion, and dashes a consensus
+  - Marks stubborn nodes, e.g. from a node attribute “stubbornness”
+- Added
+  [`plot.opinionSweep()`](https://stocnet.github.io/autograph/reference/plot.opinion.md)
+  to draw the opinion clusters for each setting
+  - e.g. `plot(sweep_opinion(net, opinions, vary = list(confidence = c(0.1, 0.3))))`
+- Improved [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+  a ‘stocnet’ from
+  [`play_opinion()`](https://stocnet.github.io/manynet/reference/make_opinion.html)
+  to draw its opinions
+- Added
+  [`plot.mobilityModel()`](https://stocnet.github.io/autograph/reference/plot.mobility.md)
+  to draw the dissatisfied occupants at each move
+- Improved [`plot()`](https://rdrr.io/r/graphics/plot.default.html) for
+  a ‘stocnet’ from
+  [`play_mobility()`](https://stocnet.github.io/manynet/reference/make_mobility.html)
+  to draw its moves
+  - Draws the occupant of each place at each step as a grid, with the
+    moves outlined
+  - Draws the dissatisfied occupants at each step in the margin
+
+### Layouts
+
+- Improved “lineage” layouts ranked by a time variable as historiographs
+  (closes [\#72](https://github.com/stocnet/autograph/issues/72))
+  - Added a time axis,
+    e.g. `graphr(x, layout = "lineage", ranks = "year")`
+  - Added curved ties with arrowheads at the cited node
+  - Improved node positions so that no tie runs through a node it does
+    not join, unless they form a chain
+  - Improved the order within each year, so that two works of one year
+    that are tied sit together
+  - Reduced tie crossings by moving works within their year, for
+    timelines of up to about 50 works
+  - Improved `isolates=` to default to “keep”, so that isolates sit at
+    their own year
+  - Improved labels to repel each other and to stay within the plot
+  - Improved node sizes to scale by area over a wider range
+- Accelerated the “layered” layouts
+- Accelerated “stress” layouts on networks of more than 1000 nodes
+  - Looser tolerances for larger networks lays out 3000 nodes in 2
+    seconds rather than 7
+
+## autograph 1.2.9
+
+### Package
+
+- Replaced the calls to ‘migraph’ functions that moved to ‘infernet’ in
+  migraph 2.0.0
+
+### Plotting
+
+- Added
+  [`plot.infernetConfusion()`](https://stocnet.github.io/autograph/reference/plot.infernetConfusion.md)
+  for `infernet::diagnose_confusion()`
+  - `panel=` shows one panel: “roc”, “confusion”, or “metrics”
+- Adapted
+  [`plot.network_measure()`](https://stocnet.github.io/autograph/reference/map_measure.md)
+  for `netrics::net_by_robustness()` curves (closes
+  [\#67](https://github.com/stocnet/autograph/issues/67))
+  - Several results can be compared in one plot,
+    e.g. `plot(failure = a, attack = b)`
+  - A dashed line shows the most robust case, where R = 0.5
+
+### Data
+
+- Added `res_netrics_robust`, precooked ‘netrics’ robustness results
+
 ## autograph 1.2.8
+
+CRAN release: 2026-10-30
 
 ### Plotting
 

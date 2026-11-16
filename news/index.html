@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">autograph</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.2.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,128 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.8" id="autograph-128">autograph 1.2.8<a class="anchor" aria-label="anchor" href="#autograph-128"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.3.0" id="autograph-130">autograph 1.3.0<a class="anchor" aria-label="anchor" href="#autograph-130"></a></h2>
+<div class="section level3">
+<h3 id="graphing-1-3-0">Graphing<a class="anchor" aria-label="anchor" href="#graphing-1-3-0"></a></h3>
+<ul><li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> arguments
+<ul><li>Added label directions to <code>label_repel</code>, e.g. <code>label_repel = "outside"</code>
+</li>
+<li>Added a label gap to <code>label_repel</code>, e.g. <code>label_repel = 10</code>
+</li>
+<li>Renamed <code>label_dist</code> to a gap in <code>label_repel</code>; <code>label_dist</code> is deprecated</li>
+<li>Renamed <code>snap</code> to <code>layout_snap</code>; <code>snap</code> is deprecated</li>
+<li>Improved the signature by hiding the internal <code>.shared</code> argument</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_graphr.html">graphr()</a></code> illustrating custom times of adoption</li>
+<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> handling of edge cases
+<ul><li>Fixed a list of stocnets sharing one layout (closing stocnet/manynet#186)</li>
+<li>Improved layout sharing to need the same nodes in the same order</li>
+<li>Passing a single static network is now drawn with <code><a href="../reference/plot_graphr.html">graphr()</a></code>
+</li>
+<li>Fixed panels with a single signed tie failing to draw, as in <code>irps_nuclear</code>
+</li>
+</ul></li>
+<li>Fixed <code><a href="../reference/plot_graphs.html">graphs()</a></code> showing one legend per wave when the waves hold different values</li>
+<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> drawing a network of places from <code><a href="https://stocnet.github.io/manynet/reference/make_mobility.html" class="external-link">play_mobility()</a></code>
+<ul><li>Colours the places by the attribute of the occupants, and leaves empty places blank</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot_graphs.html">graphs()</a></code> and <code><a href="../reference/plot_grapht.html">grapht()</a></code> colouring a diffusion in any attribute</li>
+<li>Improved <code><a href="../reference/plot_grapht.html">grapht()</a></code> arguments
+<ul><li>Added the same label directions and gaps to <code>label_repel</code>
+</li>
+<li>Renamed <code>label_dist</code> to a gap in <code>label_repel</code>; <code>label_dist</code> is deprecated</li>
+</ul></li>
+<li>Fixed <code><a href="../reference/completion.html">stocnet_completion()</a></code> offering no node or tie variables for a <code>.stocnet</code>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-1-3-0">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-3-0"></a></h3>
+<ul><li>Fixed <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> of a node or tie measure failing where the measure holds <code>NA</code> or <code>Inf</code>
+</li>
+<li>Improved <code><a href="../reference/plot.diffusion.html">plot.diff_model()</a></code> for custom diffusions
+<ul><li>Draws one line for each value, named by the value, e.g. “associate”</li>
+<li>Colours each value by its role: S blue, E yellow, I red, R green, D black</li>
+<li>Draws bars for the new nodes in the first value of I</li>
+<li>Added a line for the nodes that die from <code>fatality=</code>, named “Dead”</li>
+<li>Fixed the warnings about the uninitialised columns <code>E</code> and <code>R</code>
+</li>
+</ul></li>
+<li>Improved <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a changing ‘stocnet’ to find the attribute that diffuses
+<ul><li>e.g. <code>plot(play_diffusion(ison_lawfirm, "status", compartments = ...))</code>
+</li>
+</ul></li>
+<li>Improved <code><a href="../reference/plot.diffusion.html">plot.diffs_model()</a></code> comparing an observed diffusion with simulations
+<ul><li>Added <code>observed=</code> to draw an observed diffusion over the simulated ones</li>
+<li>Added <code>level=</code> for the share of the simulations that the band holds</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot.diffusion.html">plot.diffusionModel()</a></code> for the class that <code><a href="https://stocnet.github.io/manynet/reference/make_play.html" class="external-link">as_diffusion()</a></code> returns</li>
+<li>Added <code><a href="../reference/plot.transitions.html">plot.diffusionTransitions()</a></code> to draw the values and transitions
+<ul><li>e.g. <code>plot(net$info$transitions)</code>
+</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot.diffusion.html">plot.diffusionSweep()</a></code> to draw the share infected for each setting
+<ul><li>e.g. <code>plot(sweep_diffusion(net, vary = list(transmissibility = c(0.1, 0.5))))</code>
+</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot.opinion.html">plot.opinionModel()</a></code> to draw the opinion of each node at each step
+<ul><li>Colours each node by its first opinion, and dashes a consensus</li>
+<li>Marks stubborn nodes, e.g. from a node attribute “stubbornness”</li>
+</ul></li>
+<li>Added <code><a href="../reference/plot.opinion.html">plot.opinionSweep()</a></code> to draw the opinion clusters for each setting
+<ul><li>e.g. <code>plot(sweep_opinion(net, opinions, vary = list(confidence = c(0.1, 0.3))))</code>
+</li>
+</ul></li>
+<li>Improved <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a ‘stocnet’ from <code><a href="https://stocnet.github.io/manynet/reference/make_opinion.html" class="external-link">play_opinion()</a></code> to draw its opinions</li>
+<li>Added <code><a href="../reference/plot.mobility.html">plot.mobilityModel()</a></code> to draw the dissatisfied occupants at each move</li>
+<li>Improved <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> for a ‘stocnet’ from <code><a href="https://stocnet.github.io/manynet/reference/make_mobility.html" class="external-link">play_mobility()</a></code> to draw its moves
+<ul><li>Draws the occupant of each place at each step as a grid, with the moves outlined</li>
+<li>Draws the dissatisfied occupants at each step in the margin</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="layouts-1-3-0">Layouts<a class="anchor" aria-label="anchor" href="#layouts-1-3-0"></a></h3>
+<ul><li>Improved “lineage” layouts ranked by a time variable as historiographs (closes <a href="https://github.com/stocnet/autograph/issues/72" class="external-link">#72</a>)
+<ul><li>Added a time axis, e.g. <code>graphr(x, layout = "lineage", ranks = "year")</code>
+</li>
+<li>Added curved ties with arrowheads at the cited node</li>
+<li>Improved node positions so that no tie runs through a node it does not join, unless they form a chain</li>
+<li>Improved the order within each year, so that two works of one year that are tied sit together</li>
+<li>Reduced tie crossings by moving works within their year, for timelines of up to about 50 works</li>
+<li>Improved <code>isolates=</code> to default to “keep”, so that isolates sit at their own year</li>
+<li>Improved labels to repel each other and to stay within the plot</li>
+<li>Improved node sizes to scale by area over a wider range</li>
+</ul></li>
+<li>Accelerated the “layered” layouts</li>
+<li>Accelerated “stress” layouts on networks of more than 1000 nodes
+<ul><li>Looser tolerances for larger networks lays out 3000 nodes in 2 seconds rather than 7</li>
+</ul></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.9" id="autograph-129">autograph 1.2.9<a class="anchor" aria-label="anchor" href="#autograph-129"></a></h2>
+<div class="section level3">
+<h3 id="package-1-2-9">Package<a class="anchor" aria-label="anchor" href="#package-1-2-9"></a></h3>
+<ul><li>Replaced the calls to ‘migraph’ functions that moved to ‘infernet’ in migraph 2.0.0</li>
+</ul></div>
+<div class="section level3">
+<h3 id="plotting-1-2-9">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-2-9"></a></h3>
+<ul><li>Added <code><a href="../reference/plot.infernetConfusion.html">plot.infernetConfusion()</a></code> for <code>infernet::diagnose_confusion()</code>
+<ul><li>
+<code>panel=</code> shows one panel: “roc”, “confusion”, or “metrics”</li>
+</ul></li>
+<li>Adapted <code><a href="../reference/map_measure.html">plot.network_measure()</a></code> for <code>netrics::net_by_robustness()</code> curves (closes <a href="https://github.com/stocnet/autograph/issues/67" class="external-link">#67</a>)
+<ul><li>Several results can be compared in one plot, e.g. <code>plot(failure = a, attack = b)</code>
+</li>
+<li>A dashed line shows the most robust case, where R = 0.5</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="data-1-2-9">Data<a class="anchor" aria-label="anchor" href="#data-1-2-9"></a></h3>
+<ul><li>Added <code>res_netrics_robust</code>, precooked ‘netrics’ robustness results</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.8" id="autograph-128">autograph 1.2.8<a class="anchor" aria-label="anchor" href="#autograph-128"></a></h2><p class="text-muted">CRAN release: 2026-10-30</p>
 <div class="section level3">
 <h3 id="plotting-1-2-8">Plotting<a class="anchor" aria-label="anchor" href="#plotting-1-2-8"></a></h3>
 <ul><li>Added <code><a href="../reference/model_mrqap.html">plot.netreg()</a></code> for MRQAP results from <code>infernet::net_regression()</code> (closes <a href="https://github.com/stocnet/autograph/issues/68" class="external-link">#68</a>)</li>
