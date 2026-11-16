@@ -55,7 +55,7 @@
 
 ## Layouts
 
-- Improved "lineage" layouts ranked by a time variable as historiographs (closing #72)
+- Improved "lineage" layouts ranked by a time variable as historiographs (closes #72)
   - Added a time axis, e.g. `graphr(x, layout = "lineage", ranks = "year")`
   - Added curved ties with arrowheads at the cited node
   - Improved node positions so that no tie runs through a node it does not join, unless they form a chain

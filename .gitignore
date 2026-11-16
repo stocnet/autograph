@@ -20,3 +20,5 @@ cache/*
 .positai
 CLAUDE.md
 Rplots.pdf
+*-Ex.R
+*.Rcheck/

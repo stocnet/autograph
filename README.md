@@ -51,12 +51,29 @@ it comes to visualisation:
 `{autograph}` aims to solve these problems by providing automatic graph
 drawing for networks in any of the `{manynet}` formats, and automatic
 plotting for results from `{stocnet}` packages, including `{migraph}`,
-`{RSiena}`, and `{MoNAn}`, and more.
+`{RSiena}`, `{MoNAn}`, and `{goldfish}`, as well as for the diffusion,
+opinion, and mobility simulations in `{manynet}`.
 
 All you need to do is install the package (loading it last will make
 sure its plotting methods are the default), use `set_stocnet_theme()`
 (once) to set your preferred theme, and then use `graphr()` to graph
 your networks, or `plot()` to plot your results. That’s it!
+
+- [Design principles](#design-principles)
+- [Drawing graphs](#drawing-graphs)
+  - [More options](#more-options)
+  - [More layouts](#more-layouts)
+  - [More networks](#more-networks)
+  - [More time](#more-time)
+- [Generating plots](#generating-plots)
+  - [Plotting simulations](#plotting-simulations)
+  - [Setting a theme](#setting-a-theme)
+  - [Colours everyone can read](#colours-everyone-can-read)
+- [Installation](#installation)
+  - [Stable](#stable)
+  - [Development](#development)
+  - [Other sources](#other-sources)
+- [Funding details](#funding-details)
 
 ## Design principles
 
@@ -147,6 +164,12 @@ coordinates, or for snapping these layouts to a grid.
 
 <img src="https://www.jameshollway.com/post/autograph/README-more-layouts-1.png" alt="Graphs illustrating different layouts"/>
 
+A “lineage” layout ranked by a time variable draws a network of
+citations or descent as a historiograph: each work sits at its own year
+along a time axis, and curved ties point to the work cited.
+
+<img src="https://www.jameshollway.com/post/autograph/README-lineage-1.png" alt="Graph of a citation network drawn as a historiograph, with each work placed at its year"/>
+
 ### More networks
 
 The second graph drawing function included, `graphs()`, is used to graph
@@ -217,6 +240,17 @@ examples, using goodness-of-fit results from fitting a SAOM in
 model are similar; this is just for illustrative purposes.)
 
 <img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-1.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/><img src="https://www.jameshollway.com/post/autograph/README-siena-ergm-gof-2.png" alt="Goodness-of-fit plots for a SAOM fitted in RSiena and an ERGM fitted in ergm"/>
+
+### Plotting simulations
+
+`plot()` also draws the simulations that `{manynet}` runs on a network.
+A diffusion shows the share of nodes in each compartment at each step,
+an opinion model shows how each node’s opinion moves towards consensus,
+with stubborn nodes marked, and a mobility model shows who occupies each
+place at each step, with the moves outlined and the dissatisfied
+occupants counted in the margin.
+
+<img src="https://www.jameshollway.com/post/autograph/README-simulations-1.png" alt="Plots of a diffusion, an opinion model, and a mobility model simulated on networks"/>
 
 ### Setting a theme
 
