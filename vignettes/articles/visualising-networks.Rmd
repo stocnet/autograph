@@ -1449,7 +1449,7 @@ Where a force-directed layout obscures this ordering,
 **Draw the parent ties among the characters of Westeros.**
 
 ```{r thrones-default, fig.width=9, fig.height=6}
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 graphr(thrones)
 ```
 
@@ -1463,7 +1463,7 @@ and `check_span()` reports how many rows each tie crosses,
 so you can measure the difference.
 
 ```{r thrones-ranks}
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 spans <- sapply(c("generation", "compact", "tight"), function(r) {
   span <- check_span(graphr(thrones, ranks = r))
   c(total = attr(span, "total"), `over one row` = mean(span > 1), max = max(span))
@@ -1486,7 +1486,7 @@ and the `alignment` argument chooses the rule.
 **Compare the two alignments.**
 
 ```{r thrones-alignment}
-thrones <- to_uniplex(fict_thrones, "parent")
+thrones <- to_layer(fict_thrones, "parent")
 c(straight = attr(check_offset(graphr(thrones)), "mean"),
   rungs = attr(check_offset(graphr(thrones, alignment = "rungs")), "mean"))
 ```
